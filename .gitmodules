@@ -1,0 +1,3 @@
+[submodule "getoptnet"]
+	path = getoptnet
+	url = https://github.com/nmaier/getoptnet.git
