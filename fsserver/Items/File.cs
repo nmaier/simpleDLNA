@@ -11,6 +11,7 @@ namespace NMaier.sdlna.FileMediaServer
     private string id;
     private readonly MediaTypes mediaType;
     private IMediaFolder parent;
+    private readonly string title;
     private readonly DlnaTypes type;
 
 
@@ -23,6 +24,11 @@ namespace NMaier.sdlna.FileMediaServer
       var ext = file.Extension.ToLower().Substring(1);
       type = DlnaMaps.Ext2Dlna[ext];
       mediaType = DlnaMaps.Ext2Media[ext];
+
+      title = System.IO.Path.GetFileNameWithoutExtension(file.Name);
+      if (string.IsNullOrEmpty(title)) {
+        title = file.Name;
+      }
     }
 
 
@@ -79,7 +85,7 @@ namespace NMaier.sdlna.FileMediaServer
 
     public string Title
     {
-      get { return file.Name; }
+      get { return title; }
     }
 
     public DlnaTypes Type

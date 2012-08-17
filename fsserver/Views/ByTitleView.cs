@@ -46,6 +46,9 @@ namespace NMaier.sdlna.FileMediaServer
 
       foreach (var c in folder.ChildItems.ToList()) {
         var pre = regClean.Replace(c.Title, "");
+        if (string.IsNullOrEmpty(pre)) {
+          pre = "Unnamed";
+        }
         pre = pre.First().ToString().ToUpper();
         IFileServerFolder dest;
         if (!titles.TryGetValue(pre, out dest)) {
