@@ -1,9 +1,12 @@
-sdlna - A simple, zero-config DLNA media server
+sdlna
 ===
+A simple, zero-config DLNA media server, that you can just fire up and be done with it.
 
-Looking for a simple DLNA server that I could just fire up on some directory, watch some files on my TV and then be done with it, I came up empty. There are some decent servers out there, like Serviio and friends, but none that fits my requirements. Also there wasn't really a decent enough and uncomplicated enough open source implementation that I could borrow. The Coherence python project seemed to be a good starting point, but was already to complex for what I was trying to achieve. Also, python dealing with unicode paths on Windows pretty much sucks.
+Movivation
+---
+Looking for a simple DLNA server that I could just fire up on some directory, watch some files on my TV and then be done with it, I came up empty. There are some decent servers out there, like Serviio and friends, but none that fits my requirements. Also there wasn't really a decent enough and uncomplicated enough open source implementation that I could borrow. The Coherence python project seemed to be a good starting point, but was already to complex for what I was trying to achieve. Also, python dealing with unicode paths on Windows pretty much sucks. Then there is Mono.UPnP, which didn't really work, and the Intel(?) Developer Tools for UPnP, which seemed kinda nice at first, but turned out to be coming straight out of over-engineering hell, in my humble opinion.
 
-And so I decided to write my own server, borrowing some ideas from Coherence, and reverse engineering the various protocols involved (yuck, SOAP :p) by watching my TV interact with Coherence and Serviio under Wireshark.
+And so I decided to write my own server, borrowing some ideas from Coherence, reading some of the UPnP specs and reverse engineering the various protocols involved (yuck, SOAP :p) by watching my TV interact with Coherence and Serviio under Wireshark.
 
 Features
 ---
@@ -33,6 +36,7 @@ Run requirements
 * File system and networking :p
 * Some DLNA renderer (e.g. TV) to actually use display the served media.
  * Tested with: Samsung C-Series TV, Kinsky
+
 External dependencies
 ---
 
