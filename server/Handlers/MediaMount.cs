@@ -8,6 +8,7 @@ namespace NMaier.sdlna.Server
 {
   internal class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
+    private static uint mount = 0;
 
     private readonly string baseURI;
     private readonly string descriptor;
@@ -27,7 +28,7 @@ namespace NMaier.sdlna.Server
     {
       server = aServer;
       baseURI = aBaseURI;
-      prefix = String.Format("/{0}/", server.UUID);
+      prefix = String.Format("/mm-{0}/", ++mount);
       descriptor = GenerateDescriptor();
       if (server is IVolatileMediaServer) {
         (server as IVolatileMediaServer).Changed += ChangedServer;

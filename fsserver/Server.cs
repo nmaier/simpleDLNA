@@ -14,6 +14,7 @@ namespace NMaier.sdlna.FileMediaServer
     private bool descending = false;
     private readonly DirectoryInfo directory;
     private readonly string friendlyName;
+    private static readonly Random idGen = new Random();
     private readonly Dictionary<string, IMediaItem> ids = new Dictionary<string, IMediaItem>();
     private readonly Dictionary<string, string> paths = new Dictionary<string, string>();
     private IMediaFolder root;
@@ -133,7 +134,8 @@ namespace NMaier.sdlna.FileMediaServer
       var path = item.Path;
       string id;
       if (!paths.ContainsKey(path)) {
-        id = Guid.NewGuid().ToString();
+        while (ids.ContainsKey(id = idGen.Next(1000, int.MaxValue).ToString()))
+          ;
         paths[id] = path;
       }
       else {
