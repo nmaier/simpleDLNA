@@ -147,11 +147,14 @@ namespace NMaier.sdlna.Server
 
     internal void RegisterNotification(Guid UUID, Uri Descriptor)
     {
-      var list = new List<UpnpDevice>();
+      List<UpnpDevice> list;
+      if (!devices.TryGetValue(UUID, out list)) {
+        devices.Add(UUID, list = new List<UpnpDevice>());
+      }
       foreach (var t in new string[] { "upnp:rootdevice", "urn:schemas-upnp-org:device:MediaServer:1", "urn:schemas-upnp-org:service:ContentDirectory:1", "uuid:" + UUID.ToString() }) {
         list.Add(new UpnpDevice(UUID, t, Descriptor));
       }
-      devices[UUID] = list;
+
       NotifyAll();
       DebugFormat("Registered mount {0}", UUID);
     }

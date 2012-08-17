@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Text;
 using System.Timers;
 
 namespace NMaier.sdlna.Server
@@ -12,18 +12,19 @@ namespace NMaier.sdlna.Server
   public class HttpServer : Logging, IDisposable
   {
 
-    private Dictionary<HttpClient, DateTime> clients = new Dictionary<HttpClient, DateTime>();
-    private TcpListener listener = new TcpListener(new IPEndPoint(IPAddress.Any, 0));
-    private Dictionary<string, IPrefixHandler> prefixes = new Dictionary<string, IPrefixHandler>();
-    private Dictionary<Guid, MediaMount> servers = new Dictionary<Guid, MediaMount>();
-    public static string SERVER_SIGNATURE = GenerateServerSignature();
+    private readonly Dictionary<HttpClient, DateTime> clients = new Dictionary<HttpClient, DateTime>();
+    private readonly TcpListener listener;
+    private readonly Dictionary<string, IPrefixHandler> prefixes = new Dictionary<string, IPrefixHandler>();
+    public static readonly string SERVER_SIGNATURE = GenerateServerSignature();
+    private readonly Dictionary<Guid, MediaMount> servers = new Dictionary<Guid, MediaMount>();
     private readonly SSDPServer ssdpServer;
     private readonly Timer timeouter = new Timer(100000);
 
 
 
-    public HttpServer()
+    public HttpServer(int port = 0)
     {
+      listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
       ssdpServer = new SSDPServer(this);
       timeouter.Elapsed += TimeouterCallback;
       timeouter.Enabled = true;
@@ -62,25 +63,6 @@ namespace NMaier.sdlna.Server
       ssdpServer.Dispose();
     }
 
-    internal void RegisterHandler(IPrefixHandler handler)
-    {
-      if (handler == null) {
-        throw new ArgumentNullException();
-      }
-      var prefix = handler.Prefix;
-      if (!prefix.StartsWith("/")) {
-        throw new ArgumentException("Invalid prefix; must start with /");
-      }
-      if (!prefix.EndsWith("/")) {
-        throw new ArgumentException("Invalid prefix; must end with /");
-      }
-      if (FindHandler(prefix) != null) {
-        throw new ArgumentException("Invalid prefix; already taken /");
-      }
-      prefixes.Add(prefix, handler);
-      DebugFormat("Registered Handler for {0}", prefix);
-    }
-
     public void RegisterMediaServer(IMediaServer aServer)
     {
       var guid = aServer.UUID;
@@ -89,22 +71,30 @@ namespace NMaier.sdlna.Server
       }
 
       var end = listener.LocalEndpoint as IPEndPoint;
-      var baseURI = String.Format("http://{0}:{1}", GetIP(), end.Port);
-      var mount = new MediaMount(aServer, baseURI);
+      var mount = new MediaMount(aServer);
       servers[guid] = mount;
       RegisterHandler(mount);
 
+      try {
 
-      var uri = new Uri(String.Format("{0}{1}", baseURI, mount.DescriptorURI));
-      ssdpServer.RegisterNotification(guid, uri);
-      InfoFormat("Registered Media Server {0}", aServer.UUID);
-      InfoFormat("New mount at: {0}", uri);
-    }
-
-    internal void UnregisterHandler(IPrefixHandler handler)
-    {
-      prefixes.Remove(handler.Prefix);
-      DebugFormat("Unregistered Handler for {0}", handler.Prefix);
+        foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces()) {
+          foreach (var uni in adapter.GetIPProperties().UnicastAddresses) {
+            var address = uni.Address;
+            if (address.AddressFamily != AddressFamily.InterNetwork || IPAddress.IsLoopback(address)) {
+              continue;
+            }
+            var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
+            ssdpServer.RegisterNotification(guid, uri);
+            InfoFormat("New mount at: {0}", uri);
+          }
+        }
+      }
+      catch (Exception ex) {
+        Error("Failed to retrieve IP addresses the usual way, falling back to naive mode", ex);
+        var uri = new Uri(string.Format("http://{0}:{1}{2}", GetIP(), end.Port, mount.DescriptorURI));
+        ssdpServer.RegisterNotification(guid, uri);
+        InfoFormat("New naive mount at: {0}", uri);
+      }
     }
 
     public void UnregisterMediaServer(IMediaServer aServer)
@@ -113,8 +103,7 @@ namespace NMaier.sdlna.Server
       if (!servers.TryGetValue(aServer.UUID, out mount)) {
         return;
       }
-      var end = listener.LocalEndpoint as IPEndPoint;
-      var uri = new Uri(String.Format("http://{0}:{1}{2}", GetIP(), end.Port, mount.DescriptorURI));
+
       ssdpServer.UnregisterNotification(aServer.UUID);
       UnregisterHandler(mount);
       servers.Remove(aServer.UUID);
@@ -198,12 +187,37 @@ namespace NMaier.sdlna.Server
       return null;
     }
 
+    internal void RegisterHandler(IPrefixHandler handler)
+    {
+      if (handler == null) {
+        throw new ArgumentNullException();
+      }
+      var prefix = handler.Prefix;
+      if (!prefix.StartsWith("/")) {
+        throw new ArgumentException("Invalid prefix; must start with /");
+      }
+      if (!prefix.EndsWith("/")) {
+        throw new ArgumentException("Invalid prefix; must end with /");
+      }
+      if (FindHandler(prefix) != null) {
+        throw new ArgumentException("Invalid prefix; already taken /");
+      }
+      prefixes.Add(prefix, handler);
+      DebugFormat("Registered Handler for {0}", prefix);
+    }
+
     internal void RemoveClient(HttpClient client)
     {
       if (!clients.ContainsKey(client)) {
         return;
       }
       clients.Remove(client);
+    }
+
+    internal void UnregisterHandler(IPrefixHandler handler)
+    {
+      prefixes.Remove(handler.Prefix);
+      DebugFormat("Unregistered Handler for {0}", handler.Prefix);
     }
   }
 }

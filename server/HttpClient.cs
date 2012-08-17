@@ -50,8 +50,6 @@ namespace NMaier.sdlna.Server
       get { return body; }
     }
 
-    public IPEndPoint Endpoint { get { return client.Client.RemoteEndPoint as IPEndPoint; } }
-
     public IHeaders Headers
     {
       get { return headers; }
@@ -66,6 +64,11 @@ namespace NMaier.sdlna.Server
       }
     }
 
+    public IPEndPoint LocalEndPoint
+    {
+      get { return client.Client.LocalEndPoint as IPEndPoint; }
+    }
+
     public string Method
     {
       get { return method; }
@@ -74,6 +77,11 @@ namespace NMaier.sdlna.Server
     public string Path
     {
       get { return path; }
+    }
+
+    public IPEndPoint RemoteEndpoint
+    {
+      get { return client.Client.RemoteEndPoint as IPEndPoint; }
     }
 
 
@@ -86,7 +94,7 @@ namespace NMaier.sdlna.Server
 
     public override string ToString()
     {
-      return Endpoint.ToString();
+      return RemoteEndpoint.ToString();
     }
 
     private void Read()

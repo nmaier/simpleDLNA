@@ -8,10 +8,9 @@ namespace NMaier.sdlna.Server
 {
   internal class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
-    private static uint mount = 0;
 
-    private readonly string baseURI;
     private readonly string descriptor;
+    private static uint mount = 0;
     private const string NS_CD = "urn:schemas-upnp-org:service:ContentDirectory:1";
     private const string NS_DC = "http://purl.org/dc/elements/1.1/";
     private const string NS_DIDL = "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/";
@@ -24,10 +23,9 @@ namespace NMaier.sdlna.Server
 
 
 
-    public MediaMount(IMediaServer aServer, string aBaseURI)
+    public MediaMount(IMediaServer aServer)
     {
       server = aServer;
-      baseURI = aBaseURI;
       prefix = String.Format("/mm-{0}/", ++mount);
       descriptor = GenerateDescriptor();
       if (server is IVolatileMediaServer) {
@@ -127,7 +125,7 @@ namespace NMaier.sdlna.Server
       result.DocumentElement.AppendChild(container);
     }
 
-    private void AddItem(XmlDocument result, IMediaResource r)
+    private void AddItem(IRequest request, XmlDocument result, IMediaResource r)
     {
       var meta = r as IMediaItemMetaData;
       var item = result.CreateElement("", "item", NS_DIDL);
@@ -158,7 +156,13 @@ namespace NMaier.sdlna.Server
       item.AppendChild(objectClass);
 
       var res = result.CreateElement("", "res", NS_DIDL);
-      res.InnerText = baseURI + prefix + "file/" + r.ID;
+      res.InnerText = String.Format(
+        "http://{0}:{1}{2}file/{3}",
+        request.LocalEndPoint.Address,
+        request.LocalEndPoint.Port,
+        prefix,
+        r.ID
+        );
 
       if (meta != null) {
         res.SetAttribute("size", meta.ItemSize.ToString());
@@ -174,7 +178,13 @@ namespace NMaier.sdlna.Server
       if (r is IMediaCover) {
         var c = (r as IMediaCover).Cover;
         if (c != null) {
-          var curl = baseURI + prefix + "cover/" + r.ID;
+          var curl = String.Format(
+            "http://{0}:{1}{2}cover/{3}",
+            request.LocalEndPoint.Address,
+            request.LocalEndPoint.Port,
+            prefix,
+            r.ID
+            );
           var icon = result.CreateElement("upnp", "albumArtURI", NS_UPNP);
           icon.SetAttribute("dlna:profileID", "JPEG_TN");
           icon.InnerText = curl;
@@ -224,7 +234,7 @@ namespace NMaier.sdlna.Server
       return doc.OuterXml;
     }
 
-    private IEnumerable<KeyValuePair<string, string>> HandleBrowse(IHeaders sparams)
+    private IEnumerable<KeyValuePair<string, string>> HandleBrowse(IRequest request, IHeaders sparams)
     {
       string id = sparams["ObjectID"];
       string flag = sparams["BrowseFlag"];
@@ -273,7 +283,7 @@ namespace NMaier.sdlna.Server
               start--;
               continue;
             }
-            AddItem(result, i);
+            AddItem(request, result, i);
             if (++provided == requested) {
               break;
             }
@@ -341,7 +351,7 @@ namespace NMaier.sdlna.Server
             result = HandleGetSystemUpdateID(sparams);
             break;
           case "Browse":
-            result = HandleBrowse(sparams);
+            result = HandleBrowse(request, sparams);
             break;
           default:
             throw new Http404Exception();

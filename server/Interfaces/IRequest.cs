@@ -7,12 +7,14 @@ namespace NMaier.sdlna.Server
 
     string Body { get; }
 
-    IPEndPoint Endpoint { get; }
-
     IHeaders Headers { get; }
+
+    IPEndPoint LocalEndPoint { get; }
 
     string Method { get; }
 
     string Path { get; }
+
+    IPEndPoint RemoteEndpoint { get; }
   }
 }

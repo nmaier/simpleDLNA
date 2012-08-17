@@ -112,7 +112,7 @@ namespace NMaier.sdlna
         }
         repo.Threshold = level;
 
-        HttpServer server = new HttpServer();
+        HttpServer server = new HttpServer(options.Port);
         server.Info("CTRL-C to terminate");
 
         MediaTypes types = options.Types[0];
@@ -172,6 +172,8 @@ namespace NMaier.sdlna
     [GetOptOptions(AcceptPrefixType = ArgumentPrefixType.Dashes)]
     private class Options : GetOpt
     {
+      private int port = 0;
+
       [Parameters(HelpVar = "Directory")]
       public DirectoryInfo[] Directories = new DirectoryInfo[] { new DirectoryInfo(".") };
 
@@ -219,6 +221,21 @@ namespace NMaier.sdlna
       [ShortArgument('d')]
       [FlagArgument(true)]
       public bool DescendingOrder = false;
+
+      [Argument("port", Helpvar = "port", Helptext = "Webserver listen port (default: 0, bind an available port)")]
+      [ShortArgument('p')]
+      public int Port
+      {
+        get { return port; }
+        set
+        {
+          if (value != 0 && (value < 1 || value > ushort.MaxValue)) {
+            throw new GetOptException("Port must be between 2 and " + ushort.MaxValue.ToString());
+          }
+          port = value;
+        }
+      }
+
     }
   }
 }
