@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetOptNet", "getoptnet\GetO
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "thumbs", "thumbs\thumbs.csproj", "{EF29F98A-B8B6-4591-BA29-E71BCC308E98}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{6DC5FC07-7263-495D-889A-A0F9AEE5442D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,5 +42,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ABF98F9F-CF28-4242-9459-B10AAA00E305} = {6DC5FC07-7263-495D-889A-A0F9AEE5442D}
 	EndGlobalSection
 EndGlobal
