@@ -1,5 +1,5 @@
+packages/
 */bin
 */obj
 *.suo
 *.user
-log4net
