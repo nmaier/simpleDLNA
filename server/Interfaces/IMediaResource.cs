@@ -8,6 +8,8 @@ namespace NMaier.sdlna.Server
     Stream Content { get; }
 
     string PN { get; }
+    MediaTypes MediaType { get; }
+
 
     DlnaTypes Type { get; }
   }

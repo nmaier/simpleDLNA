@@ -67,6 +67,11 @@ namespace NMaier.sdlna.FileMediaServer
       get { return file.Length; }
     }
 
+    public MediaTypes MediaType
+    {
+      get { return mediaType; }
+    }
+
     public IMediaFolder Parent
     {
       get { return parent; }

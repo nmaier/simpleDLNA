@@ -147,11 +147,18 @@ namespace NMaier.sdlna.Server
       }
 
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
-      if (r.Type == DlnaTypes.JPEG) {
-        objectClass.InnerText = "object.item.imageItem.photo";
-      }
-      else {
-        objectClass.InnerText = "object.item.videoItem";
+      switch (r.MediaType) {
+        case MediaTypes.VIDEO:
+          objectClass.InnerText = "object.item.videoItem";
+          break;
+        case MediaTypes.IMAGE:
+          objectClass.InnerText = "object.item.imageItem.photo";
+          break;
+        case MediaTypes.AUDIO:
+          objectClass.InnerText = "object.item.audioItem";
+          break;
+        default:
+          throw new NotSupportedException();
       }
       item.AppendChild(objectClass);
 

@@ -42,6 +42,11 @@ namespace NMaier.sdlna.FileMediaServer
       get { throw new NotImplementedException(); }
     }
 
+    public MediaTypes MediaType
+    {
+      get { return MediaTypes.IMAGE; }
+    }
+
     public IMediaFolder Parent
     {
       get { throw new NotImplementedException(); }
