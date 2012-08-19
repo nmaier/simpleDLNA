@@ -10,6 +10,6 @@ namespace NMaier.sdlna.Thumbnails
 
 
 
-    MemoryStream GetThumbnail(object item, int width, int height);
+    MemoryStream GetThumbnail(object item, ref int width, ref int height);
   }
 }

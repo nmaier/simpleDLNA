@@ -33,18 +33,18 @@ namespace NMaier.sdlna.Thumbnails
 
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    public MemoryStream GetThumbnail(object item, int width, int height)
+    public MemoryStream GetThumbnail(object item, ref int width, ref int height)
     {
       if (item is Stream) {
-        return GetThumbnailInternal(item as Stream, width, height);
+        return GetThumbnailInternal(item as Stream, ref width, ref height);
       }
       if (item is FileInfo) {
-        return GetThumbnailInternal(item as FileInfo, width, height);
+        return GetThumbnailInternal(item as FileInfo, ref width, ref height);
       }
       throw new NotSupportedException();
     }
 
-    private MemoryStream GetThumbnailFromProcess(Process p, int width, int height)
+    private MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
     {
       Debug("Starting ffmpeg");
       using (var req = new ReadRequest(p, p.StandardOutput.BaseStream)) {
@@ -61,7 +61,7 @@ namespace NMaier.sdlna.Thumbnails
         Debug("Done ffmpeg");
 
         using (var img = Image.FromStream(req.OutStream)) {
-          using (var scaled = Thumbnailer.ResizeImage(img, width, height)) {
+          using (var scaled = Thumbnailer.ResizeImage(img, ref width, ref height)) {
             var rv = new MemoryStream();
             scaled.Save(rv, ImageFormat.Jpeg);
             return rv;
@@ -70,7 +70,7 @@ namespace NMaier.sdlna.Thumbnails
       }
     }
 
-    private MemoryStream GetThumbnailInternal(Stream stream, int width, int height)
+    private MemoryStream GetThumbnailInternal(Stream stream, ref int width, ref int height)
     {
       using (var p = new Process()) {
         long pos = 20;
@@ -105,13 +105,13 @@ namespace NMaier.sdlna.Thumbnails
 
         using (var pump = new WriteRequest(p, stream, p.StandardInput.BaseStream)) {
           pump.Write();
-          return GetThumbnailFromProcess(p, width, height);
+          return GetThumbnailFromProcess(p, ref width, ref height);
         }
 
       }
     }
 
-    private MemoryStream GetThumbnailInternal(FileInfo file, int width, int height)
+    private MemoryStream GetThumbnailInternal(FileInfo file, ref int width, ref int height)
     {
       using (var p = new Process()) {
 
@@ -130,7 +130,7 @@ namespace NMaier.sdlna.Thumbnails
         sti.RedirectStandardOutput = true;
         p.Start();
 
-        return GetThumbnailFromProcess(p, width, height);
+        return GetThumbnailFromProcess(p, ref width, ref height);
       }
     }
 

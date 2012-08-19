@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using NMaier.sdlna.Server.Metadata;
 
 namespace NMaier.sdlna.Server
 {
@@ -16,10 +17,10 @@ namespace NMaier.sdlna.Server
     public ItemResponse(IRequest request, IMediaResource aItem, string transferMode = "Streaming")
     {
       item = aItem;
-      var meta = item as IMediaItemMetaData;
+      var meta = item as IMetaInfo;
       if (meta != null) {
-        headers.Add("Content-Length", meta.ItemSize.ToString());
-        headers.Add("Last-Modified", meta.ItemDate.ToString("R"));
+        headers.Add("Content-Length", meta.Size.ToString());
+        headers.Add("Last-Modified", meta.Date.ToString("R"));
       }
       headers.Add("Accept-Ranges", "Bytes");
       headers.Add("Content-Type", DlnaMaps.Mime[item.Type]);

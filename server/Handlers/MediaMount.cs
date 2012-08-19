@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Xml;
-using System.Collections.Generic;
+using NMaier.sdlna.Server.Metadata;
 
 namespace NMaier.sdlna.Server
 {
@@ -97,7 +98,7 @@ namespace NMaier.sdlna.Server
 
     private void AddFolder(XmlDocument result, IMediaFolder f)
     {
-      var meta = f as IMediaItemMetaData;
+      var meta = f as IMetaInfo;
       var container = result.CreateElement("", "container", NS_DIDL);
       container.SetAttribute("restricted", "0");
       container.SetAttribute("childCount", f.ChildCount.ToString());
@@ -113,9 +114,9 @@ namespace NMaier.sdlna.Server
       var title = result.CreateElement("dc", "title", NS_DC);
       title.InnerText = f.Title;
       container.AppendChild(title);
-      if (meta != null) {
+      if (meta != null && meta.Date != null) {
         var date = result.CreateElement("dc", "date", NS_DC);
-        date.InnerText = meta.ItemDate.ToString("o");
+        date.InnerText = meta.Date.ToString("o");
         container.AppendChild(date);
       }
 
@@ -127,7 +128,6 @@ namespace NMaier.sdlna.Server
 
     private void AddItem(IRequest request, XmlDocument result, IMediaResource r)
     {
-      var meta = r as IMediaItemMetaData;
       var item = result.CreateElement("", "item", NS_DIDL);
       item.SetAttribute("restricted", "1");
       item.SetAttribute("id", r.ID);
@@ -137,30 +137,128 @@ namespace NMaier.sdlna.Server
       }
       item.SetAttribute("parentID", parent.ID);
 
-      var title = result.CreateElement("dc", "title", NS_DC);
-      title.InnerText = r.Title;
-      item.AppendChild(title);
-      if (meta != null) {
-        var date = result.CreateElement("dc", "date", NS_DC);
-        date.InnerText = meta.ItemDate.ToString("o");
-        item.AppendChild(date);
-      }
-
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
       switch (r.MediaType) {
         case MediaTypes.VIDEO:
-          objectClass.InnerText = "object.item.videoItem";
+          objectClass.InnerText = "object.item.videoItem.movie";
           break;
         case MediaTypes.IMAGE:
           objectClass.InnerText = "object.item.imageItem.photo";
           break;
         case MediaTypes.AUDIO:
-          objectClass.InnerText = "object.item.audioItem";
+          objectClass.InnerText = "object.item.audioItem.musicTrack";
           break;
         default:
           throw new NotSupportedException();
       }
       item.AppendChild(objectClass);
+      var meta = r as IMetaInfo;
+      if (meta != null && meta.Date != null) {
+        try {
+          var date = result.CreateElement("dc", "date", NS_DC);
+          date.InnerText = meta.Date.ToString("o");
+          item.AppendChild(date);
+        }
+        catch (Exception) { }
+      }
+      if (r is IMetaGenre) {
+        try {
+          var genre = (r as IMetaGenre).MetaGenre;
+          if (genre != null) {
+            var e = result.CreateElement("upnp", "genre", NS_UPNP);
+            e.InnerText = genre;
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
+      }
+      if (r is IMetaDescription) {
+        try {
+          var desc = (r as IMetaDescription).MetaDescription;
+          if (desc != null) {
+            var e = result.CreateElement("dc", "description", NS_DC);
+            e.InnerText = desc;
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
+      }
+      if (r is IMetaAudioItem) {
+        var mai = r as IMetaAudioItem;
+        try {
+          var artist = mai.MetaArtist;
+          if (artist != null) {
+            var e = result.CreateElement("upnp", "artist", NS_UPNP);
+            e.SetAttribute("role", "AlbumArtist");
+            e.InnerText = artist;
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
+        try {
+          var performer = mai.MetaPerformer;
+          if (performer != null) {
+            var e = result.CreateElement("upnp", "artist", NS_UPNP);
+            e.SetAttribute("role", "Performer");
+            e.InnerText = performer;
+            item.AppendChild(e);
+            e = result.CreateElement("dc", "creator", NS_DC);
+            e.InnerText = performer;
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
+
+        try {
+          if (mai.MetaAlbum != null) {
+            var e = result.CreateElement("upnp", "album", NS_UPNP);
+            e.InnerText = mai.MetaAlbum;
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
+      }
+
+      if (r is IMetaImageItem) {
+        try {
+          var creator = (r as IMetaImageItem).MetaCreator;
+          if (creator != null) {
+            var e = result.CreateElement("dc", "creator", NS_DC);
+            e.InnerText = creator;
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
+      }
+
+      if (r is IMetaVideoItem) {
+        var mvi = r as IMetaVideoItem;
+        try {
+          var director = mvi.MetaDirector;
+          if (director != null) {
+            var e = result.CreateElement("upnp", "director", NS_UPNP);
+            e.InnerText = director;
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
+
+        try {
+          var actors = mvi.MetaActors;
+          if (actors != null) {
+            foreach (var actor in actors) {
+              var e = result.CreateElement("upnp", "actor", NS_UPNP);
+              e.InnerText = actor;
+              item.AppendChild(e);
+            }
+          }
+        }
+        catch (Exception) { }
+      }
+
+      var title = result.CreateElement("dc", "title", NS_DC);
+      title.InnerText = r.Title;
+      item.AppendChild(title);
 
       var res = result.CreateElement("", "res", NS_DIDL);
       res.InnerText = String.Format(
@@ -172,8 +270,32 @@ namespace NMaier.sdlna.Server
         );
 
       if (meta != null) {
-        res.SetAttribute("size", meta.ItemSize.ToString());
+        try {
+          var size = meta.Size;
+          if (size.HasValue) {
+            res.SetAttribute("size", size.Value.ToString());
+          }
+        }
+        catch (Exception) { }
       }
+      if (r is IMetaResolution) {
+        try {
+          var metaRes = r as IMetaResolution;
+          res.SetAttribute("resolution", String.Format("{0}x{1}", metaRes.MetaWidth, metaRes.MetaHeight));
+        }
+        catch (Exception) { }
+      }
+      if (r is IMetaDuration) {
+        try {
+          var duration = (r as IMetaDuration).MetaDuration;
+          if (duration.HasValue) {
+            res.SetAttribute("duration", duration.Value.ToString("g"));
+          }
+        }
+        catch (Exception) { }
+      }
+
+
       var pn = r.PN;
       var mime = DlnaMaps.Mime[r.Type];
       res.SetAttribute("protocolInfo", String.Format(
@@ -183,8 +305,8 @@ namespace NMaier.sdlna.Server
       item.AppendChild(res);
 
       if (r is IMediaCover) {
-        var c = (r as IMediaCover).Cover;
-        if (c != null) {
+        try {
+          var c = (r as IMediaCover).Cover;
           var curl = String.Format(
             "http://{0}:{1}{2}cover/{3}",
             request.LocalEndPoint.Address,
@@ -193,11 +315,15 @@ namespace NMaier.sdlna.Server
             r.ID
             );
           var icon = result.CreateElement("upnp", "albumArtURI", NS_UPNP);
-          icon.SetAttribute("dlna:profileID", "JPEG_TN");
+          var profile = result.CreateAttribute("dlna", "profileID", NS_DLNA);
+          profile.InnerText = "JPEG_TN";
+          icon.SetAttributeNode(profile);
           icon.InnerText = curl;
           item.AppendChild(icon);
           icon = result.CreateElement("upnp", "icon", NS_UPNP);
-          icon.SetAttribute("dlna:profileID", "JPEG_TN");
+          profile = result.CreateAttribute("dlna", "profileID", NS_DLNA);
+          profile.InnerText = "JPEG_TN";
+          icon.SetAttributeNode(profile);
           icon.InnerText = curl;
           item.AppendChild(icon);
 
@@ -206,10 +332,18 @@ namespace NMaier.sdlna.Server
 
           pn = c.PN;
           mime = DlnaMaps.Mime[DlnaTypes.JPEG];
-          res.SetAttribute("resolution", "160x120");
+          var width = c.MetaWidth;
+          var height = c.MetaHeight;
+          if (width.HasValue && height.HasValue) {
+            res.SetAttribute("resolution", string.Format("{0}x{1}", width.Value, height.Value));
+          }
+          else {
+            res.SetAttribute("resolution", "200x200");
+          }
           res.SetAttribute("protocolInfo", "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=00;DLNA.ORG_CI=1;DLNA.ORG_FLAGS=00D00000000000000000000000000000");
           item.AppendChild(res);
         }
+        catch (Exception) { }
       }
       result.DocumentElement.AppendChild(item);
     }
@@ -297,9 +431,10 @@ namespace NMaier.sdlna.Server
           }
         }
       }
-
+      var resXML = result.OuterXml;
+      Debug(resXML);
       return new ResList() {
-        {"Result", result.OuterXml },
+        {"Result", resXML },
         {"NumberReturned", provided.ToString() },
         {"TotalMatches", root.ChildCount.ToString() },
         {"UpdateID", systemID.ToString() }

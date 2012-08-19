@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NMaier.sdlna.Server;
+using NMaier.sdlna.Server.Metadata;
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  class PlainFolder : AbstractFolder, IMediaItemMetaData
+  class PlainFolder : AbstractFolder, IMetaInfo
   {
 
     private readonly DirectoryInfo dir;
@@ -29,7 +30,7 @@ namespace NMaier.sdlna.FileMediaServer
         }
         foreach (var ext in i.Value) {
           files = files.Union(from f in dir.GetFiles("*." + ext)
-                              let m = new File(this, f)
+                              let m = File.GetFile(this, f)
                               select m as IFileServerResource);
         }
       }
@@ -44,14 +45,14 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    public DateTime ItemDate
+    public DateTime Date
     {
       get { return dir.LastWriteTimeUtc; }
     }
 
-    public long ItemSize
+    public long? Size
     {
-      get { throw new NotSupportedException(); }
+      get { return null; }
     }
 
     public override string Path

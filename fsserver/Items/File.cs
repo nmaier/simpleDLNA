@@ -1,13 +1,14 @@
+using System;
 using System.IO;
 using NMaier.sdlna.Server;
-using System;
+using NMaier.sdlna.Server.Metadata;
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  class File : IMediaResource, IFileServerResource, IMediaCover, IMediaItemMetaData
+  internal class File : Logging, IMediaResource, IFileServerResource, IMediaCover, IMetaInfo
   {
 
-    private readonly FileInfo file;
+    protected readonly FileInfo file;
     private string id;
     private readonly MediaTypes mediaType;
     private IMediaFolder parent;
@@ -16,14 +17,13 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    public File(IMediaFolder aParent, FileInfo aFile)
+    protected File(IMediaFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
       parent = aParent;
       file = aFile;
 
-      var ext = file.Extension.ToLower().Substring(1);
-      type = DlnaMaps.Ext2Dlna[ext];
-      mediaType = DlnaMaps.Ext2Media[ext];
+      type = aType;
+      mediaType = aMediaType;
 
       title = System.IO.Path.GetFileNameWithoutExtension(file.Name);
       if (string.IsNullOrEmpty(title)) {
@@ -46,25 +46,20 @@ namespace NMaier.sdlna.FileMediaServer
       }
     }
 
-    public IMediaResource Cover
+    public virtual IMediaCoverResource Cover
     {
       get { return new Cover(file); }
+    }
+
+    public DateTime Date
+    {
+      get { return file.LastWriteTimeUtc; }
     }
 
     public string ID
     {
       get { return id; }
       set { id = value; }
-    }
-
-    public DateTime ItemDate
-    {
-      get { return file.LastWriteTimeUtc; }
-    }
-
-    public long ItemSize
-    {
-      get { return file.Length; }
     }
 
     public MediaTypes MediaType
@@ -88,7 +83,12 @@ namespace NMaier.sdlna.FileMediaServer
       get { return DlnaMaps.PN[type]; }
     }
 
-    public string Title
+    public long? Size
+    {
+      get { return file.Length; }
+    }
+
+    public virtual string Title
     {
       get { return title; }
     }
@@ -104,6 +104,23 @@ namespace NMaier.sdlna.FileMediaServer
     public int CompareTo(IMediaItem other)
     {
       return Title.CompareTo(other.Title);
+    }
+
+    internal static File GetFile(IMediaFolder aParentFolder, FileInfo aFile)
+    {
+      var ext = aFile.Extension.ToLower().Substring(1);
+      var type = DlnaMaps.Ext2Dlna[ext];
+      var mediaType = DlnaMaps.Ext2Media[ext];
+      switch (mediaType) {
+        case MediaTypes.VIDEO:
+          return new VideoFile(aParentFolder, aFile, type);
+        case MediaTypes.AUDIO:
+          return new AudioFile(aParentFolder, aFile, type);
+        case MediaTypes.IMAGE:
+          return new ImageFile(aParentFolder, aFile, type);
+        default:
+          return new File(aParentFolder, aFile, type, mediaType);
+      }
     }
   }
 }

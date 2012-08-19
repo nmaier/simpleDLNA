@@ -11,7 +11,22 @@ namespace NMaier.sdlna.Thumbnails
   public class Thumbnailer : Logging
   {
 
-    private static readonly LRUCache<string, byte[]> cache = new LRUCache<string, byte[]>(1 << 11);
+    private class CacheItem
+    {
+      public readonly byte[] Data;
+      public readonly int Width;
+      public readonly int Height;
+
+      public CacheItem(byte[] aData, int aWidth, int aHeight)
+      {
+        Data = aData;
+        Width = aWidth;
+        Height = aHeight;
+      }
+    }
+
+
+    private static readonly LRUCache<string, CacheItem> cache = new LRUCache<string, CacheItem>(1 << 11);
     private static readonly Dictionary<MediaTypes, List<IThumbnailer>> thumbers = new Dictionary<MediaTypes, List<IThumbnailer>>();
 
 
@@ -49,43 +64,54 @@ namespace NMaier.sdlna.Thumbnails
 
 
 
-    public byte[] GetThumbnail(FileInfo file, int width, int height)
+    public byte[] GetThumbnail(FileInfo file, ref int width, ref int height)
     {
       var ext = file.Extension.ToLower().Substring(1);
       var mediaType = DlnaMaps.Ext2Media[ext];
 
       var key = file.FullName;
       byte[] rv;
-      if (GetThumbnailFromCache(ref key, width, height, out rv)) {
+      if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
         return rv;
       }
 
-      return GetThumbnailInternal(key, file, mediaType, width, height);
+      return GetThumbnailInternal(key, file, mediaType, ref width, ref height);
     }
 
-    public byte[] GetThumbnail(string key, MediaTypes type, Stream stream, int width, int height)
+    public byte[] GetThumbnail(string key, MediaTypes type, Stream stream, ref int width, ref int height)
     {
       byte[] rv;
-      if (GetThumbnailFromCache(ref key, width, height, out rv)) {
+      if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
         return rv;
       }
-      return GetThumbnailInternal(key, stream, type, width, height);
+      return GetThumbnailInternal(key, stream, type, ref width, ref height);
     }
 
-    private bool GetThumbnailFromCache(ref string key, int width, int height, out byte[] rv)
+    private bool GetThumbnailFromCache(ref string key, ref int width, ref int height, out byte[] rv)
     {
       key = string.Format("{0}x{1} {2}", width, height, key);
-      return cache.TryGetValue(key, out rv);
+      CacheItem ci;
+      if (cache.TryGetValue(key, out ci)) {
+        rv = ci.Data;
+        width = ci.Width;
+        height = ci.Height;
+        return true;
+      }
+      rv = null;
+      return false;
     }
 
-    private byte[] GetThumbnailInternal(string key, object item, MediaTypes type, int width, int height)
+    private byte[] GetThumbnailInternal(string key, object item, MediaTypes type, ref int width, ref int height)
     {
       var thumbnailers = thumbers[type];
+      var rw = width;
+      var rh = height;
       foreach (var thumber in thumbnailers) {
         try {
-          using (var i = thumber.GetThumbnail(item, width, height)) {
+          
+          using (var i = thumber.GetThumbnail(item, ref width, ref height)) {
             var rv = i.ToArray();
-            cache.Add(key, rv);
+            cache.Add(key, new CacheItem(rv, rw, rh));
             return rv;
           }
         }
@@ -97,7 +123,7 @@ namespace NMaier.sdlna.Thumbnails
       throw new ArgumentException("Not a supported resource");
     }
 
-    internal static Image ResizeImage(Image image, int width, int height)
+    internal static Image ResizeImage(Image image, ref int width, ref int height)
     {
       if (image.Width <= width && image.Height <= height) {
         return image;
@@ -126,6 +152,8 @@ namespace NMaier.sdlna.Thumbnails
         graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
         graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
         graphics.DrawImage(image, 0, 0, result.Width, result.Height);
+        width = result.Width;
+        height = result.Height;
       }
       return result;
     }

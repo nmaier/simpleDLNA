@@ -1,9 +1,10 @@
+using System;
 using System.IO;
 using System.Resources;
 
 namespace NMaier.sdlna.Server
 {
-  internal class ResourceResponse : IResponse
+  internal class ResourceResponse : Logging, IResponse
   {
 
     private readonly IHeaders headers = new ResponseHeaders();
@@ -16,10 +17,16 @@ namespace NMaier.sdlna.Server
     {
 
       status = aStatus;
-      resource = aResourceManager.GetObject(aResource) as byte[];
+      try {
+        resource = aResourceManager.GetObject(aResource) as byte[];
 
-      headers["Content-Type"] = type;
-      headers["Content-Length"] = resource.Length.ToString();
+        headers["Content-Type"] = type;
+        headers["Content-Length"] = resource.Length.ToString();
+      }
+      catch (Exception ex) {
+        Error("Failed to prepare resource " + aResource, ex);
+        throw;
+      }
     }
 
     public ResourceResponse(HttpCodes aStatus, string type, string aResource)

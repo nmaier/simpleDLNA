@@ -17,7 +17,7 @@ namespace NMaier.sdlna.Thumbnails
 
 
 
-    public MemoryStream GetThumbnail(object item, int width, int height)
+    public MemoryStream GetThumbnail(object item, ref int width, ref int height)
     {
       Image img = null;
       if (item is Stream) {
@@ -30,7 +30,7 @@ namespace NMaier.sdlna.Thumbnails
         throw new NotSupportedException();
       }
       using (img) {
-        using (var scaled = Thumbnailer.ResizeImage(img, width, height)) {
+        using (var scaled = Thumbnailer.ResizeImage(img, ref width, ref height)) {
           var rv = new MemoryStream();
           scaled.Save(rv, ImageFormat.Jpeg);
           return rv;

@@ -1,4 +1,5 @@
 using NMaier.sdlna.Server;
+using NMaier.sdlna.Server.Metadata;
 
 namespace NMaier.sdlna.FileMediaServer
 {
@@ -20,10 +21,10 @@ namespace NMaier.sdlna.FileMediaServer
 
     public override int Compare(IMediaItem x, IMediaItem y)
     {
-      var xm = x as IMediaItemMetaData;
-      var ym = y as IMediaItemMetaData;
-      if (xm != null && ym != null) {
-        var rv = xm.ItemSize.CompareTo(ym.ItemSize);
+      var xm = x as IMetaInfo;
+      var ym = y as IMetaInfo;
+      if (xm != null && ym != null && xm.Size.HasValue && ym.Size.HasValue) {
+        var rv = xm.Size.Value.CompareTo(ym.Size.Value);
         if (rv != 0) {
           return rv;
         }

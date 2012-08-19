@@ -39,14 +39,14 @@
 <width>48</width>
 <height>48</height>
 <depth>24</depth>
-<url>/icon/smallJPG</url>
+<url>/icon/smallJPEG</url>
 </icon>
 <icon>
 <mimetype>image/jpeg</mimetype>
 <width>120</width>
 <height>120</height>
 <depth>24</depth>
-<url>/icon/largeJPG</url>
+<url>/icon/largeJPEG</url>
 <mimetype>image/jpeg</mimetype>
 <width>120</width>
 <height>120</height>

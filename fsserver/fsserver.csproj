@@ -46,15 +46,22 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Xml" />
+    <Reference Include="taglib-sharp">
+      <HintPath>..\packages\taglib.2.1.0.0\lib\taglib-sharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Comparer\DateComparer.cs" />
     <Compile Include="Comparer\FileSizeComparer.cs" />
+    <Compile Include="Items\AudioFile.cs" />
+    <Compile Include="ByteVectorExtend.cs" />
     <Compile Include="Items\Cover.cs" />
     <Compile Include="Items\IFileServerFolder.cs" />
     <Compile Include="Comparer\IItemComparer.cs" />
     <Compile Include="Comparer\TitleComparer.cs" />
     <Compile Include="Items\IFileServerResource.cs" />
+    <Compile Include="Items\ImageFile.cs" />
+    <Compile Include="Items\VideoFile.cs" />
     <Compile Include="Repository\ComparerRepository.cs" />
     <Compile Include="Repository\IRepositoryItem.cs" />
     <Compile Include="Repository\Repository.cs" />

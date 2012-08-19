@@ -5,14 +5,23 @@ using NMaier.sdlna.Thumbnails;
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  internal class Cover : Logging, IMediaResource
+  internal class Cover : IMediaCoverResource
   {
 
     private byte[] _bytes;
     private readonly FileInfo file;
-    private static readonly Thumbnailer thumber = new Thumbnailer();
+    private int height = 240;
+    internal static readonly Thumbnailer thumber = new Thumbnailer();
+    private int width = 240;
 
 
+
+    internal Cover(byte[] aBytes, int aWidth, int aHeight)
+    {
+      _bytes = aBytes;
+      width = aWidth;
+      height = aHeight;
+    }
 
     public Cover(FileInfo aFile)
     {
@@ -26,7 +35,13 @@ namespace NMaier.sdlna.FileMediaServer
       get
       {
         if (_bytes == null) {
-          _bytes = thumber.GetThumbnail(file, 240, 240);
+          _bytes = thumber.GetThumbnail(file, ref width, ref height);
+          if (_bytes == null) {
+            _bytes = new byte[0];
+          }
+        }
+        if (_bytes.Length == 0) {
+          throw new NotSupportedException();
         }
         return _bytes;
       }
@@ -45,6 +60,16 @@ namespace NMaier.sdlna.FileMediaServer
     public MediaTypes MediaType
     {
       get { return MediaTypes.IMAGE; }
+    }
+
+    public uint? MetaHeight
+    {
+      get { return (uint)height; }
+    }
+
+    public uint? MetaWidth
+    {
+      get { return (uint)width; }
     }
 
     public IMediaFolder Parent

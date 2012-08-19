@@ -52,7 +52,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Handlers\ResList.cs" />
-    <Compile Include="Interfaces\IMediaItemMetaData.cs" />
+    <Compile Include="Interfaces\IMediaCoverResource.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaAudioItem.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaDescription.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaDuration.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaGenre.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaImageItem.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaInfo.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaResolution.cs" />
+    <Compile Include="Interfaces\Metadata\IMetaVideoItem.cs" />
     <Compile Include="Types\ConcatenatedStream.cs" />
     <Compile Include="Types\DlnaTypes.cs" />
     <Compile Include="Types\Headers.cs" />
@@ -108,6 +116,7 @@
     <None Include="Properties\smallPNG" />
     <None Include="sdlna.key.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
