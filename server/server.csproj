@@ -38,6 +38,7 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>sdlna.key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
@@ -107,16 +108,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Properties\contentdirectory" />
-    <None Include="Properties\description" />
-    <None Include="Properties\favicon" />
-    <None Include="Properties\largeJPEG" />
-    <None Include="Properties\largePNG" />
-    <None Include="Properties\smallJPEG" />
-    <None Include="Properties\smallPNG" />
+    <None Include="Resources\contentdirectory.xml" />
+    <None Include="Resources\description.xml" />
     <None Include="sdlna.key.snk" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\favicon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\large.jpg" />
+    <Content Include="Resources\large.png" />
+    <Content Include="Resources\small.jpg" />
+    <Content Include="Resources\small.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

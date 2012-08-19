@@ -12,7 +12,7 @@ namespace NMaier.sdlna.Server
     public IResponse HandleRequest(IRequest req)
     {
       var resource = req.Path.Substring(Prefix.Length);
-      var isPng = resource.IndexOf("PNG") != -1;
+      var isPng = resource.EndsWith(".png");
       return new ResourceResponse(HttpCodes.OK, isPng ? "image/png" : "image/jpeg", resource);
     }
   }

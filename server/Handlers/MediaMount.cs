@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using NMaier.sdlna.Server.Metadata;
+using System.IO;
 
 namespace NMaier.sdlna.Server
 {
@@ -33,8 +34,6 @@ namespace NMaier.sdlna.Server
         (server as IVolatileMediaServer).Changed += ChangedServer;
       }
     }
-
-
 
     public string DescriptorURI
     {
@@ -364,7 +363,7 @@ namespace NMaier.sdlna.Server
     private string GenerateDescriptor()
     {
       var doc = new XmlDocument();
-      doc.LoadXml(Encoding.UTF8.GetString(Properties.Resources.description));
+      doc.LoadXml(Properties.Resources.description);
       doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", UUID);
       doc.GetElementsByTagName("modelNumber").Item(0).InnerText = Assembly.GetExecutingAssembly().GetName().Version.ToString();
       doc.GetElementsByTagName("friendlyName").Item(0).InnerText = "sdlna — " + FriendlyName;

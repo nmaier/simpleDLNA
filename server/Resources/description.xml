@@ -20,39 +20,34 @@
 <serialNumber></serialNumber>
 
 <iconList>
-<icon>
-<mimetype>image/png</mimetype>
-<width>48</width>
-<height>48</height>
-<depth>24</depth>
-<url>/icon/smallPNG</url>
-</icon>
-<icon>
-<mimetype>image/png</mimetype>
-<width>120</width>
-<height>120</height>
-<depth>24</depth>
-<url>/icon/largePNG</url>
-</icon>
-<icon>
-<mimetype>image/jpeg</mimetype>
-<width>48</width>
-<height>48</height>
-<depth>24</depth>
-<url>/icon/smallJPEG</url>
-</icon>
-<icon>
-<mimetype>image/jpeg</mimetype>
-<width>120</width>
-<height>120</height>
-<depth>24</depth>
-<url>/icon/largeJPEG</url>
-<mimetype>image/jpeg</mimetype>
-<width>120</width>
-<height>120</height>
-<depth>24</depth>
-<url>/icon/largeJPG</url>
-</icon>
+  <icon>
+    <mimetype>image/jpeg</mimetype>
+    <width>48</width>
+    <height>48</height>
+    <depth>24</depth>
+    <url>/icon/smallJPEG</url>
+  </icon>
+  <icon>
+    <mimetype>image/png</mimetype>
+    <width>48</width>
+    <height>48</height>
+    <depth>24</depth>
+    <url>/icon/smallPNG</url>
+  </icon>
+  <icon>
+    <mimetype>image/png</mimetype>
+    <width>120</width>
+    <height>120</height>
+    <depth>24</depth>
+    <url>/icon/largePNG</url>
+  </icon>
+  <icon>
+    <mimetype>image/jpeg</mimetype>
+    <width>120</width>
+    <height>120</height>
+    <depth>24</depth>
+    <url>/icon/largeJPEG</url>
+  </icon>
 </iconList>
 <serviceList>
 <service>

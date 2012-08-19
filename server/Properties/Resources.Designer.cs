@@ -67,10 +67,26 @@ namespace NMaier.sdlna.Server.Properties {
             }
         }
         
-        internal static byte[] description {
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot;?&gt;
+        ///&lt;root xmlns=&quot;urn:schemas-upnp-org:device-1-0&quot; xmlns:dlna=&quot;urn:schemas-dlna-org:device-1-0&quot; xmlns:sec=&quot;http://www.sec.co.kr/dlna&quot;&gt;
+        ///&lt;specVersion&gt;
+        ///&lt;major&gt;1&lt;/major&gt;
+        ///&lt;minor&gt;0&lt;/minor&gt;
+        ///&lt;/specVersion&gt;
+        ///&lt;device&gt;
+        ///&lt;dlna:X_DLNACAP/&gt;
+        ///&lt;dlna:X_DLNADOC&gt;DMS-1.50&lt;/dlna:X_DLNADOC&gt;
+        ///&lt;UDN&gt;&lt;/UDN&gt;
+        ///&lt;dlna:X_DLNADOC&gt;M-DMS-1.50&lt;/dlna:X_DLNADOC&gt;
+        ///&lt;friendlyName/&gt;
+        ///&lt;deviceType&gt;urn:schemas-upnp-org:device:MediaServer:1&lt;/deviceType&gt;
+        ///&lt;manufacturer&gt;tn123.org&lt;/manufacturer&gt;
+        ///&lt;manufacturerURL&gt;https://tn123.org/&lt; [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string description {
             get {
-                object obj = ResourceManager.GetObject("description", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("description", resourceCulture);
             }
         }
         
