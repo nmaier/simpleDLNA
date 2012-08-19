@@ -384,11 +384,16 @@ namespace NMaier.sdlna.Server
       }
       Debug(id);
       Debug(flag);
-      uint requested = 20;
-      uint provided = 0, start = 0;
+      int requested = 20;
+      int provided = 0;
+      int start = 0;
       try {
-        uint.TryParse(sparams["RequestedCount"], out requested);
-        uint.TryParse(sparams["StartingIndex"], out start);
+        if (int.TryParse(sparams["RequestedCount"], out requested) && requested <= 0) {
+          requested = 20;
+        }
+        if (int.TryParse(sparams["StartingIndex"], out start) && start <= 0) {
+          start = 0;
+        }
       }
       catch (Exception ex) {
         Debug("Not all params provided", ex);
