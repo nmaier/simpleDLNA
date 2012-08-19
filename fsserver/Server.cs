@@ -129,6 +129,23 @@ namespace NMaier.sdlna.FileMediaServer
       Rescan();
     }
 
+    internal File GetFile(IFileServerFolder aParent, FileInfo aFile)
+    {
+      string key;
+      if (paths.TryGetValue(aFile.FullName, out key)) {
+        IMediaItem item;
+        if (ids.TryGetValue(key, out item) && item is File) {
+          var file = item as File;
+          if (file.Parent is IFileServerFolder) {
+            (file.Parent as IFileServerFolder).ReleaseItem(file);
+          }
+          file.Parent = aParent;
+          return file;
+        }
+      }
+      return File.GetFile(aParent, aFile);
+    }
+
     internal void RegisterPath(IFileServerMediaItem item)
     {
       var path = item.Path;
@@ -136,7 +153,7 @@ namespace NMaier.sdlna.FileMediaServer
       if (!paths.ContainsKey(path)) {
         while (ids.ContainsKey(id = idGen.Next(1000, int.MaxValue).ToString()))
           ;
-        paths[id] = path;
+        paths[path] = id;
       }
       else {
         id = paths[path];

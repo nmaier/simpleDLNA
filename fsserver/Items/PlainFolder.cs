@@ -30,7 +30,7 @@ namespace NMaier.sdlna.FileMediaServer
         }
         foreach (var ext in i.Value) {
           files = files.Union(from f in dir.GetFiles("*." + ext)
-                              let m = File.GetFile(this, f)
+                              let m = server.GetFile(this, f)
                               select m as IFileServerResource);
         }
       }
@@ -50,14 +50,14 @@ namespace NMaier.sdlna.FileMediaServer
       get { return dir.LastWriteTimeUtc; }
     }
 
-    public long? Size
-    {
-      get { return null; }
-    }
-
     public override string Path
     {
       get { return dir.FullName; }
+    }
+
+    public long? Size
+    {
+      get { return null; }
     }
 
     public override string Title
