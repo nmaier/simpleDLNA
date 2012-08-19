@@ -13,19 +13,20 @@ Features
 
 * Zero-config DLNA Server without peristant state
 * Written in C#, because .Net just works on Windows (and usually Mono), is fast, C-like and has a powerful and comprehensive stdlib. Maybe I port the thing to some other language that works better cross platform and doesn't suck like Java.
-* Thumbnailing support for images and - if ffmpeg is found in the search path - videos, using any stream as input.
+* Thumbnailing support for images and videos - if ffmpeg is found in the search path - videos, using any stream as input.
+* Meta data as provided by TagLib#
 * Serving of any and all file-system addressable  files, incl. some views (transformations)
 * Should be relatively easy to code up additional media sources, like podcasts
 
 Non-Features, maybe TODO
 ---
 
-* Audio - Didn't touch that yet
 * Media transcoding
  * Although it should be easy enough to come up with something based on ffmpeg and the various freely available image libraries
 * Full DLNA support - only browsing/playing supported at the moment
 * Complete SSDP support. Because SSDP makes me cringe, I stopped after getting the basics working
 * No Unit testing or test suite... Yeah, lazyness is your enemy
+* Microsoft WMP, while based on DLNA, won't accept media due to unimplemented MS specific commands. Same likely goes for an XBOX (which I don't own, so cannot test)
 * ...
 
 Run requirements
@@ -42,12 +43,15 @@ External dependencies
 
 * [log4net](http://logging.apache.org/log4net/)
 * [GetOptNet](https://github.com/nmaier/getoptnet)
+* [TagLib#](https://github.com/mono/taglib-sharp/)
+
+The external dependencies are checked into the git repository or referenced as a submodule.
 
 Design
 ---
 The thing wasn't formally design, but more written as I went along. However, the individual components are only loosely coupled and interact through some real, generic interfaces that allow for extensibility.
 
-Most of the IO is asynchronous, as per .Net `Stream.BeginRead/.BeginWrite`´. No forking (D'OH), no explicit thread management.
+Most of the IO is asynchronous, as per .Net `Stream.BeginRead/.BeginWrite`. No forking (D'OH), no explicit thread management.
 
 The structure is as follows:
 
