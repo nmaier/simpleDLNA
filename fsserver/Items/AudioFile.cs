@@ -2,10 +2,12 @@ using System;
 using System.IO;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
+using System.Runtime.Serialization;
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  internal class AudioFile : File, IMetaAudioItem
+  [Serializable]
+  internal class AudioFile : File, IMetaAudioItem, ISerializable
   {
 
     private string album;
@@ -20,9 +22,29 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    internal AudioFile(IMediaFolder aParent, FileInfo aFile, DlnaTypes aType)
+    internal AudioFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType)
       : base(aParent, aFile, aType, MediaTypes.AUDIO)
     {
+    }
+
+    protected AudioFile(SerializationInfo info, StreamingContext ctx) :
+      this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+    {
+      album = info.GetString("al");
+      artist = info.GetString("ar");
+      genre = info.GetString("g");
+      performer = info.GetString("p");
+      title = info.GetString("ti");
+      var ts = info.GetInt64("d");
+      if (ts > 0) {
+        duration = new TimeSpan(ts);
+      }
+      try {
+        cover = info.GetValue("c", typeof(Cover)) as Cover;
+      }
+      catch (SerializationException) { }
+
+      initialized = true;
     }
 
 
@@ -41,9 +63,6 @@ namespace NMaier.sdlna.FileMediaServer
       get
       {
         MaybeInit();
-        if (string.IsNullOrWhiteSpace(album)) {
-          throw new NotSupportedException();
-        }
         return album;
       }
     }
@@ -53,9 +72,6 @@ namespace NMaier.sdlna.FileMediaServer
       get
       {
         MaybeInit();
-        if (string.IsNullOrWhiteSpace(artist)) {
-          throw new NotSupportedException();
-        }
         return artist;
       }
     }
@@ -65,9 +81,6 @@ namespace NMaier.sdlna.FileMediaServer
       get
       {
         MaybeInit();
-        if (string.IsNullOrWhiteSpace(description)) {
-          throw new NotSupportedException();
-        }
         return description;
       }
     }
@@ -103,6 +116,7 @@ namespace NMaier.sdlna.FileMediaServer
     {
       get
       {
+        MaybeInit();
         if (!string.IsNullOrWhiteSpace(title)) {
           return title;
         }
@@ -113,6 +127,20 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      info.AddValue("ty", (Int32)Type);
+      info.AddValue("al", album);
+      info.AddValue("ar", artist);
+      info.AddValue("g", genre);
+      info.AddValue("p", performer);
+      info.AddValue("ti", title);
+      info.AddValue("d", duration.GetValueOrDefault(new TimeSpan(0)).Ticks);
+      if (cover != null) {
+        info.AddValue("c", cover, typeof(Cover));
+      }
+    }
+
     private void MaybeInit()
     {
       if (initialized) {
@@ -120,7 +148,7 @@ namespace NMaier.sdlna.FileMediaServer
       }
 
       try {
-        using (var tl = TagLib.File.Create(file.FullName)) {
+        using (var tl = TagLib.File.Create(Item.FullName)) {
           try {
             duration = tl.Properties.Duration;
             if (duration.HasValue && duration.Value.TotalSeconds < 0.1) {
@@ -193,14 +221,10 @@ namespace NMaier.sdlna.FileMediaServer
             }
             if (pic != null) {
               try {
-                int width = 240, height = 240;
-                var thumb = FileMediaServer.Cover.thumber.GetThumbnail(file.FullName, MediaTypes.IMAGE, pic.Data.ToStream(), ref width, ref height);
-                if (thumb != null) {
-                  cover = new Cover(thumb, width, height);
-                }
+                cover = new Cover(Item, pic.Data.ToStream());
               }
               catch (Exception ex) {
-                Debug("Failed to generate thumb for " + file.FullName, ex);
+                Debug("Failed to generate thumb for " + Item.FullName, ex);
               }
             }
           }
@@ -210,11 +234,13 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
       catch (TagLib.CorruptFileException ex) {
-        Debug("Failed to read metadata via taglib for file " + file.FullName, ex);
+        Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
       }
       catch (Exception ex) {
-        Warn("Unhandled exception reading metadata for file " + file.FullName, ex);
+        Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
+
+      Parent.Server.UpdateFileCache(this);
 
 
       initialized = true;

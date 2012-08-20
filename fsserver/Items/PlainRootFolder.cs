@@ -9,7 +9,7 @@ namespace NMaier.sdlna.FileMediaServer
     public PlainRootFolder(FileServer server, MediaTypes types, DirectoryInfo di)
       : base(server, types, null, di)
     {
-      id = "0";
+      ID = "0";
     }
   }
 }

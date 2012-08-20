@@ -142,6 +142,10 @@ namespace NMaier.sdlna
           }
           fs.DescendingOrder = options.DescendingOrder;
 
+          if (options.CacheFile != null) {
+            fs.SetCacheFile(options.CacheFile);
+          }
+
           fs.Load();
           server.RegisterMediaServer(fs);
           server.InfoFormat("{0} mounted", d.FullName);
@@ -221,6 +225,10 @@ namespace NMaier.sdlna
       [ShortArgument('d')]
       [FlagArgument(true)]
       public bool DescendingOrder = false;
+
+      [Argument("cache", Helpvar = "file", Helptext = "Cache file to use for storing meta data (default: none)")]
+      [ShortArgument('c')]
+      public FileInfo CacheFile = null;
 
       [Argument("port", Helpvar = "port", Helptext = "Webserver listen port (default: 0, bind an available port)")]
       [ShortArgument('p')]

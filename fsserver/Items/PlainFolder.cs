@@ -14,7 +14,7 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    public PlainFolder(FileServer server, MediaTypes types, IMediaFolder aParent, DirectoryInfo aDir)
+    public PlainFolder(FileServer server, MediaTypes types, IFileServerFolder aParent, DirectoryInfo aDir)
       : base(server, aParent)
     {
       dir = aDir;

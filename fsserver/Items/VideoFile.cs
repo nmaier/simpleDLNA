@@ -21,7 +21,7 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    internal VideoFile(IMediaFolder aParent, FileInfo aFile, DlnaTypes aType)
+    internal VideoFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType)
       : base(aParent, aFile, aType, MediaTypes.VIDEO)
     {
     }
@@ -115,7 +115,7 @@ namespace NMaier.sdlna.FileMediaServer
       }
 
       try {
-        using (var tl = TagLib.File.Create(file.FullName)) {
+        using (var tl = TagLib.File.Create(Item.FullName)) {
           try {
             duration = tl.Properties.Duration;
             if (duration.HasValue && duration.Value.TotalSeconds < 0.1) {
@@ -155,10 +155,10 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
       catch (TagLib.CorruptFileException ex) {
-        Debug("Failed to read metadata via taglib for file " + file.FullName, ex);
+        Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
       }
       catch (Exception ex) {
-        Warn("Unhandled exception reading metadata for file " + file.FullName, ex);
+        Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
 
 

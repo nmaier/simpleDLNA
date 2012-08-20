@@ -7,20 +7,26 @@ namespace NMaier.sdlna.FileMediaServer
   class VirtualFolder : AbstractFolder
   {
 
-    private readonly string name;
     private readonly string path = "virtual:" + Guid.NewGuid().ToString();
 
 
 
-    public VirtualFolder(FileServer server, IMediaFolder aParent, string aName)
+    public VirtualFolder(FileServer server, IFileServerFolder aParent, string aName)
       : base(server, aParent)
     {
-      name = aName;
+      Name = aName;
       childFolders = new List<IFileServerFolder>();
       childItems = new List<IFileServerResource>();
     }
 
+    public VirtualFolder() : this(null, null, null) { }
 
+
+
+    internal string Name {
+      get;
+      set;
+    }
 
     public override string Path
     {
@@ -29,7 +35,15 @@ namespace NMaier.sdlna.FileMediaServer
 
     public override string Title
     {
-      get { return name; }
+      get { return Name; }
+    }
+
+
+
+
+    public void Link(IFileServerResource r)
+    {
+      childItems.Add(r);
     }
   }
 }

@@ -7,7 +7,7 @@ namespace NMaier.sdlna.FileMediaServer
 
     new string ID { get; set; }
 
-    new IMediaFolder Parent { get; set; }
+    new IFileServerFolder Parent { get; set; }
 
     string Path { get; }
   }

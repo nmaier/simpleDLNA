@@ -18,6 +18,7 @@ namespace NMaier.sdlna.FileMediaServer
     private readonly Dictionary<string, IMediaItem> ids = new Dictionary<string, IMediaItem>();
     private readonly Dictionary<string, string> paths = new Dictionary<string, string>();
     private IMediaFolder root;
+    private FileStore store = null;
     private readonly List<IView> transformations = new List<IView>();
     private MediaTypes types;
     private readonly Guid uuid = Guid.NewGuid();
@@ -88,6 +89,11 @@ namespace NMaier.sdlna.FileMediaServer
       watcher.EnableRaisingEvents = true;
     }
 
+    public void SetCacheFile(FileInfo info)
+    {
+      store = new FileStore(info);
+    }
+
     public void SetOrder(string order)
     {
       comparer = ComparerRepository.Lookup(order);
@@ -135,15 +141,27 @@ namespace NMaier.sdlna.FileMediaServer
       if (paths.TryGetValue(aFile.FullName, out key)) {
         IMediaItem item;
         if (ids.TryGetValue(key, out item) && item is File) {
-          var file = item as File;
-          if (file.Parent is IFileServerFolder) {
-            (file.Parent as IFileServerFolder).ReleaseItem(file);
+          var ev = item as File;
+          if (ev.Parent is IFileServerFolder) {
+            (ev.Parent as IFileServerFolder).ReleaseItem(ev);
           }
-          file.Parent = aParent;
-          return file;
+          ev.Parent = aParent;
+          return ev;
         }
       }
-      return File.GetFile(aParent, aFile);
+
+      var ext = aFile.Extension.ToLower().Substring(1);
+      var type = DlnaMaps.Ext2Dlna[ext];
+      var mediaType = DlnaMaps.Ext2Media[ext];
+
+      if (store != null) {
+        var sv = store.MaybeGetFile(aParent, aFile, type);
+        if (sv != null) {
+          return sv;
+        }
+      }
+
+      return File.GetFile(aParent, aFile, type, mediaType);
     }
 
     internal void RegisterPath(IFileServerMediaItem item)
@@ -160,6 +178,13 @@ namespace NMaier.sdlna.FileMediaServer
       }
       ids[id] = item;
       item.ID = id;
+    }
+
+    internal void UpdateFileCache(File aFile)
+    {
+      if (store != null) {
+        store.MaybeStoreFile(aFile);
+      }
     }
   }
 }

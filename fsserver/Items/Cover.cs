@@ -2,25 +2,32 @@ using System;
 using System.IO;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Thumbnails;
+using System.Runtime.Serialization;
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  internal class Cover : IMediaCoverResource
+  [Serializable]
+  internal sealed class Cover : IMediaCoverResource, ISerializable
   {
 
     private byte[] _bytes;
     private readonly FileInfo file;
     private int height = 240;
-    internal static readonly Thumbnailer thumber = new Thumbnailer();
+    private static readonly Thumbnailer thumber = new Thumbnailer();
     private int width = 240;
 
 
 
-    internal Cover(byte[] aBytes, int aWidth, int aHeight)
+    internal Cover(FileInfo aFile, Stream aStream)
     {
-      _bytes = aBytes;
-      width = aWidth;
-      height = aHeight;
+      _bytes = thumber.GetThumbnail(aFile.FullName, MediaTypes.IMAGE, aStream, ref width, ref height);
+    }
+
+    private Cover(SerializationInfo info, StreamingContext ctx)
+    {
+      _bytes = info.GetValue("bytes", typeof(byte[])) as byte[];
+      width = info.GetInt32("width");
+      height = info.GetInt32("height");
     }
 
     public Cover(FileInfo aFile)
@@ -103,6 +110,13 @@ namespace NMaier.sdlna.FileMediaServer
     public int CompareTo(IMediaItem other)
     {
       throw new NotImplementedException();
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      info.AddValue("bytes", _bytes);
+      info.AddValue("width", width);
+      info.AddValue("height", height);
     }
   }
 }

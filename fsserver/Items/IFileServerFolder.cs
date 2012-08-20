@@ -5,6 +5,8 @@ namespace NMaier.sdlna.FileMediaServer
   interface IFileServerFolder : IMediaFolder, IFileServerMediaItem
   {
 
+    FileServer Server { get; }
+
     void AdoptItem(IFileServerMediaItem item);
 
     void ReleaseItem(IFileServerMediaItem item);

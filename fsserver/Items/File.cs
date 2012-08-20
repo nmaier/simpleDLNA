@@ -7,27 +7,19 @@ namespace NMaier.sdlna.FileMediaServer
 {
   internal class File : Logging, IMediaResource, IFileServerResource, IMediaCover, IMetaInfo
   {
-
-    protected readonly FileInfo file;
-    private string id;
-    private readonly MediaTypes mediaType;
-    private IMediaFolder parent;
     private readonly string title;
-    private readonly DlnaTypes type;
 
-
-
-    protected File(IMediaFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
+    protected File(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
-      parent = aParent;
-      file = aFile;
+      Parent = aParent;
+      Item = aFile;
 
-      type = aType;
-      mediaType = aMediaType;
+      Type = aType;
+      MediaType = aMediaType;
 
-      title = System.IO.Path.GetFileNameWithoutExtension(file.Name);
+      title = System.IO.Path.GetFileNameWithoutExtension(Item.Name);
       if (string.IsNullOrEmpty(title)) {
-        title = file.Name;
+        title = Item.Name;
       }
     }
 
@@ -38,7 +30,7 @@ namespace NMaier.sdlna.FileMediaServer
       get
       {
         return new FileStream(
-          file.FullName,
+          Item.FullName,
           FileMode.Open,
           FileAccess.Read,
           FileShare.ReadWrite | FileShare.Delete
@@ -48,44 +40,56 @@ namespace NMaier.sdlna.FileMediaServer
 
     public virtual IMediaCoverResource Cover
     {
-      get { return new Cover(file); }
+      get { return new Cover(Item); }
     }
 
     public DateTime Date
     {
-      get { return file.LastWriteTimeUtc; }
+      get { return Item.LastWriteTimeUtc; }
+    }
+
+    internal FileInfo Item
+    {
+      get;
+      set;
     }
 
     public string ID
     {
-      get { return id; }
-      set { id = value; }
+      get;
+      set;
+    }
+
+    IMediaFolder IMediaItem.Parent
+    {
+      get { return Parent; }
     }
 
     public MediaTypes MediaType
     {
-      get { return mediaType; }
+      get;
+      protected set;
     }
 
-    public IMediaFolder Parent
+    public IFileServerFolder Parent
     {
-      get { return parent; }
-      set { parent = value; }
+      get;
+      set;
     }
 
     public string Path
     {
-      get { return file.FullName; }
+      get { return Item.FullName; }
     }
 
     public string PN
     {
-      get { return DlnaMaps.PN[type]; }
+      get { return DlnaMaps.PN[Type]; }
     }
 
     public long? Size
     {
-      get { return file.Length; }
+      get { return Item.Length; }
     }
 
     public virtual string Title
@@ -95,7 +99,8 @@ namespace NMaier.sdlna.FileMediaServer
 
     public DlnaTypes Type
     {
-      get { return type; }
+      get;
+      protected set;
     }
 
 
@@ -106,20 +111,17 @@ namespace NMaier.sdlna.FileMediaServer
       return Title.CompareTo(other.Title);
     }
 
-    internal static File GetFile(IMediaFolder aParentFolder, FileInfo aFile)
+    internal static File GetFile(IFileServerFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
-      var ext = aFile.Extension.ToLower().Substring(1);
-      var type = DlnaMaps.Ext2Dlna[ext];
-      var mediaType = DlnaMaps.Ext2Media[ext];
-      switch (mediaType) {
+      switch (aMediaType) {
         case MediaTypes.VIDEO:
-          return new VideoFile(aParentFolder, aFile, type);
+          return new VideoFile(aParentFolder, aFile, aType);
         case MediaTypes.AUDIO:
-          return new AudioFile(aParentFolder, aFile, type);
+          return new AudioFile(aParentFolder, aFile, aType);
         case MediaTypes.IMAGE:
-          return new ImageFile(aParentFolder, aFile, type);
+          return new ImageFile(aParentFolder, aFile, aType);
         default:
-          return new File(aParentFolder, aFile, type, mediaType);
+          return new File(aParentFolder, aFile, aType, aMediaType);
       }
     }
   }

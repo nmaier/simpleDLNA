@@ -52,7 +52,7 @@ namespace NMaier.sdlna.FileMediaServer
         pre = pre.First().ToString().ToUpper();
         IFileServerFolder dest;
         if (!titles.TryGetValue(pre, out dest)) {
-          dest = new VirtualFolder(server, server.Root, pre);
+          dest = new VirtualFolder(server, server.Root as IFileServerFolder, pre);
           titles.Add(pre, dest);
           server.RegisterPath(dest);
         }

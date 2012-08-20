@@ -16,7 +16,7 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    internal ImageFile(IMediaFolder aParent, FileInfo aFile, DlnaTypes aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
+    internal ImageFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
 
 
 
@@ -77,7 +77,7 @@ namespace NMaier.sdlna.FileMediaServer
       }
 
       try {
-        using (var tl = TagLib.File.Create(file.FullName)) {
+        using (var tl = TagLib.File.Create(Item.FullName)) {
           try {
             width = (uint)tl.Properties.PhotoWidth;
             height = (uint)tl.Properties.PhotoHeight;
@@ -104,10 +104,10 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
       catch (TagLib.CorruptFileException ex) {
-        Debug("Failed to read metadata via taglib for file " + file.FullName, ex);
+        Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
       }
       catch (Exception ex) {
-        Warn("Unhandled exception reading metadata for file " + file.FullName, ex);
+        Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
 
 

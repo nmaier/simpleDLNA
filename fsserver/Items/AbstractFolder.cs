@@ -9,16 +9,12 @@ namespace NMaier.sdlna.FileMediaServer
 
     protected List<IFileServerFolder> childFolders;
     protected List<IFileServerResource> childItems;
-    protected string id;
-    protected IMediaFolder parent;
-    protected readonly FileServer server;
 
 
-
-    protected AbstractFolder(FileServer aServer, IMediaFolder aParent)
+    protected AbstractFolder(FileServer aServer, IFileServerFolder aParent)
     {
-      server = aServer;
-      parent = aParent;
+      Server = aServer;
+      Parent = aParent;
     }
 
 
@@ -32,6 +28,7 @@ namespace NMaier.sdlna.FileMediaServer
     {
       get { return childFolders; }
     }
+
     public IEnumerable<IMediaResource> ChildItems
     {
       get { return childItems; }
@@ -39,17 +36,23 @@ namespace NMaier.sdlna.FileMediaServer
 
     public string ID
     {
-      get { return id; }
-      set { id = value; }
+      get;
+      set;
     }
 
-    public IMediaFolder Parent
+    public IFileServerFolder Parent
     {
-      get { return parent; }
-      set { parent = value; }
+      get;
+      set;
     }
 
     abstract public string Path { get; }
+
+    internal FileServer Server
+    {
+      get;
+      set;
+    }
 
     abstract public string Title { get; }
 
@@ -97,6 +100,16 @@ namespace NMaier.sdlna.FileMediaServer
         childFolders.Reverse();
         childItems.Reverse();
       }
+    }
+
+    IMediaFolder IMediaItem.Parent
+    {
+      get { return Parent; }
+    }
+
+    FileServer IFileServerFolder.Server
+    {
+      get { return Server; }
     }
   }
 }
