@@ -4,16 +4,20 @@ using System.IO;
 using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
+using System.Runtime.Serialization;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
-  internal class VideoFile : File, IMetaVideoItem
+  [Serializable]
+  internal class VideoFile : File, IMetaVideoItem, ISerializable
   {
 
     private string[] actors;
+    private Cover _cover, cover;
     private string description;
     private string director;
     private TimeSpan? duration;
+    private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
     private string genre;
     private uint? height;
     private bool initialized = false;
@@ -27,7 +31,51 @@ namespace NMaier.sdlna.FileMediaServer.Files
     {
     }
 
+    protected VideoFile(SerializationInfo info, StreamingContext ctx)
+      : this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+    {
+      actors = info.GetValue("a", typeof(string[])) as string[];
+      description = info.GetString("de");
+      director = info.GetString("di");
+      genre = info.GetString("g");
+      title = info.GetString("t");
+      width = info.GetUInt32("w");
+      height = info.GetUInt32("h");
+      var ts = info.GetInt64("du");
+      if (ts > 0) {
+        duration = new TimeSpan(ts);
+      }
+      try {
+        _cover = cover = info.GetValue("c", typeof(Cover)) as Cover;
+      }
+      catch (Exception) { }
 
+      initialized = true;
+    }
+
+
+
+    public override IMediaCoverResource Cover
+    {
+      get
+      {
+        MaybeInit();
+        if (_cover == null) {
+          try {
+            _cover = new Cover(Item);
+            _cover.OnCoverLazyLoaded += CoverLoaded;
+          }
+          catch (Exception) { }
+        }
+        return _cover;
+      }
+    }
+
+    private void CoverLoaded(object sender, EventArgs e)
+    {
+      cover = _cover;
+      Parent.Server.UpdateFileCache(this);
+    }
 
     public IEnumerable<string> MetaActors
     {
@@ -99,6 +147,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     {
       get
       {
+        MaybeInit();
         if (!string.IsNullOrWhiteSpace(title)) {
           return string.Format("{0} — {1}", base.Title, title);
         }
@@ -108,6 +157,19 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
+
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      info.AddValue("a", actors, typeof(string[]));
+      info.AddValue("de", description);
+      info.AddValue("di", director);
+      info.AddValue("g", genre);
+      info.AddValue("t", title);
+      info.AddValue("w", width);
+      info.AddValue("h", height);
+      info.AddValue("du", duration.GetValueOrDefault(EmptyDuration).Ticks);
+      info.AddValue("c", cover);
+    }
 
     private void MaybeInit()
     {
@@ -162,6 +224,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
 
+      Parent.Server.UpdateFileCache(this);
 
       initialized = true;
     }

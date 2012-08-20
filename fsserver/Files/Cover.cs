@@ -46,6 +46,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
           if (_bytes == null) {
             _bytes = new byte[0];
           }
+          if (OnCoverLazyLoaded != null) {
+            OnCoverLazyLoaded(this, null);
+          }
         }
         if (_bytes.Length == 0) {
           throw new NotSupportedException();
@@ -104,7 +107,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       get { return DlnaTypes.JPEG; }
     }
 
-
+    internal event EventHandler OnCoverLazyLoaded;
 
 
     public int CompareTo(IMediaItem other)
