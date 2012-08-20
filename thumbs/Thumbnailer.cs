@@ -151,8 +151,14 @@ namespace NMaier.sdlna.Thumbnails
         LogManager.GetLogger(typeof(Thumbnailer)).Debug("Failed to set resolution", ex);
       }
       using (Graphics graphics = Graphics.FromImage(result)) {
-        graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-        graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
+        if (result.Width > image.Width && result.Height > image.Height) {
+          graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+          graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+        }
+        else {
+          graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+          graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
+        }
         graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
         graphics.DrawImage(image, 0, 0, result.Width, result.Height);
         width = result.Width;
