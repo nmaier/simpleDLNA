@@ -6,15 +6,19 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
-using NMaier.sdlna.Server;
+using System.Timers;
 using NMaier.sdlna.FileMediaServer.Folders;
+using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   internal class DeserializeInfo
   {
+
     public FileInfo Info;
     public DlnaTypes Type;
+
+
 
     public DeserializeInfo(FileInfo aInfo, DlnaTypes aType)
     {
@@ -22,6 +26,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       Type = aType;
     }
   }
+
   internal sealed class FileStore : Logging, IDisposable
   {
 
@@ -31,12 +36,17 @@ namespace NMaier.sdlna.FileMediaServer.Files
     private readonly IDbDataParameter insertKey;
     private readonly IDbCommand select;
     private readonly IDbDataParameter selectKey;
-
-
+    private readonly Timer vacuumer = new Timer();
 
     internal FileStore(FileInfo aStore)
     {
       var cs = string.Format("Uri=file:{0}", aStore.FullName);
+      if (aStore.Exists) {
+        vacuumer.Interval = 120 * 1000;
+      }
+      else {
+        vacuumer.Interval = 30 * 60 * 1000;
+      }
 
       try {
         if (Type.GetType("Mono.Runtime") == null) {
@@ -95,6 +105,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
       insertData.DbType = DbType.Binary;
 
       InfoFormat("FileStore at {0} is ready", aStore.FullName);
+
+      vacuumer.Elapsed += Vacuum;
+      vacuumer.Enabled = true;
     }
 
 
@@ -174,5 +187,21 @@ namespace NMaier.sdlna.FileMediaServer.Files
     {
       return connection.BeginTransaction();
     }
+
+    private void Vacuum(object source, ElapsedEventArgs e)
+    {
+      Debug("Vacuuming");
+      using (var q = connection.CreateCommand()) {
+        q.CommandText = "VACUUM";
+        try {
+          q.ExecuteNonQuery();
+        }
+        catch (Exception ex) {
+          Error("Failed to vacuum", ex);
+        }
+      }
+      vacuumer.Interval = 30 * 60 * 1000;
+    }
+
   }
 }
