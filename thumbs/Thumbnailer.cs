@@ -126,6 +126,9 @@ namespace NMaier.sdlna.Thumbnails
     internal static Image ResizeImage(Image image, ref int width, ref int height)
     {
       if (image.Width <= width && image.Height <= height) {
+        foreach (var p in image.PropertyIdList.Clone() as int[]) {
+          image.RemovePropertyItem(p);
+        }
         return image;
       }
       var nw = (float)image.Width;
