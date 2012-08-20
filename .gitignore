@@ -1,3 +1,5 @@
+fsserver/x86
+fsserver/x64
 packages/
 */bin
 */obj
