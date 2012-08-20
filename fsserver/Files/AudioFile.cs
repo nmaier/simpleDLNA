@@ -10,6 +10,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
   [Serializable]
   internal class AudioFile : File, IMetaAudioItem, ISerializable
   {
+    private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
 
     private string album;
     private string artist;
@@ -136,7 +137,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("g", genre);
       info.AddValue("p", performer);
       info.AddValue("ti", title);
-      info.AddValue("d", duration.GetValueOrDefault(new TimeSpan(0)).Ticks);
+      info.AddValue("d", duration.GetValueOrDefault(EmptyDuration).Ticks);
       if (cover != null) {
         info.AddValue("c", cover, typeof(Cover));
       }
