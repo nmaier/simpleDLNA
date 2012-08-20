@@ -84,7 +84,7 @@
     <Compile Include="Interfaces\IRequest.cs" />
     <Compile Include="Interfaces\IResponse.cs" />
     <Compile Include="Interfaces\IVolatileMediaServer.cs" />
-    <Compile Include="Reponses\ItemResponse.cs" />
+    <Compile Include="Responses\ItemResponse.cs" />
     <Compile Include="Types\Logging.cs" />
     <Compile Include="Handlers\MediaMount.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -93,10 +93,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Reponses\ResourceResponse.cs" />
+    <Compile Include="Responses\ResourceResponse.cs" />
     <Compile Include="SSDPServer.cs" />
     <Compile Include="Handlers\StaticHandler.cs" />
-    <Compile Include="Reponses\StringResponse.cs" />
+    <Compile Include="Responses\StringResponse.cs" />
     <Compile Include="Types\RawHeaders.cs" />
     <Compile Include="Types\ResponseHeaders.cs" />
     <Compile Include="UpnpDevice.cs" />
