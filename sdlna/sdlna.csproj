@@ -106,6 +106,9 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GetOptNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c9bf2c3a9070fff0, processorArchitecture=MSIL">
+      <HintPath>..\packages\GetOptNet.1.0.0.0\lib\net30\GetOptNet.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
     </Reference>
@@ -124,10 +127,6 @@
     <ProjectReference Include="..\fsserver\fsserver.csproj">
       <Project>{50E06B21-E11A-42F0-81E2-0911E771E861}</Project>
       <Name>fsserver</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\getoptnet\GetOptNet.csproj">
-      <Project>{ABF98F9F-CF28-4242-9459-B10AAA00E305}</Project>
-      <Name>GetOptNet</Name>
     </ProjectReference>
     <ProjectReference Include="..\server\server.csproj">
       <Project>{232A96F6-A2BF-44C8-B623-6E411F6296F2}</Project>
