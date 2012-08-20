@@ -110,7 +110,7 @@ namespace NMaier.sdlna.FileMediaServer
       }
       newRoot.Sort(comparer, descending);
       ids["0"] = root = newRoot;
-#if DEBUG
+#if DUMP_TREE
       using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
         using (var w = new StreamWriter(s)) {
           DumpTree(w, root);
