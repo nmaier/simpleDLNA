@@ -149,17 +149,20 @@ namespace NMaier.sdlna.FileMediaServer.Files
           formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
           formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
           formatter.Serialize(s, file);
-          using (var transaction = connection.BeginTransaction()) {
-            insertKey.Value = file.Path;
-            insertData.Value = s.ToArray();
-            insert.ExecuteNonQuery();
-            transaction.Commit();
-          }
+
+          insertKey.Value = file.Path;
+          insertData.Value = s.ToArray();
+          insert.ExecuteNonQuery();
         }
       }
       catch (Exception ex) {
         Error("Failed to serialize an object of type " + file.GetType().ToString(), ex);
       }
+    }
+
+    public IDbTransaction BeginTransaction()
+    {
+      return connection.BeginTransaction();
     }
   }
 }

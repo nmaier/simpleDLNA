@@ -104,12 +104,13 @@ namespace NMaier.sdlna.FileMediaServer
 
     private void DoRoot()
     {
-      var newRoot = new Folders.PlainRootFolder(this, types, directory);
-      foreach (var t in transformations) {
-        t.Transform(this, newRoot);
-      }
-      newRoot.Sort(comparer, descending);
-      ids["0"] = root = newRoot;
+      using (var trans = store.BeginTransaction()) {
+        var newRoot = new Folders.PlainRootFolder(this, types, directory);
+        foreach (var t in transformations) {
+          t.Transform(this, newRoot);
+        }
+        newRoot.Sort(comparer, descending);
+        ids["0"] = root = newRoot;
 #if DUMP_TREE
       using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
         using (var w = new StreamWriter(s)) {
@@ -117,6 +118,8 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 #endif
+        trans.Commit();
+      }
     }
 
     private void DumpTree(StreamWriter w, IMediaFolder folder, string prefix = "/")
