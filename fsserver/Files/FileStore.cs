@@ -65,6 +65,16 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
 
       using (var transaction = connection.BeginTransaction()) {
+        using (var pragma = connection.CreateCommand()) {
+          pragma.CommandText = "PRAGMA journal_mode = MEMORY";
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA temp_store = MEMORY";
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA locking_mode = EXCLUSIVE";
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA synchonous = NORMAL";
+          pragma.ExecuteNonQuery();
+        }
         using (var create = connection.CreateCommand()) {
           create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, data BINARY)";
           create.ExecuteNonQuery();
