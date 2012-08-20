@@ -80,6 +80,8 @@
     <Compile Include="Repository\IRepositoryItem.cs" />
     <Compile Include="Repository\Repository.cs" />
     <Compile Include="Repository\RepositoryLookupException.cs" />
+    <Compile Include="Items\KeyedVirtualFolder.cs" />
+    <Compile Include="Views\MusicView.cs" />
     <Compile Include="Views\PlainView.cs" />
     <Compile Include="Views\ByTitleView.cs" />
     <Compile Include="Items\IFileServerMediaItem.cs" />

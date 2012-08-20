@@ -77,6 +77,9 @@ namespace NMaier.sdlna.FileMediaServer
 
     public void Load()
     {
+      if (types == MediaTypes.AUDIO && transformations.Count == 0) {
+        AddView("music");
+      }
       DoRoot();
 
       changeTimer.AutoReset = false;
@@ -107,6 +110,24 @@ namespace NMaier.sdlna.FileMediaServer
       }
       newRoot.Sort(comparer, descending);
       ids["0"] = root = newRoot;
+#if DEBUG
+      using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
+        using (var w = new StreamWriter(s)) {
+          DumpTree(w, root);
+        }
+      }
+#endif
+    }
+
+    private void DumpTree(StreamWriter w, IMediaFolder folder, string prefix = "/")
+    {
+      foreach (IMediaFolder f in folder.ChildFolders) {
+        w.WriteLine("{0} {1} - {2}", prefix, f.Title, f.GetType().ToString());
+        DumpTree(w, f, prefix + f.Title + "/");
+      }
+      foreach (IMediaResource r in folder.ChildItems) {
+        w.WriteLine("{0} {1} - {2}", prefix, r.Title, r.GetType().ToString());
+      }
     }
 
     private void OnChanged(Object source, FileSystemEventArgs e)
