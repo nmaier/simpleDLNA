@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
+using NMaier.sdlna.FileMediaServer.Files;
 using NMaier.sdlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Folders
 {
   abstract class AbstractFolder : IFileServerFolder, IFileServerMediaItem
   {
@@ -89,7 +89,7 @@ namespace NMaier.sdlna.FileMediaServer
       }
     }
 
-    public void Sort(IItemComparer comparer, bool descending)
+    public void Sort(Comparers.IItemComparer comparer, bool descending)
     {
       foreach (var f in childFolders) {
         f.Sort(comparer, descending);

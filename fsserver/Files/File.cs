@@ -2,12 +2,16 @@ using System;
 using System.IO;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
+using NMaier.sdlna.FileMediaServer.Folders;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Files
 {
   internal class File : Logging, IMediaResource, IFileServerResource, IMediaCover, IMetaInfo
   {
+
     private readonly string title;
+
+
 
     protected File(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
@@ -48,12 +52,6 @@ namespace NMaier.sdlna.FileMediaServer
       get { return Item.LastWriteTimeUtc; }
     }
 
-    internal FileInfo Item
-    {
-      get;
-      set;
-    }
-
     public string ID
     {
       get;
@@ -63,6 +61,12 @@ namespace NMaier.sdlna.FileMediaServer
     IMediaFolder IMediaItem.Parent
     {
       get { return Parent; }
+    }
+
+    internal FileInfo Item
+    {
+      get;
+      set;
     }
 
     public MediaTypes MediaType

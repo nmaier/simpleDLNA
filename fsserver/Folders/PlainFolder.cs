@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
+using NMaier.sdlna.FileMediaServer.Files;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Folders
 {
   class PlainFolder : AbstractFolder, IMetaInfo
   {

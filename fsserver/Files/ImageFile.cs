@@ -1,9 +1,10 @@
 using System;
 using System.IO;
+using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Files
 {
   internal class ImageFile : File, IMetaImageItem
   {

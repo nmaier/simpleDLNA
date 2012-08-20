@@ -1,10 +1,10 @@
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Thumbnails;
-using System.Runtime.Serialization;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
   internal sealed class Cover : IMediaCoverResource, ISerializable

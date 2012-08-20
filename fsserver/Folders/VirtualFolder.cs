@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using NMaier.sdlna.Server;
+using NMaier.sdlna.FileMediaServer.Files;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Folders
 {
   class VirtualFolder : AbstractFolder
   {

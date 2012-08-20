@@ -7,8 +7,9 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using NMaier.sdlna.Server;
+using NMaier.sdlna.FileMediaServer.Folders;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Files
 {
   internal class DeserializeInfo
   {

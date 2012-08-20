@@ -1,7 +1,7 @@
 using System.IO;
 using NMaier.sdlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Folders
 {
   internal class PlainRootFolder : PlainFolder
   {

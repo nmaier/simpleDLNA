@@ -1,5 +1,5 @@
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  public class ComparerRepository : Repository<IItemComparer> { }
+  public class ComparerRepository : Repository<Comparers.IItemComparer> { }
 }

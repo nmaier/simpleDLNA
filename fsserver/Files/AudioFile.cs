@@ -1,10 +1,11 @@
 using System;
 using System.IO;
+using System.Runtime.Serialization;
+using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
-using System.Runtime.Serialization;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
   internal class AudioFile : File, IMetaAudioItem, ISerializable

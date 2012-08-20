@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NMaier.sdlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Folders
 {
   class KeyedVirtualFolder<T> : VirtualFolder where T : VirtualFolder, new()
   {

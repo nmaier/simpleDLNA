@@ -64,35 +64,35 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Comparer\DateComparer.cs" />
-    <Compile Include="Comparer\FileSizeComparer.cs" />
-    <Compile Include="FileStore.cs" />
-    <Compile Include="Items\AudioFile.cs" />
+    <Compile Include="Comparers\DateComparer.cs" />
+    <Compile Include="Comparers\FileSizeComparer.cs" />
+    <Compile Include="Files\FileStore.cs" />
+    <Compile Include="Files\AudioFile.cs" />
     <Compile Include="ByteVectorExtend.cs" />
-    <Compile Include="Items\Cover.cs" />
-    <Compile Include="Items\IFileServerFolder.cs" />
-    <Compile Include="Comparer\IItemComparer.cs" />
-    <Compile Include="Comparer\TitleComparer.cs" />
-    <Compile Include="Items\IFileServerResource.cs" />
-    <Compile Include="Items\ImageFile.cs" />
-    <Compile Include="Items\VideoFile.cs" />
+    <Compile Include="Files\Cover.cs" />
+    <Compile Include="Folders\IFileServerFolder.cs" />
+    <Compile Include="Comparers\IItemComparer.cs" />
+    <Compile Include="Comparers\TitleComparer.cs" />
+    <Compile Include="Files\IFileServerResource.cs" />
+    <Compile Include="Files\ImageFile.cs" />
+    <Compile Include="Files\VideoFile.cs" />
     <Compile Include="Repository\ComparerRepository.cs" />
     <Compile Include="Repository\IRepositoryItem.cs" />
     <Compile Include="Repository\Repository.cs" />
     <Compile Include="Repository\RepositoryLookupException.cs" />
-    <Compile Include="Items\KeyedVirtualFolder.cs" />
+    <Compile Include="Folders\KeyedVirtualFolder.cs" />
     <Compile Include="Views\MusicView.cs" />
     <Compile Include="Views\PlainView.cs" />
     <Compile Include="Views\ByTitleView.cs" />
-    <Compile Include="Items\IFileServerMediaItem.cs" />
+    <Compile Include="IFileServerMediaItem.cs" />
     <Compile Include="Views\IView.cs" />
-    <Compile Include="Items\AbstractFolder.cs" />
-    <Compile Include="Items\PlainFolder.cs" />
-    <Compile Include="Items\VirtualFolder.cs" />
+    <Compile Include="Folders\AbstractFolder.cs" />
+    <Compile Include="Folders\PlainFolder.cs" />
+    <Compile Include="Folders\VirtualFolder.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="Items\File.cs" />
+    <Compile Include="Files\File.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Items\PlainRootFolder.cs" />
+    <Compile Include="Folders\PlainRootFolder.cs" />
     <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Repository\ViewRepository.cs" />
   </ItemGroup>

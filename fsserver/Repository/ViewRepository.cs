@@ -1,5 +1,5 @@
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  public class ViewRepository : Repository<IView> { }
+  public class ViewRepository : Repository<Views.IView> { }
 }

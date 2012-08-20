@@ -1,7 +1,8 @@
 using System.Linq;
+using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Views
 {
   class PlainView : IView
   {

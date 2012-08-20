@@ -10,7 +10,7 @@ namespace NMaier.sdlna.FileMediaServer
   {
 
     private readonly Timer changeTimer = new Timer(2000);
-    private IItemComparer comparer = null;
+    private Comparers.IItemComparer comparer = null;
     private bool descending = false;
     private readonly DirectoryInfo directory;
     private readonly string friendlyName;
@@ -18,8 +18,8 @@ namespace NMaier.sdlna.FileMediaServer
     private readonly Dictionary<string, IMediaItem> ids = new Dictionary<string, IMediaItem>();
     private readonly Dictionary<string, string> paths = new Dictionary<string, string>();
     private IMediaFolder root;
-    private FileStore store = null;
-    private readonly List<IView> transformations = new List<IView>();
+    private Files.FileStore store = null;
+    private readonly List<Views.IView> transformations = new List<Views.IView>();
     private MediaTypes types;
     private readonly Guid uuid = Guid.NewGuid();
     private readonly FileSystemWatcher watcher;
@@ -94,7 +94,7 @@ namespace NMaier.sdlna.FileMediaServer
 
     public void SetCacheFile(FileInfo info)
     {
-      store = new FileStore(info);
+      store = new Files.FileStore(info);
     }
 
     public void SetOrder(string order)
@@ -104,7 +104,7 @@ namespace NMaier.sdlna.FileMediaServer
 
     private void DoRoot()
     {
-      var newRoot = new PlainRootFolder(this, types, directory);
+      var newRoot = new Folders.PlainRootFolder(this, types, directory);
       foreach (var t in transformations) {
         t.Transform(this, newRoot);
       }
@@ -156,15 +156,15 @@ namespace NMaier.sdlna.FileMediaServer
       Rescan();
     }
 
-    internal File GetFile(IFileServerFolder aParent, FileInfo aFile)
+    internal Files.File GetFile(Folders.IFileServerFolder aParent, FileInfo aFile)
     {
       string key;
       if (paths.TryGetValue(aFile.FullName, out key)) {
         IMediaItem item;
-        if (ids.TryGetValue(key, out item) && item is File) {
-          var ev = item as File;
-          if (ev.Parent is IFileServerFolder) {
-            (ev.Parent as IFileServerFolder).ReleaseItem(ev);
+        if (ids.TryGetValue(key, out item) && item is Files.File) {
+          var ev = item as Files.File;
+          if (ev.Parent is Folders.IFileServerFolder) {
+            (ev.Parent as Folders.IFileServerFolder).ReleaseItem(ev);
           }
           ev.Parent = aParent;
           return ev;
@@ -182,7 +182,7 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 
-      return File.GetFile(aParent, aFile, type, mediaType);
+      return Files.File.GetFile(aParent, aFile, type, mediaType);
     }
 
     internal void RegisterPath(IFileServerMediaItem item)
@@ -201,7 +201,7 @@ namespace NMaier.sdlna.FileMediaServer
       item.ID = id;
     }
 
-    internal void UpdateFileCache(File aFile)
+    internal void UpdateFileCache(Files.File aFile)
     {
       if (store != null) {
         store.MaybeStoreFile(aFile);

@@ -1,19 +1,19 @@
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Comparers
 {
-  class DateComparer : TitleComparer
+  class FileSizeComparer : TitleComparer
   {
 
     public override string Description
     {
-      get { return "Sort by file date"; }
+      get { return "Sort by file size"; }
     }
 
     public override string Name
     {
-      get { return "date"; }
+      get { return "size"; }
     }
 
 
@@ -23,8 +23,8 @@ namespace NMaier.sdlna.FileMediaServer
     {
       var xm = x as IMetaInfo;
       var ym = y as IMetaInfo;
-      if (xm != null && ym != null) {
-        var rv = xm.Date.CompareTo(ym.Date);
+      if (xm != null && ym != null && xm.Size.HasValue && ym.Size.HasValue) {
+        var rv = xm.Size.Value.CompareTo(ym.Size.Value);
         if (rv != 0) {
           return rv;
         }

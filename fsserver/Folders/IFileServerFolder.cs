@@ -1,6 +1,6 @@
 using NMaier.sdlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Folders
 {
   interface IFileServerFolder : IMediaFolder, IFileServerMediaItem
   {
@@ -11,6 +11,6 @@ namespace NMaier.sdlna.FileMediaServer
 
     void ReleaseItem(IFileServerMediaItem item);
 
-    void Sort(IItemComparer comparer, bool descending);
+    void Sort(Comparers.IItemComparer comparer, bool descending);
   }
 }

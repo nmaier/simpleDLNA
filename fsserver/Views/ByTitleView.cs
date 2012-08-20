@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.sdlna.FileMediaServer.Views
 {
   class ByTitleView : IView
   {
