@@ -54,7 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Handlers\ResList.cs" />
+    <Compile Include="Types\ResList.cs" />
     <Compile Include="Interfaces\IMediaCoverResource.cs" />
     <Compile Include="Interfaces\Metadata\IMetaAudioItem.cs" />
     <Compile Include="Interfaces\Metadata\IMetaDescription.cs" />
@@ -79,7 +79,6 @@
     <Compile Include="Interfaces\IMediaItem.cs" />
     <Compile Include="Interfaces\IMediaResource.cs" />
     <Compile Include="Interfaces\IMediaServer.cs" />
-    <Compile Include="Interfaces\IMediaServerMount.cs" />
     <Compile Include="Interfaces\IPrefixHandler.cs" />
     <Compile Include="Interfaces\IRequest.cs" />
     <Compile Include="Interfaces\IResponse.cs" />
