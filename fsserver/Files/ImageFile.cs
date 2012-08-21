@@ -17,7 +17,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
-    internal ImageFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
+    internal ImageFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
 
 
 

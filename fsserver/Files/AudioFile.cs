@@ -24,7 +24,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
-    internal AudioFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType)
+    internal AudioFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType)
       : base(aParent, aFile, aType, MediaTypes.AUDIO)
     {
     }

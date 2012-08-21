@@ -139,7 +139,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    internal BaseFile MaybeGetFile(IFileServerFolder aParent, FileInfo info, DlnaTypes type)
+    internal BaseFile MaybeGetFile(BaseFolder aParent, FileInfo info, DlnaTypes type)
     {
       if (connection == null) {
         return null;

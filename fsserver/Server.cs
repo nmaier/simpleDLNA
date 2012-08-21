@@ -171,15 +171,15 @@ namespace NMaier.sdlna.FileMediaServer
       Rescan();
     }
 
-    internal Files.BaseFile GetFile(Folders.IFileServerFolder aParent, FileInfo aFile)
+    internal Files.BaseFile GetFile(Folders.BaseFolder aParent, FileInfo aFile)
     {
       string key;
       if (paths.TryGetValue(aFile.FullName, out key)) {
         IMediaItem item;
         if (ids.TryGetValue(key, out item) && item is Files.BaseFile) {
           var ev = item as Files.BaseFile;
-          if (ev.Parent is Folders.IFileServerFolder) {
-            (ev.Parent as Folders.IFileServerFolder).ReleaseItem(ev);
+          if (ev.Parent is Folders.BaseFolder) {
+            (ev.Parent as Folders.BaseFolder).ReleaseItem(ev);
           }
           ev.Parent = aParent;
           return ev;

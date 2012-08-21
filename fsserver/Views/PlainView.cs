@@ -22,17 +22,17 @@ namespace NMaier.sdlna.FileMediaServer.Views
 
     public void Transform(FileServer Server, IMediaFolder Root)
     {
-      var root = Root as IFileServerFolder;
+      var root = Root as BaseFolder;
       MushFolder(Server, root, root);
       foreach (var i in root.ChildFolders.ToList()) {
         root.ReleaseItem(i as IFileServerMediaItem);
       }
     }
 
-    private void MushFolder(FileServer server, IFileServerFolder root, IFileServerFolder folder)
+    private void MushFolder(FileServer server, BaseFolder root, BaseFolder folder)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
-        MushFolder(server, root, f as IFileServerFolder);
+        MushFolder(server, root, f as BaseFolder);
       }
       foreach (var c in folder.ChildItems.ToList()) {
         root.AdoptItem(c as IFileServerMediaItem);

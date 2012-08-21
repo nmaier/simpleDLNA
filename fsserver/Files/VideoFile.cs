@@ -26,7 +26,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
-    internal VideoFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType)
+    internal VideoFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType)
       : base(aParent, aFile, aType, MediaTypes.VIDEO)
     {
     }

@@ -8,23 +8,23 @@ using NMaier.sdlna.FileMediaServer.Files;
 
 namespace NMaier.sdlna.FileMediaServer.Folders
 {
-  class PlainFolder : AbstractFolder, IMetaInfo
+  class PlainFolder : BaseFolder, IMetaInfo
   {
 
     private readonly DirectoryInfo dir;
 
 
 
-    public PlainFolder(FileServer server, MediaTypes types, IFileServerFolder aParent, DirectoryInfo aDir)
+    public PlainFolder(FileServer server, MediaTypes types, BaseFolder aParent, DirectoryInfo aDir)
       : base(server, aParent)
     {
       dir = aDir;
       childFolders = (from d in dir.GetDirectories()
                       let m = new PlainFolder(server, types, this, d)
                       where m.ChildCount > 0
-                      select m as IFileServerFolder).ToList();
+                      select m as BaseFolder).ToList();
 
-      var files = new List<Files.BaseFile>().AsEnumerable();
+      var files = new List<BaseFile>().AsEnumerable();
       foreach (var i in DlnaMaps.Media2Ext) {
         if (!types.HasFlag(i.Key)) {
           continue;

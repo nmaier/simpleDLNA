@@ -12,7 +12,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
 
 
 
-    protected KeyedVirtualFolder(FileServer server, IFileServerFolder aParent, string aName)
+    protected KeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
       : base(server, aParent, aName)
     {
     }

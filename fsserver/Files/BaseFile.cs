@@ -13,7 +13,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
-    protected BaseFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
+    protected BaseFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
       Parent = aParent;
       Item = aFile;
@@ -75,7 +75,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       protected set;
     }
 
-    public IFileServerFolder Parent
+    public BaseFolder Parent
     {
       get;
       set;
@@ -115,7 +115,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       return Title.CompareTo(other.Title);
     }
 
-    internal static BaseFile GetFile(IFileServerFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
+    internal static BaseFile GetFile(BaseFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
       switch (aMediaType) {
         case MediaTypes.VIDEO:

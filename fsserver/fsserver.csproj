@@ -70,7 +70,6 @@
     <Compile Include="Files\AudioFile.cs" />
     <Compile Include="ByteVectorExtend.cs" />
     <Compile Include="Files\Cover.cs" />
-    <Compile Include="Folders\IFileServerFolder.cs" />
     <Compile Include="Comparers\IItemComparer.cs" />
     <Compile Include="Comparers\TitleComparer.cs" />
     <Compile Include="Files\ImageFile.cs" />
@@ -85,7 +84,7 @@
     <Compile Include="Views\ByTitleView.cs" />
     <Compile Include="IFileServerMediaItem.cs" />
     <Compile Include="Views\IView.cs" />
-    <Compile Include="Folders\AbstractFolder.cs" />
+    <Compile Include="Folders\BaseFolder.cs" />
     <Compile Include="Folders\PlainFolder.cs" />
     <Compile Include="Folders\VirtualFolder.cs" />
     <Compile Include="Server.cs" />

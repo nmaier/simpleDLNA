@@ -4,18 +4,18 @@ using NMaier.sdlna.FileMediaServer.Files;
 
 namespace NMaier.sdlna.FileMediaServer.Folders
 {
-  class VirtualFolder : AbstractFolder
+  class VirtualFolder : BaseFolder
   {
 
     private readonly string path = "virtual:" + Guid.NewGuid().ToString();
 
 
 
-    public VirtualFolder(FileServer server, IFileServerFolder aParent, string aName)
+    public VirtualFolder(FileServer server, BaseFolder aParent, string aName)
       : base(server, aParent)
     {
       Name = aName;
-      childFolders = new List<IFileServerFolder>();
+      childFolders = new List<BaseFolder>();
       childItems = new List<BaseFile>();
     }
 

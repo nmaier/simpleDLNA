@@ -10,7 +10,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
   {
     private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
     {
-      public TitlesFolder(FileServer aServer, IFileServerFolder aParent) : base(aServer, aParent, "") { }
+      public TitlesFolder(FileServer aServer, BaseFolder aParent) : base(aServer, aParent, "") { }
     }
 
 
@@ -33,21 +33,21 @@ namespace NMaier.sdlna.FileMediaServer.Views
 
     public void Transform(FileServer Server, IMediaFolder Root)
     {
-      var root = Root as IFileServerFolder;
+      var root = Root as BaseFolder;
       var titles = new TitlesFolder(Server, root);
       SortFolder(Server, root, titles);
       foreach (var i in root.ChildFolders.ToList()) {
         root.ReleaseItem(i as IFileServerMediaItem);
       }
       foreach (var i in titles.ChildFolders.ToList()) {
-        root.AdoptItem(i as IFileServerFolder);
+        root.AdoptItem(i as BaseFolder);
       }
     }
 
-    private void SortFolder(FileServer server, IFileServerFolder folder, TitlesFolder titles)
+    private void SortFolder(FileServer server, BaseFolder folder, TitlesFolder titles)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
-        SortFolder(server, f as IFileServerFolder, titles);
+        SortFolder(server, f as BaseFolder, titles);
       }
 
       foreach (var c in folder.ChildItems.ToList()) {

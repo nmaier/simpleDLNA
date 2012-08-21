@@ -4,14 +4,15 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Folders
 {
-  abstract class AbstractFolder : IFileServerFolder, IFileServerMediaItem
+  abstract class BaseFolder : IFileServerMediaItem, IMediaFolder
   {
 
-    protected List<IFileServerFolder> childFolders;
+    protected List<BaseFolder> childFolders;
     protected List<BaseFile> childItems;
 
 
-    protected AbstractFolder(FileServer aServer, IFileServerFolder aParent)
+
+    protected BaseFolder(FileServer aServer, BaseFolder aParent)
     {
       Server = aServer;
       Parent = aParent;
@@ -40,7 +41,12 @@ namespace NMaier.sdlna.FileMediaServer.Folders
       set;
     }
 
-    public IFileServerFolder Parent
+    IMediaFolder IMediaItem.Parent
+    {
+      get { return Parent; }
+    }
+
+    public BaseFolder Parent
     {
       get;
       set;
@@ -62,11 +68,11 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     public void AdoptItem(IFileServerMediaItem item)
     {
       if (item.Parent != null) {
-        (item.Parent as IFileServerFolder).ReleaseItem(item);
+        (item.Parent as BaseFolder).ReleaseItem(item);
       }
       item.Parent = this;
-      if (item is IFileServerFolder) {
-        childFolders.Add(item as IFileServerFolder);
+      if (item is BaseFolder) {
+        childFolders.Add(item as BaseFolder);
       }
       else {
         childItems.Add(item as BaseFile);
@@ -81,8 +87,8 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     public void ReleaseItem(IFileServerMediaItem item)
     {
       item.Parent = null;
-      if (item is IFileServerFolder) {
-        childFolders.Remove(item as IFileServerFolder);
+      if (item is BaseFolder) {
+        childFolders.Remove(item as BaseFolder);
       }
       else {
         childItems.Remove(item as BaseFile);
@@ -100,16 +106,6 @@ namespace NMaier.sdlna.FileMediaServer.Folders
         childFolders.Reverse();
         childItems.Reverse();
       }
-    }
-
-    IMediaFolder IMediaItem.Parent
-    {
-      get { return Parent; }
-    }
-
-    FileServer IFileServerFolder.Server
-    {
-      get { return Server; }
     }
   }
 }

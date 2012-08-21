@@ -10,7 +10,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
     private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
     {
 
-      public SimpleKeyedVirtualFolder(FileServer server, IFileServerFolder aParent, string aName)
+      public SimpleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
         : base(server, aParent, aName)
       {
       }
@@ -21,7 +21,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
     private class DoubleKeyedVirtualFolder : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
     {
 
-      public DoubleKeyedVirtualFolder(FileServer server, IFileServerFolder aParent, string aName)
+      public DoubleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
         : base(server, aParent, aName)
       {
       }
@@ -32,7 +32,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
     private class TripleKeyedVirtualFolder : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
     {
 
-      public TripleKeyedVirtualFolder(FileServer server, IFileServerFolder aParent, string aName)
+      public TripleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
         : base(server, aParent, aName)
       {
       }
@@ -56,7 +56,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
 
     public void Transform(FileServer Server, IMediaFolder Root)
     {
-      var root = Root as IFileServerFolder;
+      var root = Root as BaseFolder;
       var artists = new TripleKeyedVirtualFolder(Server, root, "Artists");
       var performers = new TripleKeyedVirtualFolder(Server, root, "Performers");
       var albums = new DoubleKeyedVirtualFolder(Server, root, "Albums");
@@ -93,10 +93,10 @@ namespace NMaier.sdlna.FileMediaServer.Views
         .Link(r);
     }
 
-    private void SortFolder(FileServer server, IFileServerFolder folder, TripleKeyedVirtualFolder artists, TripleKeyedVirtualFolder performers, DoubleKeyedVirtualFolder albums, SimpleKeyedVirtualFolder genres)
+    private void SortFolder(FileServer server, BaseFolder folder, TripleKeyedVirtualFolder artists, TripleKeyedVirtualFolder performers, DoubleKeyedVirtualFolder albums, SimpleKeyedVirtualFolder genres)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
-        SortFolder(server, f as IFileServerFolder, artists, performers, albums, genres);
+        SortFolder(server, f as BaseFolder, artists, performers, albums, genres);
       }
       foreach (var i in folder.ChildItems.ToList()) {
         var ai = i as AudioFile;
