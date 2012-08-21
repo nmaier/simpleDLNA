@@ -6,14 +6,14 @@ using NMaier.sdlna.FileMediaServer.Folders;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
-  internal class File : Logging, IMediaResource, IFileServerResource, IMediaCover, IMetaInfo
+  internal class BaseFile : Logging, IMediaResource, IFileServerMediaItem, IMediaCover, IMetaInfo
   {
 
     private readonly string title;
 
 
 
-    protected File(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
+    protected BaseFile(IFileServerFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
       Parent = aParent;
       Item = aFile;
@@ -115,7 +115,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       return Title.CompareTo(other.Title);
     }
 
-    internal static File GetFile(IFileServerFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
+    internal static BaseFile GetFile(IFileServerFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
       switch (aMediaType) {
         case MediaTypes.VIDEO:
@@ -125,7 +125,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
         case MediaTypes.IMAGE:
           return new ImageFile(aParentFolder, aFile, aType);
         default:
-          return new File(aParentFolder, aFile, aType, aMediaType);
+          return new BaseFile(aParentFolder, aFile, aType, aMediaType);
       }
     }
   }

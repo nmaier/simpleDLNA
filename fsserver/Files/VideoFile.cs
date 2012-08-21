@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
-  internal class VideoFile : File, IMetaVideoItem, ISerializable
+  internal class VideoFile : BaseFile, IMetaVideoItem, ISerializable
   {
 
     private string[] actors;

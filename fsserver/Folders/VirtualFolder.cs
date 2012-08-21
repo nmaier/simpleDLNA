@@ -16,7 +16,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     {
       Name = aName;
       childFolders = new List<IFileServerFolder>();
-      childItems = new List<IFileServerResource>();
+      childItems = new List<BaseFile>();
     }
 
     public VirtualFolder() : this(null, null, null) { }
@@ -41,7 +41,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
 
 
 
-    public void Link(IFileServerResource r)
+    public void Link(BaseFile r)
     {
       childItems.Add(r);
     }

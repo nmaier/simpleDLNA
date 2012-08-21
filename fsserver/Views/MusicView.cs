@@ -78,7 +78,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
       Server.RegisterPath(folders);
     }
 
-    private void LinkTriple(TripleKeyedVirtualFolder folder, IFileServerResource r, string key1, string key2)
+    private void LinkTriple(TripleKeyedVirtualFolder folder, BaseFile r, string key1, string key2)
     {
       if (string.IsNullOrWhiteSpace(key1)) {
         return;

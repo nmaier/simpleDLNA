@@ -15,8 +15,8 @@ namespace NMaier.sdlna.FileMediaServer
     private readonly DirectoryInfo directory;
     private readonly string friendlyName;
     private static readonly Random idGen = new Random();
-    private readonly Dictionary<string, IMediaItem> ids = new Dictionary<string, IMediaItem>();
-    private readonly Dictionary<string, string> paths = new Dictionary<string, string>();
+    private Dictionary<string, IMediaItem> ids = new Dictionary<string, IMediaItem>();
+    private Dictionary<string, string> paths = new Dictionary<string, string>();
     private IMediaFolder root;
     private Files.FileStore store = null;
     private readonly List<Views.IView> transformations = new List<Views.IView>();
@@ -104,6 +104,18 @@ namespace NMaier.sdlna.FileMediaServer
 
     private void DoRoot()
     {
+      // Collect some garbage
+      var newPaths = new Dictionary<string, string>();
+      var newIds = new Dictionary<string, IMediaItem>();
+      foreach (var i in ids) {
+        if (i.Value is Files.BaseFile && (i.Value as Files.BaseFile).Item.Exists) {
+          newIds.Add(i.Key, i.Value);
+          newPaths.Add((i.Value as IFileServerMediaItem).Path, i.Key);
+        }
+      }
+      paths = newPaths;
+      ids = newIds;
+
       using (var trans = store.BeginTransaction()) {
         var newRoot = new Folders.PlainRootFolder(this, types, directory);
         foreach (var t in transformations) {
@@ -159,13 +171,13 @@ namespace NMaier.sdlna.FileMediaServer
       Rescan();
     }
 
-    internal Files.File GetFile(Folders.IFileServerFolder aParent, FileInfo aFile)
+    internal Files.BaseFile GetFile(Folders.IFileServerFolder aParent, FileInfo aFile)
     {
       string key;
       if (paths.TryGetValue(aFile.FullName, out key)) {
         IMediaItem item;
-        if (ids.TryGetValue(key, out item) && item is Files.File) {
-          var ev = item as Files.File;
+        if (ids.TryGetValue(key, out item) && item is Files.BaseFile) {
+          var ev = item as Files.BaseFile;
           if (ev.Parent is Folders.IFileServerFolder) {
             (ev.Parent as Folders.IFileServerFolder).ReleaseItem(ev);
           }
@@ -185,7 +197,7 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 
-      return Files.File.GetFile(aParent, aFile, type, mediaType);
+      return Files.BaseFile.GetFile(aParent, aFile, type, mediaType);
     }
 
     internal void RegisterPath(IFileServerMediaItem item)
@@ -204,7 +216,7 @@ namespace NMaier.sdlna.FileMediaServer
       item.ID = id;
     }
 
-    internal void UpdateFileCache(Files.File aFile)
+    internal void UpdateFileCache(Files.BaseFile aFile)
     {
       if (store != null) {
         store.MaybeStoreFile(aFile);

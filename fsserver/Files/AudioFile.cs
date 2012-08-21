@@ -8,7 +8,7 @@ using NMaier.sdlna.Server.Metadata;
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
-  internal class AudioFile : File, IMetaAudioItem, ISerializable
+  internal class AudioFile : BaseFile, IMetaAudioItem, ISerializable
   {
     private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
 

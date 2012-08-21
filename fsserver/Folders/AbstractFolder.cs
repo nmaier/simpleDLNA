@@ -8,7 +8,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
   {
 
     protected List<IFileServerFolder> childFolders;
-    protected List<IFileServerResource> childItems;
+    protected List<BaseFile> childItems;
 
 
     protected AbstractFolder(FileServer aServer, IFileServerFolder aParent)
@@ -69,7 +69,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
         childFolders.Add(item as IFileServerFolder);
       }
       else {
-        childItems.Add(item as IFileServerResource);
+        childItems.Add(item as BaseFile);
       }
     }
 
@@ -85,7 +85,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
         childFolders.Remove(item as IFileServerFolder);
       }
       else {
-        childItems.Remove(item as IFileServerResource);
+        childItems.Remove(item as BaseFile);
       }
     }
 

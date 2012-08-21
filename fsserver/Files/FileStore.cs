@@ -139,7 +139,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    internal File MaybeGetFile(IFileServerFolder aParent, FileInfo info, DlnaTypes type)
+    internal BaseFile MaybeGetFile(IFileServerFolder aParent, FileInfo info, DlnaTypes type)
     {
       if (connection == null) {
         return null;
@@ -158,7 +158,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
           var formatter = new BinaryFormatter(null, ctx);
           formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
           formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
-          var rv = formatter.Deserialize(s) as File;
+          var rv = formatter.Deserialize(s) as BaseFile;
           rv.Item = info;
           rv.Parent = aParent;
           return rv;
@@ -171,7 +171,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    internal void MaybeStoreFile(File file)
+    internal void MaybeStoreFile(BaseFile file)
     {
       if (connection == null) {
         return;

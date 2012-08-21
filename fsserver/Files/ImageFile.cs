@@ -6,7 +6,7 @@ using NMaier.sdlna.Server.Metadata;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
-  internal class ImageFile : File, IMetaImageItem
+  internal class ImageFile : BaseFile, IMetaImageItem
   {
 
     private string creator;

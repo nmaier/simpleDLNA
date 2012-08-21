@@ -24,7 +24,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
                       where m.ChildCount > 0
                       select m as IFileServerFolder).ToList();
 
-      var files = new List<IFileServerResource>().AsEnumerable();
+      var files = new List<Files.BaseFile>().AsEnumerable();
       foreach (var i in DlnaMaps.Media2Ext) {
         if (!types.HasFlag(i.Key)) {
           continue;
@@ -32,7 +32,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
         foreach (var ext in i.Value) {
           files = files.Union(from f in dir.GetFiles("*." + ext)
                               let m = server.GetFile(this, f)
-                              select m as IFileServerResource);
+                              select m);
         }
       }
       childItems = files.ToList();
