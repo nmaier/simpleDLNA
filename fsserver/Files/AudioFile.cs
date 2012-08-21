@@ -157,7 +157,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
     {
-      info.AddValue("ty", (Int32)Type);
       info.AddValue("al", album);
       info.AddValue("ar", artist);
       info.AddValue("g", genre);
