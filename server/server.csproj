@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\MediaMount_SOAP.cs" />
     <Compile Include="Types\ResList.cs" />
     <Compile Include="Interfaces\IMediaCoverResource.cs" />
     <Compile Include="Interfaces\Metadata\IMetaAudioItem.cs" />
