@@ -34,8 +34,12 @@ namespace NMaier.sdlna.FileMediaServer.Files
     private readonly IDbCommand insert;
     private readonly IDbDataParameter insertData;
     private readonly IDbDataParameter insertKey;
+    private readonly IDbDataParameter insertSize;
+    private readonly IDbDataParameter insertTime;
     private readonly IDbCommand select;
     private readonly IDbDataParameter selectKey;
+    private readonly IDbDataParameter selectSize;
+    private readonly IDbDataParameter selectTime;
     private readonly Timer vacuumer = new Timer();
 
     internal FileStore(FileInfo aStore)
@@ -86,21 +90,29 @@ namespace NMaier.sdlna.FileMediaServer.Files
           pragma.ExecuteNonQuery();
         }
         using (var create = connection.CreateCommand()) {
-          create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, data BINARY)";
+          create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, size INT, time INT, data BINARY)";
           create.ExecuteNonQuery();
         }
         transaction.Commit();
       }
 
       select = connection.CreateCommand();
-      select.CommandText = "SELECT data FROM store WHERE key = ?";
+      select.CommandText = "SELECT data FROM store WHERE key = ? AND size = ? AND time = ?";
       select.Parameters.Add(selectKey = select.CreateParameter());
       selectKey.DbType = DbType.String;
+      select.Parameters.Add(selectSize = select.CreateParameter());
+      selectSize.DbType = DbType.Int64;
+      select.Parameters.Add(selectTime = select.CreateParameter());
+      selectTime.DbType = DbType.Int64;
 
       insert = connection.CreateCommand();
-      insert.CommandText = "INSERT INTO store VALUES(?,?)";
+      insert.CommandText = "INSERT INTO store VALUES(?,?,?,?)";
       insert.Parameters.Add(insertKey = select.CreateParameter());
       insertKey.DbType = DbType.String;
+      insert.Parameters.Add(insertSize = select.CreateParameter());
+      insertSize.DbType = DbType.Int64;
+      insert.Parameters.Add(insertTime = select.CreateParameter());
+      insertTime.DbType = DbType.Int64;
       insert.Parameters.Add(insertData = select.CreateParameter());
       insertData.DbType = DbType.Binary;
 
@@ -134,6 +146,8 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
 
       selectKey.Value = info.FullName;
+      selectSize.Value = info.Length;
+      selectTime.Value = info.LastWriteTimeUtc.Ticks;
       var data = select.ExecuteScalar() as byte[];
       if (data == null) {
         return null;
@@ -173,7 +187,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
           formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
           formatter.Serialize(s, file);
 
-          insertKey.Value = file.Path;
+          insertKey.Value = file.Item.FullName;
+          insertSize.Value = file.Item.Length;
+          insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
           insertData.Value = s.ToArray();
           insert.ExecuteNonQuery();
         }
