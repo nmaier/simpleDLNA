@@ -142,7 +142,7 @@ namespace NMaier.sdlna.Thumbnails
             var r = di.GetFiles(executable, SearchOption.TopDirectoryOnly);
             if (r.Length != 0) {
               var rv = r[0];
-              LogManager.GetLogger(typeof(Thumbnailer)).InfoFormat("Found {0} at {1}", executable, rv);
+              LogManager.GetLogger(typeof(Thumbnailer)).InfoFormat("Found {0} at {1}", executable, rv.FullName);
               return rv;
             }
           }
