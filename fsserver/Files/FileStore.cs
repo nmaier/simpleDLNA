@@ -165,7 +165,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
         }
       }
       catch (Exception ex) {
-        Error("Failed to deserialize an item", ex);
+        Debug("Failed to deserialize an item", ex);
       }
       return null;
     }
