@@ -8,6 +8,11 @@ namespace NMaier.sdlna.FileMediaServer.Views
 {
   class ByTitleView : IView
   {
+    private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
+    {
+      public TitlesFolder(FileServer aServer, IFileServerFolder aParent) : base(aServer, aParent, "") { }
+    }
+
 
     private static Regex regClean = new Regex(@"[^\d\w]+", RegexOptions.Compiled);
 
@@ -29,17 +34,17 @@ namespace NMaier.sdlna.FileMediaServer.Views
     public void Transform(FileServer Server, IMediaFolder Root)
     {
       var root = Root as IFileServerFolder;
-      var titles = new Dictionary<string, IFileServerFolder>();
+      var titles = new TitlesFolder(Server, root);
       SortFolder(Server, root, titles);
       foreach (var i in root.ChildFolders.ToList()) {
         root.ReleaseItem(i as IFileServerMediaItem);
       }
-      foreach (var i in titles.Values) {
-        root.AdoptItem(i);
+      foreach (var i in titles.ChildFolders.ToList()) {
+        root.AdoptItem(i as IFileServerFolder);
       }
     }
 
-    private void SortFolder(FileServer server, IFileServerFolder folder, IDictionary<string, IFileServerFolder> titles)
+    private void SortFolder(FileServer server, IFileServerFolder folder, TitlesFolder titles)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
         SortFolder(server, f as IFileServerFolder, titles);
@@ -51,13 +56,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
           pre = "Unnamed";
         }
         pre = pre.First().ToString().ToUpper();
-        IFileServerFolder dest;
-        if (!titles.TryGetValue(pre, out dest)) {
-          dest = new VirtualFolder(server, server.Root as IFileServerFolder, pre);
-          titles.Add(pre, dest);
-          server.RegisterPath(dest);
-        }
-        dest.AdoptItem(c as IFileServerMediaItem);
+        titles.GetFolder(pre).AdoptItem(c as IFileServerMediaItem);
       }
     }
   }
