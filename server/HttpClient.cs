@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -25,22 +25,41 @@ namespace NMaier.sdlna.Server
     private string method;
     private readonly HttpServer owner;
     private string path;
-    private MemoryStream readStream = new MemoryStream();
+    private MemoryStream readStream;
+    private uint requestCount = 0;
     private IResponse response;
     private Stream responseStream;
+    private HttpStates state;
     private readonly NetworkStream stream;
+
+
+
+    internal enum HttpStates
+    {
+      ACCEPTED,
+      READBEGIN,
+      READING,
+      WRITEBEGIN,
+      WRITING,
+      CLOSED
+    }
 
 
 
     public HttpClient(HttpServer aOwner, TcpClient aClient)
     {
+      State = HttpStates.ACCEPTED;
       lastActivity = DateTime.Now;
 
       owner = aOwner;
       client = aClient;
       stream = client.GetStream();
       client.Client.UseOnlyOverlappedIO = true;
-      Read();
+
+      RemoteEndpoint = client.Client.RemoteEndPoint as IPEndPoint;
+      LocalEndPoint = client.Client.LocalEndPoint as IPEndPoint;
+
+      ReadNext();
     }
 
 
@@ -59,14 +78,27 @@ namespace NMaier.sdlna.Server
     {
       get
       {
-        var diff = DateTime.Now - lastActivity;
-        return diff.TotalSeconds > 120;
+        var diff = (DateTime.Now - lastActivity).TotalSeconds;
+        switch (state) {
+          case HttpStates.ACCEPTED:
+          case HttpStates.READBEGIN:
+          case HttpStates.WRITEBEGIN:
+            return diff > 10;
+          case HttpStates.READING:
+          case HttpStates.WRITING:
+            return diff > 60;
+          case HttpStates.CLOSED:
+            return true;
+          default:
+            throw new ApplicationException("Invalid state");
+        }
       }
     }
 
     public IPEndPoint LocalEndPoint
     {
-      get { return client.Client.LocalEndPoint as IPEndPoint; }
+      get;
+      private set;
     }
 
     public string Method
@@ -81,7 +113,18 @@ namespace NMaier.sdlna.Server
 
     public IPEndPoint RemoteEndpoint
     {
-      get { return client.Client.RemoteEndPoint as IPEndPoint; }
+      get;
+      private set;
+    }
+
+    public HttpStates State
+    {
+      get { return state; }
+      private set
+      {
+        lastActivity = DateTime.Now;
+        state = value;
+      }
     }
 
 
@@ -110,6 +153,12 @@ namespace NMaier.sdlna.Server
 
     private void ReadCallback(IAsyncResult result)
     {
+      if (state == HttpStates.CLOSED) {
+        return;
+      }
+
+      State = HttpStates.READING;
+
       int read = 0;
       try {
         read = stream.EndRead(result);
@@ -121,8 +170,10 @@ namespace NMaier.sdlna.Server
         lastActivity = DateTime.Now;
       }
       catch (Exception ex) {
-        Warn(String.Format("{0} - Failed to read data", this), ex);
-        Close();
+        if (!IsATimeout) {
+          WarnFormat("{0} - Failed to read data", this);
+          Close();
+        }
         return;
       }
 
@@ -177,6 +228,21 @@ namespace NMaier.sdlna.Server
       SetupResponse();
     }
 
+    private void ReadNext()
+    {
+      method = null;
+      headers.Clear();
+      hasHeaders = false;
+      body = null;
+      bodyBytes = 0;
+      readStream = new MemoryStream();
+
+      ++requestCount;
+      State = HttpStates.READBEGIN;
+
+      Read();
+    }
+
     private void SendResponse()
     {
       var body = response.Body;
@@ -225,7 +291,7 @@ namespace NMaier.sdlna.Server
       }
 
       var hb = new StringBuilder();
-      hb.AppendFormat("HTTP/1.0 {0} {1}\r\n", (uint)st, HttpPhrases.Phrases[st]);
+      hb.AppendFormat("HTTP/1.1 {0} {1}\r\n", (uint)st, HttpPhrases.Phrases[st]);
       hb.Append(response.Headers.HeaderBlock);
       hb.Append("\r\n");
 
@@ -241,6 +307,7 @@ namespace NMaier.sdlna.Server
 
     private void SetupResponse()
     {
+      State = HttpStates.WRITEBEGIN;
       try {
         var handler = owner.FindHandler(path);
         if (handler == null) {
@@ -268,7 +335,13 @@ namespace NMaier.sdlna.Server
         int bytes = responseStream.Read(buffer, 0, BUFFER_SIZE);
         if (bytes <= 0) {
           DebugFormat("{0} - Done writing response", this);
-          Close();
+          string conn;
+          if (headers.TryGetValue("connection", out conn) && conn.ToLower() == "keep-alive") {
+            ReadNext();
+          }
+          else {
+            Close();
+          }
           return;
         }
         stream.BeginWrite(buffer, 0, bytes, WriteCallback, null);
@@ -281,12 +354,16 @@ namespace NMaier.sdlna.Server
 
     private void WriteCallback(IAsyncResult result)
     {
+      if (state == HttpStates.CLOSED) {
+        return;
+      }
+      State = HttpStates.WRITING;
       try {
         stream.EndWrite(result);
         lastActivity = DateTime.Now;
       }
       catch (Exception ex) {
-        Debug("Failed to write - client hung up on me", ex);
+        DebugFormat("{0} - Failed to write - client hung up on me", this);
         Close();
         return;
       }
@@ -296,6 +373,9 @@ namespace NMaier.sdlna.Server
 
     internal void Close()
     {
+      State = HttpStates.CLOSED;
+
+      InfoFormat("{0} - Closing connection after {1} requestes", this, requestCount);
       try {
         client.Close();
       }

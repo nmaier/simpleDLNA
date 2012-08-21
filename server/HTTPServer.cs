@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,7 +18,7 @@ namespace NMaier.sdlna.Server
     public static readonly string SERVER_SIGNATURE = GenerateServerSignature();
     private readonly Dictionary<Guid, MediaMount> servers = new Dictionary<Guid, MediaMount>();
     private readonly SSDPServer ssdpServer;
-    private readonly Timer timeouter = new Timer(100000);
+    private readonly Timer timeouter = new Timer(10 * 1000);
 
 
 
@@ -171,8 +171,8 @@ namespace NMaier.sdlna.Server
       Debug("Timeouter");
       foreach (var c in clients.ToList()) {
         if (c.Key.IsATimeout) {
-          c.Key.Close();
           DebugFormat("Collected timeout client {0}", c);
+          c.Key.Close();
         }
       }
     }

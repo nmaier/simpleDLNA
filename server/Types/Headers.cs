@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -96,7 +96,6 @@ namespace NMaier.sdlna.Server
     public void Clear()
     {
       dict.Clear();
-      throw new NotImplementedException();
     }
 
     public bool Contains(KeyValuePair<string, string> item)

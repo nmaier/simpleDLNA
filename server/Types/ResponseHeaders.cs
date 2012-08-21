@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NMaier.sdlna.Server
 {
@@ -11,7 +11,7 @@ namespace NMaier.sdlna.Server
       this["Server"] = HttpServer.ServerSignature;
       this["Cache-Control"] = "no-cache";
       this["Date"] = DateTime.Now.ToString("R");
-      //this["Connection"] = "close";
+      this["Connection"] = "Keep-Alive";
     }
   }
 }
