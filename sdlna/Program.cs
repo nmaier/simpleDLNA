@@ -31,6 +31,7 @@ namespace NMaier.sdlna
       e.Cancel = true;
       BlockEvent.Set();
       LogManager.GetLogger(typeof(Program)).Info("Shutdown requested");
+      Console.Title = "simple DLNA - shutting down ...";
     }
 
     static void Main(string[] args)
@@ -115,6 +116,8 @@ namespace NMaier.sdlna
         HttpServer server = new HttpServer(options.Port);
         server.Info("CTRL-C to terminate");
 
+        Console.Title = "simple DLNA - starting ...";
+
         MediaTypes types = options.Types[0];
         foreach (var t in options.Types) {
           types = types | t;
@@ -151,6 +154,7 @@ namespace NMaier.sdlna
           server.InfoFormat("{0} mounted", d.FullName);
         }
 
+        Console.Title = "simple DLNA - running ...";
 
         // Basically the main loop, except we don't loop here at all ;)
         BlockEvent.WaitOne();
