@@ -116,7 +116,8 @@ namespace NMaier.sdlna.FileMediaServer
       paths = newPaths;
       ids = newIds;
 
-      using (var trans = store.BeginTransaction()) {
+      var trans = store != null ? store.BeginTransaction() : null;
+      try {
         var newRoot = new Folders.PlainRootFolder(this, types, directory);
         foreach (var t in transformations) {
           t.Transform(this, newRoot);
@@ -130,7 +131,14 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 #endif
-        trans.Commit();
+        if (trans != null) {
+          trans.Commit();
+        }
+      }
+      finally {
+        if (trans != null) {
+          trans.Dispose();
+        }
       }
     }
 
