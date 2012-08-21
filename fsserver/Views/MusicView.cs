@@ -87,7 +87,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
         return;
       }
       folder
-        .GetFolder(key1.TrimStart().First().ToString())
+        .GetFolder(key1.TrimStart().First().ToString().ToUpper())
         .GetFolder(key1)
         .GetFolder(key2)
         .Link(r);
@@ -107,7 +107,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
         if (album == null) {
           album = "Unspecified album";
         }
-        albums.GetFolder(album.TrimStart().First().ToString()).GetFolder(album).Link(ai);
+        albums.GetFolder(album.TrimStart().First().ToString().ToUpper()).GetFolder(album).Link(ai);
         LinkTriple(artists, ai, ai.MetaArtist, album);
         LinkTriple(performers, ai, ai.MetaPerformer, album);
         var genre = ai.MetaGenre;
