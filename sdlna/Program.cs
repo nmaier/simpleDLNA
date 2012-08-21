@@ -137,11 +137,14 @@ namespace NMaier.sdlna
             }
           }
 
-          try {
-            fs.SetOrder(options.Order);
-          }
-          catch (RepositoryLookupException) {
-            throw new GetOptException("Invalid order" + options.Order);
+          if (options.Order != null) {
+            try {
+
+              fs.SetOrder(options.Order);
+            }
+            catch (RepositoryLookupException) {
+              throw new GetOptException("Invalid order" + options.Order);
+            }
           }
           fs.DescendingOrder = options.DescendingOrder;
 
@@ -223,7 +226,7 @@ namespace NMaier.sdlna
 
       [Argument("sort", Helptext = "Sort order; see --list-sort-orders")]
       [ShortArgument('s')]
-      public string Order = "title";
+      public string Order = null;
 
       [Argument("sort-descending", Helptext = "Sort order; see --list-sort-orders")]
       [ShortArgument('d')]

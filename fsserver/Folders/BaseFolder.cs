@@ -81,7 +81,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
 
     public int CompareTo(IMediaItem other)
     {
-      return Title.CompareTo(other.Title);
+      return Title.ToLower().CompareTo(other.Title.ToLower());
     }
 
     public void ReleaseItem(IFileServerMediaItem item)

@@ -216,6 +216,15 @@ namespace NMaier.sdlna.Server
           }
         }
         catch (Exception) { }
+
+        try {
+          if (mai.MetaTrack != null) {
+            var e = result.CreateElement("upnp", "originalTrackNumber", NS_UPNP);
+            e.InnerText = mai.MetaTrack.Value.ToString();
+            item.AppendChild(e);
+          }
+        }
+        catch (Exception) { }
       }
 
       if (r is IMetaImageItem) {

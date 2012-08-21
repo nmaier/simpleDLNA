@@ -110,9 +110,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
-    public int CompareTo(IMediaItem other)
+    public virtual int CompareTo(IMediaItem other)
     {
-      return Title.CompareTo(other.Title);
+      return Title.ToLower().CompareTo(other.Title.ToLower());
     }
 
     internal static BaseFile GetFile(BaseFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)

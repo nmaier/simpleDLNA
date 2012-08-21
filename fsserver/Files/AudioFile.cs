@@ -10,17 +10,18 @@ namespace NMaier.sdlna.FileMediaServer.Files
   [Serializable]
   internal class AudioFile : BaseFile, IMetaAudioItem, ISerializable
   {
-    private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
 
     private string album;
     private string artist;
     private Cover cover = null;
     private string description;
     private TimeSpan? duration;
+    private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
     private string genre;
     private bool initialized = false;
     private string performer;
     private string title;
+    private uint? track;
 
 
 
@@ -37,6 +38,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       genre = info.GetString("g");
       performer = info.GetString("p");
       title = info.GetString("ti");
+      track = info.GetUInt32("tr");
       var ts = info.GetInt64("d");
       if (ts > 0) {
         duration = new TimeSpan(ts);
@@ -114,12 +116,24 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
+    public uint? MetaTrack
+    {
+      get
+      {
+        MaybeInit();
+        return track;
+      }
+    }
+
     public override string Title
     {
       get
       {
         MaybeInit();
         if (!string.IsNullOrWhiteSpace(title)) {
+          if (track.HasValue) {
+            return string.Format("{0:D2}. — {1}", track.Value, title);
+          }
           return title;
         }
         return base.Title;
@@ -129,6 +143,18 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
+    public override int CompareTo(IMediaItem other)
+    {
+      if (track.HasValue && other is AudioFile) {
+        var oa = other as AudioFile;
+        int rv;
+        if (oa.track.HasValue && (rv = track.Value.CompareTo(oa.track.Value)) != 0) {
+          return rv;
+        }
+      }
+      return base.CompareTo(other);
+    }
+
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
     {
       info.AddValue("ty", (Int32)Type);
@@ -137,6 +163,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("g", genre);
       info.AddValue("p", performer);
       info.AddValue("ti", title);
+      info.AddValue("tr", track);
       info.AddValue("d", duration.GetValueOrDefault(EmptyDuration).Ticks);
       if (cover != null) {
         info.AddValue("c", cover, typeof(Cover));
@@ -167,6 +194,11 @@ namespace NMaier.sdlna.FileMediaServer.Files
             if (string.IsNullOrWhiteSpace(genre)) {
               genre = null;
             }
+
+            if (t.Track != 0 && t.Track < (1 << 10)) {
+              track = t.Track;
+            }
+            
 
             title = t.Title;
             if (string.IsNullOrWhiteSpace(title)) {
