@@ -1,12 +1,14 @@
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
-  internal class ImageFile : BaseFile, IMetaImageItem
+  [Serializable]
+  internal class ImageFile : BaseFile, IMetaImageItem, ISerializable
   {
 
     private string creator;
@@ -18,6 +20,18 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
     internal ImageFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
+
+    protected ImageFile(SerializationInfo info, StreamingContext ctx)
+      : this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+    {
+      creator = info.GetString("cr");
+      description = info.GetString("d");
+      title = info.GetString("t");
+      width = info.GetUInt32("w");
+      height = info.GetUInt32("h");
+
+      initialized = true;
+    }
 
 
 
@@ -70,6 +84,15 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
+
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      info.AddValue("al", creator);
+      info.AddValue("ar", description);
+      info.AddValue("g", title);
+      info.AddValue("p", width);
+      info.AddValue("ti", height);
+    }
 
     private void MaybeInit()
     {
