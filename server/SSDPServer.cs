@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -58,12 +58,13 @@ namespace NMaier.sdlna.Server
       try {
         var endpoint = new IPEndPoint(IPAddress.Any, SSDP_PORT);
         var received = client.EndReceive(result, ref endpoint);
+#if DUMP_ALL_SSDP
         DebugFormat("{0} - SSDP Received a datagram", endpoint);
+#endif
 
         using (var reader = new StreamReader(new MemoryStream(received), Encoding.ASCII)) {
           var proto = reader.ReadLine().Trim();
           var method = proto.Split(new char[] { ' ' }, 2)[0];
-          DebugFormat("{0} - Datagram method: {1}", endpoint, method);
           var headers = new Headers();
           for (var line = reader.ReadLine(); line != null; line = reader.ReadLine()) {
             line = line.Trim();
@@ -73,7 +74,10 @@ namespace NMaier.sdlna.Server
             var parts = line.Split(new char[] { ':' }, 2);
             headers[parts[0]] = parts[1].Trim();
           }
+#if DUMP_ALL_SSDP
+          DebugFormat("{0} - Datagram method: {1}", endpoint, method);
           Debug(headers);
+#endif
           if (method == "M-SEARCH") {
             RespondToSearch(endpoint, headers["st"]);
           }
