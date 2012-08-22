@@ -32,6 +32,7 @@ namespace NMaier.sdlna.Server
     public static Dictionary<string, DlnaTypes> Ext2Dlna = new Dictionary<string, DlnaTypes>();
     public static Dictionary<string, MediaTypes> Ext2Media = new Dictionary<string, MediaTypes>();
     private static string[] jpgs = new string[] { "jpg", "jpe", "jpeg", "jif", "jfif" };
+    public static Dictionary<DlnaTypes, List<string>> Dlna2Ext = new Dictionary<DlnaTypes, List<string>>();
     public static Dictionary<MediaTypes, List<string>> Media2Ext = new Dictionary<MediaTypes, List<string>>();
     public static Dictionary<DlnaTypes, string> Mime = new Dictionary<DlnaTypes, string>();
     private static string[] mkvs = new string[] { "mkv", "matroska", "mk3d", "webm" };
