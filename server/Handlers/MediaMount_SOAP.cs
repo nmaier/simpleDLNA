@@ -49,6 +49,9 @@ namespace NMaier.sdlna.Server
 
     private void Browse_AddItem(IRequest request, XmlDocument result, IMediaResource r)
     {
+      var props = r.Properties;
+      string prop = null;
+
       var item = result.CreateElement("", "item", NS_DIDL);
       item.SetAttribute("restricted", "1");
       item.SetAttribute("id", r.ID);
@@ -73,106 +76,61 @@ namespace NMaier.sdlna.Server
           throw new NotSupportedException();
       }
       item.AppendChild(objectClass);
-      var meta = r as IMetaInfo;
-      if (meta != null && meta.Date != null) {
-        try {
-          var date = result.CreateElement("dc", "date", NS_DC);
-          date.InnerText = meta.Date.ToString("o");
-          item.AppendChild(date);
-        }
-        catch (Exception) { }
-      }
-      if (r is IMetaGenre) {
-        try {
-          var genre = (r as IMetaGenre).MetaGenre;
-          if (genre != null) {
-            var e = result.CreateElement("upnp", "genre", NS_UPNP);
-            e.InnerText = genre;
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
-      }
-      if (r is IMetaDescription) {
-        try {
-          var desc = (r as IMetaDescription).MetaDescription;
-          if (desc != null) {
-            var e = result.CreateElement("dc", "description", NS_DC);
-            e.InnerText = desc;
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
-      }
-      if (r is IMetaAudioItem) {
-        var mai = r as IMetaAudioItem;
-        try {
-          var artist = mai.MetaArtist;
-          if (artist != null) {
-            var e = result.CreateElement("upnp", "artist", NS_UPNP);
-            e.SetAttribute("role", "AlbumArtist");
-            e.InnerText = artist;
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
-        try {
-          var performer = mai.MetaPerformer;
-          if (performer != null) {
-            var e = result.CreateElement("upnp", "artist", NS_UPNP);
-            e.SetAttribute("role", "Performer");
-            e.InnerText = performer;
-            item.AppendChild(e);
-            e = result.CreateElement("dc", "creator", NS_DC);
-            e.InnerText = performer;
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
 
-        try {
-          if (mai.MetaAlbum != null) {
-            var e = result.CreateElement("upnp", "album", NS_UPNP);
-            e.InnerText = mai.MetaAlbum;
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
-
-        try {
-          if (mai.MetaTrack != null) {
-            var e = result.CreateElement("upnp", "originalTrackNumber", NS_UPNP);
-            e.InnerText = mai.MetaTrack.Value.ToString();
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
+      if (props.TryGetValue("DateO", out prop)) {
+        var e = result.CreateElement("dc", "date", NS_DC);
+        e.InnerText = prop;
+        item.AppendChild(e);
+      }
+      if (props.TryGetValue("Genre", out prop)) {
+        var e = result.CreateElement("upnp", "genre", NS_UPNP);
+        e.InnerText = prop;
+        item.AppendChild(e);
+      }
+      if (props.TryGetValue("Description", out prop)) {
+        var e = result.CreateElement("dc", "description", NS_DC);
+        e.InnerText = prop;
+        item.AppendChild(e);
+      }
+      if (props.TryGetValue("Artist", out prop)) {
+        var e = result.CreateElement("upnp", "artist", NS_UPNP);
+        e.SetAttribute("role", "AlbumArtist");
+        e.InnerText = prop;
+        item.AppendChild(e);
+      }
+      if (props.TryGetValue("Performer", out prop)) {
+        var e = result.CreateElement("upnp", "artist", NS_UPNP);
+        e.SetAttribute("role", "Performer");
+        e.InnerText = prop;
+        item.AppendChild(e);
+        e = result.CreateElement("dc", "creator", NS_DC);
+        e.InnerText = prop;
+        item.AppendChild(e);
+      }
+      if (props.TryGetValue("Album", out prop)) {
+        var e = result.CreateElement("upnp", "album", NS_UPNP);
+        e.InnerText = prop;
+        item.AppendChild(e);
+      }
+      if (props.TryGetValue("Track", out prop)) {
+        var e = result.CreateElement("upnp", "originalTrackNumber", NS_UPNP);
+        e.InnerText = prop;
+        item.AppendChild(e);
+      }
+      if (props.TryGetValue("Creator", out prop)) {
+        var e = result.CreateElement("dc", "creator", NS_DC);
+        e.InnerText = prop;
+        item.AppendChild(e);
       }
 
-      if (r is IMetaImageItem) {
-        try {
-          var creator = (r as IMetaImageItem).MetaCreator;
-          if (creator != null) {
-            var e = result.CreateElement("dc", "creator", NS_DC);
-            e.InnerText = creator;
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
+      if (props.TryGetValue("Director", out prop)) {
+        var e = result.CreateElement("upnp", "director", NS_UPNP);
+        e.InnerText = prop;
+        item.AppendChild(e);
       }
 
       if (r is IMetaVideoItem) {
         var mvi = r as IMetaVideoItem;
-        try {
-          var director = mvi.MetaDirector;
-          if (director != null) {
-            var e = result.CreateElement("upnp", "director", NS_UPNP);
-            e.InnerText = director;
-            item.AppendChild(e);
-          }
-        }
-        catch (Exception) { }
-
         try {
           var actors = mvi.MetaActors;
           if (actors != null) {
@@ -199,32 +157,15 @@ namespace NMaier.sdlna.Server
         r.ID
         );
 
-      if (meta != null) {
-        try {
-          var size = meta.Size;
-          if (size.HasValue) {
-            res.SetAttribute("size", size.Value.ToString());
-          }
-        }
-        catch (Exception) { }
+      if (props.TryGetValue("SizeRaw", out prop)) {
+        res.SetAttribute("size", prop);
       }
-      if (r is IMetaResolution) {
-        try {
-          var metaRes = r as IMetaResolution;
-          res.SetAttribute("resolution", String.Format("{0}x{1}", metaRes.MetaWidth, metaRes.MetaHeight));
-        }
-        catch (Exception) { }
+      if (props.TryGetValue("Resolution", out prop)) {
+        res.SetAttribute("resolution", prop);
       }
-      if (r is IMetaDuration) {
-        try {
-          var duration = (r as IMetaDuration).MetaDuration;
-          if (duration.HasValue) {
-            res.SetAttribute("duration", duration.Value.ToString("g"));
-          }
-        }
-        catch (Exception) { }
+      if (props.TryGetValue("Duration", out prop)) {
+        res.SetAttribute("duration", prop);
       }
-
 
       var pn = r.PN;
       var mime = DlnaMaps.Mime[r.Type];
