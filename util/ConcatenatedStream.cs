@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.sdlna.Util
 {
-  internal class ConcatenatedStream : Stream
+  public class ConcatenatedStream : Stream
   {
 
     Queue<Stream> streams = new Queue<Stream>();

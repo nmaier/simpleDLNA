@@ -1,30 +1,16 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using NMaier.sdlna.Server;
 using log4net;
+using NMaier.sdlna.Server;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Thumbnails
 {
   public class Thumbnailer : Logging
   {
-
-    private class CacheItem
-    {
-      public readonly byte[] Data;
-      public readonly int Width;
-      public readonly int Height;
-
-      public CacheItem(byte[] aData, int aWidth, int aHeight)
-      {
-        Data = aData;
-        Width = aWidth;
-        Height = aHeight;
-      }
-    }
-
 
     private static readonly LRUCache<string, CacheItem> cache = new LRUCache<string, CacheItem>(1 << 11);
     private static readonly Dictionary<MediaTypes, List<IThumbnailer>> thumbers = new Dictionary<MediaTypes, List<IThumbnailer>>();
@@ -108,7 +94,7 @@ namespace NMaier.sdlna.Thumbnails
       var rh = height;
       foreach (var thumber in thumbnailers) {
         try {
-          
+
           using (var i = thumber.GetThumbnail(item, ref width, ref height)) {
             var rv = i.ToArray();
             cache.Add(key, new CacheItem(rv, rw, rh));
@@ -165,6 +151,23 @@ namespace NMaier.sdlna.Thumbnails
         height = result.Height;
       }
       return result;
+    }
+
+
+
+
+    private class CacheItem
+    {
+      public readonly byte[] Data;
+      public readonly int Height;
+      public readonly int Width;
+
+      public CacheItem(byte[] aData, int aWidth, int aHeight)
+      {
+        Data = aData;
+        Width = aWidth;
+        Height = aHeight;
+      }
     }
   }
 }

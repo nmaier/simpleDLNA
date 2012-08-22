@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using log4net;
 using NMaier.sdlna.Server;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Thumbnails
 {

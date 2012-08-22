@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace NMaier.sdlna.Thumbnails
+namespace NMaier.sdlna.Util
 {
-  class LRUCache<TKey, TValue> : IDictionary<TKey, TValue>
+  public class LRUCache<TKey, TValue> : IDictionary<TKey, TValue>
   {
 
     private readonly uint capacity;

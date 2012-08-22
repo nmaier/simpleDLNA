@@ -65,7 +65,6 @@
     <Compile Include="Interfaces\Metadata\IMetaInfo.cs" />
     <Compile Include="Interfaces\Metadata\IMetaResolution.cs" />
     <Compile Include="Interfaces\Metadata\IMetaVideoItem.cs" />
-    <Compile Include="Types\ConcatenatedStream.cs" />
     <Compile Include="Types\DlnaTypes.cs" />
     <Compile Include="Types\Headers.cs" />
     <Compile Include="HttpClient.cs" />
@@ -122,6 +121,12 @@
     <Content Include="Resources\large.png" />
     <Content Include="Resources\small.jpg" />
     <Content Include="Resources\small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\util\util.csproj">
+      <Project>{A8960A7A-887C-40D7-9632-002E94BFC830}</Project>
+      <Name>util</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

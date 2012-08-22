@@ -16,8 +16,6 @@ namespace NMaier.sdlna.Server
     private const string NS_UPNP = "urn:schemas-upnp-org:metadata-1-0/upnp/";
 
 
-
-
     private void Browse_AddFolder(XmlDocument result, IMediaFolder f)
     {
       var meta = f as IMetaInfo;

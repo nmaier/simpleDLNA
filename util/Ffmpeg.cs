@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -8,9 +8,9 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using log4net;
 
-namespace NMaier.sdlna.Thumbnails
+namespace NMaier.sdlna.Util
 {
-  internal static class Ffmpeg
+  public static class Ffmpeg
   {
 
     public static readonly FileInfo FFIDENTIFY;
@@ -142,14 +142,14 @@ namespace NMaier.sdlna.Thumbnails
             var r = di.GetFiles(executable, SearchOption.TopDirectoryOnly);
             if (r.Length != 0) {
               var rv = r[0];
-              LogManager.GetLogger(typeof(Thumbnailer)).InfoFormat("Found {0} at {1}", executable, rv.FullName);
+              LogManager.GetLogger(typeof(Ffmpeg)).InfoFormat("Found {0} at {1}", executable, rv.FullName);
               return rv;
             }
           }
           catch (Exception) { }
         }
       }
-      LogManager.GetLogger(typeof(Thumbnailer)).Warn("Did not find " + executable);
+      LogManager.GetLogger(typeof(Ffmpeg)).Warn("Did not find " + executable);
       return null;
     }
   }

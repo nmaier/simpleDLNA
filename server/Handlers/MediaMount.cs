@@ -74,7 +74,7 @@ namespace NMaier.sdlna.Server
         return ProcessSoapRequest(request);
       }
       if (path.StartsWith("file/")) {
-        var id = path.Substring("file/".Length);
+        var id = path.Split('/')[1];
         var item = GetItem(id) as IMediaResource;
         return new ItemResponse(request, item);
       }

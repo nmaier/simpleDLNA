@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace NMaier.sdlna.Thumbnails
+namespace NMaier.sdlna.Util
 {
-  internal class ReadRequest : IDisposable
+  public class ReadRequest : IDisposable
   {
 
     public byte[] buffer;
