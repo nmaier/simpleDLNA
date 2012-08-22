@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using NMaier.sdlna.Server.Metadata;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {

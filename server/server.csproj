@@ -54,8 +54,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Handlers\MediaMount_HTML.cs" />
     <Compile Include="Handlers\MediaMount_SOAP.cs" />
-    <Compile Include="Types\ResList.cs" />
+    <Compile Include="Responses\FileResponse.cs" />
+    <Compile Include="Responses\Redirect.cs" />
     <Compile Include="Interfaces\IMediaCoverResource.cs" />
     <Compile Include="Interfaces\Metadata\IMetaAudioItem.cs" />
     <Compile Include="Interfaces\Metadata\IMetaDescription.cs" />
@@ -117,6 +119,7 @@
     <None Include="Resources\favicon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\browse.css" />
     <Content Include="Resources\large.jpg" />
     <Content Include="Resources\large.png" />
     <Content Include="Resources\small.jpg" />

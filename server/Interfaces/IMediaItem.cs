@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NMaier.sdlna.Server
 {
@@ -10,5 +10,7 @@ namespace NMaier.sdlna.Server
     IMediaFolder Parent { get; }
 
     string Title { get; }
+
+    IHeaders Properties { get; }
   }
 }

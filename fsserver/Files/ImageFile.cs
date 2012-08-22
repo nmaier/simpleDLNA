@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
 using NMaier.sdlna.FileMediaServer.Folders;
@@ -71,12 +71,31 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
+    public override IHeaders Properties
+    {
+      get
+      {
+        MaybeInit();
+        var rv = base.Properties;
+        if (description != null) {
+          rv.Add("Description", description);
+        }
+        if (creator != null) {
+          rv.Add("Creator", creator);
+        }
+        if (width != null && height != null) {
+          rv.Add("Resolution", string.Format("{0}x{1}", width.Value, height.Value));
+        }
+        return rv;
+      }
+    }
+
     public override string Title
     {
       get
       {
         if (!string.IsNullOrWhiteSpace(title)) {
-          return string.Format("{0} � {1}", base.Title, title);
+          return string.Format("{0} — {1}", base.Title, title);
         }
         return base.Title;
       }

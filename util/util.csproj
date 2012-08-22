@@ -56,8 +56,10 @@
     <Compile Include="Ffmpeg.cs" />
     <Compile Include="Formatting.cs" />
     <Compile Include="LRUCache.cs" />
+    <Compile Include="MoreDom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadRequest.cs" />
+    <Compile Include="ResList.cs" />
     <Compile Include="WriteRequest.cs" />
   </ItemGroup>
   <ItemGroup>

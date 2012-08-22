@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.IO;
+using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
-using NMaier.sdlna.FileMediaServer.Folders;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
@@ -89,6 +89,28 @@ namespace NMaier.sdlna.FileMediaServer.Files
     public string PN
     {
       get { return DlnaMaps.PN[Type]; }
+    }
+
+    public virtual IHeaders Properties
+    {
+      get
+      {
+        var rv = new RawHeaders();
+        rv.Add("Title", Title);
+        rv.Add("MediaType", MediaType.ToString());
+        rv.Add("Type", Type.ToString());
+        rv.Add("SizeRaw", Size.ToString());
+        rv.Add("Size", Util.Formatting.FormatFileSize(Size.Value));
+        rv.Add("Date", Date.ToString());
+        rv.Add("DateO", Date.ToString("o"));
+        try {
+          if (Cover != null) {
+            rv.Add("HasCover", "true");
+          }
+        }
+        catch (Exception) { }
+        return rv;
+      }
     }
 
     public long? Size

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Xml;
 
@@ -82,6 +83,22 @@ namespace NMaier.sdlna.Server
         var id = path.Substring("cover/".Length);
         var item = GetItem(id) as IMediaCover;
         return new ItemResponse(request, item.Cover, "Interactive");
+      }
+      if (path == "" || path == "index.html") {
+        return new Redirect(request, prefix + "index/0");
+      }
+      if (path.StartsWith("index/")) {
+        var id = path.Substring("index/".Length);
+        var item = GetItem(id);
+        return ProcessHtmlRequest(request, item);
+      }
+      if (path == "browse.css") {
+#if DEBUG
+        var a = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.Parent.Parent.Parent.Parent;
+        return new FileResponse(HttpCodes.OK, "text/css", new FileInfo(Path.Combine(a.FullName, "server", "Resources", "browse.css")));
+#else
+        return new ResourceResponse(HttpCodes.OK, "text/css", "browse_css");
+#endif
       }
       WarnFormat("Did not understand {0} {1}", request.Method, path);
       throw new Http404Exception();

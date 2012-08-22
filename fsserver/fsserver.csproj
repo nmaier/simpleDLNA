@@ -101,6 +101,10 @@
       <Project>{EF29F98A-B8B6-4591-BA29-E71BCC308E98}</Project>
       <Name>thumbs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\util\util.csproj">
+      <Project>{A8960A7A-887C-40D7-9632-002E94BFC830}</Project>
+      <Name>util</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

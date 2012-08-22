@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
 using NMaier.sdlna.Server;
@@ -92,6 +92,11 @@ namespace NMaier.sdlna.FileMediaServer.Files
       get { return "DLNA.ORG_PN=JPEG_TN"; }
     }
 
+    public IHeaders Properties
+    {
+      get { throw new NotImplementedException(); }
+    }
+
     public long Size
     {
       get { return bytes.Length; }
@@ -107,7 +112,12 @@ namespace NMaier.sdlna.FileMediaServer.Files
       get { return DlnaTypes.JPEG; }
     }
 
+
+
+
     internal event EventHandler OnCoverLazyLoaded;
+
+
 
 
     public int CompareTo(IMediaItem other)

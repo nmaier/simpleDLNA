@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
 using NMaier.sdlna.FileMediaServer.Folders;
@@ -125,6 +125,37 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
+    public override IHeaders Properties
+    {
+      get
+      {
+        MaybeInit();
+        var rv = base.Properties;
+        if (album != null) {
+          rv.Add("Album", album);
+        }
+        if (artist != null) {
+          rv.Add("Artist", artist);
+        }
+        if (description != null) {
+          rv.Add("Description", description);
+        }
+        if (duration != null) {
+          rv.Add("Duration", duration.Value.ToString("g"));
+        }
+        if (genre != null) {
+          rv.Add("Genre", genre);
+        }
+        if (performer != null) {
+          rv.Add("Performer", performer);
+        }
+        if (track != null) {
+          rv.Add("Track", track.Value.ToString());
+        }
+        return rv;
+      }
+    }
+
     public override string Title
     {
       get
@@ -132,7 +163,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
         MaybeInit();
         if (!string.IsNullOrWhiteSpace(title)) {
           if (track.HasValue) {
-            return string.Format("{0:D2}. � {1}", track.Value, title);
+            return string.Format("{0:D2}. — {1}", track.Value, title);
           }
           return title;
         }
@@ -197,7 +228,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
             if (t.Track != 0 && t.Track < (1 << 10)) {
               track = t.Track;
             }
-            
+
 
             title = t.Title;
             if (string.IsNullOrWhiteSpace(title)) {

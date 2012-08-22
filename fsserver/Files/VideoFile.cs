@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
-using System.Runtime.Serialization;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
@@ -69,12 +69,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
         }
         return _cover;
       }
-    }
-
-    private void CoverLoaded(object sender, EventArgs e)
-    {
-      cover = _cover;
-      Parent.Server.UpdateFileCache(this);
     }
 
     public IEnumerable<string> MetaActors
@@ -143,13 +137,41 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
+    public override IHeaders Properties
+    {
+      get
+      {
+        MaybeInit();
+        var rv = base.Properties;
+        if (description != null) {
+          rv.Add("Description", description);
+        }
+        if (actors != null && actors.Length != 0) {
+          rv.Add("Actors", string.Join(", ", actors));
+        }
+        if (director != null) {
+          rv.Add("Director", director);
+        }
+        if (duration != null) {
+          rv.Add("Duration", duration.Value.ToString("g"));
+        }
+        if (genre != null) {
+          rv.Add("Genre", genre);
+        }
+        if (width != null && height != null) {
+          rv.Add("Resolution", string.Format("{0}x{1}", width.Value, height.Value));
+        }
+        return rv;
+      }
+    }
+
     public override string Title
     {
       get
       {
         MaybeInit();
         if (!string.IsNullOrWhiteSpace(title)) {
-          return string.Format("{0} � {1}", base.Title, title);
+          return string.Format("{0} — {1}", base.Title, title);
         }
         return base.Title;
       }
@@ -169,6 +191,12 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("h", height);
       info.AddValue("du", duration.GetValueOrDefault(EmptyDuration).Ticks);
       info.AddValue("c", cover);
+    }
+
+    private void CoverLoaded(object sender, EventArgs e)
+    {
+      cover = _cover;
+      Parent.Server.UpdateFileCache(this);
     }
 
     private void MaybeInit()

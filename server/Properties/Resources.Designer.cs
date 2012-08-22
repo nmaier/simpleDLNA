@@ -60,6 +60,13 @@ namespace NMaier.sdlna.Server.Properties {
             }
         }
         
+        internal static byte[] browse_css {
+            get {
+                object obj = ResourceManager.GetObject("browse_css", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
         internal static byte[] contentdirectory {
             get {
                 object obj = ResourceManager.GetObject("contentdirectory", resourceCulture);
@@ -82,7 +89,7 @@ namespace NMaier.sdlna.Server.Properties {
         ///&lt;friendlyName/&gt;
         ///&lt;deviceType&gt;urn:schemas-upnp-org:device:MediaServer:1&lt;/deviceType&gt;
         ///&lt;manufacturer&gt;tn123.org&lt;/manufacturer&gt;
-        ///&lt;manufacturerURL&gt;https://tn123.org/&lt; [rest of string was truncated]&quot;;.
+        ///&lt;manufacturerURL&gt;https://tn123.org/&lt;/manufacturerU [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string description {
             get {

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NMaier.sdlna.FileMediaServer.Files;
 using NMaier.sdlna.Server;
 
@@ -53,6 +53,16 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     }
 
     abstract public string Path { get; }
+
+    public virtual IHeaders Properties
+    {
+      get
+      {
+        var rv = new RawHeaders();
+        rv.Add("Title", Title);
+        return rv;
+      }
+    }
 
     internal FileServer Server
     {
