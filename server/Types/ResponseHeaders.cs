@@ -11,7 +11,7 @@ namespace NMaier.sdlna.Server
       this["Server"] = HttpServer.ServerSignature;
       this["Cache-Control"] = "no-cache";
       this["Date"] = DateTime.Now.ToString("R");
-      this["Connection"] = "Keep-Alive";
+      this["Connection"] = "keep-alive";
     }
   }
 }

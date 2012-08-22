@@ -22,7 +22,7 @@ namespace NMaier.sdlna.Server
         headers.Add("Content-Length", meta.Size.ToString());
         headers.Add("Last-Modified", meta.Date.ToString("R"));
       }
-      headers.Add("Accept-Ranges", "Bytes");
+      headers.Add("Accept-Ranges", "bytes");
       headers.Add("Content-Type", DlnaMaps.Mime[item.Type]);
       if (request.Headers.ContainsKey("getcontentFeatures.dlna.org")) {
         if (item.Type == DlnaTypes.JPEG) {

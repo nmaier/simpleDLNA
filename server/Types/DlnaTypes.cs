@@ -58,7 +58,7 @@ namespace NMaier.sdlna.Server
       Mime.Add(DlnaTypes.MPEG, "video/mpeg");
       Mime.Add(DlnaTypes.JPEG, "image/jpeg");
       Mime.Add(DlnaTypes.AVC, "video/mp4");
-      Mime.Add(DlnaTypes.MP3, "audio/mp3");
+      Mime.Add(DlnaTypes.MP3, "audio/mpeg");
       Mime.Add(DlnaTypes.AAC, "audio/aac");
       Mime.Add(DlnaTypes.VORBIS, "audio/ogg");
 
@@ -78,6 +78,7 @@ namespace NMaier.sdlna.Server
         foreach (var e in i.e) {
           Ext2Dlna.Add(e, t);
         }
+        Dlna2Ext.Add(i.t, new List<string>(i.e));
       }
 
       InitMedia(new string[][] { avis, mkvs, mpgs, avcs }, MediaTypes.VIDEO);

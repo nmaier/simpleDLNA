@@ -169,7 +169,7 @@ namespace NMaier.sdlna.Server
         readStream.Write(buffer, 0, read);
         lastActivity = DateTime.Now;
       }
-      catch (Exception ex) {
+      catch (Exception) {
         if (!IsATimeout) {
           WarnFormat("{0} - Failed to read data", this);
           Close();
@@ -281,8 +281,8 @@ namespace NMaier.sdlna.Server
           }
           if (start > 0) {
             body.Seek(start, SeekOrigin.Begin);
-            headers["Content-Range"] = String.Format("bytes {0}-{1}/{2}", start, (contentLength - start - 1), contentLength);
           }
+          response.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, (contentLength - start - 1), contentLength));
           st = HttpCodes.PARTIAL;
         }
         catch (Exception ex) {
@@ -362,7 +362,7 @@ namespace NMaier.sdlna.Server
         stream.EndWrite(result);
         lastActivity = DateTime.Now;
       }
-      catch (Exception ex) {
+      catch (Exception) {
         DebugFormat("{0} - Failed to write - client hung up on me", this);
         Close();
         return;
