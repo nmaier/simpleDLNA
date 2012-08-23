@@ -62,7 +62,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
         MaybeInit();
         if (_cover == null) {
           try {
-            _cover = new Cover(Item);
+            _cover = base.Cover as Cover;
             _cover.OnCoverLazyLoaded += CoverLoaded;
           }
           catch (Exception) { }
