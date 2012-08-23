@@ -14,8 +14,10 @@ namespace NMaier.sdlna.Server
     private readonly UdpClient client = new UdpClient();
     private const int DATAGRAMS_PER_MESSAGE = 3;
     private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
+    private readonly Queue<Datagram> messageQueue = new Queue<Datagram>();
     private readonly Timer notificationTimer = new Timer(10000);
     private readonly HttpServer owner;
+    private readonly Timer queueTimer = new Timer(250);
     private readonly Random random = new Random();
     const string SSDP_ADDR = "239.255.255.250";
     private readonly IPEndPoint SSDP_ENDP = new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
@@ -26,9 +28,13 @@ namespace NMaier.sdlna.Server
 
     public SSDPServer(HttpServer aOwner, int TTL = 12)
     {
+      owner = aOwner;
+
       notificationTimer.Elapsed += Tick;
       notificationTimer.Enabled = true;
-      owner = aOwner;
+
+      queueTimer.Elapsed += ProcessQueue;
+
       client.Client.UseOnlyOverlappedIO = true;
       client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
       client.ExclusiveAddressUse = false;
@@ -44,8 +50,29 @@ namespace NMaier.sdlna.Server
     public void Dispose()
     {
       Debug("Disposing SSDP");
-      notificationTimer.Enabled = false;
+
       client.DropMulticastGroup(SSDP_IP);
+
+      notificationTimer.Enabled = false;
+      queueTimer.Enabled = false;
+      notificationTimer.Dispose();
+      queueTimer.Dispose();
+
+    }
+
+    private void ProcessQueue(object sender, ElapsedEventArgs e)
+    {
+      if (messageQueue.Count != 0) {
+        var msg = messageQueue.Dequeue();
+        if (msg != null) {
+          msg.Send();
+          if (msg.SendCount <= DATAGRAMS_PER_MESSAGE) {
+            messageQueue.Enqueue(msg);
+          }
+        }
+      }
+      queueTimer.Enabled = messageQueue.Count != 0;
+      queueTimer.Interval = random.Next(100, 500);
     }
 
     private void Receive()
@@ -89,13 +116,12 @@ namespace NMaier.sdlna.Server
       Receive();
     }
 
-    private static void SendDatagram(IPEndPoint endpoint, byte[] msg)
+    private void SendDatagram(IPEndPoint endpoint, string msg)
     {
-      for (var i = 0; i < DATAGRAMS_PER_MESSAGE; ++i) {
-        using (var udp = new UdpClient()) {
-          udp.Send(msg, msg.Length, endpoint);
-        }
-      }
+      var dgram = new Datagram(endpoint, msg);
+      dgram.Send();
+      messageQueue.Enqueue(dgram);
+      queueTimer.Enabled = true;
     }
 
     private void SendSearchResponse(IPEndPoint endpoint, UpnpDevice dev)
@@ -110,8 +136,7 @@ namespace NMaier.sdlna.Server
       headers.Add("ST", dev.Type);
       headers.Add("USN", dev.USN);
 
-      var msg = Encoding.ASCII.GetBytes(method + headers.HeaderBlock + "\r\n");
-      SendDatagram(endpoint, msg);
+      SendDatagram(endpoint, method + headers.HeaderBlock + "\r\n");
       InfoFormat("{1} - Responded to a {0} request", dev.Type, endpoint);
     }
 
@@ -145,7 +170,7 @@ namespace NMaier.sdlna.Server
       headers.Add("NT", dev.Type);
       headers.Add("USN", dev.USN);
 
-      SendDatagram(SSDP_ENDP, Encoding.ASCII.GetBytes(method + headers.HeaderBlock + "\r\n"));
+      SendDatagram(SSDP_ENDP, method + headers.HeaderBlock + "\r\n");
       DebugFormat("{0} said {1}", dev.USN, type);
     }
 
