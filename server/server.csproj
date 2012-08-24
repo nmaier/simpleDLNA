@@ -54,7 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Datagram.cs" />
+    <Compile Include="Types\Datagram.cs" />
     <Compile Include="Handlers\MediaMount_HTML.cs" />
     <Compile Include="Handlers\MediaMount_SOAP.cs" />
     <Compile Include="Responses\FileResponse.cs" />
@@ -101,7 +101,7 @@
     <Compile Include="Responses\StringResponse.cs" />
     <Compile Include="Types\RawHeaders.cs" />
     <Compile Include="Types\ResponseHeaders.cs" />
-    <Compile Include="UpnpDevice.cs" />
+    <Compile Include="Types\UpnpDevice.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
