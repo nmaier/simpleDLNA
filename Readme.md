@@ -8,6 +8,19 @@ Looking for a simple DLNA server that I could just fire up on some directory, wa
 
 And so I decided to write my own server, borrowing some ideas from Coherence, reading some of the UPnP specs and reverse engineering the various protocols involved (yuck, SOAP :p) by watching my TV interact with Coherence and Serviio under Wireshark.
 
+Basic use
+---
+
+* `sdlna.exe` / `mono sdna.exe`
+  Serve videos from current directory and subdirectories
+* `sdlna.exe -t image -t audio -v bytitle`
+   Serve images and audio files from the current directory and subdirectories, organizing files by title.
+* `sdlna.exe -c cache.sqlite dir1 dir2`
+   Serve videos from dir1 and dir2 (and subdirectories), storing meta data and thumbnails in the persistent cache store `cache.sqlite`.
+* `sdlna.exe --help`
+  Display usage help
+
+
 Features
 ---
 
@@ -87,6 +100,8 @@ Mini FAQ
 * **A**: Maybe, but probably not. See Contributing
 * **Q**: Why .Net and C#? I'm on Linux and/or Mac!
 * **A**: Yeah, well... Other languages have their own set of problems. C# is reasonably portable, managed and garbage collected, statically typed and comes with a huge stdlib.
+* **Q**: Where are the binaries?
+* **A**: There is no official release for now. I'm still cleaning up stuff a bit. Stay tuned...
 
 Thanks
 ---
