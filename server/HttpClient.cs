@@ -376,7 +376,7 @@ namespace NMaier.sdlna.Server
     {
       State = HttpStates.CLOSED;
 
-      InfoFormat("{0} - Closing connection after {1} requestes", this, requestCount);
+      DebugFormat("{0} - Closing connection after {1} requests", this, requestCount);
       try {
         client.Close();
       }
