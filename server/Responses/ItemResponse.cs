@@ -34,13 +34,8 @@ namespace NMaier.sdlna.Server
       }
       Headers.Add("transferMode.dlna.org", transferMode);
 
+      stream = item.Content;
 
-      if (request.Method == "HEAD") {
-        stream = null;
-      }
-      else {
-        stream = item.Content;
-      }
       Debug(headers);
     }
 

@@ -15,8 +15,9 @@ namespace NMaier.sdlna.Server
     private uint bodyBytes = 0;
     private readonly byte[] buffer = new byte[BUFFER_SIZE];
     private const int BUFFER_SIZE = 1 << 16;
-    private static readonly Regex bytes = new Regex(@"^bytes=(\d+)", RegexOptions.Compiled);
+    private static readonly Regex bytes = new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
     private readonly TcpClient client;
+    private long contentLength;
     private static IHandler Error404 = new StaticHandler(new StringResponse(HttpCodes.NOT_FOUND, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
     private static IHandler Error416 = new StaticHandler(new StringResponse(HttpCodes.RANGE_NOT_SATISFIABLE, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
     private static IHandler Error500 = new StaticHandler(new StringResponse(HttpCodes.INTERNAL_ERROR, "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"));
@@ -249,11 +250,11 @@ namespace NMaier.sdlna.Server
       var body = response.Body;
       var st = response.Status;
 
-      long contentLength = -1;
+      contentLength = -1;
       string clf;
       if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
         try {
-          contentLength = body.Length;
+          contentLength = body.Length - body.Position;
           if (contentLength < 0) {
             throw new InvalidDataException();
           }
@@ -271,19 +272,26 @@ namespace NMaier.sdlna.Server
           if (!m.Success) {
             throw new Exception("Not parsed!");
           }
-          long start = 0;
+          var totalLength = contentLength;
+          long start = 0, end = totalLength - 1;
           if (!long.TryParse(m.Groups[1].Value, out start) || start < 0) {
             throw new Exception("Not parsed");
           }
-          if (start >= contentLength) {
+          if (m.Groups.Count != 3 || !long.TryParse(m.Groups[2].Value, out end) || end <= start || end >= totalLength) {
+            end = totalLength - 1;
+          }
+          if (start >= end) {
             response = Error416.HandleRequest(this);
             SendResponse();
             return;
           }
+
           if (start > 0) {
-            body.Seek(start, SeekOrigin.Begin);
+            body.Seek(start, SeekOrigin.Current);
           }
-          response.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, (contentLength - start - 1), contentLength));
+          contentLength = end - start + 1;
+          response.Headers["Content-Length"] = contentLength.ToString();
+          response.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, totalLength));
           st = HttpCodes.PARTIAL;
         }
         catch (Exception ex) {
@@ -297,9 +305,16 @@ namespace NMaier.sdlna.Server
       hb.Append("\r\n");
 
       var rs = new ConcatenatedStream();
-      rs.AddStream(new MemoryStream(Encoding.ASCII.GetBytes(hb.ToString())));
+      var headerStream = new MemoryStream(Encoding.ASCII.GetBytes(hb.ToString()));
+      rs.AddStream(headerStream);
       if (method != "HEAD" && body != null) {
         rs.AddStream(body);
+        if (contentLength >= 0) {
+          contentLength += headerStream.Length;
+        }
+      }
+      else {
+        contentLength = headerStream.Length;
       }
       responseStream = rs;
       InfoFormat("{0} - {1} response for {2}", this, (uint)st, path);
@@ -333,7 +348,11 @@ namespace NMaier.sdlna.Server
     private void Write()
     {
       try {
-        int bytes = responseStream.Read(buffer, 0, BUFFER_SIZE);
+        int bytes = (int)Math.Min((long)BUFFER_SIZE, contentLength >= 0 ? contentLength : (long)BUFFER_SIZE);
+        if (bytes > 0) {
+          bytes = responseStream.Read(buffer, 0, BUFFER_SIZE);
+          contentLength -= bytes;
+        }
         if (bytes <= 0) {
           DebugFormat("{0} - Done writing response", this);
           string conn;
