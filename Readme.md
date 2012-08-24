@@ -2,7 +2,7 @@ sdlna
 ===
 A simple, zero-config DLNA media server, that you can just fire up and be done with it.
 
-Movivation
+Motivation
 ---
 Looking for a simple DLNA server that I could just fire up on some directory, watch some files on my TV and then be done with it, I came up empty. There are some decent servers out there, like Serviio and friends, but none that fits my requirements. Also there wasn't really a decent enough and uncomplicated enough open source implementation that I could borrow. The Coherence python project seemed to be a good starting point, but was already to complex for what I was trying to achieve. Also, python dealing with unicode paths on Windows pretty much sucks. Then there is Mono.UPnP, which didn't really work, and the Intel(?) Developer Tools for UPnP, which seemed kinda nice at first, but turned out to be coming straight out of over-engineering hell, in my humble opinion.
 
@@ -11,9 +11,9 @@ And so I decided to write my own server, borrowing some ideas from Coherence, re
 Features
 ---
 
-* Zero-config DLNA Server without peristant state
+* Zero-config DLNA Server without peristant state (optional cache)
 * Written in C#, because .Net just works on Windows (and usually Mono), is fast, C-like and has a powerful and comprehensive stdlib. Maybe I port the thing to some other language that works better cross platform and doesn't suck like Java.
-* Thumbnailing support for images and videos - if ffmpeg is found in the search path - videos, using any stream as input.
+* Thumbnailing support for images and videos - if ffmpeg is found in the search path -, using any stream as input.
 * Meta data as provided by TagLib#
 * Serving of any and all file-system addressable  files, incl. some views (transformations)
 * Should be relatively easy to code up additional media sources, like podcasts
@@ -35,7 +35,7 @@ Run requirements
 * Some .Net 4 compatible implementation to run the app
  * Tested on .Net 4 and Fedora17 + mono, OSX Lion + mono
 * File system and networking :p
-* Some DLNA renderer (e.g. TV) to actually use display the served media.
+* Some DLNA renderer (e.g. TV) to actually display the served media.
  * Tested with: Samsung C-Series TV, Kinsky
 
 External dependencies
@@ -44,8 +44,9 @@ External dependencies
 * [log4net](http://logging.apache.org/log4net/)
 * [GetOptNet](https://github.com/nmaier/getoptnet)
 * [TagLib#](https://github.com/mono/taglib-sharp/)
+* System.Data.SQLITE
 
-The external dependencies are checked into the git repository or referenced as a submodule.
+The external dependencies are nuget managed and can be auto-restored (except for Sqlite maybe... Just reinstall it using nuget into the fsserver project).
 
 Design
 ---
