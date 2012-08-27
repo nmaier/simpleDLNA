@@ -9,6 +9,8 @@ namespace NMaier.sdlna.FileMediaServer.Files
   internal class BaseFile : Logging, IMediaResource, IFileServerMediaItem, IMediaCover, IMetaInfo
   {
 
+    private DateTime? lastModified = null;
+    private long? length = null;
     private readonly string title;
 
 
@@ -17,6 +19,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
     {
       Parent = aParent;
       Item = aFile;
+
+      length = Item.Length;
+      lastModified = Item.LastWriteTimeUtc;
 
       Type = aType;
       MediaType = aMediaType;
@@ -49,7 +54,13 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     public DateTime Date
     {
-      get { return Item.LastWriteTimeUtc; }
+      get
+      {
+        if (lastModified == null) {
+          lastModified = Item.LastWriteTimeUtc;
+        }
+        return lastModified.Value;
+      }
     }
 
     public string ID
@@ -115,7 +126,13 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     public long? Size
     {
-      get { return Item.Length; }
+      get
+      {
+        if (length == null) {
+          length = Item.Length;
+        }
+        return length;
+      }
     }
 
     public virtual string Title
