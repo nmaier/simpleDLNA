@@ -142,6 +142,18 @@ namespace NMaier.sdlna.Server
       return RemoteEndpoint.ToString();
     }
 
+    private void MaybeCloseResponseStream()
+    {
+      if (responseStream != null) {
+        try {
+          responseStream.Close();
+          responseStream.Dispose();
+          responseStream = null;
+        }
+        catch (Exception) { }
+      }
+    }
+
     private void Read()
     {
       try {
@@ -220,18 +232,19 @@ namespace NMaier.sdlna.Server
           Debug(body);
           Debug(headers);
         }
+        SetupResponse();
       }
       catch (Exception ex) {
         Warn(String.Format("{0} - Failed to process request", this), ex);
         response = Error500.HandleRequest(this);
         SendResponse();
-        return;
       }
-      SetupResponse();
     }
 
     private void ReadNext()
     {
+      MaybeCloseResponseStream();
+
       method = null;
       headers.Clear();
       hasHeaders = false;
@@ -281,6 +294,7 @@ namespace NMaier.sdlna.Server
             end = totalLength - 1;
           }
           if (start >= end) {
+            body.Close();
             response = Error416.HandleRequest(this);
             SendResponse();
             return;
@@ -396,6 +410,7 @@ namespace NMaier.sdlna.Server
       State = HttpStates.CLOSED;
 
       DebugFormat("{0} - Closing connection after {1} requests", this, requestCount);
+      MaybeCloseResponseStream();
       try {
         client.Close();
       }

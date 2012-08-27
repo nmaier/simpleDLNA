@@ -34,8 +34,6 @@ namespace NMaier.sdlna.Server
       }
       Headers.Add("transferMode.dlna.org", transferMode);
 
-      stream = item.Content;
-
       Debug(headers);
     }
 
@@ -43,7 +41,7 @@ namespace NMaier.sdlna.Server
 
     public Stream Body
     {
-      get { return stream; }
+      get { return item.Content; }
     }
 
     public IHeaders Headers
