@@ -15,6 +15,9 @@ namespace NMaier.sdlna.Server
     private const string NS_DLNA = "urn:schemas-dlna-org:metadata-1-0/";
     private const string NS_SOAPENV = "http://schemas.xmlsoap.org/soap/envelope/";
     private const string NS_UPNP = "urn:schemas-upnp-org:metadata-1-0/upnp/";
+    private static LRUCache<string, ResList> SoapCache = new LRUCache<string, ResList>(200);
+
+
 
 
     private void Browse_AddFolder(XmlDocument result, IMediaFolder f)
@@ -228,6 +231,12 @@ namespace NMaier.sdlna.Server
 
     private IEnumerable<KeyValuePair<string, string>> HandleBrowse(IRequest request, IHeaders sparams)
     {
+      var key = Prefix + sparams.HeaderBlock;
+      ResList rv;
+      if (SoapCache.TryGetValue(key, out rv)) {
+        return rv;
+      }
+
       string id = sparams["ObjectID"];
       string flag = sparams["BrowseFlag"];
       if (id == "0") {
@@ -288,13 +297,15 @@ namespace NMaier.sdlna.Server
         }
       }
       var resXML = result.OuterXml;
-      Debug(resXML);
-      return new ResList() {
+      //Debug(resXML);
+      rv =  new ResList() {
         {"Result", resXML },
         {"NumberReturned", provided.ToString() },
         {"TotalMatches", root.ChildCount.ToString() },
         {"UpdateID", systemID.ToString() }
       };
+      SoapCache[key] = rv;
+      return rv;
     }
 
     private IHeaders HandleGetSearchCapabilities(IHeaders sparams)
