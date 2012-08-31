@@ -11,7 +11,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
   internal class ImageFile : BaseFile, IMetaImageItem, ISerializable
   {
 
-    private Cover _cover = null, cover = null;
     private string creator;
     private string description;
     private uint? width, height;
@@ -30,31 +29,10 @@ namespace NMaier.sdlna.FileMediaServer.Files
       title = info.GetString("t");
       width = info.GetUInt32("w");
       height = info.GetUInt32("h");
-      try {
-        _cover = cover = info.GetValue("c", typeof(Cover)) as Cover;
-      }
-      catch (SerializationException) { }
 
       initialized = true;
     }
 
-
-
-    public override IMediaCoverResource Cover
-    {
-      get
-      {
-        MaybeInit();
-        if (_cover == null) {
-          try {
-            _cover = base.Cover as Cover;
-            _cover.OnCoverLazyLoaded += CoverLoaded;
-          }
-          catch (Exception) { }
-        }
-        return _cover;
-      }
-    }
 
     public string MetaCreator
     {
@@ -127,18 +105,12 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
     {
+      MaybeInit();
       info.AddValue("cr", creator);
       info.AddValue("d", description);
       info.AddValue("t", title);
       info.AddValue("w", width);
       info.AddValue("h", height);
-      info.AddValue("c", cover);
-    }
-
-    private void CoverLoaded(object sender, EventArgs e)
-    {
-      cover = _cover;
-      Parent.Server.UpdateFileCache(this);
     }
 
     private void MaybeInit()
@@ -181,8 +153,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
 
-
       initialized = true;
+
+      Parent.Server.UpdateFileCache(this);
     }
   }
 }

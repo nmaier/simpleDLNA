@@ -42,18 +42,25 @@ namespace NMaier.sdlna.FileMediaServer.Files
       get
       {
         if (_bytes == null) {
-          _bytes = thumber.GetThumbnail(file, ref width, ref height);
-          if (_bytes == null) {
-            _bytes = new byte[0];
-          }
-          if (OnCoverLazyLoaded != null) {
-            OnCoverLazyLoaded(this, null);
-          }
+          ForceLoad();
         }
         if (_bytes.Length == 0) {
           throw new NotSupportedException();
         }
         return _bytes;
+      }
+    }
+
+    internal void ForceLoad()
+    {
+      if (_bytes == null) {
+        _bytes = thumber.GetThumbnail(file, ref width, ref height);
+      }
+      if (_bytes == null) {
+        _bytes = new byte[0];
+      }
+      if (OnCoverLazyLoaded != null) {
+        OnCoverLazyLoaded(this, null);
       }
     }
 

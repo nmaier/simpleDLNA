@@ -32,6 +32,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     private readonly System.Data.IDbConnection connection;
     private readonly IDbCommand insert;
+    private readonly IDbDataParameter insertCover;
     private readonly IDbDataParameter insertData;
     private readonly IDbDataParameter insertKey;
     private readonly IDbDataParameter insertSize;
@@ -40,6 +41,10 @@ namespace NMaier.sdlna.FileMediaServer.Files
     private readonly IDbDataParameter selectKey;
     private readonly IDbDataParameter selectSize;
     private readonly IDbDataParameter selectTime;
+    private readonly IDbCommand selectCover;
+    private readonly IDbDataParameter selectCoverKey;
+    private readonly IDbDataParameter selectCoverSize;
+    private readonly IDbDataParameter selectCoverTime;
     private readonly Timer vacuumer = new Timer();
 
     internal FileStore(FileInfo aStore)
@@ -84,13 +89,11 @@ namespace NMaier.sdlna.FileMediaServer.Files
           pragma.ExecuteNonQuery();
           pragma.CommandText = "PRAGMA temp_store = MEMORY";
           pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA locking_mode = EXCLUSIVE";
-          pragma.ExecuteNonQuery();
           pragma.CommandText = "PRAGMA synchonous = NORMAL";
           pragma.ExecuteNonQuery();
         }
         using (var create = connection.CreateCommand()) {
-          create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, size INT, time INT, data BINARY)";
+          create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, size INT, time INT, data BINARY, cover BINARY)";
           create.ExecuteNonQuery();
         }
         transaction.Commit();
@@ -105,8 +108,17 @@ namespace NMaier.sdlna.FileMediaServer.Files
       select.Parameters.Add(selectTime = select.CreateParameter());
       selectTime.DbType = DbType.Int64;
 
+      selectCover = connection.CreateCommand();
+      selectCover.CommandText = "SELECT cover FROM store WHERE key = ? AND size = ? AND time = ?";
+      selectCover.Parameters.Add(selectCoverKey = select.CreateParameter());
+      selectCoverKey.DbType = DbType.String;
+      selectCover.Parameters.Add(selectCoverSize = select.CreateParameter());
+      selectCoverSize.DbType = DbType.Int64;
+      selectCover.Parameters.Add(selectCoverTime = select.CreateParameter());
+      selectCoverTime.DbType = DbType.Int64;
+
       insert = connection.CreateCommand();
-      insert.CommandText = "INSERT INTO store VALUES(?,?,?,?)";
+      insert.CommandText = "INSERT INTO store VALUES(?,?,?,?,?)";
       insert.Parameters.Add(insertKey = select.CreateParameter());
       insertKey.DbType = DbType.String;
       insert.Parameters.Add(insertSize = select.CreateParameter());
@@ -115,6 +127,8 @@ namespace NMaier.sdlna.FileMediaServer.Files
       insertTime.DbType = DbType.Int64;
       insert.Parameters.Add(insertData = select.CreateParameter());
       insertData.DbType = DbType.Binary;
+      insert.Parameters.Add(insertCover = select.CreateParameter());
+      insertCover.DbType = DbType.Binary;
 
       InfoFormat("FileStore at {0} is ready", aStore.FullName);
 
@@ -138,17 +152,18 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
-    [MethodImpl(MethodImplOptions.Synchronized)]
     internal BaseFile MaybeGetFile(BaseFolder aParent, FileInfo info, DlnaTypes type)
     {
       if (connection == null) {
         return null;
       }
-
-      selectKey.Value = info.FullName;
-      selectSize.Value = info.Length;
-      selectTime.Value = info.LastWriteTimeUtc.Ticks;
-      var data = select.ExecuteScalar() as byte[];
+      byte[] data;
+      lock (connection) {
+        selectKey.Value = info.FullName;
+        selectSize.Value = info.Length;
+        selectTime.Value = info.LastWriteTimeUtc.Ticks;
+        data = select.ExecuteScalar() as byte[];
+      }
       if (data == null) {
         return null;
       }
@@ -168,9 +183,57 @@ namespace NMaier.sdlna.FileMediaServer.Files
         Debug("Failed to deserialize an item", ex);
       }
       return null;
+
     }
 
-    [MethodImpl(MethodImplOptions.Synchronized)]
+    internal bool HasCover(BaseFile file)
+    {
+      if (connection == null) {
+        return false;
+      }
+
+      var info = file.Item;
+      lock (connection) {
+        selectCoverKey.Value = info.FullName;
+        selectCoverSize.Value = info.Length;
+        selectCoverTime.Value = info.LastWriteTimeUtc.Ticks;
+        var data = selectCover.ExecuteScalar();
+        return (data as byte[]) != null;
+      }
+    }
+
+    internal Cover MaybeGetCover(BaseFile file)
+    {
+      if (connection == null) {
+        return null;
+      }
+
+      var info = file.Item;
+      byte[] data;
+      lock (connection) {
+        selectCoverKey.Value = info.FullName;
+        selectCoverSize.Value = info.Length;
+        selectCoverTime.Value = info.LastWriteTimeUtc.Ticks;
+        data = selectCover.ExecuteScalar() as byte[];
+      }
+      if (data == null) {
+        return null;
+      }
+      try {
+        using (var s = new MemoryStream(data)) {
+          var formatter = new BinaryFormatter();
+          formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
+          formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
+          var rv = formatter.Deserialize(s) as Cover;
+          return rv;
+        }
+      }
+      catch (Exception ex) {
+        Debug("Failed to deserialize a cover", ex);
+      }
+      return null;
+    }
+
     internal void MaybeStoreFile(BaseFile file)
     {
       if (connection == null) {
@@ -187,11 +250,25 @@ namespace NMaier.sdlna.FileMediaServer.Files
           formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
           formatter.Serialize(s, file);
 
-          insertKey.Value = file.Item.FullName;
-          insertSize.Value = file.Item.Length;
-          insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
-          insertData.Value = s.ToArray();
-          insert.ExecuteNonQuery();
+          lock (connection) {
+            insertKey.Value = file.Item.FullName;
+            insertSize.Value = file.Item.Length;
+            insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
+            insertData.Value = s.ToArray();
+
+            var cover = file.MaybeGetCover();
+            if (cover != null) {
+              using (var c = new MemoryStream()) {
+                formatter.Serialize(c, cover);
+                insertCover.Value = c.ToArray();
+              }
+            }
+            else {
+              insertCover.Value = null;
+            }
+
+            insert.ExecuteNonQuery();
+          }
         }
       }
       catch (Exception ex) {
@@ -199,21 +276,22 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
-    public IDbTransaction BeginTransaction()
+    private IDbTransaction BeginTransaction()
     {
       return connection.BeginTransaction();
     }
 
     private void Vacuum(object source, ElapsedEventArgs e)
     {
-      Debug("Vacuuming");
-      using (var q = connection.CreateCommand()) {
-        q.CommandText = "VACUUM";
-        try {
-          q.ExecuteNonQuery();
-        }
-        catch (Exception ex) {
-          Error("Failed to vacuum", ex);
+      lock (connection) {
+        using (var q = connection.CreateCommand()) {
+          q.CommandText = "VACUUM";
+          try {
+            q.ExecuteNonQuery();
+          }
+          catch (Exception ex) {
+            Error("Failed to vacuum", ex);
+          }
         }
       }
       vacuumer.Interval = 30 * 60 * 1000;

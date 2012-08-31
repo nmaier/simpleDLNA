@@ -13,7 +13,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
   {
 
     private string[] actors;
-    private Cover _cover, cover;
     private string description;
     private string director;
     private TimeSpan? duration;
@@ -45,31 +44,10 @@ namespace NMaier.sdlna.FileMediaServer.Files
       if (ts > 0) {
         duration = new TimeSpan(ts);
       }
-      try {
-        _cover = cover = info.GetValue("c", typeof(Cover)) as Cover;
-      }
-      catch (Exception) { }
-
       initialized = true;
     }
 
 
-
-    public override IMediaCoverResource Cover
-    {
-      get
-      {
-        MaybeInit();
-        if (_cover == null) {
-          try {
-            _cover = base.Cover as Cover;
-            _cover.OnCoverLazyLoaded += CoverLoaded;
-          }
-          catch (Exception) { }
-        }
-        return _cover;
-      }
-    }
 
     public IEnumerable<string> MetaActors
     {
@@ -182,6 +160,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
     {
+      MaybeInit();
       info.AddValue("a", actors, typeof(string[]));
       info.AddValue("de", description);
       info.AddValue("di", director);
@@ -190,13 +169,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("w", width);
       info.AddValue("h", height);
       info.AddValue("du", duration.GetValueOrDefault(EmptyDuration).Ticks);
-      info.AddValue("c", cover);
-    }
-
-    private void CoverLoaded(object sender, EventArgs e)
-    {
-      cover = _cover;
-      Parent.Server.UpdateFileCache(this);
     }
 
     private void MaybeInit()
@@ -252,9 +224,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
 
-      Parent.Server.UpdateFileCache(this);
-
       initialized = true;
+
+      Parent.Server.UpdateFileCache(this);
     }
   }
 }

@@ -48,10 +48,7 @@ namespace NMaier.sdlna.Util
       get { return items[key]; }
       set
       {
-        if (items.ContainsKey(key)) {
-          items[key] = value;
-        }
-        items.Add(key, value);
+        items[key] = value;
       }
     }
 

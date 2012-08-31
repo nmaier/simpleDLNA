@@ -3,12 +3,15 @@ using System.IO;
 using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Server.Metadata;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   internal class BaseFile : Logging, IMediaResource, IFileServerMediaItem, IMediaCover, IMetaInfo
   {
 
+    private WeakReference _cover = new WeakReference(null);
+    private static readonly LRUCache<string, Cover> coverCache = new LRUCache<string, Cover>(500);
     private DateTime? lastModified = null;
     private long? length = null;
     private readonly string title;
@@ -47,9 +50,28 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
+    protected Cover cover
+    {
+      get { return _cover.Target as Cover; }
+      set
+      {
+        if (value != null) {
+          coverCache[Item.FullName] = value;
+        }
+        _cover = new WeakReference(value);
+      }
+    }
+
     public virtual IMediaCoverResource Cover
     {
-      get { return new Cover(Item); }
+      get
+      {
+        if (cover == null && !LoadCoverFromCache()) {
+          cover = new Cover(Item);
+          cover.OnCoverLazyLoaded += LazyLoadedCover;
+        }
+        return cover;
+      }
     }
 
     public DateTime Date
@@ -154,6 +176,28 @@ namespace NMaier.sdlna.FileMediaServer.Files
       return Title.ToLower().CompareTo(other.Title.ToLower());
     }
 
+    public void LazyLoadedCover(object sender, EventArgs e)
+    {
+      Parent.Server.UpdateFileCache(this);
+    }
+
+    public void LoadCover()
+    {
+      if (cover != null) {
+        return;
+      }
+      cover = new Cover(Item);
+      cover.OnCoverLazyLoaded += LazyLoadedCover;
+      cover.ForceLoad();
+      cover = null;
+    }
+
+    protected bool LoadCoverFromCache()
+    {
+      cover = Parent.Server.GetCover(this);
+      return cover != null;
+    }
+
     internal static BaseFile GetFile(BaseFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
     {
       switch (aMediaType) {
@@ -166,6 +210,11 @@ namespace NMaier.sdlna.FileMediaServer.Files
         default:
           return new BaseFile(aParentFolder, aFile, aType, aMediaType);
       }
+    }
+
+    internal Cover MaybeGetCover()
+    {
+      return cover;
     }
   }
 }

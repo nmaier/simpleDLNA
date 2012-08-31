@@ -10,8 +10,6 @@ namespace NMaier.sdlna.Server
     private readonly Headers headers = new ResponseHeaders();
     private readonly IMediaResource item;
     private HttpCodes status = HttpCodes.OK;
-    private readonly Stream stream;
-
 
 
     public ItemResponse(IRequest request, IMediaResource aItem, string transferMode = "Streaming")

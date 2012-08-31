@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Timers;
 using NMaier.sdlna.Server;
+using System.Threading.Tasks;
 
 namespace NMaier.sdlna.FileMediaServer
 {
@@ -116,14 +118,12 @@ namespace NMaier.sdlna.FileMediaServer
       paths = newPaths;
       ids = newIds;
 
-      var trans = store != null ? store.BeginTransaction() : null;
-      try {
-        var newRoot = new Folders.PlainRootFolder(this, types, directory);
-        foreach (var t in transformations) {
-          t.Transform(this, newRoot);
-        }
-        newRoot.Sort(comparer, descending);
-        ids["0"] = root = newRoot;
+      var newRoot = new Folders.PlainRootFolder(this, types, directory);
+      foreach (var t in transformations) {
+        t.Transform(this, newRoot);
+      }
+      newRoot.Sort(comparer, descending);
+      ids["0"] = root = newRoot;
 #if DUMP_TREE
       using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
         using (var w = new StreamWriter(s)) {
@@ -131,14 +131,33 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 #endif
-        if (trans != null) {
-          trans.Commit();
-        }
-      }
-      finally {
-        if (trans != null) {
-          trans.Dispose();
-        }
+      if (store != null) {
+        var files = (from i in ids.Values
+                     let f = (i as Files.BaseFile)
+                     where f != null
+                     select new WeakReference(f)).ToList();
+        Task.Factory.StartNew(() =>
+        {
+          foreach (var i in files) {
+            try {
+              var item = (i.Target as Files.BaseFile);
+              if (item == null) {
+                continue;
+              }
+              if (store.HasCover(item)) {
+                continue;
+              }
+              item.LoadCover();
+              using (var k = item.Cover.Content) {
+                k.ReadByte();
+              }
+            }
+            catch (Exception ex) {
+              Debug("Failed to thumb", ex);
+            }
+          }
+          return;
+        }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
       }
     }
 
@@ -177,6 +196,14 @@ namespace NMaier.sdlna.FileMediaServer
     private void RescanTimer(object sender, ElapsedEventArgs e)
     {
       Rescan();
+    }
+
+    internal Files.Cover GetCover(Files.BaseFile file)
+    {
+      if (store != null) {
+        return store.MaybeGetCover(file);
+      }
+      return null;
     }
 
     internal Files.BaseFile GetFile(Folders.BaseFolder aParent, FileInfo aFile)

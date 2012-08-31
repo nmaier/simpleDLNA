@@ -13,7 +13,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     private string album;
     private string artist;
-    private Cover cover = null;
     private string description;
     private TimeSpan? duration;
     private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
@@ -33,6 +32,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     protected AudioFile(SerializationInfo info, StreamingContext ctx) :
       this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
     {
+      MaybeInit();
       album = info.GetString("al");
       artist = info.GetString("ar");
       genre = info.GetString("g");
@@ -43,11 +43,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
       if (ts > 0) {
         duration = new TimeSpan(ts);
       }
-      try {
-        cover = info.GetValue("c", typeof(Cover)) as Cover;
-      }
-      catch (SerializationException) { }
-
       initialized = true;
     }
 
@@ -57,7 +52,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
     {
       get
       {
-        MaybeInit();
+        if (cover == null && !LoadCoverFromCache()) {
+          MaybeInit();
+        }
         return cover;
       }
     }
@@ -195,9 +192,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("ti", title);
       info.AddValue("tr", track);
       info.AddValue("d", duration.GetValueOrDefault(EmptyDuration).Ticks);
-      if (cover != null) {
-        info.AddValue("c", cover, typeof(Cover));
-      }
     }
 
     private void MaybeInit()
@@ -304,10 +298,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
 
-      Parent.Server.UpdateFileCache(this);
-
-
       initialized = true;
+
+      Parent.Server.UpdateFileCache(this);
     }
   }
 }
