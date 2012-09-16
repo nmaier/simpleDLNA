@@ -145,17 +145,19 @@ namespace NMaier.sdlna.FileMediaServer.Files
             Debug("Failed to transpose Tag props", ex);
           }
         }
+
+
+        initialized = true;
+
+        Parent.Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
         Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
+        initialized = true;
       }
       catch (Exception ex) {
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
-
-      initialized = true;
-
-      Parent.Server.UpdateFileCache(this);
     }
   }
 }
