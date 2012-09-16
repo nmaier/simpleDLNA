@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading.Tasks;
 using System.Timers;
 using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
@@ -46,9 +48,11 @@ namespace NMaier.sdlna.FileMediaServer.Files
     private readonly IDbDataParameter selectCoverSize;
     private readonly IDbDataParameter selectCoverTime;
     private readonly Timer vacuumer = new Timer();
+    public readonly FileInfo StoreFile;
 
     internal FileStore(FileInfo aStore)
     {
+      StoreFile = aStore;
       var cs = string.Format("Uri=file:{0}", aStore.FullName);
       if (aStore.Exists) {
         vacuumer.Interval = 120 * 1000;
@@ -283,17 +287,50 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     private void Vacuum(object source, ElapsedEventArgs e)
     {
-      lock (connection) {
-        using (var q = connection.CreateCommand()) {
-          q.CommandText = "VACUUM";
-          try {
-            q.ExecuteNonQuery();
-          }
-          catch (Exception ex) {
-            Error("Failed to vacuum", ex);
+      Debug("VACUUM");
+      Task.Factory.StartNew(() =>
+      {
+        var files = new List<string>();
+        lock (connection) {
+          using (var q = connection.CreateCommand()) {
+            q.CommandText = "SELECT key FROM store";
+            using (var r = q.ExecuteReader()) {
+              while (r.Read()) {
+                files.Add(r.GetString(0));
+              }
+            }
           }
         }
-      }
+        var gone = (from f in files
+                    let m = new FileInfo(f)
+                    where !m.Exists
+                    select f);
+        using (var q = connection.CreateCommand()) {
+          q.CommandText = "DELETE FROM store WHERE key = ?";
+          var p = q.CreateParameter();
+          p.DbType = DbType.String;
+          q.Parameters.Add(p);
+          foreach (var f in gone) {
+            p.Value = f;
+            lock (connection) {
+              q.ExecuteNonQuery();
+            }
+          }
+        }
+        lock (connection) {
+          using (var q = connection.CreateCommand()) {
+            q.CommandText = "VACUUM";
+            try {
+              q.ExecuteNonQuery();
+            }
+            catch (Exception ex) {
+              Error("Failed to vacuum", ex);
+            }
+          }
+        }
+        Debug("Vacuum done!");
+      }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
+
       vacuumer.Interval = 30 * 60 * 1000;
     }
 
