@@ -6,11 +6,6 @@ namespace NMaier.sdlna.FileMediaServer.Folders
 {
   class VirtualFolder : BaseFolder
   {
-
-    private readonly string path = "virtual:" + Guid.NewGuid().ToString();
-
-
-
     public VirtualFolder(FileServer server, BaseFolder aParent, string aName)
       : base(server, aParent)
     {
@@ -30,7 +25,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
 
     public override string Path
     {
-      get { return path; }
+      get { return string.Format("{0}/virtual:{1}", Parent.Path, Name); }
     }
 
     public override string Title

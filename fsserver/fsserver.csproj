@@ -71,7 +71,6 @@
     <Compile Include="Comparers\IItemComparer.cs" />
     <Compile Include="Comparers\TitleComparer.cs" />
     <Compile Include="Files\ImageFile.cs" />
-    <Compile Include="Files\LRUCache.cs" />
     <Compile Include="Files\VideoFile.cs" />
     <Compile Include="Repository\ComparerRepository.cs" />
     <Compile Include="Repository\IRepositoryItem.cs" />

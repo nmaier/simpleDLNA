@@ -110,10 +110,11 @@ namespace NMaier.sdlna.FileMediaServer
       var newPaths = new Dictionary<string, string>();
       var newIds = new Dictionary<string, IMediaItem>();
       foreach (var i in ids) {
-        if (i.Value is Files.BaseFile && (i.Value as Files.BaseFile).Item.Exists) {
-          newIds.Add(i.Key, i.Value);
-          newPaths.Add((i.Value as IFileServerMediaItem).Path, i.Key);
+        if (i.Value is Files.BaseFile && !(i.Value as Files.BaseFile).Item.Exists) {
+          continue;
         }
+        newIds.Add(i.Key, i.Value);
+        newPaths.Add((i.Value as IFileServerMediaItem).Path, i.Key);
       }
       paths = newPaths;
       ids = newIds;
@@ -174,6 +175,9 @@ namespace NMaier.sdlna.FileMediaServer
 
     private void OnChanged(Object source, FileSystemEventArgs e)
     {
+      if (store != null && e.FullPath.ToLower() == store.StoreFile.FullName.ToLower()) {
+        return;
+      }
       InfoFormat("File System changed: {0}", directory.FullName);
       changeTimer.Enabled = true;
     }
@@ -216,8 +220,10 @@ namespace NMaier.sdlna.FileMediaServer
           if (ev.Parent is Folders.BaseFolder) {
             (ev.Parent as Folders.BaseFolder).ReleaseItem(ev);
           }
-          ev.Parent = aParent;
-          return ev;
+          if (ev.Date == aFile.LastWriteTimeUtc && ev.Size == aFile.Length) {
+            ev.Parent = aParent;
+            return ev;
+          }
         }
       }
 
