@@ -87,8 +87,11 @@ namespace NMaier.sdlna.Server
           case HttpStates.WRITEBEGIN:
             return diff > 10;
           case HttpStates.READING:
-          case HttpStates.WRITING:
             return diff > 60;
+          case HttpStates.WRITING:
+            // DLNA renderers might suspend the download when having buffered enough
+            // and resume the same stream latter when buffer is emptied
+            return diff > 3600;
           case HttpStates.CLOSED:
             return true;
           default:
