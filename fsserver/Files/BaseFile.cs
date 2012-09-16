@@ -33,6 +33,15 @@ namespace NMaier.sdlna.FileMediaServer.Files
       if (string.IsNullOrEmpty(title)) {
         title = Item.Name;
       }
+      try {
+        title = Uri.UnescapeDataString(title);
+      }
+      catch (Exception) { }
+      if (!title.Contains(" ")) {
+        foreach (var c in new char[] { '_', '+', '.' }) {
+          title = title.Replace(c, ' ');
+        }
+      }
     }
 
 
