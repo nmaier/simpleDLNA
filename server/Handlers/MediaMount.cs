@@ -5,7 +5,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {
-  internal partial class MediaMount : Logging, IMediaServer, IPrefixHandler
+  internal sealed partial class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
 
     private readonly string descriptor;

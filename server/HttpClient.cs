@@ -8,7 +8,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {
-  internal class HttpClient : Logging, IRequest, IDisposable
+  internal sealed class HttpClient : Logging, IRequest, IDisposable
   {
 
     private string body;

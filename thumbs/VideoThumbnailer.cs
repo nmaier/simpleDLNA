@@ -9,12 +9,12 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Thumbnails
 {
-  class VideoThumbnailer : Logging, IThumbnailer
+  internal sealed class VideoThumbnailer : Logging, IThumbnailer
   {
 
     public VideoThumbnailer()
     {
-      if (Ffmpeg.FFMPEG == null) {
+      if (FFmpeg.FFMPEG == null) {
         throw new NotSupportedException("No ffmpeg available");
       }
     }
@@ -90,7 +90,7 @@ namespace NMaier.sdlna.Thumbnails
         sti.CreateNoWindow = true;
 #endif
         sti.UseShellExecute = false;
-        sti.FileName = Ffmpeg.FFMPEG.FullName;
+        sti.FileName = FFmpeg.FFMPEG.FullName;
         sti.Arguments = String.Format(
           "-ss {0} -i pipe: -an -frames:v 1 -f image2  pipe:",
           pos
@@ -117,7 +117,7 @@ namespace NMaier.sdlna.Thumbnails
         sti.CreateNoWindow = true;
 #endif
         sti.UseShellExecute = false;
-        sti.FileName = Ffmpeg.FFMPEG.FullName;
+        sti.FileName = FFmpeg.FFMPEG.FullName;
         sti.Arguments = String.Format(
           "-ss {0} -i \"{1}\" -an -frames:v 1 -f image2  pipe:",
           IdentifyBestCapturePosition(file),
@@ -134,7 +134,7 @@ namespace NMaier.sdlna.Thumbnails
     private long IdentifyBestCapturePosition(FileInfo file)
     {
       try {
-        var dur = Ffmpeg.GetFileDuration(file);
+        var dur = FFmpeg.GetFileDuration(file);
         if (dur > 600) {
           return (long)(dur / 5.0);
         }

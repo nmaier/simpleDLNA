@@ -1,7 +1,7 @@
 
 namespace NMaier.sdlna.Server
 {
-  class IconHandler : IPrefixHandler
+  internal sealed class IconHandler : IPrefixHandler
   {
 
     public string Prefix { get { return "/icon/"; } }

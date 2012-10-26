@@ -2,7 +2,7 @@
 
 namespace NMaier.sdlna.Server
 {
-  internal class FileResponse : IResponse
+  internal sealed class FileResponse : IResponse
   {
 
     private readonly FileInfo body;

@@ -4,7 +4,7 @@ using System.IO;
 
 namespace NMaier.sdlna.Util
 {
-  public class ReadRequest : IDisposable
+  public sealed class ReadRequest : IDisposable
   {
 
     public byte[] buffer;

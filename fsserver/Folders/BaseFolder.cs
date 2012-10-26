@@ -5,7 +5,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Folders
 {
-  abstract class BaseFolder : IFileServerMediaItem, IMediaFolder
+  internal abstract class BaseFolder : IFileServerMediaItem, IMediaFolder
   {
 
     protected List<BaseFolder> childFolders;

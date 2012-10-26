@@ -10,7 +10,7 @@ using log4net;
 
 namespace NMaier.sdlna.Util
 {
-  public static class Ffmpeg
+  public static class FFmpeg
   {
 
     public static readonly FileInfo FFIDENTIFY;
@@ -20,7 +20,7 @@ namespace NMaier.sdlna.Util
 
 
 
-    static Ffmpeg()
+    static FFmpeg()
     {
       FFMPEG = FindExecutable("ffmpeg");
       FFIDENTIFY = FindExecutable("ffidentify");
@@ -33,8 +33,8 @@ namespace NMaier.sdlna.Util
     {
       string sw, sh;
       int w, h;
-      if (Ffmpeg.IdentifyFile(file).TryGetValue("VIDEO_WIDTH", out sw)
-        && Ffmpeg.IdentifyFile(file).TryGetValue("VIDEO_HEIGHT", out sh)
+      if (FFmpeg.IdentifyFile(file).TryGetValue("VIDEO_WIDTH", out sw)
+        && FFmpeg.IdentifyFile(file).TryGetValue("VIDEO_HEIGHT", out sh)
         && int.TryParse(sw, out w)
         && int.TryParse(sh, out h)
         && w > 0 && h > 0) {
@@ -47,7 +47,7 @@ namespace NMaier.sdlna.Util
     {
       string sl;
       double dur;
-      if (Ffmpeg.IdentifyFile(file).TryGetValue("LENGTH", out sl)
+      if (FFmpeg.IdentifyFile(file).TryGetValue("LENGTH", out sl)
         && Double.TryParse(sl, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("en-US", "en"), out dur)
         && dur > 0) {
         return dur;
@@ -57,7 +57,7 @@ namespace NMaier.sdlna.Util
 
     public static IDictionary<string, string> IdentifyFile(FileInfo file)
     {
-      if (Ffmpeg.FFIDENTIFY == null) {
+      if (FFmpeg.FFIDENTIFY == null) {
         throw new NotSupportedException();
       }
       IDictionary<string, string> rv;
@@ -72,7 +72,7 @@ namespace NMaier.sdlna.Util
             sti.CreateNoWindow = true;
 #endif
             sti.UseShellExecute = false;
-            sti.FileName = Ffmpeg.FFIDENTIFY.FullName;
+            sti.FileName = FFmpeg.FFIDENTIFY.FullName;
             sti.Arguments = String.Format("\"{0}\"", file.FullName);
             sti.LoadUserProfile = false;
             sti.RedirectStandardOutput = true;
@@ -142,14 +142,14 @@ namespace NMaier.sdlna.Util
             var r = di.GetFiles(executable, SearchOption.TopDirectoryOnly);
             if (r.Length != 0) {
               var rv = r[0];
-              LogManager.GetLogger(typeof(Ffmpeg)).InfoFormat("Found {0} at {1}", executable, rv.FullName);
+              LogManager.GetLogger(typeof(FFmpeg)).InfoFormat("Found {0} at {1}", executable, rv.FullName);
               return rv;
             }
           }
           catch (Exception) { }
         }
       }
-      LogManager.GetLogger(typeof(Ffmpeg)).Warn("Did not find " + executable);
+      LogManager.GetLogger(typeof(FFmpeg)).Warn("Did not find " + executable);
       return null;
     }
   }

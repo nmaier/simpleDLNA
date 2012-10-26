@@ -5,7 +5,7 @@ using NMaier.sdlna.FileMediaServer.Files;
 
 namespace NMaier.sdlna.FileMediaServer.Folders
 {
-  class VirtualFolder : BaseFolder
+  internal class VirtualFolder : BaseFolder
   {
     public VirtualFolder(FileServer server, BaseFolder aParent, string aName)
       : base(server, aParent)

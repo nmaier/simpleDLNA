@@ -2,7 +2,7 @@ using System;
 
 namespace NMaier.sdlna.Server
 {
-  class UpnpDevice
+  internal sealed class UpnpDevice
   {
 
     public readonly Uri Descriptor;

@@ -3,7 +3,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.Thumbnails
 {
-  interface IThumbnailer
+  internal interface IThumbnailer
   {
 
     MediaTypes Handling { get; }

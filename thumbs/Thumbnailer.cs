@@ -9,7 +9,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Thumbnails
 {
-  public class Thumbnailer : Logging
+  public sealed class Thumbnailer : Logging
   {
 
     private static readonly LRUCache<string, CacheItem> cache = new LRUCache<string, CacheItem>(1 << 11);

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace NMaier.sdlna.Util
 {
-  public class LRUCache<TKey, TValue> : IDictionary<TKey, TValue>
+  public sealed class LRUCache<TKey, TValue> : IDictionary<TKey, TValue>
   {
 
     private readonly uint capacity;

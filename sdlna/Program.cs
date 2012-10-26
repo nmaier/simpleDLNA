@@ -13,7 +13,7 @@ using log4net.Layout;
 
 namespace NMaier.sdlna
 {
-  class Program
+  public sealed class Program
   {
 
     private static ManualResetEvent BlockEvent = new ManualResetEvent(false);

@@ -9,7 +9,7 @@ using NMaier.sdlna.Server.Metadata;
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
-  internal class VideoFile : BaseFile, IMetaVideoItem, ISerializable
+  internal sealed class VideoFile : BaseFile, IMetaVideoItem, ISerializable
   {
 
     private string[] actors;
@@ -30,7 +30,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     {
     }
 
-    protected VideoFile(SerializationInfo info, StreamingContext ctx)
+    private VideoFile(SerializationInfo info, StreamingContext ctx)
       : this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
     {
       actors = info.GetValue("a", typeof(string[])) as string[];

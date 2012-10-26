@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NMaier.sdlna.Server
 {
-  internal class Datagram
+  internal sealed class Datagram
   {
 
     public readonly IPEndPoint EndPoint;

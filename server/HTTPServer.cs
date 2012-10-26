@@ -10,7 +10,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {
-  public class HttpServer : Logging, IDisposable
+  public sealed class HttpServer : Logging, IDisposable
   {
 
     private readonly Dictionary<HttpClient, DateTime> clients = new Dictionary<HttpClient, DateTime>();

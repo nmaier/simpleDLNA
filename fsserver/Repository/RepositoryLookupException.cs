@@ -2,7 +2,7 @@ using System;
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  public class RepositoryLookupException : ArgumentException
+  public sealed class RepositoryLookupException : ArgumentException
   {
 
     public readonly string Key;

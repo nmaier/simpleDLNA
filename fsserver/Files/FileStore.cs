@@ -15,7 +15,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {
-  internal class DeserializeInfo
+  internal sealed class DeserializeInfo
   {
 
     public FileInfo Info;

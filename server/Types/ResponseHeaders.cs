@@ -2,7 +2,7 @@
 
 namespace NMaier.sdlna.Server
 {
-  public class ResponseHeaders : RawHeaders
+  public sealed class ResponseHeaders : RawHeaders
   {
 
     public ResponseHeaders()

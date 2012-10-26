@@ -8,7 +8,7 @@ using NMaier.sdlna.Server.Metadata;
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
-  internal class AudioFile : BaseFile, IMetaAudioItem, ISerializable
+  internal sealed class AudioFile : BaseFile, IMetaAudioItem, ISerializable
   {
 
     private string album;
@@ -29,7 +29,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     {
     }
 
-    protected AudioFile(SerializationInfo info, StreamingContext ctx) :
+    private AudioFile(SerializationInfo info, StreamingContext ctx) :
       this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
     {
       MaybeInit();

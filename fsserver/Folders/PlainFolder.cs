@@ -8,7 +8,7 @@ using NMaier.sdlna.FileMediaServer.Files;
 
 namespace NMaier.sdlna.FileMediaServer.Folders
 {
-  class PlainFolder : BaseFolder, IMetaInfo
+  internal class PlainFolder : BaseFolder, IMetaInfo
   {
 
     private readonly DirectoryInfo dir;

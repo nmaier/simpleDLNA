@@ -6,7 +6,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.Thumbnails
 {
-  class ImageThumbnailer : IThumbnailer
+  internal sealed class ImageThumbnailer : IThumbnailer
   {
 
     public MediaTypes Handling

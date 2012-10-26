@@ -6,7 +6,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Views
 {
-  class ByTitleView : IView
+  internal sealed class ByTitleView : IView
   {
     private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
     {

@@ -2,7 +2,7 @@
 
 namespace NMaier.sdlna.Util
 {
-  public class ResList : List<KeyValuePair<string, string>>
+  public sealed class ResList : List<KeyValuePair<string, string>>
   {
 
 

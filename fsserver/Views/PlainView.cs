@@ -4,7 +4,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Views
 {
-  class PlainView : IView
+  internal sealed class PlainView : IView
   {
 
     public string Description

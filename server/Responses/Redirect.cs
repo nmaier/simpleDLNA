@@ -2,7 +2,7 @@
 
 namespace NMaier.sdlna.Server
 {
-  internal class Redirect : StringResponse, IResponse
+  internal sealed class Redirect : StringResponse, IResponse
   {
 
     internal Redirect(HttpCodes code, IRequest request, string path)

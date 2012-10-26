@@ -9,7 +9,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Views
 {
-  class SeriesView : IView
+  internal sealed class SeriesView : IView
   {
     private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
     {

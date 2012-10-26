@@ -1,7 +1,7 @@
 
 namespace NMaier.sdlna.Server
 {
-  class StaticHandler : IPrefixHandler
+  internal sealed class StaticHandler : IPrefixHandler
   {
 
     private readonly string prefix;

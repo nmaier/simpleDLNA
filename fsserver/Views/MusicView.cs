@@ -5,7 +5,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Views
 {
-  class MusicView : IView
+  internal sealed class MusicView : IView
   {
     private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
     {

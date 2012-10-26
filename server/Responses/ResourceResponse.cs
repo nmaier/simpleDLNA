@@ -5,7 +5,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {
-  internal class ResourceResponse : Logging, IResponse
+  internal sealed class ResourceResponse : Logging, IResponse
   {
 
     private readonly IHeaders headers = new ResponseHeaders();

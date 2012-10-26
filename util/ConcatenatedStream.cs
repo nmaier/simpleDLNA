@@ -4,7 +4,7 @@ using System.IO;
 
 namespace NMaier.sdlna.Util
 {
-  public class ConcatenatedStream : Stream
+  public sealed class ConcatenatedStream : Stream
   {
 
     Queue<Stream> streams = new Queue<Stream>();

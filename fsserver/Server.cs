@@ -10,7 +10,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.FileMediaServer
 {
-  public class FileServer : Logging, IMediaServer, IVolatileMediaServer
+  public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer
   {
 
     private readonly Timer changeTimer = new Timer(2000);

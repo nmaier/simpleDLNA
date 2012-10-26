@@ -5,7 +5,7 @@ using NMaier.sdlna.Server;
 
 namespace NMaier.sdlna.FileMediaServer.Folders
 {
-  class KeyedVirtualFolder<T> : VirtualFolder where T : VirtualFolder, new()
+  internal class KeyedVirtualFolder<T> : VirtualFolder where T : VirtualFolder, new()
   {
 
     private readonly Dictionary<string, T> keys = new Dictionary<string, T>();

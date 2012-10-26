@@ -8,7 +8,7 @@ using NMaier.sdlna.Server.Metadata;
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
-  internal class ImageFile : BaseFile, IMetaImageItem, ISerializable
+  internal sealed class ImageFile : BaseFile, IMetaImageItem, ISerializable
   {
 
     private string creator;
@@ -21,7 +21,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     internal ImageFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
 
-    protected ImageFile(SerializationInfo info, StreamingContext ctx)
+    private ImageFile(SerializationInfo info, StreamingContext ctx)
       : this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
     {
       creator = info.GetString("cr");

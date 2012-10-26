@@ -9,7 +9,7 @@ using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {
-  public class SSDPServer : Logging, IDisposable
+  internal sealed class SSDPServer : Logging, IDisposable
   {
 
     private readonly UdpClient client = new UdpClient();
