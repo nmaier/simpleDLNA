@@ -12,7 +12,7 @@ namespace NMaier.sdlna.FileMediaServer
   {
 
     private readonly Timer changeTimer = new Timer(2000);
-    private Comparers.IItemComparer comparer = null;
+    private Comparers.IItemComparer comparer = new Comparers.TitleComparer();
     private bool descending = false;
     private readonly DirectoryInfo directory;
     private readonly string friendlyName;
