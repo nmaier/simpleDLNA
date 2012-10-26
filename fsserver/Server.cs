@@ -65,6 +65,7 @@ namespace NMaier.sdlna.FileMediaServer
 
 
     public event EventHandler Changed;
+    private Task thumberTask;
 
 
 
@@ -150,12 +151,12 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 #endif
-      if (store != null) {
+      if (store != null && thumberTask == null) {
         var files = (from i in ids.Values
                      let f = (i as Files.BaseFile)
                      where f != null
                      select new WeakReference(f)).ToList();
-        Task.Factory.StartNew(() =>
+        thumberTask = Task.Factory.StartNew(() =>
         {
           foreach (var i in files) {
             try {
@@ -175,6 +176,7 @@ namespace NMaier.sdlna.FileMediaServer
               Debug("Failed to thumb", ex);
             }
           }
+          thumberTask = null;
           return;
         }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
       }
