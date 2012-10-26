@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using NMaier.sdlna.FileMediaServer.Files;
 using NMaier.sdlna.Server;
 
@@ -92,6 +93,16 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     public int CompareTo(IMediaItem other)
     {
       return Title.ToLower().CompareTo(other.Title.ToLower());
+    }
+
+    public void Cleanup()
+    {
+      foreach (var f in childFolders) {
+        f.Cleanup();
+      }
+      childFolders = (from f in childFolders
+                      where f.ChildCount > 0
+                      select f).ToList();
     }
 
     public void ReleaseItem(IFileServerMediaItem item)

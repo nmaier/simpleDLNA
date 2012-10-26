@@ -123,6 +123,7 @@ namespace NMaier.sdlna.FileMediaServer
       foreach (var t in transformations) {
         t.Transform(this, newRoot);
       }
+      newRoot.Cleanup();
       newRoot.Sort(comparer, descending);
       ids["0"] = root = newRoot;
 #if DUMP_TREE
