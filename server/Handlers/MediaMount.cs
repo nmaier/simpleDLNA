@@ -117,7 +117,7 @@ namespace NMaier.sdlna.Server
       doc.LoadXml(Properties.Resources.description);
       doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", UUID);
       doc.GetElementsByTagName("modelNumber").Item(0).InnerText = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-      doc.GetElementsByTagName("friendlyName").Item(0).InnerText = "sdlna — " + FriendlyName;
+      doc.GetElementsByTagName("friendlyName").Item(0).InnerText = FriendlyName + " — sdlna";
       doc.GetElementsByTagName("SCPDURL").Item(0).InnerText = String.Format("{0}contentDirectory.xml", prefix);
       doc.GetElementsByTagName("controlURL").Item(0).InnerText = String.Format("{0}control", prefix);
       doc.GetElementsByTagName("eventSubURL").Item(0).InnerText = String.Format("{0}events", prefix);
