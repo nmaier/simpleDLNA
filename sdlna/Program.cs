@@ -124,6 +124,8 @@ namespace NMaier.sdlna
           server.InfoFormat("Enabled type {0}", t);
         }
 
+        var friendlyName = "sdlna";
+
         foreach (var d in options.Directories) {
           server.InfoFormat("Mounting FileServer for {0}", d.FullName);
           var fs = new FileServer(types, d);
@@ -155,9 +157,10 @@ namespace NMaier.sdlna
           fs.Load();
           server.RegisterMediaServer(fs);
           server.InfoFormat("{0} mounted", d.FullName);
+          friendlyName = fs.FriendlyName;
         }
 
-        Console.Title = "simple DLNA - running ...";
+        Console.Title = String.Format("{0} - running ...", friendlyName);
 
         // Basically the main loop, except we don't loop here at all ;)
         BlockEvent.WaitOne();
