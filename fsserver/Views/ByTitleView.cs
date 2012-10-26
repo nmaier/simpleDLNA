@@ -10,7 +10,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
   {
     private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
     {
-      public TitlesFolder(FileServer aServer, BaseFolder aParent) : base(aServer, aParent, "") { }
+      public TitlesFolder(FileServer aServer, BaseFolder aParent) : base(aServer, aParent, "titles") { }
     }
 
 
