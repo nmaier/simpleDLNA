@@ -72,7 +72,7 @@ namespace NMaier.sdlna.Server
         }
       }
       queueTimer.Enabled = messageQueue.Count != 0;
-      queueTimer.Interval = random.Next(100, 500);
+      queueTimer.Interval = random.Next(250, 2000);
     }
 
     private void Receive()
