@@ -198,7 +198,7 @@ namespace NMaier.sdlna.FileMediaServer
       if (store != null && e.FullPath.ToLower() == store.StoreFile.FullName.ToLower()) {
         return;
       }
-      InfoFormat("File System changed: {0}", directory.FullName);
+      DebugFormat("File System changed: {0}", e.FullPath);
       changeTimer.Enabled = true;
     }
 
