@@ -7,7 +7,7 @@ using NMaier.sdlna.Thumbnails;
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
-  internal sealed class Cover : IMediaCoverResource, ISerializable
+  internal sealed class Cover : Logging, IMediaCoverResource, ISerializable
   {
 
     private byte[] _bytes;
@@ -53,8 +53,13 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
     internal void ForceLoad()
     {
-      if (_bytes == null) {
-        _bytes = thumber.GetThumbnail(file, ref width, ref height);
+      try {
+        if (_bytes == null) {
+          _bytes = thumber.GetThumbnail(file, ref width, ref height);
+        }
+      }
+      catch (Exception ex) {
+        Warn("Failed to load thumb for " + file.FullName, ex);
       }
       if (_bytes == null) {
         _bytes = new byte[0];
