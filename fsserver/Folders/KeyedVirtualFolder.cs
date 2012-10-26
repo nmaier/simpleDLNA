@@ -25,13 +25,14 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     public T GetFolder(string key)
     {
       T rv;
-      if (!keys.TryGetValue(key, out rv)) {
+      var lkey = key.ToLower();
+      if (!keys.TryGetValue(lkey, out rv)) {
         rv = new T();
         rv.Server = Server;
         rv.Name = key;
         AdoptItem(rv);
         Server.RegisterPath(rv);
-        keys.Add(key, rv);
+        keys.Add(lkey, rv);
       }
       return rv;
     }
