@@ -60,11 +60,11 @@ namespace NMaier.sdlna.Server
 
       RemoteEndpoint = client.Client.RemoteEndPoint as IPEndPoint;
       LocalEndPoint = client.Client.LocalEndPoint as IPEndPoint;
-
-      ReadNext();
     }
 
-
+    public void Start() {
+      ReadNext();
+    }
 
     public string Body
     {

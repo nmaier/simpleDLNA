@@ -122,16 +122,25 @@ namespace NMaier.sdlna.Server
 
     private void AcceptCallback(IAsyncResult result)
     {
+      TcpClient tcpclient = null;
       try {
-        var client = new HttpClient(this, listener.EndAcceptTcpClient(result));
-        clients.Add(client, DateTime.Now);
-        DebugFormat("Accepted client {0}", client);
+        tcpclient = listener.EndAcceptTcpClient(result);
       }
       catch (Exception ex) {
         Error("Failed to accept a client", ex);
       }
-
       Accept();
+      try {
+        var client = new HttpClient(this, tcpclient);
+        lock (clients) {
+          clients.Add(client, DateTime.Now);
+        }
+        DebugFormat("Accepted client {0}", client);
+        client.Start();
+      }
+      catch (Exception ex) {
+        Error("Failed to accept a client", ex);
+      }
     }
 
     private static string GenerateServerSignature()
