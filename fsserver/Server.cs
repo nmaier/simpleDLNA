@@ -257,7 +257,7 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 
-      var ext = aFile.Extension.ToLower().Substring(1);
+      var ext = new Regex(@"[^\w\d]+", RegexOptions.Compiled).Replace(aFile.Extension.ToLower().Substring(1), "");
       var type = DlnaMaps.Ext2Dlna[ext];
       var mediaType = DlnaMaps.Ext2Media[ext];
 
