@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using NMaier.sdlna.FileMediaServer.Folders;
 using NMaier.sdlna.Server;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {

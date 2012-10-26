@@ -1,7 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Reflection;
 using System.Xml;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {

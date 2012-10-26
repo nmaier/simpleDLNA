@@ -55,6 +55,7 @@
     <Compile Include="ConcatenatedStream.cs" />
     <Compile Include="Ffmpeg.cs" />
     <Compile Include="Formatting.cs" />
+    <Compile Include="Logging.cs" />
     <Compile Include="LRUCache.cs" />
     <Compile Include="MoreDom.cs" />
     <Compile Include="NaturalStringComparer.cs" />

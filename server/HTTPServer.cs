@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Timers;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.Server
 {

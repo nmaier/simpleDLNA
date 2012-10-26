@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Timers;
 using NMaier.sdlna.Server;
-using System.Threading.Tasks;
-using System.Text.RegularExpressions;
-using System.Runtime.CompilerServices;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.FileMediaServer
 {

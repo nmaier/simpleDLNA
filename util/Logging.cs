@@ -1,7 +1,7 @@
 using System;
 using log4net;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.sdlna.Util
 {
   public class Logging : ILog
   {

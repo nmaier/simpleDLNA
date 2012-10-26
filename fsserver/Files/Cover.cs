@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using NMaier.sdlna.Server;
 using NMaier.sdlna.Thumbnails;
+using NMaier.sdlna.Util;
 
 namespace NMaier.sdlna.FileMediaServer.Files
 {

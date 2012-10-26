@@ -133,6 +133,10 @@
       <Project>{232A96F6-A2BF-44C8-B623-6E411F6296F2}</Project>
       <Name>server</Name>
     </ProjectReference>
+    <ProjectReference Include="..\util\util.csproj">
+      <Project>{A8960A7A-887C-40D7-9632-002E94BFC830}</Project>
+      <Name>util</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
