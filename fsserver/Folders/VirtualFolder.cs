@@ -18,14 +18,22 @@ namespace NMaier.sdlna.FileMediaServer.Folders
 
 
 
-    internal string Name {
+    internal string Name
+    {
       get;
       set;
     }
 
+    private string path = null;
     public override string Path
     {
-      get { return string.Format("{0}/virtual:{1}", Parent.Path, Name); }
+      get
+      {
+        if (string.IsNullOrEmpty(path)) {
+          path = string.Format("{0}/virtual:{1}", Parent.Path, Name);
+        }
+        return path;
+      }
     }
 
     public override string Title
