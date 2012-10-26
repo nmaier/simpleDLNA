@@ -32,7 +32,7 @@ namespace NMaier.sdlna.FileMediaServer
     {
       types = aTypes;
       directory = aDirectory;
-      friendlyName = directory.FullName;
+      friendlyName = string.Format("{0} ({1})", directory.Name, directory.Parent.FullName);
       watcher = new FileSystemWatcher(directory.FullName);
     }
 
