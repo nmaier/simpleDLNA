@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using NMaier.sdlna.FileMediaServer.Files;
 
@@ -47,6 +48,17 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     public void Link(BaseFile r)
     {
       childItems.Add(r);
+    }
+
+    internal void AdoptChildren()
+    {
+      var children = (from c in childItems
+                     where c.Parent != this
+                     select c).ToList();
+      childItems.Clear();
+      foreach (var c in children) {
+        AdoptItem(c);
+      }
     }
   }
 }

@@ -93,6 +93,7 @@
     <Compile Include="Folders\PlainRootFolder.cs" />
     <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Repository\ViewRepository.cs" />
+    <Compile Include="Views\SeriesView.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\server\server.csproj">
