@@ -5,6 +5,8 @@ using System.Linq;
 using System.Timers;
 using NMaier.sdlna.Server;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using System.Runtime.CompilerServices;
 
 namespace NMaier.sdlna.FileMediaServer
 {
@@ -107,17 +109,30 @@ namespace NMaier.sdlna.FileMediaServer
     private void DoRoot()
     {
       // Collect some garbage
-      var newPaths = new Dictionary<string, string>();
-      var newIds = new Dictionary<string, IMediaItem>();
-      foreach (var i in ids) {
-        if (i.Value is Files.BaseFile && !(i.Value as Files.BaseFile).Item.Exists) {
-          continue;
+      lock (ids) {
+        lock (paths) {
+          var newPaths = new Dictionary<string, string>();
+          var newIds = new Dictionary<string, IMediaItem>();
+          foreach (var i in ids) {
+            if (i.Value is Files.BaseFile && !(i.Value as Files.BaseFile).Item.Exists) {
+              continue;
+            }
+            try {
+              newIds.Add(i.Key, i.Value);
+              var path = (i.Value as IFileServerMediaItem).Path;
+              newPaths.Add(path, i.Key);
+            }
+            catch (Exception ex) {
+              Error(i.Key);
+              Error((i.Value as IFileServerMediaItem).Path);
+              Error(ex);
+              throw;
+            }
+          }
+          paths = newPaths;
+          ids = newIds;
         }
-        newIds.Add(i.Key, i.Value);
-        newPaths.Add((i.Value as IFileServerMediaItem).Path, i.Key);
       }
-      paths = newPaths;
-      ids = newIds;
 
       var newRoot = new Folders.PlainRootFolder(this, types, directory);
       foreach (var t in transformations) {
@@ -125,7 +140,9 @@ namespace NMaier.sdlna.FileMediaServer
       }
       newRoot.Cleanup();
       newRoot.Sort(comparer, descending);
-      ids["0"] = root = newRoot;
+      lock (ids) {
+        ids["0"] = root = newRoot;
+      }
 #if DUMP_TREE
       using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
         using (var w = new StreamWriter(s)) {
@@ -191,10 +208,20 @@ namespace NMaier.sdlna.FileMediaServer
 
     private void Rescan()
     {
-      DoRoot();
+      lock (this) {
+        try {
+          InfoFormat("Rescanning...");
+          DoRoot();
+          InfoFormat("Done rescanning...");
 
-      if (Changed != null) {
-        Changed(this, null);
+          if (Changed != null) {
+            InfoFormat("Notifying...");
+            Changed(this, null);
+          }
+        }
+        catch (Exception ex) {
+          Error(ex);
+        }
       }
     }
 
