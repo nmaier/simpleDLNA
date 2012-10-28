@@ -32,7 +32,7 @@ namespace NMaier.sdlna.Server
 
     public void Send()
     {
-      using (var udp = new UdpClient()) {
+      using (var udp = new UdpClient(AddressFamily.InterNetwork)) {
         var msg = Encoding.ASCII.GetBytes(Message);
         udp.Send(msg, msg.Length, EndPoint);
       }

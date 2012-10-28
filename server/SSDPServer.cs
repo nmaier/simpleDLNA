@@ -84,7 +84,7 @@ namespace NMaier.sdlna.Server
     private void ReceiveCallback(IAsyncResult result)
     {
       try {
-        var endpoint = new IPEndPoint(IPAddress.Any, SSDP_PORT);
+        var endpoint = new IPEndPoint(IPAddress.None, SSDP_PORT);
         var received = client.EndReceive(result, ref endpoint);
 #if DUMP_ALL_SSDP
         DebugFormat("{0} - SSDP Received a datagram", endpoint);
