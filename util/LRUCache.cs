@@ -10,8 +10,8 @@ namespace NMaier.sdlna.Util
 
     private readonly uint capacity;
     private readonly uint toDrop;
-    private readonly IDictionary<TKey, TValue> items = new Dictionary<TKey, TValue>();
-    private readonly List<TKey> order = new List<TKey>();
+    private readonly IDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
+    private readonly LinkedList<KeyValuePair<TKey, TValue>> order = new LinkedList<KeyValuePair<TKey, TValue>>();
 
 
 
@@ -45,16 +45,18 @@ namespace NMaier.sdlna.Util
 
     public TValue this[TKey key]
     {
-      get { return items[key]; }
+      get { return items[key].Value.Value; }
+      [MethodImpl(MethodImplOptions.Synchronized)]
       set
       {
-        items[key] = value;
+        Remove(key);
+        Add(key, value);
       }
     }
 
     public ICollection<TValue> Values
     {
-      get { return items.Values; }
+      get { return (from i in items.Values select i.Value.Value).ToList(); }
     }
 
 
@@ -63,16 +65,14 @@ namespace NMaier.sdlna.Util
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Add(TKey key, TValue value)
     {
-      items.Add(key, value);
-      order.Add(key);
-      MaybeDropSome();
+      Add(new KeyValuePair<TKey,TValue>(key, value));
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Add(KeyValuePair<TKey, TValue> item)
     {
-      items.Add(item);
-      order.Add(item.Key);
+      var n = order.AddFirst(item);
+      items.Add(item.Key, n);
       MaybeDropSome();
     }
 
@@ -85,7 +85,7 @@ namespace NMaier.sdlna.Util
 
     public bool Contains(KeyValuePair<TKey, TValue> item)
     {
-      return items.Contains(item);
+      return items.ContainsKey(item.Key);
     }
 
     public bool ContainsKey(TKey key)
@@ -100,14 +100,18 @@ namespace NMaier.sdlna.Util
 
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
     {
-      return items.GetEnumerator();
+      foreach (var i in items) {
+        yield return i.Value.Value;
+      }
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     public bool Remove(TKey key)
     {
-      if (items.Remove(key)) {
-        order.Remove(key);
+      LinkedListNode<KeyValuePair<TKey, TValue>> node;
+      if (items.TryGetValue(key, out node)) {
+        items.Remove(key);
+        order.Remove(node);
         return true;
       }
       return false;
@@ -116,8 +120,10 @@ namespace NMaier.sdlna.Util
     [MethodImpl(MethodImplOptions.Synchronized)]
     public bool Remove(KeyValuePair<TKey, TValue> item)
     {
-      if (items.Remove(item)) {
-        order.Remove(item.Key);
+      LinkedListNode<KeyValuePair<TKey, TValue>> node;
+      if (items.TryGetValue(item.Key, out node)) {
+        items.Remove(item.Key);
+        order.Remove(node);
         return true;
       }
       return false;
@@ -125,7 +131,13 @@ namespace NMaier.sdlna.Util
 
     public bool TryGetValue(TKey key, out TValue value)
     {
-      return items.TryGetValue(key, out value);
+      LinkedListNode<KeyValuePair<TKey, TValue>> node;
+      if (items.TryGetValue(key, out node)) {
+        value = node.Value.Value;
+        return true;
+      }
+      value = default(TValue);
+      return false;
     }
 
     private void MaybeDropSome()
@@ -134,9 +146,8 @@ namespace NMaier.sdlna.Util
         return;
       }
       for (var i = 0; i < toDrop; ++i) {
-        var key = order[0];
-        order.RemoveAt(0);
-        items.Remove(key);
+        items.Remove(order.Last.Value.Key);
+        order.RemoveLast();
       }
     }
 
