@@ -158,26 +158,32 @@ namespace NMaier.sdlna.FileMediaServer
                      select new WeakReference(f)).ToList();
         thumberTask = Task.Factory.StartNew(() =>
         {
-          foreach (var i in files) {
-            try {
-              var item = (i.Target as Files.BaseFile);
-              if (item == null) {
-                continue;
+          try {
+            foreach (var i in files) {
+              try {
+                var item = (i.Target as Files.BaseFile);
+                if (item == null) {
+                  continue;
+                }
+                if (store.HasCover(item)) {
+                  continue;
+                }
+                item.LoadCover();
+                using (var k = item.Cover.Content) {
+                  k.ReadByte();
+                }
               }
-              if (store.HasCover(item)) {
-                continue;
+              catch (Exception ex) {
+                Debug("Failed to thumb", ex);
               }
-              item.LoadCover();
-              using (var k = item.Cover.Content) {
-                k.ReadByte();
-              }
-            }
-            catch (Exception ex) {
-              Debug("Failed to thumb", ex);
             }
           }
-          thumberTask = null;
-          return;
+          catch (Exception ex) {
+            Error(ex);
+          }
+          finally {
+            thumberTask = null;
+          }
         }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
       }
     }
