@@ -131,5 +131,12 @@ namespace NMaier.sdlna.Server.Properties {
                 return ((byte[])(obj));
             }
         }
+        
+        internal static byte[] x_featurelist {
+            get {
+                object obj = ResourceManager.GetObject("x_featurelist", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
     }
 }

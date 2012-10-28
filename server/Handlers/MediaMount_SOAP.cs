@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using NMaier.sdlna.Server.Metadata;
 using NMaier.sdlna.Util;
@@ -14,8 +15,10 @@ namespace NMaier.sdlna.Server
     private const string NS_DIDL = "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/";
     private const string NS_DLNA = "urn:schemas-dlna-org:metadata-1-0/";
     private const string NS_SOAPENV = "http://schemas.xmlsoap.org/soap/envelope/";
+    private const string NS_SEC = "http://www.sec.co.kr/";
     private const string NS_UPNP = "urn:schemas-upnp-org:metadata-1-0/upnp/";
-    private static LRUCache<string, ResList> SoapCache = new LRUCache<string, ResList>(200);
+    private static IDictionary<string, ResList> SoapCache = new LRUCache<string, ResList>(200);
+    private static readonly string featureList = Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
 
 
 
@@ -79,6 +82,15 @@ namespace NMaier.sdlna.Server
           throw new NotSupportedException();
       }
       item.AppendChild(objectClass);
+
+      if (r is IBookmarkable) {
+        var bookmark = (r as IBookmarkable).Bookmark;
+        if (bookmark.HasValue) {
+          var dcmInfo = result.CreateElement("sec", "dcmInfo", NS_SEC);
+          dcmInfo.InnerText = string.Format("BM={0}", bookmark.Value);
+          item.AppendChild(dcmInfo);
+        }
+      }
 
       if (props.TryGetValue("DateO", out prop)) {
         var e = result.CreateElement("dc", "date", NS_DC);
@@ -266,6 +278,7 @@ namespace NMaier.sdlna.Server
       didl.SetAttribute("xmlns:dc", NS_DC);
       didl.SetAttribute("xmlns:dlna", NS_DLNA);
       didl.SetAttribute("xmlns:upnp", NS_UPNP);
+      didl.SetAttribute("xmlns:sec", NS_SEC);
       result.AppendChild(didl);
 
       if (flag == "BrowseMetadata") {
@@ -298,7 +311,7 @@ namespace NMaier.sdlna.Server
       }
       var resXML = result.OuterXml;
       //Debug(resXML);
-      rv =  new ResList() {
+      rv = new ResList() {
         {"Result", resXML },
         {"NumberReturned", provided.ToString() },
         {"TotalMatches", root.ChildCount.ToString() },
@@ -321,6 +334,31 @@ namespace NMaier.sdlna.Server
     private IHeaders HandleGetSystemUpdateID(IHeaders sparams)
     {
       return new RawHeaders() { { "Id", systemID.ToString() } };
+    }
+
+    private IHeaders HandleXGetFeatureList()
+    {
+      return new RawHeaders() { { "FeatureList", featureList } };
+    }
+
+    private IHeaders HandleXSetBookmark(IHeaders sparams)
+    {
+      var id = sparams["ObjectID"];
+      var item = GetItem(id) as IBookmarkable;
+      if (item != null) {
+        ulong newbookmark = ulong.Parse(sparams["PosSecond"]);
+        if (newbookmark > 30) {
+          // rewind 5 seconds
+          newbookmark -= 5;
+        }
+        if (newbookmark > 30 || !item.Bookmark.HasValue || item.Bookmark.Value < 60) {
+          item.Bookmark = newbookmark;
+          lock (SoapCache) {
+            SoapCache.Clear();
+          }
+        }
+      }
+      return new RawHeaders();
     }
 
     private IResponse ProcessSoapRequest(IRequest request)
@@ -362,10 +400,16 @@ namespace NMaier.sdlna.Server
           case "Browse":
             result = HandleBrowse(request, sparams);
             break;
+          case "X_GetFeatureList":
+            result = HandleXGetFeatureList();
+            break;
+          case "X_SetBookmark":
+            result = HandleXSetBookmark(sparams);
+            break;
           default:
             throw new Http404Exception();
         }
-        var response = env.CreateElement(String.Format("u:{0}Response", method.LocalName), NS_CD);
+        var response = env.CreateElement(String.Format("u:{0}Response", method.LocalName), method.NamespaceURI);
         rbody.AppendChild(response);
 
         foreach (var i in result) {

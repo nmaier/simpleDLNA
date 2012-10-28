@@ -221,7 +221,7 @@ namespace NMaier.sdlna
       [Argument("type", Helptext = "Types to serv (IMAGE, VIDEO)")]
       [ArgumentAlias("what")]
       [ShortArgument('t')]
-      public MediaTypes[] Types = new MediaTypes[] { MediaTypes.VIDEO };
+      public MediaTypes[] Types = new MediaTypes[] { MediaTypes.VIDEO, MediaTypes.IMAGE, MediaTypes.AUDIO };
 
       [Argument("view", Helptext = "Apply a view")]
       [ShortArgument('v')]

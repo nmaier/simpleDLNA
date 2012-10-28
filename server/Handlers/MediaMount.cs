@@ -106,7 +106,9 @@ namespace NMaier.sdlna.Server
 
     private void ChangedServer(object sender, EventArgs e)
     {
-      SoapCache.Clear();
+      lock (SoapCache) {
+        SoapCache.Clear();
+      }
       InfoFormat("Rescanned mount {0}", UUID);
       systemID++;
     }

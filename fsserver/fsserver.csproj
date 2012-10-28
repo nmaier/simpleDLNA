@@ -74,6 +74,7 @@
     <Compile Include="Comparers\TitleComparer.cs" />
     <Compile Include="Files\ImageFile.cs" />
     <Compile Include="Files\VideoFile.cs" />
+    <Compile Include="Folders\PlainRootFolder.cs" />
     <Compile Include="Repository\ComparerRepository.cs" />
     <Compile Include="Repository\IRepositoryItem.cs" />
     <Compile Include="Repository\Repository.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="Server.cs" />
     <Compile Include="Files\BaseFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Folders\PlainRootFolder.cs" />
     <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Repository\ViewRepository.cs" />
     <Compile Include="Views\SeriesView.cs" />

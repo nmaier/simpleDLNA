@@ -9,7 +9,7 @@ using NMaier.sdlna.Server.Metadata;
 namespace NMaier.sdlna.FileMediaServer.Files
 {
   [Serializable]
-  internal sealed class VideoFile : BaseFile, IMetaVideoItem, ISerializable
+  internal sealed class VideoFile : BaseFile, IMetaVideoItem, ISerializable, IBookmarkable
   {
 
     private string[] actors;
@@ -22,6 +22,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
     private bool initialized = false;
     private string title;
     private uint? width;
+    private ulong? bookmark;
 
 
 
@@ -44,6 +45,10 @@ namespace NMaier.sdlna.FileMediaServer.Files
       if (ts > 0) {
         duration = new TimeSpan(ts);
       }
+      try {
+        bookmark = info.GetUInt64("b");
+      }
+      catch (Exception) { }
       initialized = true;
     }
 
@@ -167,6 +172,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("t", title);
       info.AddValue("w", width);
       info.AddValue("h", height);
+      info.AddValue("b", bookmark);
       info.AddValue("du", duration.GetValueOrDefault(EmptyDuration).Ticks);
     }
 
@@ -226,6 +232,16 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
       catch (Exception ex) {
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
+      }
+    }
+
+    public ulong? Bookmark
+    {
+      get { return bookmark; }
+      set
+      {
+        bookmark = value;
+        Parent.Server.UpdateFileCache(this);
       }
     }
   }

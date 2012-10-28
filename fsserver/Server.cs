@@ -107,11 +107,27 @@ namespace NMaier.sdlna.FileMediaServer
       comparer = ComparerRepository.Lookup(order);
     }
 
+    private IFileServerMediaItem CreateRoot(string ID, MediaTypes types, DirectoryInfo directory)
+    {
+      var rv = new Folders.PlainRootFolder(ID, this, types, directory);
+      foreach (var t in transformations) {
+        t.Transform(this, rv);
+      }
+      rv.Cleanup();
+      rv.Sort(comparer, descending);
+      return rv;
+    }
+
     private void DoRoot()
     {
       // Collect some garbage
       lock (ids) {
         lock (paths) {
+          // Remove specialized (Samsung) views, to avoid dupes
+          ids.Remove("I");
+          ids.Remove("A");
+          ids.Remove("V");
+
           var newPaths = new Dictionary<string, string>();
           var newIds = new Dictionary<string, IMediaItem>();
           foreach (var i in ids) {
@@ -135,14 +151,17 @@ namespace NMaier.sdlna.FileMediaServer
         }
       }
 
-      var newRoot = new Folders.PlainRootFolder(this, types, directory);
-      foreach (var t in transformations) {
-        t.Transform(this, newRoot);
-      }
-      newRoot.Cleanup();
-      newRoot.Sort(comparer, descending);
       lock (ids) {
-        ids["0"] = root = newRoot;
+        ids["0"] = root = CreateRoot("0", types, directory) as IMediaFolder;
+        var typeView = CreateRoot("I", types & MediaTypes.IMAGE, directory);
+        typeView.Parent = root as Folders.BaseFolder;
+        ids["I"] = typeView;
+        typeView = CreateRoot("A", types & MediaTypes.AUDIO, directory);
+        typeView.Parent = root as Folders.BaseFolder;
+        ids["A"] = typeView;
+        typeView = CreateRoot("V", types & MediaTypes.VIDEO, directory);
+        typeView.Parent = root as Folders.BaseFolder;
+        ids["V"] = typeView;
       }
 #if DUMP_TREE
       using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {

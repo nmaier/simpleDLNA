@@ -18,6 +18,9 @@
 <modelNumber></modelNumber> 
 <modelURL>https://tn123.org/</modelURL> 
 <serialNumber></serialNumber>
+<sec:ProductCap>DCM10,getMediaInfo.sec</sec:ProductCap>
+<sec:X_ProductCap>DCM10,getMediaInfo.sec</sec:X_ProductCap>
+
 
 <iconList>
   <icon>
@@ -51,10 +54,10 @@
 </iconList>
 <serviceList>
 <service>
-<serviceType>urn:schemas-upnp-org:service:ContentDirectory:1</serviceType>
-<serviceId>urn:upnp-org:serviceId:ContentDirectory</serviceId>
-<SCPDURL>/serviceDescription/ContentDirectory</SCPDURL>
-<controlURL>/serviceControl</controlURL>
+  <serviceType>urn:schemas-upnp-org:service:ContentDirectory:1</serviceType>
+  <serviceId>urn:upnp-org:serviceId:ContentDirectory</serviceId>
+  <SCPDURL>/contentDirectory.xml</SCPDURL>
+  <controlURL>/serviceControl</controlURL>
 <eventSubURL></eventSubURL>
 </service>
 </serviceList>

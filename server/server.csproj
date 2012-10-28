@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IBookmarkable.cs" />
     <Compile Include="Types\Datagram.cs" />
     <Compile Include="Handlers\MediaMount_HTML.cs" />
     <Compile Include="Handlers\MediaMount_SOAP.cs" />
@@ -124,6 +125,7 @@
     <Content Include="Resources\large.png" />
     <Content Include="Resources\small.jpg" />
     <Content Include="Resources\small.png" />
+    <Content Include="Resources\x_featurelist.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\util\util.csproj">
