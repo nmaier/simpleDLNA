@@ -229,7 +229,7 @@ namespace NMaier.sdlna.FileMediaServer
 
     private void OnRenamed(Object source, RenamedEventArgs e)
     {
-      InfoFormat("File System changed (rename): {0}", directory.FullName);
+      DebugFormat("File System changed (rename): {0}", directory.FullName);
       changeTimer.Enabled = true;
     }
 
