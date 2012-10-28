@@ -123,15 +123,8 @@ namespace NMaier.sdlna.Server
 
     private void AcceptCallback(IAsyncResult result)
     {
-      TcpClient tcpclient = null;
       try {
-        tcpclient = listener.EndAcceptTcpClient(result);
-      }
-      catch (Exception ex) {
-        Error("Failed to accept a client", ex);
-      }
-      Accept();
-      try {
+        var tcpclient = listener.EndAcceptTcpClient(result);
         var client = new HttpClient(this, tcpclient);
         lock (clients) {
           clients.Add(client, DateTime.Now);
@@ -141,6 +134,9 @@ namespace NMaier.sdlna.Server
       }
       catch (Exception ex) {
         Error("Failed to accept a client", ex);
+      }
+      finally {
+        Accept();
       }
     }
 
@@ -179,10 +175,13 @@ namespace NMaier.sdlna.Server
     private void TimeouterCallback(object sender, ElapsedEventArgs e)
     {
       Debug("Timeouter");
-      foreach (var c in clients.ToList()) {
-        if (c.Key.IsATimeout) {
-          DebugFormat("Collected timeout client {0}", c);
-          c.Key.Close();
+      lock (clients) {
+        foreach (var c in clients.ToList()) {
+          if (c.Key.IsATimeout) {
+            DebugFormat("Collected timeout client {0}", c);
+            c.Key.Close();
+            clients.Remove(c.Key);
+          }
         }
       }
     }
@@ -218,10 +217,12 @@ namespace NMaier.sdlna.Server
 
     internal void RemoveClient(HttpClient client)
     {
-      if (!clients.ContainsKey(client)) {
-        return;
+      lock (clients) {
+        if (!clients.ContainsKey(client)) {
+          return;
+        }
+        clients.Remove(client);
       }
-      clients.Remove(client);
     }
 
     internal void UnregisterHandler(IPrefixHandler handler)
