@@ -13,7 +13,7 @@ namespace NMaier.sdlna.FileMediaServer
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer
   {
 
-    private readonly Timer changeTimer = new Timer(2000);
+    private readonly Timer changeTimer = new Timer(20000);
     private Comparers.IItemComparer comparer = new Comparers.TitleComparer();
     private bool descending = false;
     private readonly DirectoryInfo directory;
