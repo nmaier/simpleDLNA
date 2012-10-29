@@ -424,8 +424,8 @@ namespace NMaier.SimpleDlna.Server
         var detail = env.CreateDocumentFragment();
         detail.InnerXml = "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>401</errorCode><errorDescription>Invalid Action</errorDescription></UPnPError></detail>";
         fault.AppendChild(detail);
-
         rbody.AppendChild(fault);
+        WarnFormat("Invalid call: Action: {0}, Params: {1}, Problem {2}", method.LocalName, sparams, ex.Message);
       }
 
       var rv = new StringResponse(code, "text/xml", env.OuterXml);
