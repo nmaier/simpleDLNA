@@ -123,10 +123,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
       // Collect some garbage
       lock (ids) {
         lock (paths) {
+#if ENABLE_SAMSUNG
           // Remove specialized (Samsung) views, to avoid dupes
           ids.Remove("I");
           ids.Remove("A");
           ids.Remove("V");
+#endif
 
           var newPaths = new Dictionary<string, string>();
           var newIds = new Dictionary<string, IMediaItem>();
@@ -153,6 +155,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
       lock (ids) {
         ids["0"] = root = CreateRoot("0", types, directory) as IMediaFolder;
+#if ENABLE_SAMSUNG
         var typeView = CreateRoot("I", types & MediaTypes.IMAGE, directory);
         typeView.Parent = root as Folders.BaseFolder;
         ids["I"] = typeView;
@@ -162,6 +165,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         typeView = CreateRoot("V", types & MediaTypes.VIDEO, directory);
         typeView.Parent = root as Folders.BaseFolder;
         ids["V"] = typeView;
+#endif
       }
 #if DUMP_TREE
       using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
