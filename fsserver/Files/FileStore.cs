@@ -187,12 +187,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
           return rv;
         }
       }
-      catch (SerializationException ex) {
-        Debug("Failed to deserialize an item", ex);
-        return null;
-      }
       catch (Exception ex) {
-        Fatal("Failed to deserialize an item", ex);
+        if (ex is TargetInvocationException || ex is SerializationException) {
+          Debug("Failed to deserialize an item", ex);
+          return null;
+        }
         throw;
       }
     }
