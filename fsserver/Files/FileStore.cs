@@ -17,16 +17,17 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   internal sealed class DeserializeInfo
   {
-
+    public FileServer Server;
     public FileInfo Info;
     public DlnaType Type;
 
 
 
-    public DeserializeInfo(FileInfo aInfo, DlnaType aType)
+    public DeserializeInfo(FileServer server, FileInfo info, DlnaType type)
     {
-      Info = aInfo;
-      Type = aType;
+      Server = server;
+      Info = info;
+      Type = type;
     }
   }
 
@@ -123,7 +124,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       selectCoverTime.DbType = DbType.Int64;
 
       insert = connection.CreateCommand();
-      insert.CommandText = "INSERT INTO store VALUES(?,?,?,?,?)";
+      insert.CommandText = "INSERT OR REPLACE INTO store VALUES(?,?,?,?,?)";
       insert.Parameters.Add(insertKey = select.CreateParameter());
       insertKey.DbType = DbType.String;
       insert.Parameters.Add(insertSize = select.CreateParameter());
@@ -160,7 +161,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-    internal BaseFile MaybeGetFile(BaseFolder aParent, FileInfo info, DlnaType type)
+    internal BaseFile MaybeGetFile(FileServer server, BaseFolder aParent, FileInfo info, DlnaType type)
     {
       if (connection == null) {
         return null;
@@ -177,13 +178,12 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
       try {
         using (var s = new MemoryStream(data)) {
-          var ctx = new StreamingContext(StreamingContextStates.Persistence, new DeserializeInfo(info, type));
+          var ctx = new StreamingContext(StreamingContextStates.Persistence, new DeserializeInfo(server, info, type));
           var formatter = new BinaryFormatter(null, ctx);
           formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
           formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
           var rv = formatter.Deserialize(s) as BaseFile;
           rv.Item = info;
-          rv.Parent = aParent;
           return rv;
         }
       }

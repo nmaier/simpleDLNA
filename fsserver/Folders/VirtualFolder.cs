@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using NMaier.SimpleDlna.FileMediaServer.Files;
 
 namespace NMaier.SimpleDlna.FileMediaServer.Folders
@@ -50,25 +49,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
     public override string Title
     {
       get { return Name; }
-    }
-
-
-
-
-    public void LinkFile(BaseFile file)
-    {
-      childItems.Add(file);
-    }
-
-    internal void AdoptChildren()
-    {
-      var children = (from c in childItems
-                      where c.Parent != this
-                      select c).ToList();
-      childItems.Clear();
-      foreach (var c in children) {
-        AdoptItem(c);
-      }
     }
   }
 }

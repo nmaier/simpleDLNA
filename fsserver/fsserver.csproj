@@ -85,9 +85,16 @@
     <Compile Include="Repository\Repository.cs" />
     <Compile Include="Repository\RepositoryLookupException.cs" />
     <Compile Include="Folders\KeyedVirtualFolder.cs" />
-    <Compile Include="Views\MusicView.cs" />
+    <Compile Include="Views\ByTitleView.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\FlattenView.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\MusicView.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Views\PlainView.cs" />
-    <Compile Include="Views\ByTitleView.cs" />
     <Compile Include="IFileServerMediaItem.cs" />
     <Compile Include="Views\IView.cs" />
     <Compile Include="Folders\BaseFolder.cs" />
@@ -96,9 +103,10 @@
     <Compile Include="Server.cs" />
     <Compile Include="Files\BaseFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Repository\ViewRepository.cs" />
-    <Compile Include="Views\SeriesView.cs" />
+    <Compile Include="Views\SeriesView.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\server\server.csproj">

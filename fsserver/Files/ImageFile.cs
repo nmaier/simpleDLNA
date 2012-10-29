@@ -19,10 +19,14 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
 
 
-    internal ImageFile(BaseFolder aParent, FileInfo aFile, DlnaType aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
+    internal ImageFile(FileServer server, FileInfo aFile, DlnaType aType) : base(server, aFile, aType, MediaTypes.IMAGE) { }
 
     private ImageFile(SerializationInfo info, StreamingContext ctx)
-      : this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+      : this((ctx.Context as DeserializeInfo).Server, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+    { }
+
+    private ImageFile(SerializationInfo info, DeserializeInfo di)
+      : this(di.Server, di.Info, di.Type)
     {
       creator = info.GetString("cr");
       description = info.GetString("d");
@@ -150,7 +154,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
         initialized = true;
 
-        Parent.Server.UpdateFileCache(this);
+        Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
         Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);

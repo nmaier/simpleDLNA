@@ -9,7 +9,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 
 
 
-    public VirtualClonedFolder(FileServer server, IMediaFolder parent, string name, MediaTypes types)
+    public VirtualClonedFolder(FileServer server, IMediaFolder parent, string name, MediaTypes types = MediaTypes.AUDIO | MediaTypes.IMAGE | MediaTypes.VIDEO)
       : base(server, null, name)
     {
       this.types = types;
@@ -17,6 +17,10 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       CloneFolder(this, parent);
       Cleanup();
     }
+
+    public VirtualClonedFolder(BaseFolder parent, string name) : this(parent.Server, parent, name) { }
+
+    public VirtualClonedFolder(BaseFolder parent) : this(parent.Server, parent, parent.Path) { }
 
 
 
@@ -29,12 +33,12 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
     {
       foreach (var f in folder.ChildFolders) {
         var vf = new VirtualFolder(Server, parent, f.Title, f.Id);
-        parent.AdoptItem(vf);
+        parent.AdoptFolder(vf);
         CloneFolder(vf, f as BaseFolder);
       }
       foreach (var i in folder.ChildItems) {
         if ((types & i.MediaType) == i.MediaType) {
-          parent.LinkFile(i as Files.BaseFile);
+          parent.AddFile(i as Files.BaseFile);
         }
       }
     }

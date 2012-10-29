@@ -26,13 +26,17 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
 
 
-    internal VideoFile(BaseFolder aParent, FileInfo aFile, DlnaType aType)
-      : base(aParent, aFile, aType, MediaTypes.VIDEO)
+    internal VideoFile(FileServer server, FileInfo aFile, DlnaType aType)
+      : base(server, aFile, aType, MediaTypes.VIDEO)
     {
     }
 
     private VideoFile(SerializationInfo info, StreamingContext ctx)
-      : this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+      : this(info, ctx.Context as DeserializeInfo)
+    { }
+
+    private VideoFile(SerializationInfo info, DeserializeInfo di)
+      : this(di.Server, di.Info, di.Type)
     {
       actors = info.GetValue("a", typeof(string[])) as string[];
       description = info.GetString("de");
@@ -60,7 +64,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       set
       {
         bookmark = value;
-        Parent.Server.UpdateFileCache(this);
+        Server.UpdateFileCache(this);
       }
     }
 
@@ -234,7 +238,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
         initialized = true;
 
-        Parent.Server.UpdateFileCache(this);
+        Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
         Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);

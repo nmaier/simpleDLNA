@@ -24,13 +24,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
 
 
-    internal AudioFile(BaseFolder aParent, FileInfo aFile, DlnaType aType)
-      : base(aParent, aFile, aType, MediaTypes.AUDIO)
+    internal AudioFile(FileServer server, FileInfo aFile, DlnaType aType)
+      : base(server, aFile, aType, MediaTypes.AUDIO)
     {
     }
 
-    private AudioFile(SerializationInfo info, StreamingContext ctx) :
-      this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+    private AudioFile(SerializationInfo info, DeserializeInfo di)
+      : this(di.Server, di.Info, di.Type)
     {
       MaybeInit();
       album = info.GetString("al");
@@ -45,6 +45,10 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
       initialized = true;
     }
+
+    private AudioFile(SerializationInfo info, StreamingContext ctx) :
+      this(info, ctx.Context as DeserializeInfo)
+    { }
 
 
 
@@ -298,7 +302,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
         initialized = true;
 
-        Parent.Server.UpdateFileCache(this);
+        Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
         Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);

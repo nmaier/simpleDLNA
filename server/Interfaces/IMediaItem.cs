@@ -7,8 +7,6 @@ namespace NMaier.SimpleDlna.Server
 
     string Id { get; }
 
-    IMediaFolder Parent { get; }
-
     IHeaders Properties { get; }
 
     string Title { get; }

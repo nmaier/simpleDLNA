@@ -20,22 +20,20 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
 
 
 
-    public void Transform(FileServer Server, IMediaFolder Root)
+    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
     {
-      var root = Root as BaseFolder;
-      MushFolder(Server, root, root);
-      foreach (var i in root.ChildFolders.ToList()) {
-        root.ReleaseItem(i as IFileServerMediaItem);
-      }
+      var rv = new VirtualFolder(Server, null, "0");
+      EatAll(rv, Root);
+      return rv;
     }
 
-    private void MushFolder(FileServer server, BaseFolder root, BaseFolder folder)
+    private void EatAll(BaseFolder root, IMediaFolder folder)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
-        MushFolder(server, root, f as BaseFolder);
+        EatAll(root, f);
       }
       foreach (var c in folder.ChildItems.ToList()) {
-        root.AdoptItem(c as IFileServerMediaItem);
+        root.AddFile(c as Files.BaseFile);
       }
     }
   }

@@ -61,11 +61,7 @@ namespace NMaier.SimpleDlna.Server
       var item = result.CreateElement("", "item", NS_DIDL);
       item.SetAttribute("restricted", "1");
       item.SetAttribute("id", r.Id);
-      var parent = r.Parent;
-      if (parent == null) {
-        parent = Root;
-      }
-      item.SetAttribute("parentID", parent.Id);
+      item.SetAttribute("parentID", Root.Id);
 
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
       switch (r.MediaType) {

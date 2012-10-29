@@ -25,17 +25,18 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
 
 
 
-    public void Transform(FileServer Server, IMediaFolder Root)
+    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
     {
-      var root = Root as BaseFolder;
+      var root = new VirtualClonedFolder(Root as BaseFolder);
       var titles = new TitlesFolder(Server, root);
       SortFolder(Server, root, titles);
       foreach (var i in root.ChildFolders.ToList()) {
-        root.ReleaseItem(i as IFileServerMediaItem);
+        root.ReleaseFolder(i as BaseFolder);
       }
       foreach (var i in titles.ChildFolders.ToList()) {
-        root.AdoptItem(i as BaseFolder);
+        root.AdoptFolder(i as BaseFolder);
       }
+      return root;
     }
 
     private void SortFolder(FileServer server, BaseFolder folder, TitlesFolder titles)
@@ -50,7 +51,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
           pre = "Unnamed";
         }
         pre = pre.First().ToString().ToUpper();
-        titles.GetFolder(pre).AdoptItem(c as IFileServerMediaItem);
+        var file = c as Files.BaseFile;
+        titles.GetFolder(pre).AddFile(file);
+        folder.RemoveFile(file);
       }
     }
 

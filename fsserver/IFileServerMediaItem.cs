@@ -7,8 +7,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     new string Id { get; set; }
 
-    new Folders.BaseFolder Parent { get; set; }
-
     string Path { get; }
   }
 }

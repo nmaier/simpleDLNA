@@ -21,9 +21,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
 
 
 
-    public void Transform(FileServer Server, IMediaFolder Root)
+    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
     {
-      var root = Root as BaseFolder;
+      var root = new VirtualClonedFolder(Root as BaseFolder);
       var artists = new TripleKeyedVirtualFolder(Server, root, "Artists");
       var performers = new TripleKeyedVirtualFolder(Server, root, "Performers");
       var albums = new DoubleKeyedVirtualFolder(Server, root, "Albums");
@@ -31,13 +31,14 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       var folders = new VirtualFolder(Server, root, "Folders");
       SortFolder(Server, root, artists, performers, albums, genres);
       foreach (var f in root.ChildFolders.ToList()) {
-        folders.AdoptItem(f as IFileServerMediaItem);
+        folders.AdoptFolder(f as BaseFolder);
       }
-      root.AdoptItem(artists);
-      root.AdoptItem(performers);
-      root.AdoptItem(albums);
-      root.AdoptItem(genres);
-      root.AdoptItem(folders);
+      root.AdoptFolder(artists);
+      root.AdoptFolder(performers);
+      root.AdoptFolder(albums);
+      root.AdoptFolder(genres);
+      root.AdoptFolder(folders);
+      return root;
     }
 
     private static void LinkTriple(TripleKeyedVirtualFolder folder, BaseFile r, string key1, string key2)
@@ -52,7 +53,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         .GetFolder(key1.TrimStart().First().ToString().ToUpper())
         .GetFolder(key1)
         .GetFolder(key2)
-        .LinkFile(r);
+        .AddFile(r);
     }
 
     private void SortFolder(FileServer server, BaseFolder folder, TripleKeyedVirtualFolder artists, TripleKeyedVirtualFolder performers, DoubleKeyedVirtualFolder albums, SimpleKeyedVirtualFolder genres)
@@ -69,12 +70,12 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         if (album == null) {
           album = "Unspecified album";
         }
-        albums.GetFolder(album.TrimStart().First().ToString().ToUpper()).GetFolder(album).LinkFile(ai);
+        albums.GetFolder(album.TrimStart().First().ToString().ToUpper()).GetFolder(album).AddFile(ai);
         LinkTriple(artists, ai, ai.MetaArtist, album);
         LinkTriple(performers, ai, ai.MetaPerformer, album);
         var genre = ai.MetaGenre;
         if (genre != null) {
-          genres.GetFolder(genre).LinkFile(ai);
+          genres.GetFolder(genre).AddFile(ai);
         }
       }
     }

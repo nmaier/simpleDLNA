@@ -10,5 +10,7 @@ namespace NMaier.SimpleDlna.Server
     IEnumerable<IMediaFolder> ChildFolders { get; }
 
     IEnumerable<IMediaResource> ChildItems { get; }
+
+    IMediaFolder Parent { get; }
   }
 }

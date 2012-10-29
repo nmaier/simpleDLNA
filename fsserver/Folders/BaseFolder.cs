@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NMaier.SimpleDlna.FileMediaServer.Files;
 using NMaier.SimpleDlna.Server;
@@ -42,7 +43,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       set;
     }
 
-    IMediaFolder IMediaItem.Parent
+    IMediaFolder IMediaFolder.Parent
     {
       get { return Parent; }
     }
@@ -76,18 +77,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 
 
 
-    public void AdoptItem(IFileServerMediaItem item)
+    public void AdoptFolder(BaseFolder folder)
     {
-      if (item.Parent != null) {
-        (item.Parent as BaseFolder).ReleaseItem(item);
+      if (folder.Parent != null) {
+        folder.Parent.ReleaseFolder(folder);
       }
-      item.Parent = this;
-      if (item is BaseFolder) {
-        childFolders.Add(item as BaseFolder);
-      }
-      else {
-        childItems.Add(item as BaseFile);
-      }
+      folder.Parent = this;
+      childFolders.Add(folder);
     }
 
     public void Cleanup()
@@ -105,15 +101,10 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       return Title.ToLower().CompareTo(other.Title.ToLower());
     }
 
-    public void ReleaseItem(IFileServerMediaItem item)
+    public void ReleaseFolder(BaseFolder folder)
     {
-      item.Parent = null;
-      if (item is BaseFolder) {
-        childFolders.Remove(item as BaseFolder);
-      }
-      else {
-        childItems.Remove(item as BaseFile);
-      }
+      folder.Parent = null;
+      childFolders.Remove(folder);
     }
 
     public void Sort(Comparers.IItemComparer comparer, bool descending)
@@ -127,6 +118,22 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         childFolders.Reverse();
         childItems.Reverse();
       }
+    }
+
+    internal void AddFile(BaseFile file)
+    {
+      if (file == null) {
+        throw new ArgumentNullException("file");
+      }
+      childItems.Add(file);
+    }
+
+    internal void RemoveFile(BaseFile file)
+    {
+      if (file == null) {
+        throw new ArgumentNullException("file");
+      }
+      childItems.Remove(file);
     }
   }
 }

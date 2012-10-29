@@ -20,9 +20,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
 
 
 
-    public void Transform(FileServer Server, IMediaFolder Root)
+    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
     {
-      var r = Root as BaseFolder;
+      var r = new VirtualClonedFolder(Root as BaseFolder);
       var cross = from f in r.ChildFolders
                   from t in r.ChildFolders
                   where f != t
@@ -34,6 +34,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
 
       TransformInternal(r, r);
       MergeFolders(r, r);
+      return r;
     }
 
     private void MergeFolders(BaseFolder aFrom, BaseFolder aTo)
@@ -45,20 +46,23 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       foreach (var m in merges.ToList()) {
         MergeFolders(m.f, m.t);
         foreach (var c in m.f.ChildFolders.ToList()) {
-          m.t.AdoptItem(c as IFileServerMediaItem);
+          m.t.AdoptFolder(c as BaseFolder);
         }
         foreach (var c in m.f.ChildItems.ToList()) {
-          m.t.AdoptItem(c as IFileServerMediaItem);
+          var file = c as Files.BaseFile;
+          m.t.AddFile(file);
+          m.f.RemoveFile(file);
         }
-        (m.f.Parent as BaseFolder).ReleaseItem(m.f);
+        (m.f.Parent as BaseFolder).ReleaseFolder(m.f);
       }
     }
 
     bool TransformInternal(BaseFolder root, BaseFolder current)
     {
       foreach (var f in current.ChildFolders.ToList()) {
-        if (TransformInternal(root, f as BaseFolder)) {
-          current.ReleaseItem(f as IFileServerMediaItem);
+        var bf = f as BaseFolder;
+        if (TransformInternal(root, bf)) {
+          current.ReleaseFolder(bf);
         }
       }
 
@@ -67,16 +71,18 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       }
       var newParent = current.Parent as BaseFolder;
       foreach (var c in current.ChildItems.ToList()) {
-        newParent.AdoptItem(c as IFileServerMediaItem);
+        newParent.AddFile(c as Files.BaseFile);
       }
 
       if (current.ChildCount != 0) {
         MergeFolders(current, newParent);
         foreach (var f in current.ChildFolders.ToList()) {
-          newParent.AdoptItem(f as IFileServerMediaItem);
+          newParent.AdoptFolder(f as BaseFolder);
         }
         foreach (var f in current.ChildItems.ToList()) {
-          newParent.AdoptItem(f as IFileServerMediaItem);
+          var file = f as Files.BaseFile;
+          newParent.AddFile(file);
+          current.RemoveFile(file);
         }
       }
       return true;

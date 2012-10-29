@@ -15,12 +15,16 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     private DateTime? lastModified = null;
     private long? length = null;
     private readonly string title;
+    private readonly FileServer server;
 
 
 
-    protected BaseFile(BaseFolder aParent, FileInfo aFile, DlnaType aType, MediaTypes aMediaType)
+    protected BaseFile(FileServer server, FileInfo aFile, DlnaType aType, MediaTypes aMediaType)
     {
-      Parent = aParent;
+      if (server == null) {
+        throw new ArgumentNullException("server");
+      }
+      this.server = server;
       Item = aFile;
 
       length = Item.Length;
@@ -88,11 +92,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       set;
     }
 
-    IMediaFolder IMediaItem.Parent
-    {
-      get { return Parent; }
-    }
-
     public DateTime InfoDate
     {
       get
@@ -127,12 +126,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       protected set;
     }
 
-    public BaseFolder Parent
-    {
-      get;
-      set;
-    }
-
     public string Path
     {
       get { return Item.FullName; }
@@ -165,6 +158,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
+    protected FileServer Server { get { return server; } }
     public virtual string Title
     {
       get { return title; }
@@ -186,7 +180,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
     public void LazyLoadedCover(object sender, EventArgs e)
     {
-      Parent.Server.UpdateFileCache(this);
+      Server.UpdateFileCache(this);
     }
 
     public void LoadCover()
@@ -202,7 +196,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
     protected bool LoadCoverFromCache()
     {
-      cover = Parent.Server.GetCover(this);
+      cover = Server.GetCover(this);
       return cover != null;
     }
 
@@ -210,13 +204,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     {
       switch (aMediaType) {
         case MediaTypes.VIDEO:
-          return new VideoFile(aParentFolder, aFile, aType);
+          return new VideoFile(aParentFolder.Server, aFile, aType);
         case MediaTypes.AUDIO:
-          return new AudioFile(aParentFolder, aFile, aType);
+          return new AudioFile(aParentFolder.Server, aFile, aType);
         case MediaTypes.IMAGE:
-          return new ImageFile(aParentFolder, aFile, aType);
+          return new ImageFile(aParentFolder.Server, aFile, aType);
         default:
-          return new BaseFile(aParentFolder, aFile, aType, aMediaType);
+          return new BaseFile(aParentFolder.Server, aFile, aType, aMediaType);
       }
     }
 
