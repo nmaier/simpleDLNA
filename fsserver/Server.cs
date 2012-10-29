@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.SimpleDlna.FileMediaServer
 {
-  public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer
+  public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
 
     private readonly Timer changeTimer = new Timer(20000);
@@ -30,10 +30,10 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    public FileServer(MediaTypes aTypes, DirectoryInfo aDirectory)
+    public FileServer(MediaTypes types, DirectoryInfo directory)
     {
-      types = aTypes;
-      directory = aDirectory;
+      this.types = types;
+      this.directory = directory;
       friendlyName = string.Format("{0} ({1})", directory.Name, directory.Parent.FullName);
       watcher = new FileSystemWatcher(directory.FullName);
     }
@@ -56,7 +56,7 @@ namespace NMaier.sdlna.FileMediaServer
       get { return root; }
     }
 
-    public Guid UUID
+    public Guid Uuid
     {
       get { return uuid; }
     }
@@ -107,9 +107,9 @@ namespace NMaier.sdlna.FileMediaServer
       comparer = ComparerRepository.Lookup(order);
     }
 
-    private IFileServerMediaItem CreateRoot(string ID, MediaTypes types, DirectoryInfo directory)
+    private IFileServerMediaItem CreateRoot(string ID, MediaTypes acceptedTypes, DirectoryInfo rootDirectory)
     {
-      var rv = new Folders.PlainRootFolder(ID, this, types, directory);
+      var rv = new Folders.PlainRootFolder(ID, this, acceptedTypes, rootDirectory);
       foreach (var t in transformations) {
         t.Transform(this, rv);
       }
@@ -206,7 +206,7 @@ namespace NMaier.sdlna.FileMediaServer
         }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
       }
     }
-
+#if DUMP_TREE
     private void DumpTree(StreamWriter w, IMediaFolder folder, string prefix = "/")
     {
       foreach (IMediaFolder f in folder.ChildFolders) {
@@ -217,6 +217,7 @@ namespace NMaier.sdlna.FileMediaServer
         w.WriteLine("{0} {1} - {2}", prefix, r.Title, r.GetType().ToString());
       }
     }
+#endif
 
     private void OnChanged(Object source, FileSystemEventArgs e)
     {
@@ -275,7 +276,7 @@ namespace NMaier.sdlna.FileMediaServer
           if (ev.Parent is Folders.BaseFolder) {
             (ev.Parent as Folders.BaseFolder).ReleaseItem(ev);
           }
-          if (ev.Date == aFile.LastWriteTimeUtc && ev.Size == aFile.Length) {
+          if (ev.InfoDate == aFile.LastWriteTimeUtc && ev.InfoSize == aFile.Length) {
             ev.Parent = aParent;
             return ev;
           }
@@ -309,13 +310,26 @@ namespace NMaier.sdlna.FileMediaServer
         id = paths[path];
       }
       ids[id] = item;
-      item.ID = id;
+      item.Id = id;
     }
 
     internal void UpdateFileCache(Files.BaseFile aFile)
     {
       if (store != null) {
         store.MaybeStoreFile(aFile);
+      }
+    }
+
+    public void Dispose()
+    {
+      if (watcher != null) {
+        watcher.Dispose();
+      }
+      if (changeTimer != null) {
+        changeTimer.Dispose();
+      }
+      if (store != null) {
+        store.Dispose();
       }
     }
   }

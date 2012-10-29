@@ -1,16 +1,16 @@
 using System.IO;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public interface IMediaResource : IMediaItem
   {
 
     Stream Content { get; }
 
-    string PN { get; }
     MediaTypes MediaType { get; }
 
+    string PN { get; }
 
-    DlnaTypes Type { get; }
+    DlnaType Type { get; }
   }
 }

@@ -6,9 +6,10 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Timers;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Utilities;
+using NMaier.SimpleDlna.Server.Ssdp;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpServer : Logging, IDisposable
   {
@@ -16,9 +17,9 @@ namespace NMaier.sdlna.Server
     private readonly Dictionary<HttpClient, DateTime> clients = new Dictionary<HttpClient, DateTime>();
     private readonly TcpListener listener;
     private readonly Dictionary<string, IPrefixHandler> prefixes = new Dictionary<string, IPrefixHandler>();
-    public static readonly string SERVER_SIGNATURE = GenerateServerSignature();
     private readonly Dictionary<Guid, MediaMount> servers = new Dictionary<Guid, MediaMount>();
-    private readonly SSDPServer ssdpServer;
+    public static readonly string Signature = GenerateServerSignature();
+    private readonly SsdpHandler ssdpServer;
     private readonly Timer timeouter = new Timer(10 * 1000);
 
 
@@ -26,7 +27,7 @@ namespace NMaier.sdlna.Server
     public HttpServer(int port = 0)
     {
       listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
-      ssdpServer = new SSDPServer(this);
+      ssdpServer = new SsdpHandler();
       timeouter.Elapsed += TimeouterCallback;
       timeouter.Enabled = true;
 
@@ -35,21 +36,9 @@ namespace NMaier.sdlna.Server
 
       listener.Server.Ttl = 32;
       listener.Start();
-      InfoFormat("Running HTTP Server: {0} on port {1}", SERVER_SIGNATURE, (listener.LocalEndpoint as IPEndPoint).Port);
+      InfoFormat("Running HTTP Server: {0} on port {1}", Signature, (listener.LocalEndpoint as IPEndPoint).Port);
       Accept();
     }
-
-
-
-    public static string ServerSignature
-    {
-      get
-      {
-        return SERVER_SIGNATURE;
-      }
-    }
-
-    public string Signature { get { return SERVER_SIGNATURE; } }
 
 
 
@@ -62,17 +51,25 @@ namespace NMaier.sdlna.Server
         UnregisterMediaServer(s);
       }
       ssdpServer.Dispose();
+      timeouter.Dispose();
+      listener.Stop();
+      lock (clients) {
+        foreach (var c in clients.ToList()) {
+          c.Key.Dispose();
+        }
+        clients.Clear();
+      }
     }
 
-    public void RegisterMediaServer(IMediaServer aServer)
+    public void RegisterMediaServer(IMediaServer server)
     {
-      var guid = aServer.UUID;
+      var guid = server.Uuid;
       if (servers.ContainsKey(guid)) {
         throw new ArgumentException("Attempting to register more than once");
       }
 
       var end = listener.LocalEndpoint as IPEndPoint;
-      var mount = new MediaMount(aServer);
+      var mount = new MediaMount(server);
       servers[guid] = mount;
       RegisterHandler(mount);
 
@@ -98,24 +95,28 @@ namespace NMaier.sdlna.Server
       }
     }
 
-    public void UnregisterMediaServer(IMediaServer aServer)
+    public void UnregisterMediaServer(IMediaServer server)
     {
       MediaMount mount;
-      if (!servers.TryGetValue(aServer.UUID, out mount)) {
+      if (!servers.TryGetValue(server.Uuid, out mount)) {
         return;
       }
 
-      ssdpServer.UnregisterNotification(aServer.UUID);
+      ssdpServer.UnregisterNotification(server.Uuid);
       UnregisterHandler(mount);
-      servers.Remove(aServer.UUID);
-      InfoFormat("Unregistered Media Server {0}", aServer.UUID);
+      servers.Remove(server.Uuid);
+      InfoFormat("Unregistered Media Server {0}", server.Uuid);
     }
 
     private void Accept()
     {
       try {
+        if (!listener.Server.IsBound) {
+          return;
+        }
         listener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallback), null);
       }
+      catch (ObjectDisposedException) { }
       catch (Exception ex) {
         Fatal("Failed to accept", ex);
       }
@@ -126,12 +127,19 @@ namespace NMaier.sdlna.Server
       try {
         var tcpclient = listener.EndAcceptTcpClient(result);
         var client = new HttpClient(this, tcpclient);
-        lock (clients) {
-          clients.Add(client, DateTime.Now);
+        try {
+          lock (clients) {
+            clients.Add(client, DateTime.Now);
+          }
+          DebugFormat("Accepted client {0}", client);
+          client.Start();
         }
-        DebugFormat("Accepted client {0}", client);
-        client.Start();
+        catch (Exception) {
+          client.Dispose();
+          throw;
+        }
       }
+      catch (ObjectDisposedException) { }
       catch (Exception ex) {
         Error("Failed to accept a client", ex);
       }
@@ -180,7 +188,6 @@ namespace NMaier.sdlna.Server
           if (c.Key.IsATimeout) {
             DebugFormat("Collected timeout client {0}", c);
             c.Key.Close();
-            clients.Remove(c.Key);
           }
         }
       }
@@ -199,7 +206,7 @@ namespace NMaier.sdlna.Server
     internal void RegisterHandler(IPrefixHandler handler)
     {
       if (handler == null) {
-        throw new ArgumentNullException();
+        throw new ArgumentNullException("handler");
       }
       var prefix = handler.Prefix;
       if (!prefix.StartsWith("/")) {

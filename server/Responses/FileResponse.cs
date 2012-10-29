@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed class FileResponse : IResponse
   {

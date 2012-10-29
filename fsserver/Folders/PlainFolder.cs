@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Server.Metadata;
-using NMaier.sdlna.FileMediaServer.Files;
+using NMaier.SimpleDlna.FileMediaServer.Files;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.sdlna.FileMediaServer.Folders
+namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class PlainFolder : BaseFolder, IMetaInfo
   {
@@ -46,19 +46,19 @@ namespace NMaier.sdlna.FileMediaServer.Folders
 
 
 
-    public DateTime Date
+    public DateTime InfoDate
     {
       get { return dir.LastWriteTimeUtc; }
+    }
+
+    public long? InfoSize
+    {
+      get { return null; }
     }
 
     public override string Path
     {
       get { return dir.FullName; }
-    }
-
-    public long? Size
-    {
-      get { return null; }
     }
 
     public override string Title

@@ -1,6 +1,6 @@
 using System;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public interface IMediaServer
   {
@@ -9,7 +9,7 @@ namespace NMaier.sdlna.Server
 
     IMediaFolder Root { get; }
 
-    Guid UUID { get; }
+    Guid Uuid { get; }
 
 
 

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal class StringResponse : IResponse
   {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public interface IHeaders : IDictionary<string, string>
   {

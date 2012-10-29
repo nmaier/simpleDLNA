@@ -4,15 +4,15 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using log4net;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Thumbnails
+namespace NMaier.SimpleDlna.Thumbnails
 {
   public sealed class Thumbnailer : Logging
   {
 
-    private static readonly LRUCache<string, CacheItem> cache = new LRUCache<string, CacheItem>(1 << 11);
+    private static readonly LruDictionary<string, CacheItem> cache = new LruDictionary<string, CacheItem>(1 << 11);
     private static readonly Dictionary<MediaTypes, List<IThumbnailer>> thumbers = new Dictionary<MediaTypes, List<IThumbnailer>>();
 
 
@@ -32,26 +32,26 @@ namespace NMaier.sdlna.Thumbnails
         if (ctor == null) {
           continue;
         }
-        try {
-          var thumber = ctor.Invoke(new object[] { }) as IThumbnailer;
-          if (thumber == null) {
-            continue;
-          }
-          foreach (MediaTypes i in types) {
-            if (thumber.Handling.HasFlag(i)) {
-              thumbers[i].Add(thumber);
-            }
+        var thumber = ctor.Invoke(new object[] { }) as IThumbnailer;
+        if (thumber == null) {
+          continue;
+        }
+        foreach (MediaTypes i in types) {
+          if (thumber.Handling.HasFlag(i)) {
+            thumbers[i].Add(thumber);
           }
         }
-        catch (Exception) { }
       }
     }
 
 
 
 
-    public byte[] GetThumbnail(FileInfo file, ref int width, ref int height)
+    public byte[] GetThumbnail(FileSystemInfo file, ref int width, ref int height)
     {
+      if (file == null) {
+        throw new ArgumentNullException("file");
+      }
       var ext = file.Extension.ToLower().Substring(1);
       var mediaType = DlnaMaps.Ext2Media[ext];
 
@@ -73,7 +73,7 @@ namespace NMaier.sdlna.Thumbnails
       return GetThumbnailInternal(key, stream, type, ref width, ref height);
     }
 
-    private bool GetThumbnailFromCache(ref string key, ref int width, ref int height, out byte[] rv)
+    private static bool GetThumbnailFromCache(ref string key, ref int width, ref int height, out byte[] rv)
     {
       key = string.Format("{0}x{1} {2}", width, height, key);
       CacheItem ci;
@@ -94,7 +94,6 @@ namespace NMaier.sdlna.Thumbnails
       var rh = height;
       foreach (var thumber in thumbnailers) {
         try {
-
           using (var i = thumber.GetThumbnail(item, ref width, ref height)) {
             var rv = i.ToArray();
             cache.Add(key, new CacheItem(rv, rw, rh));
@@ -131,26 +130,32 @@ namespace NMaier.sdlna.Thumbnails
 
       var result = new Bitmap((int)nw, (int)nh);
       try {
-        result.SetResolution(image.HorizontalResolution, image.VerticalResolution);
-      }
-      catch (Exception ex) {
-        LogManager.GetLogger(typeof(Thumbnailer)).Debug("Failed to set resolution", ex);
-      }
-      using (Graphics graphics = Graphics.FromImage(result)) {
-        if (result.Width > image.Width && result.Height > image.Height) {
-          graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-          graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+        try {
+          result.SetResolution(image.HorizontalResolution, image.VerticalResolution);
         }
-        else {
-          graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-          graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
+        catch (Exception ex) {
+          LogManager.GetLogger(typeof(Thumbnailer)).Debug("Failed to set resolution", ex);
         }
-        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
-        graphics.DrawImage(image, 0, 0, result.Width, result.Height);
-        width = result.Width;
-        height = result.Height;
+        using (Graphics graphics = Graphics.FromImage(result)) {
+          if (result.Width > image.Width && result.Height > image.Height) {
+            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+          }
+          else {
+            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
+            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
+          }
+          graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+          graphics.DrawImage(image, 0, 0, result.Width, result.Height);
+          width = result.Width;
+          height = result.Height;
+        }
+        return result;
       }
-      return result;
+      catch (Exception) {
+        result.Dispose();
+        throw;
+      }
     }
 
 

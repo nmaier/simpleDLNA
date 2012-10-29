@@ -1,7 +1,7 @@
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Server.Metadata;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.sdlna.FileMediaServer.Comparers
+namespace NMaier.SimpleDlna.FileMediaServer.Comparers
 {
   class DateComparer : TitleComparer
   {
@@ -24,7 +24,7 @@ namespace NMaier.sdlna.FileMediaServer.Comparers
       var xm = x as IMetaInfo;
       var ym = y as IMetaInfo;
       if (xm != null && ym != null) {
-        var rv = xm.Date.CompareTo(ym.Date);
+        var rv = xm.InfoDate.CompareTo(ym.InfoDate);
         if (rv != 0) {
           return rv;
         }

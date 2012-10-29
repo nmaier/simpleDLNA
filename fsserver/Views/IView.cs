@@ -1,9 +1,10 @@
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer.Views
+namespace NMaier.SimpleDlna.FileMediaServer.Views
 {
   public interface IView : IRepositoryItem
   {
-    void Transform(FileServer Server, IMediaFolder Root);
+
+    void Transform(FileServer server, IMediaFolder root);
   }
 }

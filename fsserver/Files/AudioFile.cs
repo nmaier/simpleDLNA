@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Server.Metadata;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.sdlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   [Serializable]
   internal sealed class AudioFile : BaseFile, IMetaAudioItem, ISerializable
@@ -24,7 +24,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
-    internal AudioFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType)
+    internal AudioFile(BaseFolder aParent, FileInfo aFile, DlnaType aType)
       : base(aParent, aFile, aType, MediaTypes.AUDIO)
     {
     }
@@ -194,6 +194,37 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("d", duration.GetValueOrDefault(EmptyDuration).Ticks);
     }
 
+    private void InitCover(TagLib.Tag tag)
+    {
+      TagLib.IPicture pic = null;
+      foreach (var p in tag.Pictures) {
+        if (p.Type == TagLib.PictureType.FrontCover) {
+          pic = p;
+          break;
+        }
+        switch (p.Type) {
+          case TagLib.PictureType.Other:
+          case TagLib.PictureType.OtherFileIcon:
+          case TagLib.PictureType.FileIcon:
+            pic = p;
+            break;
+          default:
+            if (pic == null) {
+              pic = p;
+            }
+            break;
+        }
+      }
+      if (pic != null) {
+        try {
+          cover = new Cover(Item, pic.Data.ToStream());
+        }
+        catch (Exception ex) {
+          Debug("Failed to generate thumb for " + Item.FullName, ex);
+        }
+      }
+    }
+
     private void MaybeInit()
     {
       if (initialized) {
@@ -258,33 +289,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
               album = null;
             }
 
-            TagLib.IPicture pic = null;
-            foreach (var p in t.Pictures) {
-              if (p.Type == TagLib.PictureType.FrontCover) {
-                pic = p;
-                break;
-              }
-              switch (p.Type) {
-                case TagLib.PictureType.Other:
-                case TagLib.PictureType.OtherFileIcon:
-                case TagLib.PictureType.FileIcon:
-                  pic = p;
-                  break;
-                default:
-                  if (pic == null) {
-                    pic = p;
-                  }
-                  break;
-              }
-            }
-            if (pic != null) {
-              try {
-                cover = new Cover(Item, pic.Data.ToStream());
-              }
-              catch (Exception ex) {
-                Debug("Failed to generate thumb for " + Item.FullName, ex);
-              }
-            }
+            InitCover(t);
           }
           catch (Exception ex) {
             Debug("Failed to transpose Tag props", ex);

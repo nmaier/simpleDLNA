@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using System.Xml;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed partial class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
@@ -48,9 +48,9 @@ namespace NMaier.sdlna.Server
       get { return server.Root; }
     }
 
-    public Guid UUID
+    public Guid Uuid
     {
-      get { return server.UUID; }
+      get { return server.Uuid; }
     }
 
 
@@ -84,21 +84,16 @@ namespace NMaier.sdlna.Server
         var item = GetItem(id) as IMediaCover;
         return new ItemResponse(request, item.Cover, "Interactive");
       }
-      if (path == "" || path == "index.html") {
+      if (string.IsNullOrEmpty(path) || path == "index.html") {
         return new Redirect(request, prefix + "index/0");
       }
       if (path.StartsWith("index/")) {
         var id = path.Substring("index/".Length);
         var item = GetItem(id);
-        return ProcessHtmlRequest(request, item);
+        return ProcessHtmlRequest(item);
       }
       if (path == "browse.css") {
-#if DEBUG
-        var a = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.Parent.Parent.Parent.Parent;
-        return new FileResponse(HttpCodes.OK, "text/css", new FileInfo(Path.Combine(a.FullName, "server", "Resources", "browse.css")));
-#else
         return new ResourceResponse(HttpCodes.OK, "text/css", "browse_css");
-#endif
       }
       WarnFormat("Did not understand {0} {1}", request.Method, path);
       throw new Http404Exception();
@@ -109,7 +104,7 @@ namespace NMaier.sdlna.Server
       lock (SoapCache) {
         SoapCache.Clear();
       }
-      InfoFormat("Rescanned mount {0}", UUID);
+      InfoFormat("Rescanned mount {0}", Uuid);
       systemID++;
     }
 
@@ -117,7 +112,7 @@ namespace NMaier.sdlna.Server
     {
       var doc = new XmlDocument();
       doc.LoadXml(Properties.Resources.description);
-      doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", UUID);
+      doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", Uuid);
       doc.GetElementsByTagName("modelNumber").Item(0).InnerText = Assembly.GetExecutingAssembly().GetName().Version.ToString();
       doc.GetElementsByTagName("friendlyName").Item(0).InnerText = FriendlyName + " — sdlna";
       doc.GetElementsByTagName("SCPDURL").Item(0).InnerText = String.Format("{0}contentDirectory.xml", prefix);

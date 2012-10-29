@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace NMaier.sdlna.Util
+﻿
+namespace NMaier.SimpleDlna.Utilities
 {
   public static class Formatting
   {

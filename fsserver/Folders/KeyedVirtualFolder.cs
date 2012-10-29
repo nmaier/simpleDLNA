@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using NMaier.sdlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer.Folders
+namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class KeyedVirtualFolder<T> : VirtualFolder where T : VirtualFolder, new()
   {

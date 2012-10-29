@@ -8,23 +8,15 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using log4net;
 
-namespace NMaier.sdlna.Util
+namespace NMaier.SimpleDlna.Utilities
 {
   public static class FFmpeg
   {
 
-    public static readonly FileInfo FFIDENTIFY;
-    public static readonly FileInfo FFMPEG;
-    private static LRUCache<FileInfo, IDictionary<string, string>> infoCache = new LRUCache<FileInfo, IDictionary<string, string>>(500);
+    public static readonly string FFidentifyExecutable = FindExecutable("ffidentify");
+    public static readonly string FFmpegExecutable = FindExecutable("ffmpeg");
+    private static LruDictionary<FileInfo, IDictionary<string, string>> infoCache = new LruDictionary<FileInfo, IDictionary<string, string>>(500);
     private static readonly Regex RegLine = new Regex(@"^(?:ID|META)_([\w\d_]+)=(.+)$", RegexOptions.Compiled);
-
-
-
-    static FFmpeg()
-    {
-      FFMPEG = FindExecutable("ffmpeg");
-      FFIDENTIFY = FindExecutable("ffidentify");
-    }
 
 
 
@@ -33,8 +25,8 @@ namespace NMaier.sdlna.Util
     {
       string sw, sh;
       int w, h;
-      if (FFmpeg.IdentifyFile(file).TryGetValue("VIDEO_WIDTH", out sw)
-        && FFmpeg.IdentifyFile(file).TryGetValue("VIDEO_HEIGHT", out sh)
+      if (IdentifyFile(file).TryGetValue("VIDEO_WIDTH", out sw)
+        && IdentifyFile(file).TryGetValue("VIDEO_HEIGHT", out sh)
         && int.TryParse(sw, out w)
         && int.TryParse(sh, out h)
         && w > 0 && h > 0) {
@@ -57,8 +49,11 @@ namespace NMaier.sdlna.Util
 
     public static IDictionary<string, string> IdentifyFile(FileInfo file)
     {
-      if (FFmpeg.FFIDENTIFY == null) {
+      if (FFmpeg.FFidentifyExecutable == null) {
         throw new NotSupportedException();
+      }
+      if (file == null) {
+        throw new ArgumentNullException("file");
       }
       IDictionary<string, string> rv;
       if (infoCache.TryGetValue(file, out rv)) {
@@ -72,7 +67,7 @@ namespace NMaier.sdlna.Util
             sti.CreateNoWindow = true;
 #endif
             sti.UseShellExecute = false;
-            sti.FileName = FFmpeg.FFIDENTIFY.FullName;
+            sti.FileName = FFmpeg.FFidentifyExecutable;
             sti.Arguments = String.Format("\"{0}\"", file.FullName);
             sti.LoadUserProfile = false;
             sti.RedirectStandardOutput = true;
@@ -105,7 +100,7 @@ namespace NMaier.sdlna.Util
       throw new NotSupportedException();
     }
 
-    private static FileInfo FindExecutable(string executable)
+    private static string FindExecutable(string executable)
     {
       var isWin = Environment.OSVersion.Platform.ToString().ToLower().Contains("win");
       if (isWin) {
@@ -143,7 +138,7 @@ namespace NMaier.sdlna.Util
             if (r.Length != 0) {
               var rv = r[0];
               LogManager.GetLogger(typeof(FFmpeg)).InfoFormat("Found {0} at {1}", executable, rv.FullName);
-              return rv;
+              return rv.FullName;
             }
           }
           catch (Exception) { }

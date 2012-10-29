@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using NMaier.sdlna.Server.Metadata;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal partial class MediaMount
   {
 
+    private static readonly string featureList = Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
     private const string NS_CD = "urn:schemas-upnp-org:service:ContentDirectory:1";
     private const string NS_DC = "http://purl.org/dc/elements/1.1/";
     private const string NS_DIDL = "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/";
     private const string NS_DLNA = "urn:schemas-dlna-org:metadata-1-0/";
-    private const string NS_SOAPENV = "http://schemas.xmlsoap.org/soap/envelope/";
     private const string NS_SEC = "http://www.sec.co.kr/";
+    private const string NS_SOAPENV = "http://schemas.xmlsoap.org/soap/envelope/";
     private const string NS_UPNP = "urn:schemas-upnp-org:metadata-1-0/upnp/";
-    private static IDictionary<string, ResList> SoapCache = new LRUCache<string, ResList>(200);
-    private static readonly string featureList = Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
+    private static IDictionary<string, AttributeCollection> SoapCache = new LruDictionary<string, AttributeCollection>(200);
 
 
 
@@ -29,21 +29,21 @@ namespace NMaier.sdlna.Server
       var container = result.CreateElement("", "container", NS_DIDL);
       container.SetAttribute("restricted", "0");
       container.SetAttribute("childCount", f.ChildCount.ToString());
-      container.SetAttribute("id", f.ID);
+      container.SetAttribute("id", f.Id);
       var parent = f.Parent;
       if (parent == null) {
-        container.SetAttribute("parentID", Root.ID);
+        container.SetAttribute("parentID", Root.Id);
       }
       else {
-        container.SetAttribute("parentID", parent.ID);
+        container.SetAttribute("parentID", parent.Id);
       }
 
       var title = result.CreateElement("dc", "title", NS_DC);
       title.InnerText = f.Title;
       container.AppendChild(title);
-      if (meta != null && meta.Date != null) {
+      if (meta != null && meta.InfoDate != null) {
         var date = result.CreateElement("dc", "date", NS_DC);
-        date.InnerText = meta.Date.ToString("o");
+        date.InnerText = meta.InfoDate.ToString("o");
         container.AppendChild(date);
       }
 
@@ -60,12 +60,12 @@ namespace NMaier.sdlna.Server
 
       var item = result.CreateElement("", "item", NS_DIDL);
       item.SetAttribute("restricted", "1");
-      item.SetAttribute("id", r.ID);
+      item.SetAttribute("id", r.Id);
       var parent = r.Parent;
       if (parent == null) {
         parent = Root;
       }
-      item.SetAttribute("parentID", parent.ID);
+      item.SetAttribute("parentID", parent.Id);
 
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
       switch (r.MediaType) {
@@ -83,8 +83,9 @@ namespace NMaier.sdlna.Server
       }
       item.AppendChild(objectClass);
 
-      if (r is IBookmarkable) {
-        var bookmark = (r as IBookmarkable).Bookmark;
+      var bookmarkable = r as IBookmarkable;
+      if (bookmarkable != null) {
+        var bookmark = bookmarkable.Bookmark;
         if (bookmark.HasValue) {
           var dcmInfo = result.CreateElement("sec", "dcmInfo", NS_SEC);
           dcmInfo.InnerText = string.Format("BM={0}", bookmark.Value);
@@ -144,8 +145,8 @@ namespace NMaier.sdlna.Server
         item.AppendChild(e);
       }
 
-      if (r is IMetaVideoItem) {
-        var mvi = r as IMetaVideoItem;
+      var mvi = r as IMetaVideoItem;
+      if (mvi != null) {
         try {
           var actors = mvi.MetaActors;
           if (actors != null) {
@@ -169,7 +170,7 @@ namespace NMaier.sdlna.Server
         request.LocalEndPoint.Address,
         request.LocalEndPoint.Port,
         prefix,
-        r.ID
+        r.Id
         );
 
       if (props.TryGetValue("SizeRaw", out prop)) {
@@ -190,15 +191,16 @@ namespace NMaier.sdlna.Server
           ));
       item.AppendChild(res);
 
-      if (r is IMediaCover) {
+      var cover = r as IMediaCover;
+      if (cover != null) {
         try {
-          var c = (r as IMediaCover).Cover;
+          var c = cover.Cover;
           var curl = String.Format(
             "http://{0}:{1}{2}cover/{3}",
             request.LocalEndPoint.Address,
             request.LocalEndPoint.Port,
             prefix,
-            r.ID
+            r.Id
             );
           var icon = result.CreateElement("upnp", "albumArtURI", NS_UPNP);
           var profile = result.CreateAttribute("dlna", "profileID", NS_DLNA);
@@ -217,7 +219,7 @@ namespace NMaier.sdlna.Server
           res.InnerText = curl;
 
           pn = c.PN;
-          mime = DlnaMaps.Mime[DlnaTypes.JPEG];
+          mime = DlnaMaps.Mime[DlnaType.JPEG];
           var width = c.MetaWidth;
           var height = c.MetaHeight;
           if (width.HasValue && height.HasValue) {
@@ -234,17 +236,10 @@ namespace NMaier.sdlna.Server
       result.DocumentElement.AppendChild(item);
     }
 
-    private static void Browse_AddResponseParam(XmlDocumentFragment response, string name, string value)
-    {
-      var node = response.OwnerDocument.CreateElement("", name, NS_SOAPENV);
-      node.InnerText = value;
-      response.AppendChild(node);
-    }
-
     private IEnumerable<KeyValuePair<string, string>> HandleBrowse(IRequest request, IHeaders sparams)
     {
       var key = Prefix + sparams.HeaderBlock;
-      ResList rv;
+      AttributeCollection rv;
       if (SoapCache.TryGetValue(key, out rv)) {
         return rv;
       }
@@ -252,7 +247,7 @@ namespace NMaier.sdlna.Server
       string id = sparams["ObjectID"];
       string flag = sparams["BrowseFlag"];
       if (id == "0") {
-        id = Root.ID;
+        id = Root.Id;
       }
       Debug(id);
       Debug(flag);
@@ -310,33 +305,32 @@ namespace NMaier.sdlna.Server
         }
       }
       var resXML = result.OuterXml;
-      //Debug(resXML);
-      rv = new ResList() {
-        {"Result", resXML },
-        {"NumberReturned", provided.ToString() },
-        {"TotalMatches", root.ChildCount.ToString() },
-        {"UpdateID", systemID.ToString() }
+      rv = new AttributeCollection() {
+        {"Result", resXML},
+        {"NumberReturned", provided.ToString()},
+        {"TotalMatches", root.ChildCount.ToString()},
+        {"UpdateID", systemID.ToString()}
       };
       SoapCache[key] = rv;
       return rv;
     }
 
-    private IHeaders HandleGetSearchCapabilities(IHeaders sparams)
+    private static IHeaders HandleGetSearchCapabilities()
     {
       return new RawHeaders() { { "SearchCaps", "" } };
     }
 
-    private IHeaders HandleGetSortCapabilities(IHeaders sparams)
+    private static IHeaders HandleGetSortCapabilities()
     {
       return new RawHeaders() { { "SortCaps", "" } };
     }
 
-    private IHeaders HandleGetSystemUpdateID(IHeaders sparams)
+    private IHeaders HandleGetSystemUpdateID()
     {
       return new RawHeaders() { { "Id", systemID.ToString() } };
     }
 
-    private IHeaders HandleXGetFeatureList()
+    private static IHeaders HandleXGetFeatureList()
     {
       return new RawHeaders() { { "FeatureList", featureList } };
     }
@@ -389,13 +383,13 @@ namespace NMaier.sdlna.Server
         IEnumerable<KeyValuePair<string, string>> result;
         switch (method.LocalName) {
           case "GetSearchCapabilities":
-            result = HandleGetSearchCapabilities(sparams);
+            result = HandleGetSearchCapabilities();
             break;
           case "GetSortCapabilities":
-            result = HandleGetSortCapabilities(sparams);
+            result = HandleGetSortCapabilities();
             break;
           case "GetSystemUpdateID":
-            result = HandleGetSystemUpdateID(sparams);
+            result = HandleGetSystemUpdateID();
             break;
           case "Browse":
             result = HandleBrowse(request, sparams);

@@ -8,8 +8,8 @@
     <ProjectGuid>{50E06B21-E11A-42F0-81E2-0911E771E861}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NMaier.sdlna.FileMediaServer</RootNamespace>
-    <AssemblyName>NMaier.sdlna.FileMediaServer</AssemblyName>
+    <RootNamespace>NMaier.SimpleDlna.FileMediaServer</RootNamespace>
+    <AssemblyName>SimpleDlna.FileMediaServer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\sdlna.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -75,6 +78,7 @@
     <Compile Include="Files\ImageFile.cs" />
     <Compile Include="Files\VideoFile.cs" />
     <Compile Include="Folders\PlainRootFolder.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Repository\ComparerRepository.cs" />
     <Compile Include="Repository\IRepositoryItem.cs" />
     <Compile Include="Repository\Repository.cs" />

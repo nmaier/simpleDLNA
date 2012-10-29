@@ -1,5 +1,5 @@
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed class StaticHandler : IPrefixHandler
   {

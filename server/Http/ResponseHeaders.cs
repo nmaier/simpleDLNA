@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public sealed class ResponseHeaders : RawHeaders
   {
@@ -8,7 +8,7 @@ namespace NMaier.sdlna.Server
     public ResponseHeaders()
       : base()
     {
-      this["Server"] = HttpServer.ServerSignature;
+      this["Server"] = HttpServer.Signature;
       this["Cache-Control"] = "no-cache";
       this["Date"] = DateTime.Now.ToString("R");
       this["Connection"] = "keep-alive";

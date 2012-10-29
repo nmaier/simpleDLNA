@@ -1,9 +1,10 @@
 ﻿using System;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public interface IBookmarkable
   {
+
     ulong? Bookmark { get; set; }
   }
 }

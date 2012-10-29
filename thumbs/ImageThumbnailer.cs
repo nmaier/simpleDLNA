@@ -2,9 +2,9 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.Thumbnails
+namespace NMaier.SimpleDlna.Thumbnails
 {
   internal sealed class ImageThumbnailer : IThumbnailer
   {
@@ -32,8 +32,14 @@ namespace NMaier.sdlna.Thumbnails
       using (img) {
         using (var scaled = Thumbnailer.ResizeImage(img, ref width, ref height)) {
           var rv = new MemoryStream();
-          scaled.Save(rv, ImageFormat.Jpeg);
-          return rv;
+          try {
+            scaled.Save(rv, ImageFormat.Jpeg);
+            return rv;
+          }
+          catch (Exception) {
+            rv.Dispose();
+            throw;
+          }
         }
       }
     }

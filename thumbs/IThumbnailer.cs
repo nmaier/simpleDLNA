@@ -1,7 +1,7 @@
 using System.IO;
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.Thumbnails
+namespace NMaier.SimpleDlna.Thumbnails
 {
   internal interface IThumbnailer
   {

@@ -9,21 +9,21 @@ using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using System.Timers;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   internal sealed class DeserializeInfo
   {
 
     public FileInfo Info;
-    public DlnaTypes Type;
+    public DlnaType Type;
 
 
 
-    public DeserializeInfo(FileInfo aInfo, DlnaTypes aType)
+    public DeserializeInfo(FileInfo aInfo, DlnaType aType)
     {
       Info = aInfo;
       Type = aType;
@@ -79,7 +79,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
           connection = ctor.Invoke(new[] { cs }) as IDbConnection;
         }
         if (connection == null) {
-          throw new ArgumentNullException("no connection");
+          throw new ArgumentException("no connection");
         }
         connection.Open();
       }
@@ -155,9 +155,12 @@ namespace NMaier.sdlna.FileMediaServer.Files
       if (connection != null) {
         connection.Dispose();
       }
+      if (vacuumer != null) {
+        vacuumer.Dispose();
+      }
     }
 
-    internal BaseFile MaybeGetFile(BaseFolder aParent, FileInfo info, DlnaTypes type)
+    internal BaseFile MaybeGetFile(BaseFolder aParent, FileInfo info, DlnaType type)
     {
       if (connection == null) {
         return null;
@@ -184,11 +187,14 @@ namespace NMaier.sdlna.FileMediaServer.Files
           return rv;
         }
       }
-      catch (Exception ex) {
+      catch (SerializationException ex) {
         Debug("Failed to deserialize an item", ex);
+        return null;
       }
-      return null;
-
+      catch (Exception ex) {
+        Fatal("Failed to deserialize an item", ex);
+        throw;
+      }
     }
 
     internal bool HasCover(BaseFile file)
@@ -233,10 +239,14 @@ namespace NMaier.sdlna.FileMediaServer.Files
           return rv;
         }
       }
-      catch (Exception ex) {
+      catch (SerializationException ex) {
         Debug("Failed to deserialize a cover", ex);
+        return null;
       }
-      return null;
+      catch (Exception ex) {
+        Fatal("Failed to deserialize a cover", ex);
+        throw;
+      }
     }
 
     internal void MaybeStoreFile(BaseFile file)
@@ -278,12 +288,8 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
       catch (Exception ex) {
         Error("Failed to serialize an object of type " + file.GetType().ToString(), ex);
+        throw;
       }
-    }
-
-    private IDbTransaction BeginTransaction()
-    {
-      return connection.BeginTransaction();
     }
 
     private void Vacuum(object source, ElapsedEventArgs e)

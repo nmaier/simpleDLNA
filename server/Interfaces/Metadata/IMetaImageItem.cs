@@ -1,5 +1,5 @@
 
-namespace NMaier.sdlna.Server.Metadata
+namespace NMaier.SimpleDlna.Server.Metadata
 {
   public interface IMetaImageItem : IMetaInfo, IMetaResolution, IMetaDescription
   {

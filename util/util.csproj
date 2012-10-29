@@ -8,8 +8,8 @@
     <ProjectGuid>{A8960A7A-887C-40D7-9632-002E94BFC830}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NMaier.sdlna.Util</RootNamespace>
-    <AssemblyName>NMaier.sdlna.Util</AssemblyName>
+    <RootNamespace>NMaier.SimpleDlna.Utilities</RootNamespace>
+    <AssemblyName>SimpleDlna.Utilities</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -32,6 +32,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\sdlna.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -55,13 +57,15 @@
     <Compile Include="ConcatenatedStream.cs" />
     <Compile Include="Ffmpeg.cs" />
     <Compile Include="Formatting.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Logging.cs" />
-    <Compile Include="LRUCache.cs" />
+    <Compile Include="LruDictionary.cs" />
     <Compile Include="MoreDom.cs" />
     <Compile Include="NaturalStringComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadRequest.cs" />
-    <Compile Include="ResList.cs" />
+    <Compile Include="AttributeCollection.cs" />
+    <Compile Include="SafeNativeMethods.cs" />
     <Compile Include="WriteRequest.cs" />
   </ItemGroup>
   <ItemGroup>

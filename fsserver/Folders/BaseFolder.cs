@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using NMaier.sdlna.FileMediaServer.Files;
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.FileMediaServer.Files;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer.Folders
+namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal abstract class BaseFolder : IFileServerMediaItem, IMediaFolder
   {
@@ -36,7 +36,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
       get { return childItems; }
     }
 
-    public string ID
+    public string Id
     {
       get;
       set;
@@ -90,11 +90,6 @@ namespace NMaier.sdlna.FileMediaServer.Folders
       }
     }
 
-    public int CompareTo(IMediaItem other)
-    {
-      return Title.ToLower().CompareTo(other.Title.ToLower());
-    }
-
     public void Cleanup()
     {
       foreach (var f in childFolders) {
@@ -103,6 +98,11 @@ namespace NMaier.sdlna.FileMediaServer.Folders
       childFolders = (from f in childFolders
                       where f.ChildCount > 0
                       select f).ToList();
+    }
+
+    public int CompareTo(IMediaItem other)
+    {
+      return Title.ToLower().CompareTo(other.Title.ToLower());
     }
 
     public void ReleaseItem(IFileServerMediaItem item)

@@ -1,6 +1,6 @@
 using System;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   public sealed class RepositoryLookupException : ArgumentException
   {
@@ -9,10 +9,12 @@ namespace NMaier.sdlna.FileMediaServer
 
 
 
-    public RepositoryLookupException(string aKey)
-      : base(String.Format("Failed to lookup {0}", aKey))
+    public RepositoryLookupException(string key)
+      : base(String.Format("Failed to lookup {0}", key))
     {
-      Key = aKey;
+      Key = key;
     }
+
+    public RepositoryLookupException() : base() { }
   }
 }

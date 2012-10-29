@@ -1,11 +1,11 @@
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   interface IFileServerMediaItem : IMediaItem
   {
 
-    new string ID { get; set; }
+    new string Id { get; set; }
 
     new Folders.BaseFolder Parent { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed class Redirect : StringResponse, IResponse
   {

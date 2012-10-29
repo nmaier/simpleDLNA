@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Thumbnails;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Thumbnails;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   [Serializable]
   internal sealed class Cover : Logging, IMediaCoverResource, ISerializable
@@ -52,30 +52,12 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
-    internal void ForceLoad()
-    {
-      try {
-        if (_bytes == null) {
-          _bytes = thumber.GetThumbnail(file, ref width, ref height);
-        }
-      }
-      catch (Exception ex) {
-        Warn("Failed to load thumb for " + file.FullName, ex);
-      }
-      if (_bytes == null) {
-        _bytes = new byte[0];
-      }
-      if (OnCoverLazyLoaded != null) {
-        OnCoverLazyLoaded(this, null);
-      }
-    }
-
     public Stream Content
     {
       get { return new MemoryStream(bytes); }
     }
 
-    public string ID
+    public string Id
     {
       get { throw new NotImplementedException(); }
     }
@@ -110,19 +92,14 @@ namespace NMaier.sdlna.FileMediaServer.Files
       get { throw new NotImplementedException(); }
     }
 
-    public long Size
-    {
-      get { return bytes.Length; }
-    }
-
     public string Title
     {
       get { throw new NotImplementedException(); }
     }
 
-    public DlnaTypes Type
+    public DlnaType Type
     {
-      get { return DlnaTypes.JPEG; }
+      get { return DlnaType.JPEG; }
     }
 
 
@@ -143,6 +120,24 @@ namespace NMaier.sdlna.FileMediaServer.Files
       info.AddValue("bytes", _bytes);
       info.AddValue("width", width);
       info.AddValue("height", height);
+    }
+
+    internal void ForceLoad()
+    {
+      try {
+        if (_bytes == null) {
+          _bytes = thumber.GetThumbnail(file, ref width, ref height);
+        }
+      }
+      catch (Exception ex) {
+        Warn("Failed to load thumb for " + file.FullName, ex);
+      }
+      if (_bytes == null) {
+        _bytes = new byte[0];
+      }
+      if (OnCoverLazyLoaded != null) {
+        OnCoverLazyLoaded(this, null);
+      }
     }
   }
 }

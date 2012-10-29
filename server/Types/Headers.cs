@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public class Headers : IHeaders
   {
@@ -19,12 +19,12 @@ namespace NMaier.sdlna.Server
 
 
 
-    protected Headers(bool aAsIs = false)
+    protected Headers(bool asIs = false)
     {
-      asIs = aAsIs;
+      this.asIs = asIs;
     }
 
-    public Headers() { }
+    public Headers() : this(false) { }
 
 
 

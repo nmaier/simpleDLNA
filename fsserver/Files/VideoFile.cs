@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Server.Metadata;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.sdlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   [Serializable]
   internal sealed class VideoFile : BaseFile, IMetaVideoItem, ISerializable, IBookmarkable
   {
 
     private string[] actors;
+    private ulong? bookmark;
     private string description;
     private string director;
     private TimeSpan? duration;
@@ -22,11 +23,10 @@ namespace NMaier.sdlna.FileMediaServer.Files
     private bool initialized = false;
     private string title;
     private uint? width;
-    private ulong? bookmark;
 
 
 
-    internal VideoFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType)
+    internal VideoFile(BaseFolder aParent, FileInfo aFile, DlnaType aType)
       : base(aParent, aFile, aType, MediaTypes.VIDEO)
     {
     }
@@ -53,6 +53,16 @@ namespace NMaier.sdlna.FileMediaServer.Files
     }
 
 
+
+    public ulong? Bookmark
+    {
+      get { return bookmark; }
+      set
+      {
+        bookmark = value;
+        Parent.Server.UpdateFileCache(this);
+      }
+    }
 
     public IEnumerable<string> MetaActors
     {
@@ -232,16 +242,6 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
       catch (Exception ex) {
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
-      }
-    }
-
-    public ulong? Bookmark
-    {
-      get { return bookmark; }
-      set
-      {
-        bookmark = value;
-        Parent.Server.UpdateFileCache(this);
       }
     }
   }

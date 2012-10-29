@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using NMaier.sdlna.Server.Metadata;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed class ItemResponse : Logging, IResponse
   {
@@ -13,18 +13,19 @@ namespace NMaier.sdlna.Server
     private HttpCodes status = HttpCodes.OK;
 
 
+
     public ItemResponse(IRequest request, IMediaResource aItem, string transferMode = "Streaming")
     {
       item = aItem;
       var meta = item as IMetaInfo;
       if (meta != null) {
-        headers.Add("Content-Length", meta.Size.ToString());
-        headers.Add("Last-Modified", meta.Date.ToString("R"));
+        headers.Add("Content-Length", meta.InfoSize.ToString());
+        headers.Add("Last-Modified", meta.InfoDate.ToString("R"));
       }
       headers.Add("Accept-Ranges", "bytes");
       headers.Add("Content-Type", DlnaMaps.Mime[item.Type]);
       if (request.Headers.ContainsKey("getcontentFeatures.dlna.org")) {
-        if (item.Type == DlnaTypes.JPEG) {
+        if (item.Type == DlnaType.JPEG) {
           headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=00D00000000000000000000000000000", item.PN));
         }
         else {

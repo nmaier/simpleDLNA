@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace NMaier.sdlna.Util
+namespace NMaier.SimpleDlna.Utilities
 {
   public sealed class ConcatenatedStream : Stream
   {
@@ -46,9 +46,9 @@ namespace NMaier.sdlna.Util
 
 
 
-    public void AddStream(Stream s)
+    public void AddStream(Stream stream)
     {
-      streams.Enqueue(s);
+      streams.Enqueue(stream);
     }
 
     public override void Flush()

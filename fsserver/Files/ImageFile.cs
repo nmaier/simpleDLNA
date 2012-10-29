@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Server.Metadata;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.sdlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   [Serializable]
   internal sealed class ImageFile : BaseFile, IMetaImageItem, ISerializable
@@ -19,7 +19,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
 
 
-    internal ImageFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
+    internal ImageFile(BaseFolder aParent, FileInfo aFile, DlnaType aType) : base(aParent, aFile, aType, MediaTypes.IMAGE) { }
 
     private ImageFile(SerializationInfo info, StreamingContext ctx)
       : this(null, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
@@ -32,6 +32,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
 
       initialized = true;
     }
+
 
 
     public string MetaCreator

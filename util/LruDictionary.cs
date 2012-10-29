@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace NMaier.sdlna.Util
+namespace NMaier.SimpleDlna.Utilities
 {
-  public sealed class LRUCache<TKey, TValue> : IDictionary<TKey, TValue>
+  public sealed class LruDictionary<TKey, TValue> : IDictionary<TKey, TValue>
   {
 
     private readonly uint capacity;
-    private readonly uint toDrop;
     private readonly IDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
     private readonly LinkedList<KeyValuePair<TKey, TValue>> order = new LinkedList<KeyValuePair<TKey, TValue>>();
+    private readonly uint toDrop;
 
 
 
-    public LRUCache(uint aCapacity)
+    public LruDictionary(uint capacity)
     {
-      capacity = aCapacity;
+      this.capacity = capacity;
       toDrop = Math.Min(10, (uint)(capacity * 0.07));
     }
 
@@ -65,7 +65,7 @@ namespace NMaier.sdlna.Util
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Add(TKey key, TValue value)
     {
-      Add(new KeyValuePair<TKey,TValue>(key, value));
+      Add(new KeyValuePair<TKey, TValue>(key, value));
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]

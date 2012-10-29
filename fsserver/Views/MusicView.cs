@@ -1,45 +1,12 @@
 using System.Linq;
-using NMaier.sdlna.FileMediaServer.Files;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.FileMediaServer.Files;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer.Views
+namespace NMaier.SimpleDlna.FileMediaServer.Views
 {
   internal sealed class MusicView : IView
   {
-    private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
-    {
-
-      public SimpleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
-        : base(server, aParent, aName)
-      {
-      }
-
-      public SimpleKeyedVirtualFolder() { }
-    }
-
-    private class DoubleKeyedVirtualFolder : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
-    {
-
-      public DoubleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
-        : base(server, aParent, aName)
-      {
-      }
-
-      public DoubleKeyedVirtualFolder() { }
-    }
-
-    private class TripleKeyedVirtualFolder : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
-    {
-
-      public TripleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
-        : base(server, aParent, aName)
-      {
-      }
-
-      public TripleKeyedVirtualFolder() { }
-    }
-
 
     public string Description
     {
@@ -78,7 +45,7 @@ namespace NMaier.sdlna.FileMediaServer.Views
       Server.RegisterPath(folders);
     }
 
-    private void LinkTriple(TripleKeyedVirtualFolder folder, BaseFile r, string key1, string key2)
+    private static void LinkTriple(TripleKeyedVirtualFolder folder, BaseFile r, string key1, string key2)
     {
       if (string.IsNullOrWhiteSpace(key1)) {
         return;
@@ -115,6 +82,37 @@ namespace NMaier.sdlna.FileMediaServer.Views
           genres.GetFolder(genre).Link(ai);
         }
       }
+    }
+
+
+
+
+    private class DoubleKeyedVirtualFolder : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
+    {
+      public DoubleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
+        : base(server, aParent, aName)
+      {
+      }
+
+      public DoubleKeyedVirtualFolder() { }
+    }
+    private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
+    {
+      public SimpleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
+        : base(server, aParent, aName)
+      {
+      }
+
+      public SimpleKeyedVirtualFolder() { }
+    }
+    private class TripleKeyedVirtualFolder : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
+    {
+      public TripleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
+        : base(server, aParent, aName)
+      {
+      }
+
+      public TripleKeyedVirtualFolder() { }
     }
   }
 }

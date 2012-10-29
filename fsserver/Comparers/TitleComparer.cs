@@ -1,13 +1,17 @@
 using System;
 using System.Collections;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.FileMediaServer.Comparers
+namespace NMaier.SimpleDlna.FileMediaServer.Comparers
 {
   class TitleComparer : IItemComparer, IComparer
   {
+
     private static StringComparer comp = new NaturalStringComparer();
+
+
+
     public virtual string Description
     {
       get { return "Sort alphabetically"; }
@@ -25,6 +29,7 @@ namespace NMaier.sdlna.FileMediaServer.Comparers
     {
       return comp.Compare(x.Title, y.Title);
     }
+
     public int Compare(object x, object y)
     {
       return comp.Compare(x, y);

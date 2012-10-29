@@ -1,24 +1,24 @@
 ﻿using System;
 using System.IO;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Server.Metadata;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   internal class BaseFile : Logging, IMediaResource, IFileServerMediaItem, IMediaCover, IMetaInfo
   {
 
     private WeakReference _cover = new WeakReference(null);
-    private static readonly LRUCache<string, Cover> coverCache = new LRUCache<string, Cover>(500);
+    private static readonly LruDictionary<string, Cover> coverCache = new LruDictionary<string, Cover>(500);
     private DateTime? lastModified = null;
     private long? length = null;
     private readonly string title;
 
 
 
-    protected BaseFile(BaseFolder aParent, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
+    protected BaseFile(BaseFolder aParent, FileInfo aFile, DlnaType aType, MediaTypes aMediaType)
     {
       Parent = aParent;
       Item = aFile;
@@ -33,10 +33,9 @@ namespace NMaier.sdlna.FileMediaServer.Files
       if (string.IsNullOrEmpty(title)) {
         title = Item.Name;
       }
-      try {
+      if (!string.IsNullOrWhiteSpace(title)) {
         title = Uri.UnescapeDataString(title);
       }
-      catch (Exception) { }
       if (!title.Contains(" ")) {
         foreach (var c in new char[] { '_', '+', '.' }) {
           title = title.Replace(c, ' ');
@@ -83,7 +82,18 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
-    public DateTime Date
+    public string Id
+    {
+      get;
+      set;
+    }
+
+    IMediaFolder IMediaItem.Parent
+    {
+      get { return Parent; }
+    }
+
+    public DateTime InfoDate
     {
       get
       {
@@ -94,15 +104,15 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
-    public string ID
+    public long? InfoSize
     {
-      get;
-      set;
-    }
-
-    IMediaFolder IMediaItem.Parent
-    {
-      get { return Parent; }
+      get
+      {
+        if (length == null) {
+          length = Item.Length;
+        }
+        return length;
+      }
     }
 
     internal FileInfo Item
@@ -141,10 +151,10 @@ namespace NMaier.sdlna.FileMediaServer.Files
         rv.Add("Title", Title);
         rv.Add("MediaType", MediaType.ToString());
         rv.Add("Type", Type.ToString());
-        rv.Add("SizeRaw", Size.ToString());
-        rv.Add("Size", Util.Formatting.FormatFileSize(Size.Value));
-        rv.Add("Date", Date.ToString());
-        rv.Add("DateO", Date.ToString("o"));
+        rv.Add("SizeRaw", InfoSize.ToString());
+        rv.Add("Size", Utilities.Formatting.FormatFileSize(InfoSize.Value));
+        rv.Add("Date", InfoDate.ToString());
+        rv.Add("DateO", InfoDate.ToString("o"));
         try {
           if (Cover != null) {
             rv.Add("HasCover", "true");
@@ -155,23 +165,12 @@ namespace NMaier.sdlna.FileMediaServer.Files
       }
     }
 
-    public long? Size
-    {
-      get
-      {
-        if (length == null) {
-          length = Item.Length;
-        }
-        return length;
-      }
-    }
-
     public virtual string Title
     {
       get { return title; }
     }
 
-    public DlnaTypes Type
+    public DlnaType Type
     {
       get;
       protected set;
@@ -207,7 +206,7 @@ namespace NMaier.sdlna.FileMediaServer.Files
       return cover != null;
     }
 
-    internal static BaseFile GetFile(BaseFolder aParentFolder, FileInfo aFile, DlnaTypes aType, MediaTypes aMediaType)
+    internal static BaseFile GetFile(BaseFolder aParentFolder, FileInfo aFile, DlnaType aType, MediaTypes aMediaType)
     {
       switch (aMediaType) {
         case MediaTypes.VIDEO:

@@ -1,7 +1,7 @@
 using System.IO;
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer.Folders
+namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class PlainRootFolder : PlainFolder
   {
@@ -9,7 +9,7 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     public PlainRootFolder(string aID, FileServer server, MediaTypes types, DirectoryInfo di)
       : base(server, types, null, di)
     {
-      ID = aID;
+      Id = aID;
     }
   }
 }

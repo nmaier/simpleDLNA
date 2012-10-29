@@ -1,18 +1,12 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer.Views
+namespace NMaier.SimpleDlna.FileMediaServer.Views
 {
   internal sealed class ByTitleView : IView
   {
-    private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
-    {
-      public TitlesFolder(FileServer aServer, BaseFolder aParent) : base(aServer, aParent, "titles") { }
-    }
-
 
     private static Regex regClean = new Regex(@"[^\d\w]+", RegexOptions.Compiled);
 
@@ -58,6 +52,14 @@ namespace NMaier.sdlna.FileMediaServer.Views
         pre = pre.First().ToString().ToUpper();
         titles.GetFolder(pre).AdoptItem(c as IFileServerMediaItem);
       }
+    }
+
+
+
+
+    private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
+    {
+      public TitlesFolder(FileServer aServer, BaseFolder aParent) : base(aServer, aParent, "titles") { }
     }
   }
 }

@@ -1,12 +1,16 @@
-using System;
-using System.Linq;
 using System.Collections.Generic;
-using NMaier.sdlna.FileMediaServer.Files;
+using System.Linq;
+using NMaier.SimpleDlna.FileMediaServer.Files;
 
-namespace NMaier.sdlna.FileMediaServer.Folders
+namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class VirtualFolder : BaseFolder
   {
+
+    private string path = null;
+
+
+
     public VirtualFolder(FileServer server, BaseFolder aParent, string aName)
       : base(server, aParent)
     {
@@ -25,7 +29,6 @@ namespace NMaier.sdlna.FileMediaServer.Folders
       set;
     }
 
-    private string path = null;
     public override string Path
     {
       get
@@ -53,8 +56,8 @@ namespace NMaier.sdlna.FileMediaServer.Folders
     internal void AdoptChildren()
     {
       var children = (from c in childItems
-                     where c.Parent != this
-                     select c).ToList();
+                      where c.Parent != this
+                      select c).ToList();
       childItems.Clear();
       foreach (var c in children) {
         AdoptItem(c);

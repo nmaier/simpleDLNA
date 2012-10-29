@@ -1,6 +1,6 @@
-using NMaier.sdlna.Server.Metadata;
+using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public interface IMediaCoverResource : IMediaResource, IMetaResolution { }
 }

@@ -1,16 +1,16 @@
 ﻿using System;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public interface IMediaItem : IComparable<IMediaItem>
   {
 
-    string ID { get; }
+    string Id { get; }
 
     IMediaFolder Parent { get; }
 
-    string Title { get; }
-
     IHeaders Properties { get; }
+
+    string Title { get; }
   }
 }

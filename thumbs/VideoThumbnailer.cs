@@ -3,18 +3,22 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Runtime.CompilerServices;
-using NMaier.sdlna.Server;
-using NMaier.sdlna.Util;
+using System.Threading;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Thumbnails
+namespace NMaier.SimpleDlna.Thumbnails
 {
   internal sealed class VideoThumbnailer : Logging, IThumbnailer
   {
 
+    private Semaphore semaphore = new Semaphore(2, 2);
+
+
+
     public VideoThumbnailer()
     {
-      if (FFmpeg.FFMPEG == null) {
+      if (FFmpeg.FFmpegExecutable == null) {
         throw new NotSupportedException("No ffmpeg available");
       }
     }
@@ -29,16 +33,23 @@ namespace NMaier.sdlna.Thumbnails
 
 
 
-    [MethodImpl(MethodImplOptions.Synchronized)]
     public MemoryStream GetThumbnail(object item, ref int width, ref int height)
     {
-      if (item is Stream) {
-        return GetThumbnailInternal(item as Stream, ref width, ref height);
+      semaphore.WaitOne();
+      try {
+        var stream = item as Stream;
+        if (stream != null) {
+          return GetThumbnailInternal(stream, ref width, ref height);
+        }
+        var fi = item as FileInfo;
+        if (fi != null) {
+          return GetThumbnailInternal(fi, ref width, ref height);
+        }
+        throw new NotSupportedException();
       }
-      if (item is FileInfo) {
-        return GetThumbnailInternal(item as FileInfo, ref width, ref height);
+      finally {
+        semaphore.Release();
       }
-      throw new NotSupportedException();
     }
 
     private MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
@@ -60,8 +71,14 @@ namespace NMaier.sdlna.Thumbnails
         using (var img = Image.FromStream(req.OutStream)) {
           using (var scaled = Thumbnailer.ResizeImage(img, ref width, ref height)) {
             var rv = new MemoryStream();
-            scaled.Save(rv, ImageFormat.Jpeg);
-            return rv;
+            try {
+              scaled.Save(rv, ImageFormat.Jpeg);
+              return rv;
+            }
+            catch (Exception) {
+              rv.Dispose();
+              throw;
+            }
           }
         }
       }
@@ -90,7 +107,7 @@ namespace NMaier.sdlna.Thumbnails
         sti.CreateNoWindow = true;
 #endif
         sti.UseShellExecute = false;
-        sti.FileName = FFmpeg.FFMPEG.FullName;
+        sti.FileName = FFmpeg.FFmpegExecutable;
         sti.Arguments = String.Format(
           "-ss {0} -i pipe: -an -frames:v 1 -f image2  pipe:",
           pos
@@ -117,7 +134,7 @@ namespace NMaier.sdlna.Thumbnails
         sti.CreateNoWindow = true;
 #endif
         sti.UseShellExecute = false;
-        sti.FileName = FFmpeg.FFMPEG.FullName;
+        sti.FileName = FFmpeg.FFmpegExecutable;
         sti.Arguments = String.Format(
           "-ss {0} -i \"{1}\" -an -frames:v 1 -f image2  pipe:",
           IdentifyBestCapturePosition(file),
@@ -131,7 +148,7 @@ namespace NMaier.sdlna.Thumbnails
       }
     }
 
-    private long IdentifyBestCapturePosition(FileInfo file)
+    private static long IdentifyBestCapturePosition(FileInfo file)
     {
       try {
         var dur = FFmpeg.GetFileDuration(file);

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public interface IMediaFolder : IMediaItem
   {
@@ -8,6 +8,7 @@ namespace NMaier.sdlna.Server
     uint ChildCount { get; }
 
     IEnumerable<IMediaFolder> ChildFolders { get; }
+
     IEnumerable<IMediaResource> ChildItems { get; }
   }
 }

@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using System.Resources;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed class ResourceResponse : Logging, IResponse
   {

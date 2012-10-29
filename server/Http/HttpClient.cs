@@ -4,9 +4,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed class HttpClient : Logging, IRequest, IDisposable
   {
@@ -62,9 +62,7 @@ namespace NMaier.sdlna.Server
       LocalEndPoint = client.Client.LocalEndPoint as IPEndPoint;
     }
 
-    public void Start() {
-      ReadNext();
-    }
+
 
     public string Body
     {
@@ -138,6 +136,14 @@ namespace NMaier.sdlna.Server
     public void Dispose()
     {
       Close();
+      if (readStream != null) {
+        readStream.Dispose();
+      }
+    }
+
+    public void Start()
+    {
+      ReadNext();
     }
 
     public override string ToString()
@@ -153,7 +159,7 @@ namespace NMaier.sdlna.Server
           responseStream.Dispose();
           responseStream = null;
         }
-        catch (Exception) { }
+        catch (IOException) { }
       }
     }
 
@@ -162,7 +168,7 @@ namespace NMaier.sdlna.Server
       try {
         stream.BeginRead(buffer, 0, BUFFER_SIZE, ReadCallback, 0);
       }
-      catch (Exception ex) {
+      catch (IOException ex) {
         Warn(String.Format("{0} - Failed to BeginRead", this), ex);
         Close();
       }
@@ -186,7 +192,7 @@ namespace NMaier.sdlna.Server
         readStream.Write(buffer, 0, read);
         lastActivity = DateTime.Now;
       }
-      catch (Exception) {
+      catch (IOException) {
         if (!IsATimeout) {
           WarnFormat("{0} - Failed to read data", this);
           Close();
@@ -200,7 +206,7 @@ namespace NMaier.sdlna.Server
           StreamReader reader = new StreamReader(readStream);
           for (var line = reader.ReadLine(); line != null; line = reader.ReadLine()) {
             line = line.Trim();
-            if (line == "") {
+            if (string.IsNullOrEmpty(line)) {
               hasHeaders = true;
               readStream = new MemoryStream();
               if (headers.ContainsKey("content-length") && uint.TryParse(headers["content-length"], out bodyBytes)) {
@@ -217,7 +223,7 @@ namespace NMaier.sdlna.Server
               var parts = line.Split(new char[] { ' ' }, 3);
               method = parts[0].Trim().ToUpper();
               path = parts[1].Trim();
-              InfoFormat("{0} - {1} request for {2}", this, method, path);
+              DebugFormat("{0} - {1} request for {2}", this, method, path);
             }
             else {
               var parts = line.Split(new char[] { ':' }, 2);
@@ -263,14 +269,14 @@ namespace NMaier.sdlna.Server
 
     private void SendResponse()
     {
-      var body = response.Body;
+      var responseBody = response.Body;
       var st = response.Status;
 
       contentLength = -1;
       string clf;
       if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
         try {
-          contentLength = body.Length - body.Position;
+          contentLength = responseBody.Length - responseBody.Position;
           if (contentLength < 0) {
             throw new InvalidDataException();
           }
@@ -286,25 +292,25 @@ namespace NMaier.sdlna.Server
         try {
           var m = bytes.Match(ar);
           if (!m.Success) {
-            throw new Exception("Not parsed!");
+            throw new InvalidDataException("Not parsed!");
           }
           var totalLength = contentLength;
           long start = 0, end = totalLength - 1;
           if (!long.TryParse(m.Groups[1].Value, out start) || start < 0) {
-            throw new Exception("Not parsed");
+            throw new InvalidDataException("Not parsed");
           }
           if (m.Groups.Count != 3 || !long.TryParse(m.Groups[2].Value, out end) || end <= start || end >= totalLength) {
             end = totalLength - 1;
           }
           if (start >= end) {
-            body.Close();
+            responseBody.Close();
             response = Error416.HandleRequest(this);
             SendResponse();
             return;
           }
 
           if (start > 0) {
-            body.Seek(start, SeekOrigin.Current);
+            responseBody.Seek(start, SeekOrigin.Current);
           }
           contentLength = end - start + 1;
           response.Headers["Content-Length"] = contentLength.ToString();
@@ -322,20 +328,26 @@ namespace NMaier.sdlna.Server
       hb.Append("\r\n");
 
       var rs = new ConcatenatedStream();
-      var headerStream = new MemoryStream(Encoding.ASCII.GetBytes(hb.ToString()));
-      rs.AddStream(headerStream);
-      if (method != "HEAD" && body != null) {
-        rs.AddStream(body);
-        if (contentLength >= 0) {
-          contentLength += headerStream.Length;
+      try {
+        var headerStream = new MemoryStream(Encoding.ASCII.GetBytes(hb.ToString()));
+        rs.AddStream(headerStream);
+        if (method != "HEAD" && responseBody != null) {
+          rs.AddStream(responseBody);
+          if (contentLength >= 0) {
+            contentLength += headerStream.Length;
+          }
         }
+        else {
+          contentLength = headerStream.Length;
+        }
+        responseStream = rs;
+        InfoFormat("{0} - {1} response for {2}", this, (uint)st, path);
+        Write();
       }
-      else {
-        contentLength = headerStream.Length;
+      catch (Exception) {
+        rs.Dispose();
+        throw;
       }
-      responseStream = rs;
-      InfoFormat("{0} - {1} response for {2}", this, (uint)st, path);
-      Write();
     }
 
     private void SetupResponse()
@@ -348,7 +360,7 @@ namespace NMaier.sdlna.Server
         }
         response = handler.HandleRequest(this);
         if (response == null) {
-          throw new ArgumentNullException();
+          throw new ArgumentException("Handler did not return a response");
         }
       }
       catch (Http404Exception ex) {
@@ -383,7 +395,7 @@ namespace NMaier.sdlna.Server
         }
         stream.BeginWrite(buffer, 0, bytes, WriteCallback, null);
       }
-      catch (Exception ex) {
+      catch (IOException ex) {
         Debug(String.Format("{0} - Failed to write - Client hung up on me", this), ex);
         Close();
       }
@@ -399,7 +411,7 @@ namespace NMaier.sdlna.Server
         stream.EndWrite(result);
         lastActivity = DateTime.Now;
       }
-      catch (Exception) {
+      catch (IOException) {
         DebugFormat("{0} - Failed to write - client hung up on me", this);
         Close();
         return;

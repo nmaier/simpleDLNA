@@ -5,11 +5,11 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Timers;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server.Ssdp
 {
-  internal sealed class SSDPServer : Logging, IDisposable
+  internal sealed class SsdpHandler : Logging, IDisposable
   {
 
     private readonly UdpClient client = new UdpClient();
@@ -17,8 +17,7 @@ namespace NMaier.sdlna.Server
     private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
     private readonly Queue<Datagram> messageQueue = new Queue<Datagram>();
     private readonly Timer notificationTimer = new Timer(10000);
-    private readonly HttpServer owner;
-    private readonly Timer queueTimer = new Timer(250);
+    private readonly Timer queueTimer = new Timer(1000);
     private readonly Random random = new Random();
     const string SSDP_ADDR = "239.255.255.250";
     private readonly IPEndPoint SSDP_ENDP = new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
@@ -27,10 +26,8 @@ namespace NMaier.sdlna.Server
 
 
 
-    public SSDPServer(HttpServer aOwner, int TTL = 12)
+    public SsdpHandler(int ttl = 12)
     {
-      owner = aOwner;
-
       notificationTimer.Elapsed += Tick;
       notificationTimer.Enabled = true;
 
@@ -40,7 +37,7 @@ namespace NMaier.sdlna.Server
       client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
       client.ExclusiveAddressUse = false;
       client.Client.Bind(new IPEndPoint(IPAddress.Any, SSDP_PORT));
-      client.JoinMulticastGroup(SSDP_IP, TTL);
+      client.JoinMulticastGroup(SSDP_IP, ttl);
       Info("SSDP service started");
       Receive();
     }
@@ -78,7 +75,10 @@ namespace NMaier.sdlna.Server
 
     private void Receive()
     {
-      client.BeginReceive(new AsyncCallback(ReceiveCallback), null);
+      try {
+        client.BeginReceive(new AsyncCallback(ReceiveCallback), null);
+      }
+      catch (ObjectDisposedException) { }
     }
 
     private void ReceiveCallback(IAsyncResult result)
@@ -96,7 +96,7 @@ namespace NMaier.sdlna.Server
           var headers = new Headers();
           for (var line = reader.ReadLine(); line != null; line = reader.ReadLine()) {
             line = line.Trim();
-            if (line == "") {
+            if (string.IsNullOrEmpty(line)) {
               break;
             }
             var parts = line.Split(new char[] { ':' }, 2);
@@ -133,7 +133,7 @@ namespace NMaier.sdlna.Server
       headers.Add("DATE", DateTime.Now.ToString("R"));
       headers.Add("EXT", "");
       headers.Add("LOCATION", dev.Descriptor.ToString());
-      headers.Add("SERVER", owner.Signature);
+      headers.Add("SERVER", HttpServer.Signature);
       headers.Add("ST", dev.Type);
       headers.Add("USN", dev.USN);
 
@@ -166,7 +166,7 @@ namespace NMaier.sdlna.Server
       headers.Add("HOST", "239.255.255.250:1900");
       headers.Add("CACHE-CONTROL", "max-age = 180");
       headers.Add("LOCATION", dev.Descriptor.ToString());
-      headers.Add("SERVER", owner.Signature);
+      headers.Add("SERVER", HttpServer.Signature);
       headers.Add("NTS", "ssdp:" + type);
       headers.Add("NT", dev.Type);
       headers.Add("USN", dev.USN);

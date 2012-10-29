@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using System.Xml;
-using NMaier.sdlna.Util;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   internal partial class MediaMount
   {
+
     private readonly List<string> htmlItemProperties = new List<string>() {
       "Type",
       "Duration",
@@ -20,7 +21,10 @@ namespace NMaier.sdlna.Server
       "Size",
     };
 
-    private IResponse ProcessHtmlRequest(IRequest request, IMediaItem aItem)
+
+
+
+    private IResponse ProcessHtmlRequest(IMediaItem aItem)
     {
       var item = aItem as IMediaFolder;
       if (item == null) {
@@ -29,72 +33,72 @@ namespace NMaier.sdlna.Server
       var doc = new XmlDocument();
       doc.AppendChild(doc.CreateDocumentType("html", null, null, null));
 
-      doc.AppendChild(doc.E("html"));
+      doc.AppendChild(doc.EL("html"));
 
-      var head = doc.E("head");
+      var head = doc.EL("head");
       doc.DocumentElement.AppendChild(head);
-      head.AppendChild(doc.E("title", string.Format("{0} — simple DLNA", item.Title)));
-      head.AppendChild(doc.E(
+      head.AppendChild(doc.EL("title", string.Format("{0} — simple DLNA", item.Title)));
+      head.AppendChild(doc.EL(
         "link",
-        new ResList() { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", prefix + "browse.css" } }
+        new AttributeCollection() { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", prefix + "browse.css" } }
         ));
 
-      var body = doc.E("body");
+      var body = doc.EL("body");
       doc.DocumentElement.AppendChild(body);
-      var article = doc.E("article");
+      var article = doc.EL("article");
       body.AppendChild(article);
 
-      article.AppendChild(doc.E("h1", string.Format("Folder: {0}", item.Title)));
+      article.AppendChild(doc.EL("h1", string.Format("Folder: {0}", item.Title)));
 
-      XmlElement e;
-      var folders = doc.E("ul", new ResList() { { "class", "folders" } });
+      XmlNode e;
+      var folders = doc.EL("ul", new AttributeCollection() { { "class", "folders" } });
       if (item.Parent != null) {
-        folders.AppendChild(e = doc.E("li"));
-        e.AppendChild(doc.E(
+        folders.AppendChild(e = doc.EL("li"));
+        e.AppendChild(doc.EL(
             "a",
-            new ResList() { { "href", prefix + "index/" + item.Parent.ID }, { "class", "parent" } },
+            new AttributeCollection() { { "href", prefix + "index/" + item.Parent.Id }, { "class", "parent" } },
             "Parent"
             ));
       }
       foreach (var i in item.ChildFolders) {
-        folders.AppendChild(e = doc.E("li"));
-        e.AppendChild(doc.E(
+        folders.AppendChild(e = doc.EL("li"));
+        e.AppendChild(doc.EL(
           "a",
-          new ResList() { { "href", prefix + "index/" + i.ID } },
+          new AttributeCollection() { { "href", prefix + "index/" + i.Id } },
           string.Format("{0} ({1})", i.Title, i.ChildCount)
           ));
       }
       article.AppendChild(folders);
 
-      XmlElement items = null;
-      article.AppendChild(items = doc.E("ul", new ResList() { { "class", "items" } }));
+      XmlNode items = null;
+      article.AppendChild(items = doc.EL("ul", new AttributeCollection() { { "class", "items" } }));
       foreach (var i in item.ChildItems) {
-        items.AppendChild(e = doc.E("li"));
-        var link = doc.E(
+        items.AppendChild(e = doc.EL("li"));
+        var link = doc.EL(
           "a",
-          new ResList() { { "href", string.Format("{0}file/{1}/{2}.{3}", prefix, i.ID, i.Title, DlnaMaps.Dlna2Ext[i.Type][0]) } }
+          new AttributeCollection() { { "href", string.Format("{0}file/{1}/{2}.{3}", prefix, i.Id, i.Title, DlnaMaps.Dlna2Ext[i.Type][0]) } }
           );
-        var details = doc.E("section");
+        var details = doc.EL("section");
         link.AppendChild(details);
         e.AppendChild(link);
 
-        details.AppendChild(doc.E("h3", new ResList { { "title", i.Title }}, i.Title));
-        
+        details.AppendChild(doc.EL("h3", new AttributeCollection { { "title", i.Title } }, i.Title));
+
         var props = i.Properties;
         if (props.ContainsKey("HasCover")) {
-          details.AppendChild(doc.E(
+          details.AppendChild(doc.EL(
             "img",
-            new ResList { { "title", "Cover image" }, { "alt", "Cover image" }, { "src", prefix + "cover/" + i.ID } }
+            new AttributeCollection { { "title", "Cover image" }, { "alt", "Cover image" }, { "src", prefix + "cover/" + i.Id } }
             ));
         }
 
-        var table = doc.E("table");
+        var table = doc.EL("table");
         foreach (var p in htmlItemProperties) {
           string v;
           if (props.TryGetValue(p, out v)) {
-            table.AppendChild(e = doc.E("tr"));
-            e.AppendChild(doc.E("th", p));
-            e.AppendChild(doc.E("td", v));
+            table.AppendChild(e = doc.EL("tr"));
+            e.AppendChild(doc.EL("th", p));
+            e.AppendChild(doc.EL("td", v));
           }
         }
         if (table.ChildNodes.Count != 0) {
@@ -103,20 +107,20 @@ namespace NMaier.sdlna.Server
 
         string description;
         if (props.TryGetValue("Description", out description)) {
-          link.AppendChild(doc.E("p", new ResList() { { "class", "desc" } }, description));
+          link.AppendChild(doc.EL("p", new AttributeCollection() { { "class", "desc" } }, description));
         }
       }
-      article.AppendChild(doc.E("div", new ResList() { { "class", "clear" } }, ""));
+      article.AppendChild(doc.EL("div", new AttributeCollection() { { "class", "clear" } }, ""));
 
-      var footer = doc.E("footer");
-      footer.AppendChild(doc.E("img", new ResList() { { "src", "/icon/smallPNG" } }));
-      footer.AppendChild(doc.E("h3", string.Format(
+      var footer = doc.EL("footer");
+      footer.AppendChild(doc.EL("img", new AttributeCollection() { { "src", "/icon/smallPNG" } }));
+      footer.AppendChild(doc.EL("h3", string.Format(
         "simple DLNA Media Server: sdlna/{0}.{1}",
         Assembly.GetExecutingAssembly().GetName().Version.Major,
         Assembly.GetExecutingAssembly().GetName().Version.Minor
         )));
-      footer.AppendChild(doc.E("p", new ResList() { { "class", "desc" } }, "A simple, zero-config DLNA media server, that you can just fire up and be done with it."));
-      footer.AppendChild(doc.E("a", new ResList() { { "href", "https://github.com/nmaier/sdlna/" } }, "Fork me on GitHub"));
+      footer.AppendChild(doc.EL("p", new AttributeCollection() { { "class", "desc" } }, "A simple, zero-config DLNA media server, that you can just fire up and be done with it."));
+      footer.AppendChild(doc.EL("a", new AttributeCollection() { { "href", "https://github.com/nmaier/simpleDLNA/" } }, "Fork me on GitHub"));
       body.AppendChild(footer);
 
       return new StringResponse(HttpCodes.OK, doc.OuterXml);

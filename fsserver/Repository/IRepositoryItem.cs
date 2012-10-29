@@ -1,9 +1,11 @@
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   public interface IRepositoryItem
   {
-    string Name { get; }
+
     string Description { get; }
+
+    string Name { get; }
   }
 }

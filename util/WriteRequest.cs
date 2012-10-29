@@ -2,26 +2,33 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace NMaier.sdlna.Util
+namespace NMaier.SimpleDlna.Utilities
 {
   public sealed class WriteRequest : IDisposable
   {
 
-    public byte[] buffer;
-    public Stream InStream;
-    public Stream OutStream;
-    public Process Request;
-    private IAsyncResult res;
+    private byte[] buffer;
+    private Stream inStream;
+    private Stream outStream;
+    private Process request;
 
 
 
-    public WriteRequest(Process aProcess, Stream aInStream, Stream aOutStream)
+    public WriteRequest(Process process, Stream inStream, Stream outStream)
     {
-      Request = aProcess;
-      InStream = aInStream;
-      OutStream = aOutStream;
+      this.request = process;
+      this.inStream = inStream;
+      this.outStream = outStream;
       buffer = new byte[1 << 17];
     }
+
+
+
+    public Stream InStream { get { return inStream; } }
+
+    public Stream OutStream { get { return outStream; } }
+
+    public Process Request { get { return request; } }
 
 
 
@@ -33,16 +40,15 @@ namespace NMaier.sdlna.Util
 
     public void Write()
     {
-      res = null;
-      if (Request.HasExited) {
+      if (request.HasExited) {
         return;
       }
-      var read = InStream.Read(buffer, 0, buffer.Length);
+      var read = inStream.Read(buffer, 0, buffer.Length);
       if (read != 0) {
         try {
-          res = OutStream.BeginWrite(buffer, 0, buffer.Length, WriteCallback, null);
+          outStream.BeginWrite(buffer, 0, buffer.Length, WriteCallback, null);
         }
-        catch (Exception) {
+        catch (IOException) {
           // hung up, probably
         }
       }
@@ -51,10 +57,10 @@ namespace NMaier.sdlna.Util
     private void WriteCallback(IAsyncResult ar)
     {
       try {
-        OutStream.EndWrite(ar);
+        outStream.EndWrite(ar);
         Write();
       }
-      catch (Exception) {
+      catch (IOException) {
         // hung up, probably
       }
     }

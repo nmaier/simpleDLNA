@@ -1,8 +1,8 @@
 using System.Linq;
-using NMaier.sdlna.FileMediaServer.Folders;
-using NMaier.sdlna.Server;
+using NMaier.SimpleDlna.FileMediaServer.Folders;
+using NMaier.SimpleDlna.Server;
 
-namespace NMaier.sdlna.FileMediaServer.Views
+namespace NMaier.SimpleDlna.FileMediaServer.Views
 {
   internal sealed class PlainView : IView
   {

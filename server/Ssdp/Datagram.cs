@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 
-namespace NMaier.sdlna.Server
+namespace NMaier.SimpleDlna.Server.Ssdp
 {
   internal sealed class Datagram
   {

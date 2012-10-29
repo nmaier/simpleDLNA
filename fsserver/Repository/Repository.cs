@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace NMaier.sdlna.FileMediaServer
+namespace NMaier.SimpleDlna.FileMediaServer
 {
-  public class Repository<TInterface> where TInterface : class, IRepositoryItem
+  public abstract class Repository<TInterface> where TInterface : class, IRepositoryItem
   {
 
     private static readonly Dictionary<string, TInterface> items = new Dictionary<string, TInterface>();

@@ -8,8 +8,8 @@
     <ProjectGuid>{EF29F98A-B8B6-4591-BA29-E71BCC308E98}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>NMaier.sdlna.Thumbnails</RootNamespace>
-    <AssemblyName>NMaier.sdlna.Thumbnails</AssemblyName>
+    <RootNamespace>NMaier.SimpleDlna.Thumbnails</RootNamespace>
+    <AssemblyName>SimpleDlna.Thumbnails</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -32,6 +32,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\sdlna.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -52,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ImageThumbnailer.cs" />
     <Compile Include="IThumbnailer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
