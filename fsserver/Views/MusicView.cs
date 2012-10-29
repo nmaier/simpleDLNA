@@ -34,15 +34,10 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         folders.AdoptItem(f as IFileServerMediaItem);
       }
       root.AdoptItem(artists);
-      Server.RegisterPath(artists);
       root.AdoptItem(performers);
-      Server.RegisterPath(performers);
       root.AdoptItem(albums);
-      Server.RegisterPath(albums);
       root.AdoptItem(genres);
-      Server.RegisterPath(genres);
       root.AdoptItem(folders);
-      Server.RegisterPath(folders);
     }
 
     private static void LinkTriple(TripleKeyedVirtualFolder folder, BaseFile r, string key1, string key2)

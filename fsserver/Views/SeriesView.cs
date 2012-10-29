@@ -39,7 +39,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         var fsmi = f as VirtualFolder;
         fsmi.AdoptChildren();
         root.AdoptItem(fsmi);
-        Server.RegisterPath(fsmi);
       }
     }
 

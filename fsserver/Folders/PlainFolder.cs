@@ -36,12 +36,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         }
       }
       childItems = files.ToList();
-      foreach (var c in childFolders) {
-        server.RegisterPath(c);
-      }
-      foreach (var c in childItems) {
-        server.RegisterPath(c);
-      }
     }
 
 

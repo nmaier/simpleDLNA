@@ -155,6 +155,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
       lock (ids) {
         ids["0"] = root = CreateRoot("0", types, directory) as IMediaFolder;
+        RegisterFolderTree(root);
 #if ENABLE_SAMSUNG
         var typeView = CreateRoot("I", types & MediaTypes.IMAGE, directory);
         typeView.Parent = root as Folders.BaseFolder;
@@ -300,8 +301,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
       return Files.BaseFile.GetFile(aParent, aFile, type, mediaType);
     }
-
-    internal void RegisterPath(IFileServerMediaItem item)
+    private void RegisterFolderTree(IMediaFolder folder)
+    {
+      foreach (var f in folder.ChildFolders) {
+        RegisterPath(f as IFileServerMediaItem);
+        RegisterFolderTree(f);
+      }
+      foreach (var i in folder.ChildItems) {
+        RegisterPath(i as IFileServerMediaItem);
+      }
+    }
+    private void RegisterPath(IFileServerMediaItem item)
     {
       var path = item.Path;
       string id;

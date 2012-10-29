@@ -28,7 +28,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         rv.Server = Server;
         rv.Name = key;
         AdoptItem(rv);
-        Server.RegisterPath(rv);
         keys.Add(lkey, rv);
       }
       return rv;
