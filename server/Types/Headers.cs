@@ -150,5 +150,10 @@ namespace NMaier.SimpleDlna.Server
     {
       return dict.GetEnumerator();
     }
+
+    public override string ToString()
+    {
+      return string.Format("({0})", string.Join(", ", (from x in dict select string.Format("{0}={1}", x.Key, x.Value))));
+    }
   }
 }
