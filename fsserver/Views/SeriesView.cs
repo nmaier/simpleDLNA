@@ -75,7 +75,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         if (string.IsNullOrEmpty(ser)) {
           continue;
         }
-        series.GetFolder(ser).Link(vi);
+        series.GetFolder(ser).LinkFile(vi);
       }
     }
 

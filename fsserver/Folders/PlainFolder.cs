@@ -24,18 +24,18 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
                       where m.ChildCount > 0
                       select m as BaseFolder).ToList();
 
-      var files = new List<BaseFile>().AsEnumerable();
+      childItems = new List<BaseFile>();
       foreach (var i in DlnaMaps.Media2Ext) {
         if (!types.HasFlag(i.Key)) {
           continue;
         }
         foreach (var ext in i.Value) {
-          files = files.Union(from f in dir.GetFiles("*." + ext)
-                              let m = server.GetFile(this, f)
-                              select m);
+          var files = (from f in dir.GetFiles("*." + ext)
+                      let m = server.GetFile(this, f)
+                      select m).ToList();
+          childItems.AddRange(files);
         }
       }
-      childItems = files.ToList();
     }
 
 

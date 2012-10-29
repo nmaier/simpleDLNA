@@ -78,6 +78,7 @@
     <Compile Include="Files\ImageFile.cs" />
     <Compile Include="Files\VideoFile.cs" />
     <Compile Include="Folders\PlainRootFolder.cs" />
+    <Compile Include="Folders\VirtualClonedFolder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Repository\ComparerRepository.cs" />
     <Compile Include="Repository\IRepositoryItem.cs" />

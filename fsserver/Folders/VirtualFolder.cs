@@ -7,16 +7,23 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
   internal class VirtualFolder : BaseFolder
   {
 
+    private readonly string id;
     private string path = null;
 
 
 
-    public VirtualFolder(FileServer server, BaseFolder aParent, string aName)
-      : base(server, aParent)
+    public VirtualFolder(FileServer server, BaseFolder parent, string name, string id)
+      : base(server, parent)
     {
-      Name = aName;
+      this.id = id;
+      Name = name;
       childFolders = new List<BaseFolder>();
       childItems = new List<BaseFile>();
+    }
+
+    public VirtualFolder(FileServer server, BaseFolder parent, string name)
+      : this(server, parent, name, name)
+    {
     }
 
     public VirtualFolder() : this(null, null, null) { }
@@ -34,7 +41,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       get
       {
         if (string.IsNullOrEmpty(path)) {
-          path = string.Format("{0}/virtual:{1}", Parent.Path, Name);
+          path = string.Format("{0}/:{1}", Parent.Path, string.IsNullOrEmpty(id) ? Name : id);
         }
         return path;
       }
@@ -48,9 +55,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 
 
 
-    public void Link(BaseFile r)
+    public void LinkFile(BaseFile file)
     {
-      childItems.Add(r);
+      childItems.Add(file);
     }
 
     internal void AdoptChildren()

@@ -52,7 +52,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         .GetFolder(key1.TrimStart().First().ToString().ToUpper())
         .GetFolder(key1)
         .GetFolder(key2)
-        .Link(r);
+        .LinkFile(r);
     }
 
     private void SortFolder(FileServer server, BaseFolder folder, TripleKeyedVirtualFolder artists, TripleKeyedVirtualFolder performers, DoubleKeyedVirtualFolder albums, SimpleKeyedVirtualFolder genres)
@@ -69,12 +69,12 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         if (album == null) {
           album = "Unspecified album";
         }
-        albums.GetFolder(album.TrimStart().First().ToString().ToUpper()).GetFolder(album).Link(ai);
+        albums.GetFolder(album.TrimStart().First().ToString().ToUpper()).GetFolder(album).LinkFile(ai);
         LinkTriple(artists, ai, ai.MetaArtist, album);
         LinkTriple(performers, ai, ai.MetaPerformer, album);
         var genre = ai.MetaGenre;
         if (genre != null) {
-          genres.GetFolder(genre).Link(ai);
+          genres.GetFolder(genre).LinkFile(ai);
         }
       }
     }
