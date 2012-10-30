@@ -33,7 +33,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       var series = new SimpleKeyedVirtualFolder(Server, root, "Series");
       SortFolder(Server, root, series);
       foreach (var f in series.ChildFolders.ToList()) {
-        if (f.ChildCount < 3) {
+        if (f.ChildCount < 2) {
           foreach (var file in f.ChildItems) {
             root.AddFile(file as BaseFile);
           }
