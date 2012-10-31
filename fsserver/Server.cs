@@ -13,7 +13,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
 
-    private readonly Timer changeTimer = new Timer(20000);
+    private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
     private Comparers.IItemComparer comparer = new Comparers.TitleComparer();
     private bool descending = false;
     private readonly DirectoryInfo directory;
@@ -192,13 +192,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (store != null && e.FullPath.ToLower() == store.StoreFile.FullName.ToLower()) {
         return;
       }
+      if (e.ChangeType == WatcherChangeTypes.Deleted) {
+        changeTimer.Interval = TimeSpan.FromSeconds(2).TotalMilliseconds;
+        changeTimer.Enabled = true;
+        return;
+      }
       DebugFormat("File System changed: {0}", e.FullPath);
+      changeTimer.Interval = TimeSpan.FromSeconds(30).TotalMilliseconds;
       changeTimer.Enabled = true;
     }
 
     private void OnRenamed(Object source, RenamedEventArgs e)
     {
       DebugFormat("File System changed (rename): {0}", directory.FullName);
+      changeTimer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
       changeTimer.Enabled = true;
     }
 
