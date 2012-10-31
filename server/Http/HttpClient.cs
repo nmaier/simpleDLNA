@@ -159,7 +159,7 @@ namespace NMaier.SimpleDlna.Server
           responseStream.Dispose();
           responseStream = null;
         }
-        catch (IOException) { }
+        catch (Exception) { }
       }
     }
 
@@ -192,7 +192,7 @@ namespace NMaier.SimpleDlna.Server
         readStream.Write(buffer, 0, read);
         lastActivity = DateTime.Now;
       }
-      catch (IOException) {
+      catch (Exception) {
         if (!IsATimeout) {
           WarnFormat("{0} - Failed to read data", this);
           Close();
@@ -395,7 +395,7 @@ namespace NMaier.SimpleDlna.Server
         }
         stream.BeginWrite(buffer, 0, bytes, WriteCallback, null);
       }
-      catch (IOException ex) {
+      catch (Exception ex) {
         Debug(String.Format("{0} - Failed to write - Client hung up on me", this), ex);
         Close();
       }
@@ -411,7 +411,7 @@ namespace NMaier.SimpleDlna.Server
         stream.EndWrite(result);
         lastActivity = DateTime.Now;
       }
-      catch (IOException) {
+      catch (Exception) {
         DebugFormat("{0} - Failed to write - client hung up on me", this);
         Close();
         return;
