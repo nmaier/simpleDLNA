@@ -11,6 +11,7 @@ namespace NMaier.SimpleDlna.Server
   internal sealed class HttpClient : Logging, IRequest, IDisposable
   {
 
+    private readonly uint BEGIN_TIMEOUT = 10;
     private string body;
     private uint bodyBytes = 0;
     private readonly byte[] buffer = new byte[BUFFER_SIZE];
@@ -27,12 +28,14 @@ namespace NMaier.SimpleDlna.Server
     private string method;
     private readonly HttpServer owner;
     private string path;
+    private readonly uint READ_TIMEOUT = (uint)TimeSpan.FromMinutes(1).TotalSeconds;
     private MemoryStream readStream;
     private uint requestCount = 0;
     private IResponse response;
     private Stream responseStream;
     private HttpStates state;
     private readonly NetworkStream stream;
+    private readonly uint WRITE_TIMEOUT = (uint)TimeSpan.FromMinutes(180).TotalSeconds;
 
 
 
@@ -48,7 +51,7 @@ namespace NMaier.SimpleDlna.Server
 
 
 
-    public HttpClient(HttpServer aOwner, TcpClient aClient)
+public HttpClient(HttpServer aOwner, TcpClient aClient)
     {
       State = HttpStates.ACCEPTED;
       lastActivity = DateTime.Now;
@@ -83,13 +86,13 @@ namespace NMaier.SimpleDlna.Server
           case HttpStates.ACCEPTED:
           case HttpStates.READBEGIN:
           case HttpStates.WRITEBEGIN:
-            return diff > 10;
+            return diff > BEGIN_TIMEOUT;
           case HttpStates.READING:
-            return diff > 60;
+            return diff > READ_TIMEOUT;
           case HttpStates.WRITING:
             // DLNA renderers might suspend the download when having buffered enough
             // and resume the same stream latter when buffer is emptied
-            return diff > 3600;
+            return diff > WRITE_TIMEOUT;
           case HttpStates.CLOSED:
             return true;
           default:
