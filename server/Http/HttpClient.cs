@@ -213,6 +213,9 @@ public HttpClient(HttpServer aOwner, TcpClient aClient)
               hasHeaders = true;
               readStream = new MemoryStream();
               if (headers.ContainsKey("content-length") && uint.TryParse(headers["content-length"], out bodyBytes)) {
+                if (bodyBytes > (1 << 20)) {
+                  throw new IOException("Body too long");
+                }
                 var bytes = Encoding.ASCII.GetBytes(reader.ReadToEnd());
                 readStream.Write(bytes, 0, bytes.Length);
                 DebugFormat("Must read body bytes {0}", bodyBytes);
