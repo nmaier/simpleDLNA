@@ -117,7 +117,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public void SetCacheFile(FileInfo info)
     {
-      store = new Files.FileStore(info);
+      try {
+        store = new Files.FileStore(info);
+      }
+      catch (Exception ex) {
+        Warn("FileStore is not availble; failed to load SQLite Adapter", ex);
+        store = null;
+      }
     }
 
     public void SetOrder(string order)

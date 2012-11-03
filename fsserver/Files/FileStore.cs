@@ -17,8 +17,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
   internal sealed class DeserializeInfo
   {
-    public FileServer Server;
+
     public FileInfo Info;
+    public FileServer Server;
     public DlnaType Type;
 
 
@@ -52,42 +53,16 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     private readonly Timer vacuumer = new Timer();
     public readonly FileInfo StoreFile;
 
-    internal FileStore(FileInfo aStore)
+    internal FileStore(FileInfo storeFile)
     {
-      StoreFile = aStore;
-      var cs = string.Format("Uri=file:{0}", aStore.FullName);
-      if (aStore.Exists) {
+      StoreFile = storeFile;
+      if (storeFile.Exists) {
         vacuumer.Interval = 120 * 1000;
       }
       else {
         vacuumer.Interval = 30 * 60 * 1000;
       }
-
-      try {
-        if (Type.GetType("Mono.Runtime") == null) {
-          connection = new System.Data.SQLite.SQLiteConnection(cs);
-        }
-        else {
-          Assembly monoSqlite;
-          try {
-            monoSqlite = Assembly.Load("Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756");
-          }
-          catch (Exception) {
-            monoSqlite = Assembly.Load("Mono.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756");
-          }
-          var dbconn = monoSqlite.GetType("Mono.Data.Sqlite.SqliteConnection");
-          var ctor = dbconn.GetConstructor(new[] { typeof(string) });
-          connection = ctor.Invoke(new[] { cs }) as IDbConnection;
-        }
-        if (connection == null) {
-          throw new ArgumentException("no connection");
-        }
-        connection.Open();
-      }
-      catch (Exception ex) {
-        Warn("FileStore is not availble; failed to load SQLite Adapter", ex);
-        return;
-      }
+      connection = Sqlite.GetDatabaseConnection(storeFile);
 
       using (var transaction = connection.BeginTransaction()) {
         using (var pragma = connection.CreateCommand()) {
@@ -136,7 +111,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       insert.Parameters.Add(insertCover = select.CreateParameter());
       insertCover.DbType = DbType.Binary;
 
-      InfoFormat("FileStore at {0} is ready", aStore.FullName);
+      InfoFormat("FileStore at {0} is ready", storeFile.FullName);
 
       vacuumer.Elapsed += Vacuum;
       vacuumer.Enabled = true;
