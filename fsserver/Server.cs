@@ -149,8 +149,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private IMediaFolder BuildView(Folders.BaseFolder root)
     {
       var rv = root;
+      RegisterFolderTree(rv);
       foreach (var t in transformations) {
         rv = t.Transform(this, rv) as Folders.BaseFolder;
+        RegisterFolderTree(rv);
       }
       rv.Cleanup();
       rv.Sort(comparer, descending);
@@ -180,29 +182,27 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       lock (this) {
         if (directories.Length == 1) {
-          master = new Folders.PlainRootFolder("0", this, types, directories[0]);
+          master = new Folders.PlainRootFolder(friendlyName, this, types, directories[0]);
         }
         else {
-          var virtualRoot = new Folders.VirtualFolder(this, null, "0");
+          var virtualRoot = new Folders.VirtualFolder(this, null, friendlyName, "0");
           foreach (var d in directories) {
-            virtualRoot.Merge(new Folders.PlainRootFolder("0", this, types, d));
+            var pr = new Folders.PlainRootFolder(friendlyName, this, types, d);
+            RegisterFolderTree(pr);
+            virtualRoot.Merge(pr);
           }
           master = virtualRoot;
         }
         ids["0"] = new WeakReference(root = BuildView(master));
-        RegisterFolderTree(master);
 
         images = BuildView(new Folders.VirtualClonedFolder(this, master, "I", types & MediaTypes.IMAGE));
         ids["I"] = new WeakReference(images);
-        RegisterFolderTree(images);
 
         audio = BuildView(new Folders.VirtualClonedFolder(this, master, "A", types & MediaTypes.AUDIO));
         ids["A"] = new WeakReference(audio);
-        RegisterFolderTree(audio);
 
         video = BuildView(new Folders.VirtualClonedFolder(this, master, "V", types & MediaTypes.VIDEO));
         ids["V"] = new WeakReference(video);
-        RegisterFolderTree(video);
       }
       Cleanup();
 
@@ -210,6 +210,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
         using (var w = new StreamWriter(s)) {
           DumpTree(w, root);
+          w.WriteLine();
+          DumpTree(w, master);
         }
       }
 #endif
@@ -377,11 +379,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private void DumpTree(StreamWriter w, IMediaFolder folder, string prefix = "/")
     {
       foreach (IMediaFolder f in folder.ChildFolders) {
-        w.WriteLine("{0} {1} - {2}", prefix, f.Title, f.GetType().ToString());
+        w.WriteLine("{0} {1} - ({3}) {2}", prefix, f.Title, f.GetType().ToString(), f.Id);
         DumpTree(w, f, prefix + f.Title + "/");
       }
       foreach (IMediaResource r in folder.ChildItems) {
-        w.WriteLine("{0} {1} - {2}", prefix, r.Title, r.GetType().ToString());
+        w.WriteLine("{0} {1} - ({3}) {2}", prefix, r.Title, r.GetType().ToString(), r.Id);
       }
     }
 #endif

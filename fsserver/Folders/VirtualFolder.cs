@@ -76,7 +76,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
                                    select f as VirtualFolder
                                    ).DefaultIfEmpty(null).FirstOrDefault();
         if (ownFolder == null) {
-          ownFolder = new VirtualFolder(Server, this, cf.Title);
+          ownFolder = new VirtualFolder(Server, this, cf.Title, cf.Id);
           childFolders.Add(ownFolder);
         }
         ownFolder.Merge(cf as BaseFolder);
