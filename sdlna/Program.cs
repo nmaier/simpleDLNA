@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using log4net;
 using log4net.Appender;
@@ -79,6 +80,10 @@ namespace NMaier.SimpleDlna
         }
         if (options.ShowVersion) {
           ShowVersion();
+          return;
+        }
+        if (options.ShowLicense) {
+          ShowLicense();
           return;
         }
         if (options.ListViews) {
@@ -191,12 +196,27 @@ namespace NMaier.SimpleDlna
       return fs;
     }
 
+    private static void ShowLicense()
+    {
+      Console.Write(Encoding.UTF8.GetString(Properties.Resources.LICENSE));
+    }
+
     private static void ShowVersion()
     {
       var a = Assembly.GetEntryAssembly();
       var v = a.GetName().Version;
       Console.WriteLine("App:    {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-      Console.WriteLine("Server: {0}", HttpServer.Signature);
+      a = Assembly.GetAssembly(typeof(FileServer));
+      v = a.GetName().Version;
+      Console.WriteLine("Files:  {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
+      a = Assembly.GetAssembly(typeof(HttpServer));
+      v = a.GetName().Version;
+      Console.WriteLine("Server: {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
+      a = Assembly.GetAssembly(typeof(Utilities.AttributeCollection));
+      v = a.GetName().Version;
+      Console.WriteLine("Util:   {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
+
+      Console.WriteLine("Http:   {0}", HttpServer.Signature);
     }
 
 
@@ -220,12 +240,12 @@ namespace NMaier.SimpleDlna
       [Argument("list-views", Helptext = "List all available views")]
       [FlagArgument(true)]
       public bool ListViews = false;
-      [Argument("log-file", Helptext = "Log to specified file as well", Helpvar = "File")]
+      [Argument("log-file", Helptext = "Log to specified file as well (default: none)", Helpvar = "File")]
       public FileInfo LogFile = null;
-      [Argument("log-level", Helptext = "Log level of OFF, DEBUG, INFO, WARN, ERROR, FATAL")]
+      [Argument("log-level", Helptext = "Log level of OFF, DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)", Helpvar = "level")]
       [ShortArgument('l')]
       public string LogLevel = "INFO";
-      [Argument("sort", Helptext = "Sort order; see --list-sort-orders")]
+      [Argument("sort", Helptext = "Sort order; see --list-sort-orders", Helpvar = "order")]
       [ShortArgument('s')]
       public string Order = null;
       private int port = 0;
@@ -238,11 +258,15 @@ namespace NMaier.SimpleDlna
       [ShortArgument('V')]
       [FlagArgument(true)]
       public bool ShowVersion = false;
-      [Argument("type", Helptext = "Types to serv (IMAGE, VIDEO)")]
+      [Argument("license", Helptext = "Print license")]
+      [ShortArgument('L')]
+      [FlagArgument(true)]
+      public bool ShowLicense = false;
+      [Argument("type", Helptext = "Types to serv (IMAGE, VIDEO, AUDIO; default: all)")]
       [ArgumentAlias("what")]
       [ShortArgument('t')]
       public MediaTypes[] Types = new MediaTypes[] { MediaTypes.VIDEO, MediaTypes.IMAGE, MediaTypes.AUDIO };
-      [Argument("view", Helptext = "Apply a view")]
+      [Argument("view", Helptext = "Apply a view (default: no views applied)", Helpvar = "view")]
       [ShortArgument('v')]
       public string[] Views = new string[0];
       [Argument("seperate", Helptext = "Mount directories as seperate servers")]
