@@ -109,10 +109,21 @@ namespace NMaier.SimpleDlna
 
           var friendlyName = "sdlna";
 
-          foreach (var d in options.Directories) {
-            server.InfoFormat("Mounting FileServer for {0}", d.FullName);
-            var fs = SetupFileServer(options, server, types, d);
+          if (options.Seperate) {
+            foreach (var d in options.Directories) {
+              server.InfoFormat("Mounting FileServer for {0}", d.FullName);
+              var fs = SetupFileServer(options, types, new DirectoryInfo[] { d });
+              friendlyName = fs.FriendlyName;
+              server.RegisterMediaServer(fs);
+              server.InfoFormat("{0} mounted", d.FullName);
+            }
+          }
+          else {
+            server.InfoFormat("Mounting FileServer for {0} ({1})", options.Directories[0], options.Directories.Length);
+            var fs = SetupFileServer(options, types, options.Directories);
             friendlyName = fs.FriendlyName;
+            server.RegisterMediaServer(fs);
+            server.InfoFormat("{0} ({1}) mounted", options.Directories[0], options.Directories.Length);
           }
 
           Console.Title = String.Format("{0} - running ...", friendlyName);
@@ -143,7 +154,7 @@ namespace NMaier.SimpleDlna
       server.Info("Closed!");
     }
 
-    private static FileServer SetupFileServer(Options options, HttpServer server, MediaTypes types, DirectoryInfo d)
+    private static FileServer SetupFileServer(Options options, MediaTypes types, DirectoryInfo[] d)
     {
       var fs = new FileServer(types, d);
       try {
@@ -172,8 +183,6 @@ namespace NMaier.SimpleDlna
         }
 
         fs.Load();
-        server.RegisterMediaServer(fs);
-        server.InfoFormat("{0} mounted", d.FullName);
       }
       catch (Exception) {
         fs.Dispose();
@@ -236,6 +245,10 @@ namespace NMaier.SimpleDlna
       [Argument("view", Helptext = "Apply a view")]
       [ShortArgument('v')]
       public string[] Views = new string[0];
+      [Argument("seperate", Helptext = "Mount directories as seperate servers")]
+      [ShortArgument('m')]
+      [FlagArgument(true)]
+      public bool Seperate = false;
 
       [Argument("port", Helpvar = "port", Helptext = "Webserver listen port (default: 0, bind an available port)")]
       [ShortArgument('p')]

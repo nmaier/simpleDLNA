@@ -16,7 +16,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
     private Comparers.IItemComparer comparer = new Comparers.TitleComparer();
     private bool descending = false;
-    private readonly DirectoryInfo directory;
+    private readonly DirectoryInfo[] directories;
     private readonly string friendlyName;
     private static readonly Random idGen = new Random();
     private Dictionary<string, WeakReference> ids = new Dictionary<string, WeakReference>();
@@ -28,17 +28,30 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private MediaTypes types;
     private readonly Guid uuid = Guid.NewGuid();
     private IMediaFolder root, images, audio, video;
-    private readonly FileSystemWatcher watcher;
+    private readonly FileSystemWatcher[] watchers;
     private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
 
 
 
-    public FileServer(MediaTypes types, DirectoryInfo directory)
+    public FileServer(MediaTypes types, IEnumerable<DirectoryInfo> directories)
     {
       this.types = types;
-      this.directory = directory;
-      friendlyName = string.Format("{0} ({1})", directory.Name, directory.Parent.FullName);
-      watcher = new FileSystemWatcher(directory.FullName);
+      this.directories = directories.Distinct().ToArray();
+      if (this.directories.Length == 0) {
+        throw new ArgumentException("Provide one or more directories", "directories");
+      }
+      if (this.directories.Length == 1) {
+        friendlyName = string.Format("{0} ({1})", this.directories[0].Name, this.directories[0].Parent.FullName);
+      }
+      else {
+        friendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, this.directories[0].Parent.FullName, this.directories.Length - 1);
+      }
+      watchers = (from d in directories select new FileSystemWatcher(d.FullName)).ToArray();
+    }
+
+    public FileServer(MediaTypes types, DirectoryInfo directory)
+      : this(types, new DirectoryInfo[] { directory })
+    {
     }
 
 
@@ -79,8 +92,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public void Dispose()
     {
-      if (watcher != null) {
-        watcher.Dispose();
+      foreach (var w in watchers) {
+        w.Dispose();
       }
       if (changeTimer != null) {
         changeTimer.Dispose();
@@ -105,11 +118,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
       changeTimer.AutoReset = false;
       changeTimer.Elapsed += RescanTimer;
 
-      watcher.IncludeSubdirectories = true;
-      watcher.Created += new FileSystemEventHandler(OnChanged);
-      watcher.Deleted += new FileSystemEventHandler(OnChanged);
-      watcher.Renamed += new RenamedEventHandler(OnRenamed);
-      watcher.EnableRaisingEvents = true;
+      foreach (var watcher in watchers) {
+        watcher.IncludeSubdirectories = true;
+        watcher.Created += new FileSystemEventHandler(OnChanged);
+        watcher.Deleted += new FileSystemEventHandler(OnChanged);
+        watcher.Renamed += new RenamedEventHandler(OnRenamed);
+        watcher.EnableRaisingEvents = true;
+      }
 
       watchTimer.Elapsed += RescanTimer;
       watchTimer.Enabled = true;
@@ -145,7 +160,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private void Cleanup()
     {
       GC.Collect();
-      lock (ids) {
+      lock (this) {
         int pc = paths.Count, ic = ids.Count;
         var npaths = new Dictionary<string, string>();
         foreach (var p in paths) {
@@ -163,8 +178,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void DoRoot()
     {
-      lock (ids) {
-        master = new Folders.PlainRootFolder("0", this, types, directory);
+      lock (this) {
+        if (directories.Length == 1) {
+          master = new Folders.PlainRootFolder("0", this, types, directories[0]);
+        }
+        else {
+          var virtualRoot = new Folders.VirtualFolder(this, null, "0");
+          foreach (var d in directories) {
+            virtualRoot.Merge(new Folders.PlainRootFolder("0", this, types, d));
+          }
+          master = virtualRoot;
+        }
         ids["0"] = new WeakReference(root = BuildView(master));
         RegisterFolderTree(master);
 
@@ -210,7 +234,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void OnRenamed(Object source, RenamedEventArgs e)
     {
-      DebugFormat("File System changed (rename): {0}", directory.FullName);
+      DebugFormat("File System changed (rename): {0}", e.FullPath);
       changeTimer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
       changeTimer.Enabled = true;
     }
