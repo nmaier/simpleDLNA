@@ -11,7 +11,7 @@ namespace NMaier.SimpleDlna.Server
   internal sealed class HttpClient : Logging, IRequest, IDisposable
   {
 
-    private readonly uint BEGIN_TIMEOUT = 10;
+    private readonly uint BEGIN_TIMEOUT = 30;
     private string body;
     private uint bodyBytes = 0;
     private readonly byte[] buffer = new byte[BUFFER_SIZE];
