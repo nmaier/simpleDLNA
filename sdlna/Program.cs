@@ -292,7 +292,7 @@ namespace NMaier.SimpleDlna
       {
         var appender = new ConsoleAppender();
         var layout = new PatternLayout();
-        layout.ConversionPattern = "%6level [%3thread] %-20.20logger{1} - %message%newline%exception";
+        layout.ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception";
         layout.ActivateOptions();
         appender.Layout = layout;
         appender.ActivateOptions();
