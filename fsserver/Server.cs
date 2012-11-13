@@ -294,12 +294,18 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void Thumbnail()
     {
-      if (store != null && thumberTask == null) {
+      if (store == null) {
+        return;
+      }
+      lock (ids) {
+        if (thumberTask != null) {
+          return;
+        }
         var files = (from i in ids.Values
                      let f = (i.Target as Files.BaseFile)
                      where f != null
                      select new WeakReference(f)).ToList();
-        thumberTask = Task.Factory.StartNew(() =>
+        thumberTask = new Task(() =>
         {
           try {
             foreach (var i in files) {
@@ -329,6 +335,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             GC.Collect();
           }
         }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
+        thumberTask.Start();
       }
     }
 
