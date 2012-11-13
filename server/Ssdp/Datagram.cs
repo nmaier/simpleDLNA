@@ -9,13 +9,15 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     public readonly IPEndPoint EndPoint;
     public readonly string Message;
+    public readonly bool Sticky;
 
 
 
-    public Datagram(IPEndPoint aEndPoint, string aMessage)
+    public Datagram(IPEndPoint aEndPoint, string aMessage, bool sticky)
     {
       EndPoint = aEndPoint;
       Message = aMessage;
+      Sticky = sticky;
       SendCount = 0;
     }
 
