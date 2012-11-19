@@ -30,9 +30,18 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
           continue;
         }
         foreach (var ext in i.Value) {
-          var files = (from f in dir.GetFiles("*." + ext)
-                      let m = server.GetFile(this, f)
-                      select m).ToList();
+          var _files = from f in dir.GetFiles("*." + ext)
+                       select f;
+          var files = new List<Files.BaseFile>();
+          foreach (var f in _files) {
+            try {
+              files.Add(server.GetFile(this, f));
+            }
+            catch (Exception ex) {
+              server.Warn(f);
+              server.Warn(ex);
+            }
+          }
           childItems.AddRange(files);
         }
       }
