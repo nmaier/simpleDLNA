@@ -18,9 +18,10 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private const int DATAGRAMS_PER_MESSAGE = 3;
     private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
     private readonly Queue<Datagram> messageQueue = new Queue<Datagram>();
-    private readonly Timers.Timer notificationTimer = new Timers.Timer(10000);
+    private readonly Timers.Timer notificationTimer = new Timers.Timer(60000);
+    private readonly int port;
     private readonly Timers.Timer queueTimer = new Timers.Timer(1000);
-    private readonly Random random = new Random();
+    private static readonly Random random = new Random();
     private bool running = true;
     const string SSDP_ADDR = "239.255.255.250";
     private readonly IPEndPoint SSDP_ENDP = new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
@@ -29,8 +30,9 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
 
 
-    public SsdpHandler(int ttl = 12)
+    public SsdpHandler(int port, int ttl = 50)
     {
+      this.port = port;
       notificationTimer.Elapsed += Tick;
       notificationTimer.Enabled = true;
 
@@ -71,7 +73,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         while (messageQueue.Count != 0) {
           var msg = messageQueue.Dequeue();
           if (msg != null && (running || msg.Sticky)) {
-            msg.Send();
+            msg.Send(port);
             if (msg.SendCount <= DATAGRAMS_PER_MESSAGE) {
               messageQueue.Enqueue(msg);
             }
@@ -81,7 +83,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
       datagramPosted.Set();
       queueTimer.Enabled = messageQueue.Count != 0;
-      queueTimer.Interval = random.Next(250, running ? 2000 : 500);
+      queueTimer.Interval = random.Next(50, running ? 300 : 100);
     }
 
     private void Receive()
@@ -134,8 +136,10 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         return;
       }
       var dgram = new Datagram(endpoint, msg, sticky);
-      dgram.Send();
       lock (messageQueue) {
+        if (messageQueue.Count == 0) {
+          dgram.Send(port);
+        }
         messageQueue.Enqueue(dgram);
       }
       queueTimer.Enabled = true;

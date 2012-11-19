@@ -32,9 +32,9 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
 
 
-    public void Send()
+    public void Send(int port)
     {
-      using (var udp = new UdpClient(AddressFamily.InterNetwork)) {
+      using (var udp = new UdpClient(port, AddressFamily.InterNetwork)) {
         var msg = Encoding.ASCII.GetBytes(Message);
         udp.Send(msg, msg.Length, EndPoint);
       }

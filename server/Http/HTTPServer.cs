@@ -27,7 +27,6 @@ namespace NMaier.SimpleDlna.Server
     public HttpServer(int port = 0)
     {
       listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
-      ssdpServer = new SsdpHandler();
       timeouter.Elapsed += TimeouterCallback;
       timeouter.Enabled = true;
 
@@ -36,7 +35,9 @@ namespace NMaier.SimpleDlna.Server
 
       listener.Server.Ttl = 32;
       listener.Start();
-      InfoFormat("Running HTTP Server: {0} on port {1}", Signature, (listener.LocalEndpoint as IPEndPoint).Port);
+      var realPort = (listener.LocalEndpoint as IPEndPoint).Port;
+      InfoFormat("Running HTTP Server: {0} on port {1}", Signature, realPort);
+      ssdpServer = new SsdpHandler(realPort);
       Accept();
     }
 
