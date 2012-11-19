@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
@@ -47,6 +48,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         friendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, this.directories[0].Parent.FullName, this.directories.Length - 1);
       }
       watchers = (from d in directories select new FileSystemWatcher(d.FullName)).ToArray();
+      uuid = DeriveUUID();
     }
 
     public FileServer(MediaTypes types, DirectoryInfo directory)
@@ -176,6 +178,21 @@ namespace NMaier.SimpleDlna.FileMediaServer
         paths = npaths;
         DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
       }
+    }
+
+    private Guid DeriveUUID()
+    {
+      byte[] bytes = Guid.NewGuid().ToByteArray();
+      var i = 0;
+      var copy = Encoding.ASCII.GetBytes("sdlnafs");
+      for (; i < copy.Length; ++i) {
+        bytes[i] = copy[i];
+      }
+      copy = Encoding.UTF8.GetBytes(friendlyName);
+      for (var j = 0; j < copy.Length && i < bytes.Length - 1; ++i, ++j) {
+        bytes[i] = copy[j];
+      }
+      return new Guid(bytes);
     }
 
     private void DoRoot()
