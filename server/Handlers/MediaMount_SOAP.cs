@@ -32,7 +32,7 @@ namespace NMaier.SimpleDlna.Server
       container.SetAttribute("id", f.Id);
       var parent = f.Parent;
       if (parent == null) {
-        container.SetAttribute("parentID", Root.Id);
+        container.SetAttribute("parentID", "0");
       }
       else {
         container.SetAttribute("parentID", parent.Id);
@@ -61,7 +61,7 @@ namespace NMaier.SimpleDlna.Server
       var item = result.CreateElement("", "item", NS_DIDL);
       item.SetAttribute("restricted", "1");
       item.SetAttribute("id", r.Id);
-      item.SetAttribute("parentID", Root.Id);
+      item.SetAttribute("parentID", "0");
 
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
       switch (r.MediaType) {
@@ -242,11 +242,7 @@ namespace NMaier.SimpleDlna.Server
 
       string id = sparams["ObjectID"];
       string flag = sparams["BrowseFlag"];
-      if (id == "0") {
-        id = Root.Id;
-      }
-      Debug(id);
-      Debug(flag);
+
       int requested = 20;
       int provided = 0;
       int start = 0;

@@ -69,11 +69,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       get { return friendlyName; }
     }
 
-    public IMediaFolder Root
-    {
-      get { return master; }
-    }
-
     public Guid Uuid
     {
       get { return uuid; }

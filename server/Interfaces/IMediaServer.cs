@@ -7,8 +7,6 @@ namespace NMaier.SimpleDlna.Server
 
     string FriendlyName { get; }
 
-    IMediaFolder Root { get; }
-
     Guid Uuid { get; }
 
 

@@ -43,11 +43,6 @@ namespace NMaier.SimpleDlna.Server
       get { return prefix; }
     }
 
-    public IMediaFolder Root
-    {
-      get { return server.Root; }
-    }
-
     public Guid Uuid
     {
       get { return server.Uuid; }
