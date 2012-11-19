@@ -34,6 +34,7 @@ namespace NMaier.SimpleDlna.Server
       RegisterHandler(new IconHandler());
 
       listener.Server.Ttl = 32;
+      listener.Server.UseOnlyOverlappedIO = true;
       listener.Start();
       var realPort = (listener.LocalEndpoint as IPEndPoint).Port;
       InfoFormat("Running HTTP Server: {0} on port {1}", Signature, realPort);
