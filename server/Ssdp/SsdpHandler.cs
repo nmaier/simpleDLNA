@@ -30,7 +30,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
 
 
-    public SsdpHandler(int port, int ttl = 50)
+    public SsdpHandler(int port, int ttl = 1)
     {
       this.port = port;
       notificationTimer.Elapsed += Tick;
@@ -71,13 +71,16 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     {
       lock (messageQueue) {
         while (messageQueue.Count != 0) {
-          var msg = messageQueue.Dequeue();
+          var msg = messageQueue.Peek();
           if (msg != null && (running || msg.Sticky)) {
             msg.Send(port);
-            if (msg.SendCount <= DATAGRAMS_PER_MESSAGE) {
-              messageQueue.Enqueue(msg);
+            if (msg.SendCount > DATAGRAMS_PER_MESSAGE) {
+              messageQueue.Dequeue();
             }
             break;
+          }
+          else {
+            messageQueue.Dequeue();
           }
         }
       }
