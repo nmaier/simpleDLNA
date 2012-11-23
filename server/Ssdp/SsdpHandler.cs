@@ -152,7 +152,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     {
       var headers = new RawHeaders();
       var method = "HTTP/1.1 200 OK\r\n";
-      headers.Add("CACHE-CONTROL", "max-age = 180");
+      headers.Add("CACHE-CONTROL", "max-age = 720");
       headers.Add("DATE", DateTime.Now.ToString("R"));
       headers.Add("EXT", "");
       headers.Add("LOCATION", dev.Descriptor.ToString());
@@ -187,7 +187,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       var headers = new RawHeaders();
       var method = "NOTIFY * HTTP/1.1\r\n";
       headers.Add("HOST", "239.255.255.250:1900");
-      headers.Add("CACHE-CONTROL", "max-age = 180");
+      headers.Add("CACHE-CONTROL", "max-age = 720");
       headers.Add("LOCATION", dev.Descriptor.ToString());
       headers.Add("SERVER", HttpServer.Signature);
       headers.Add("NTS", "ssdp:" + type);
