@@ -24,8 +24,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private static readonly Random random = new Random();
     private bool running = true;
     const string SSDP_ADDR = "239.255.255.250";
-    private readonly IPEndPoint SSDP_ENDP = new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
-    private readonly IPAddress SSDP_IP = IPAddress.Parse(SSDP_ADDR);
+    private static readonly IPEndPoint SSDP_ENDP = new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
+    private static readonly IPAddress SSDP_IP = IPAddress.Parse(SSDP_ADDR);
     const int SSDP_PORT = 1900;
 
 
