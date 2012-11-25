@@ -164,7 +164,7 @@ namespace NMaier.SimpleDlna.Utilities
       int start = 0;
       for (int i = 0, end = str.Length; i < end; ++i) {
         var c = str[i];
-        var cnum = c == ' ' ? num : c >= '0' && c <= '9';
+        var cnum = c >= '0' && c <= '9';
         if (cnum == num) {
           continue;
         }
@@ -173,7 +173,7 @@ namespace NMaier.SimpleDlna.Utilities
           if (num) {
             parts.Add(new NumericPart(p));
           }
-          else {
+          else if (!string.IsNullOrWhiteSpace(p)) {
             parts.Add(new StringPart(p, comparer));
           }
         }
@@ -181,11 +181,13 @@ namespace NMaier.SimpleDlna.Utilities
         start = i;
       }
       var pe = str.Substring(start).Trim();
-      if (num && !string.IsNullOrEmpty(pe)) {
-        parts.Add(new NumericPart(pe));
-      }
-      else {
-        parts.Add(new StringPart(pe, comparer));
+      if (!string.IsNullOrWhiteSpace(pe)) {
+        if (num) {
+          parts.Add(new NumericPart(pe));
+        }
+        else {
+          parts.Add(new StringPart(pe, comparer));
+        }
       }
 
       rv = parts.ToArray();
