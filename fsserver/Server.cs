@@ -233,6 +233,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void OnChanged(Object source, FileSystemEventArgs e)
     {
+      if (changeTimer.Enabled) {
+        return;
+      }
       if (store != null && e.FullPath.ToLower() == store.StoreFile.FullName.ToLower()) {
         return;
       }
@@ -248,6 +251,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void OnRenamed(Object source, RenamedEventArgs e)
     {
+      if (changeTimer.Enabled) {
+        return;
+      }
+
       DebugFormat("File System changed (rename): {0}", e.FullPath);
       changeTimer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
       changeTimer.Enabled = true;
