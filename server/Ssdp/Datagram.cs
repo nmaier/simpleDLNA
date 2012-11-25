@@ -1,10 +1,12 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
 {
-  internal sealed class Datagram
+  internal sealed class Datagram : Logging
   {
 
     public readonly IPEndPoint EndPoint;
@@ -34,11 +36,29 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     public void Send(int port)
     {
-      using (var udp = new UdpClient(port, AddressFamily.InterNetwork)) {
-        var msg = Encoding.ASCII.GetBytes(Message);
-        udp.Send(msg, msg.Length, EndPoint);
+      var msg = Encoding.ASCII.GetBytes(Message);
+      foreach (var external in IP.ExternalAddresses) {
+        try {
+          var client = new UdpClient(new IPEndPoint(external, port));
+          client.BeginSend(msg, msg.Length, EndPoint, SendCallback, client);
+        }
+        catch (Exception ex) {
+          Error(ex);
+        }
       }
       ++SendCount;
+    }
+
+    private void SendCallback(IAsyncResult result)
+    {
+      using (var client = result.AsyncState as UdpClient) {
+        try {
+          client.EndSend(result);
+        }
+        catch (Exception ex) {
+          Error(ex);
+        }
+      }
     }
   }
 }
