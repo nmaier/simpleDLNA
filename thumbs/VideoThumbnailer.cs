@@ -109,7 +109,7 @@ namespace NMaier.SimpleDlna.Thumbnails
         sti.UseShellExecute = false;
         sti.FileName = FFmpeg.FFmpegExecutable;
         sti.Arguments = String.Format(
-          "-ss {0} -i pipe: -an -frames:v 1 -f image2  pipe:",
+          "-v quiet -ss {0} -i pipe: -an -frames:v 1 -f image2  pipe:",
           pos
           );
         sti.LoadUserProfile = false;
@@ -136,7 +136,7 @@ namespace NMaier.SimpleDlna.Thumbnails
         sti.UseShellExecute = false;
         sti.FileName = FFmpeg.FFmpegExecutable;
         sti.Arguments = String.Format(
-          "-ss {0} -i \"{1}\" -an -frames:v 1 -f image2  pipe:",
+          "-v quiet -ss {0} -i \"{1}\" -an -frames:v 1 -f image2  pipe:",
           IdentifyBestCapturePosition(file),
           file.FullName
           );
