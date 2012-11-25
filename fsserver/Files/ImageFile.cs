@@ -160,6 +160,10 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
         Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
+      catch (TagLib.UnsupportedFormatException ex) {
+        Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
+        initialized = true;
+      }
       catch (Exception ex) {
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
