@@ -61,6 +61,7 @@
     <Compile Include="Ffmpeg.cs" />
     <Compile Include="Formatting.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IP.cs" />
     <Compile Include="Logging.cs" />
     <Compile Include="LruDictionary.cs" />
     <Compile Include="MoreDom.cs" />

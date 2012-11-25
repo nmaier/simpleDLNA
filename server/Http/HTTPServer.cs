@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Timers;
-using NMaier.SimpleDlna.Utilities;
 using NMaier.SimpleDlna.Server.Ssdp;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -75,25 +74,10 @@ namespace NMaier.SimpleDlna.Server
       servers[guid] = mount;
       RegisterHandler(mount);
 
-      try {
-
-        foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces()) {
-          foreach (var uni in adapter.GetIPProperties().UnicastAddresses) {
-            var address = uni.Address;
-            if (address.AddressFamily != AddressFamily.InterNetwork || IPAddress.IsLoopback(address)) {
-              continue;
-            }
-            var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
-            ssdpServer.RegisterNotification(guid, uri);
-            InfoFormat("New mount at: {0}", uri);
-          }
-        }
-      }
-      catch (Exception ex) {
-        Error("Failed to retrieve IP addresses the usual way, falling back to naive mode", ex);
-        var uri = new Uri(string.Format("http://{0}:{1}{2}", GetIP(), end.Port, mount.DescriptorURI));
+      foreach (var address in IP.ExternalAddresses) {
+        var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
         ssdpServer.RegisterNotification(guid, uri);
-        InfoFormat("New naive mount at: {0}", uri);
+        InfoFormat("New mount at: {0}", uri);
       }
     }
 
@@ -170,16 +154,6 @@ namespace NMaier.SimpleDlna.Server
         Assembly.GetExecutingAssembly().GetName().Version.Major,
         Assembly.GetExecutingAssembly().GetName().Version.Minor
         );
-    }
-
-    private static IPAddress GetIP()
-    {
-      foreach (var i in Dns.GetHostEntry(Dns.GetHostName()).AddressList) {
-        if (i.AddressFamily == AddressFamily.InterNetwork) {
-          return i;
-        }
-      }
-      throw new ApplicationException("No IP");
     }
 
     private void TimeouterCallback(object sender, ElapsedEventArgs e)

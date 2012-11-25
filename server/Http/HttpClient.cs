@@ -51,7 +51,7 @@ namespace NMaier.SimpleDlna.Server
 
 
 
-public HttpClient(HttpServer aOwner, TcpClient aClient)
+    public HttpClient(HttpServer aOwner, TcpClient aClient)
     {
       State = HttpStates.ACCEPTED;
       lastActivity = DateTime.Now;
