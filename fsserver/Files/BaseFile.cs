@@ -57,7 +57,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
           Item.FullName,
           FileMode.Open,
           FileAccess.Read,
-          FileShare.ReadWrite | FileShare.Delete
+          FileShare.ReadWrite | FileShare.Delete,
+          1<<17,
+          FileOptions.Asynchronous | FileOptions.SequentialScan
           );
       }
     }
