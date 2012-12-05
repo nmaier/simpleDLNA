@@ -382,23 +382,39 @@ namespace NMaier.SimpleDlna.Server
 
     private void Write()
     {
+      int bytes = (int)Math.Min((long)BUFFER_SIZE, contentLength >= 0 ? contentLength : (long)BUFFER_SIZE);
+      if (bytes <= 0) {
+        WriteFinish();
+        return;
+      }
       try {
-        int bytes = (int)Math.Min((long)BUFFER_SIZE, contentLength >= 0 ? contentLength : (long)BUFFER_SIZE);
-        if (bytes > 0) {
-          bytes = responseStream.Read(buffer, 0, BUFFER_SIZE);
-          contentLength -= bytes;
-        }
-        if (bytes <= 0) {
-          DebugFormat("{0} - Done writing response", this);
-          string conn;
-          if (headers.TryGetValue("connection", out conn) && conn.ToLower() == "keep-alive") {
-            ReadNext();
-          }
-          else {
-            Close();
-          }
-          return;
-        }
+        responseStream.BeginRead(buffer, 0, bytes, WriteBufferFilled, null);
+      }
+      catch (Exception ex) {
+        Debug(String.Format("{0} - Failed to fill buffer", this), ex);
+        Close();
+      }
+    }
+
+    private void WriteBufferFilled(IAsyncResult result)
+    {
+      int bytes = -1;
+      try {
+        bytes = responseStream.EndRead(result);
+        contentLength -= bytes;
+      }
+      catch (Exception ex) {
+        Debug(String.Format("{0} - Failed to fill buffer", this), ex);
+        Close();
+        return;
+      }
+
+      if (bytes <= 0) {
+        WriteFinish();
+        return;
+      }
+
+      try {
         stream.BeginWrite(buffer, 0, bytes, WriteCallback, null);
       }
       catch (Exception ex) {
@@ -424,6 +440,18 @@ namespace NMaier.SimpleDlna.Server
       }
 
       Write();
+    }
+
+    private void WriteFinish()
+    {
+      DebugFormat("{0} - Done writing response", this);
+      string conn;
+      if (headers.TryGetValue("connection", out conn) && conn.ToLower() == "keep-alive") {
+        ReadNext();
+      }
+      else {
+        Close();
+      }
     }
 
     internal void Close()
