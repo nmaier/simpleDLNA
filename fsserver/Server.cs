@@ -31,6 +31,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private IMediaFolder root, images, audio, video;
     private readonly FileSystemWatcher[] watchers;
     private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
+    private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
 
 
 
@@ -379,7 +380,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
       }
 
-      var ext = new Regex(@"[^\w\d]+", RegexOptions.Compiled).Replace(info.Extension.ToLower().Substring(1), "");
+      var ext = re_sansitizeExt.Replace(info.Extension.ToLower().Substring(1), "");
       var type = DlnaMaps.Ext2Dlna[ext];
       var mediaType = DlnaMaps.Ext2Media[ext];
 
