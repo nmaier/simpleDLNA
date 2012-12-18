@@ -86,7 +86,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       childFolders.Add(folder);
     }
 
-    public void Cleanup()
+    public virtual void Cleanup()
     {
       foreach (var f in childFolders) {
         f.Cleanup();

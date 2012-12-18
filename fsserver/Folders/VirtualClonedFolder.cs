@@ -5,15 +5,17 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
   internal class VirtualClonedFolder : VirtualFolder
   {
 
+    private readonly BaseFolder clone;
     private readonly MediaTypes types;
 
 
 
-    public VirtualClonedFolder(FileServer server, IMediaFolder parent, string name, MediaTypes types = MediaTypes.AUDIO | MediaTypes.IMAGE | MediaTypes.VIDEO)
+    public VirtualClonedFolder(FileServer server, BaseFolder parent, string name, MediaTypes types = MediaTypes.AUDIO | MediaTypes.IMAGE | MediaTypes.VIDEO)
       : base(server, null, name)
     {
       this.types = types;
       Id = name;
+      clone = parent;
       CloneFolder(this, parent);
       Cleanup();
     }
@@ -28,6 +30,12 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 
 
 
+
+    public override void Cleanup()
+    {
+      base.Cleanup();
+      clone.Cleanup();
+    }
 
     private void CloneFolder(VirtualFolder parent, IMediaFolder folder)
     {

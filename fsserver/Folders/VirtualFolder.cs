@@ -9,6 +9,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
   {
 
     private readonly string id;
+    private List<BaseFolder> merged = new List<BaseFolder>();
     private string path = null;
 
 
@@ -62,11 +63,20 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 
 
 
+    public override void Cleanup()
+    {
+      base.Cleanup();
+      foreach (var m in merged) {
+        m.Cleanup();
+      }
+    }
+
     internal void Merge(BaseFolder folder)
     {
       if (folder == null) {
         throw new ArgumentNullException("folder");
       }
+      merged.Add(folder);
       foreach (var item in folder.ChildItems) {
         AddFile(item as Files.BaseFile);
       }
@@ -74,7 +84,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         VirtualFolder ownFolder = (from f in childFolders
                                    where f is VirtualFolder && f.Title == cf.Title
                                    select f as VirtualFolder
-                                   ).DefaultIfEmpty(null).FirstOrDefault();
+                                   ).FirstOrDefault();
         if (ownFolder == null) {
           ownFolder = new VirtualFolder(Server, this, cf.Title, cf.Id);
           childFolders.Add(ownFolder);

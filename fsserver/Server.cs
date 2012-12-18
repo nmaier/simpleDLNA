@@ -194,28 +194,31 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private void DoRoot()
     {
       lock (this) {
+        Folders.BaseFolder newMaster;
         if (directories.Length == 1) {
-          master = new Folders.PlainRootFolder(friendlyName, this, types, directories[0]);
+          newMaster = new Folders.PlainRootFolder(friendlyName, this, types, directories[0]);
         }
         else {
-          var virtualRoot = new Folders.VirtualFolder(this, null, friendlyName, "0");
+          var virtualMaster = new Folders.VirtualFolder(this, null, friendlyName, "0");
           foreach (var d in directories) {
             var pr = new Folders.PlainRootFolder(friendlyName, this, types, d);
             RegisterFolderTree(pr);
-            virtualRoot.Merge(pr);
+            virtualMaster.Merge(pr);
           }
-          master = virtualRoot;
+          newMaster = virtualMaster;
         }
-        ids["0"] = new WeakReference(root = BuildView(master));
+        ids["0"] = new WeakReference(root = BuildView(newMaster));
 
-        images = BuildView(new Folders.VirtualClonedFolder(this, master, "I", types & MediaTypes.IMAGE));
+        images = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "I", types & MediaTypes.IMAGE));
         ids["I"] = new WeakReference(images);
 
-        audio = BuildView(new Folders.VirtualClonedFolder(this, master, "A", types & MediaTypes.AUDIO));
+        audio = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "A", types & MediaTypes.AUDIO));
         ids["A"] = new WeakReference(audio);
 
-        video = BuildView(new Folders.VirtualClonedFolder(this, master, "V", types & MediaTypes.VIDEO));
+        video = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "V", types & MediaTypes.VIDEO));
         ids["V"] = new WeakReference(video);
+
+        master = newMaster;
       }
       Cleanup();
 
