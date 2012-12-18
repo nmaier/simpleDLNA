@@ -55,9 +55,8 @@ namespace NMaier.SimpleDlna.Thumbnails
     private MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
     {
       Debug("Starting ffmpeg");
-      using (var req = new ReadRequest(p, p.StandardOutput.BaseStream)) {
-        req.Read();
-
+      using (var thumb = new MemoryStream()) {
+        var pump = new StreamPump(p.StandardOutput.BaseStream, thumb, null, 4096);
         if (!p.WaitForExit(20000)) {
           p.Kill();
           throw new ArgumentException("ffmpeg timed out");
@@ -65,10 +64,12 @@ namespace NMaier.SimpleDlna.Thumbnails
         if (p.ExitCode != 0) {
           throw new ArgumentException("ffmpeg does not understand the stream");
         }
-        req.Finish();
         Debug("Done ffmpeg");
+        if (!pump.Wait(2000)) {
+          throw new ArgumentException("stream reading timed out");
+        }
 
-        using (var img = Image.FromStream(req.OutStream)) {
+        using (var img = Image.FromStream(thumb)) {
           using (var scaled = Thumbnailer.ResizeImage(img, ref width, ref height)) {
             var rv = new MemoryStream();
             try {
@@ -117,11 +118,11 @@ namespace NMaier.SimpleDlna.Thumbnails
         sti.RedirectStandardOutput = true;
         p.Start();
 
-        using (var pump = new WriteRequest(p, stream, p.StandardInput.BaseStream)) {
-          pump.Write();
-          return GetThumbnailFromProcess(p, ref width, ref height);
-        }
-
+        new StreamPump(stream, p.StandardInput.BaseStream, (pump, result) =>
+        {
+          stream.Dispose();
+        }, 4096);
+        return GetThumbnailFromProcess(p, ref width, ref height);
       }
     }
 

@@ -14,11 +14,10 @@ namespace NMaier.SimpleDlna.Server
     private readonly uint BEGIN_TIMEOUT = 30;
     private string body;
     private uint bodyBytes = 0;
-    private readonly byte[] buffer = new byte[BUFFER_SIZE];
+    private readonly byte[] buffer = new byte[2048];
     private const int BUFFER_SIZE = 1 << 16;
     private static readonly Regex bytes = new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
     private readonly TcpClient client;
-    private long contentLength;
     private static IHandler Error404 = new StaticHandler(new StringResponse(HttpCodes.NOT_FOUND, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
     private static IHandler Error416 = new StaticHandler(new StringResponse(HttpCodes.RANGE_NOT_SATISFIABLE, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
     private static IHandler Error500 = new StaticHandler(new StringResponse(HttpCodes.INTERNAL_ERROR, "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"));
@@ -32,7 +31,6 @@ namespace NMaier.SimpleDlna.Server
     private MemoryStream readStream;
     private uint requestCount = 0;
     private IResponse response;
-    private Stream responseStream;
     private HttpStates state;
     private readonly NetworkStream stream;
     private readonly uint WRITE_TIMEOUT = (uint)TimeSpan.FromMinutes(180).TotalSeconds;
@@ -154,22 +152,10 @@ namespace NMaier.SimpleDlna.Server
       return RemoteEndpoint.ToString();
     }
 
-    private void MaybeCloseResponseStream()
-    {
-      if (responseStream != null) {
-        try {
-          responseStream.Close();
-          responseStream.Dispose();
-          responseStream = null;
-        }
-        catch (Exception) { }
-      }
-    }
-
     private void Read()
     {
       try {
-        stream.BeginRead(buffer, 0, BUFFER_SIZE, ReadCallback, 0);
+        stream.BeginRead(buffer, 0, buffer.Length, ReadCallback, 0);
       }
       catch (IOException ex) {
         Warn(String.Format("{0} - Failed to BeginRead", this), ex);
@@ -258,8 +244,6 @@ namespace NMaier.SimpleDlna.Server
 
     private void ReadNext()
     {
-      MaybeCloseResponseStream();
-
       method = null;
       headers.Clear();
       hasHeaders = false;
@@ -278,7 +262,7 @@ namespace NMaier.SimpleDlna.Server
       var responseBody = response.Body;
       var st = response.Status;
 
-      contentLength = -1;
+      long contentLength = -1;
       string clf;
       if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
         try {
@@ -339,16 +323,24 @@ namespace NMaier.SimpleDlna.Server
         rs.AddStream(headerStream);
         if (method != "HEAD" && responseBody != null) {
           rs.AddStream(responseBody);
-          if (contentLength >= 0) {
-            contentLength += headerStream.Length;
-          }
         }
-        else {
-          contentLength = headerStream.Length;
-        }
-        responseStream = rs;
         InfoFormat("{0} - {1} response for {2}", this, (uint)st, path);
-        Write();
+        state = HttpStates.WRITING;
+        new StreamPump(rs, stream, (pump, result) =>
+        {
+          pump.Input.Close();
+          pump.Input.Dispose();
+          if (result == StreamPumpResult.Delivered) {
+            DebugFormat("{0} - Done writing response", this);
+
+            string conn;
+            if (headers.TryGetValue("connection", out conn) && conn.ToLower() == "keep-alive") {
+              ReadNext();
+              return;
+            }
+          }
+          Close();
+        }, BUFFER_SIZE);
       }
       catch (Exception) {
         rs.Dispose();
@@ -380,86 +372,11 @@ namespace NMaier.SimpleDlna.Server
       SendResponse();
     }
 
-    private void Write()
-    {
-      int bytes = (int)Math.Min((long)BUFFER_SIZE, contentLength >= 0 ? contentLength : (long)BUFFER_SIZE);
-      if (bytes <= 0) {
-        WriteFinish();
-        return;
-      }
-      try {
-        responseStream.BeginRead(buffer, 0, bytes, WriteBufferFilled, null);
-      }
-      catch (Exception ex) {
-        Debug(String.Format("{0} - Failed to fill buffer", this), ex);
-        Close();
-      }
-    }
-
-    private void WriteBufferFilled(IAsyncResult result)
-    {
-      int bytes = -1;
-      try {
-        bytes = responseStream.EndRead(result);
-        contentLength -= bytes;
-      }
-      catch (Exception ex) {
-        Debug(String.Format("{0} - Failed to fill buffer", this), ex);
-        Close();
-        return;
-      }
-
-      if (bytes <= 0) {
-        WriteFinish();
-        return;
-      }
-
-      try {
-        stream.BeginWrite(buffer, 0, bytes, WriteCallback, null);
-      }
-      catch (Exception ex) {
-        Debug(String.Format("{0} - Failed to write - Client hung up on me", this), ex);
-        Close();
-      }
-    }
-
-    private void WriteCallback(IAsyncResult result)
-    {
-      if (state == HttpStates.CLOSED) {
-        return;
-      }
-      State = HttpStates.WRITING;
-      try {
-        stream.EndWrite(result);
-        lastActivity = DateTime.Now;
-      }
-      catch (Exception) {
-        DebugFormat("{0} - Failed to write - client hung up on me", this);
-        Close();
-        return;
-      }
-
-      Write();
-    }
-
-    private void WriteFinish()
-    {
-      DebugFormat("{0} - Done writing response", this);
-      string conn;
-      if (headers.TryGetValue("connection", out conn) && conn.ToLower() == "keep-alive") {
-        ReadNext();
-      }
-      else {
-        Close();
-      }
-    }
-
     internal void Close()
     {
       State = HttpStates.CLOSED;
 
       DebugFormat("{0} - Closing connection after {1} requests", this, requestCount);
-      MaybeCloseResponseStream();
       try {
         client.Close();
       }

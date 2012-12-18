@@ -67,11 +67,10 @@
     <Compile Include="MoreDom.cs" />
     <Compile Include="NaturalStringComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadRequest.cs" />
     <Compile Include="AttributeCollection.cs" />
     <Compile Include="SafeNativeMethods.cs" />
     <Compile Include="Sqlite.cs" />
-    <Compile Include="WriteRequest.cs" />
+    <Compile Include="StreamPump.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
