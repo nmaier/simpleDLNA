@@ -34,31 +34,31 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
 
 
-    public void Send(int port)
+    public void Send()
     {
       var msg = Encoding.ASCII.GetBytes(Message);
       foreach (var external in IP.ExternalAddresses) {
         try {
-          var client = new UdpClient(new IPEndPoint(external, port));
-          client.BeginSend(msg, msg.Length, EndPoint, SendCallback, client);
+          var client = new UdpClient(new IPEndPoint(external, 0));
+          client.BeginSend(msg, msg.Length, EndPoint, result =>
+          {
+            try {
+              client.EndSend(result);
+            }
+            catch (Exception ex) {
+              Error(ex);
+            }
+            finally {
+              try { client.Close(); }
+              catch (Exception) { };
+            }
+          }, null);
         }
         catch (Exception ex) {
           Error(ex);
         }
       }
       ++SendCount;
-    }
-
-    private void SendCallback(IAsyncResult result)
-    {
-      using (var client = result.AsyncState as UdpClient) {
-        try {
-          client.EndSend(result);
-        }
-        catch (Exception ex) {
-          Error(ex);
-        }
-      }
     }
   }
 }

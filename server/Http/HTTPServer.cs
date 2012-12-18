@@ -37,7 +37,7 @@ namespace NMaier.SimpleDlna.Server
       listener.Start();
       var realPort = (listener.LocalEndpoint as IPEndPoint).Port;
       InfoFormat("Running HTTP Server: {0} on port {1}", Signature, realPort);
-      ssdpServer = new SsdpHandler(realPort);
+      ssdpServer = new SsdpHandler();
       Accept();
     }
 

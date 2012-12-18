@@ -19,7 +19,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
     private readonly Queue<Datagram> messageQueue = new Queue<Datagram>();
     private readonly Timers.Timer notificationTimer = new Timers.Timer(60000);
-    private readonly int port;
     private readonly Timers.Timer queueTimer = new Timers.Timer(1000);
     private static readonly Random random = new Random();
     private bool running = true;
@@ -30,9 +29,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
 
 
-    public SsdpHandler(int port, int ttl = 1)
+    public SsdpHandler()
     {
-      this.port = port;
       notificationTimer.Elapsed += Tick;
       notificationTimer.Enabled = true;
 
@@ -42,7 +40,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
       client.ExclusiveAddressUse = false;
       client.Client.Bind(new IPEndPoint(IPAddress.Any, SSDP_PORT));
-      client.JoinMulticastGroup(SSDP_IP, ttl);
+      client.JoinMulticastGroup(SSDP_IP, 2);
       Info("SSDP service started");
       Receive();
     }
@@ -73,7 +71,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         while (messageQueue.Count != 0) {
           var msg = messageQueue.Peek();
           if (msg != null && (running || msg.Sticky)) {
-            msg.Send(port);
+            msg.Send();
             if (msg.SendCount > DATAGRAMS_PER_MESSAGE) {
               messageQueue.Dequeue();
             }
@@ -141,7 +139,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       var dgram = new Datagram(endpoint, msg, sticky);
       lock (messageQueue) {
         if (messageQueue.Count == 0) {
-          dgram.Send(port);
+          dgram.Send();
         }
         messageQueue.Enqueue(dgram);
       }
