@@ -4,11 +4,10 @@ using System.Reflection;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
-  public abstract class Repository<TInterface> where TInterface : class, IRepositoryItem
+  public abstract class Repository<TInterface>
+    where TInterface : class, IRepositoryItem
   {
-
     private static readonly Dictionary<string, TInterface> items = new Dictionary<string, TInterface>();
-
 
 
     static Repository()
@@ -19,7 +18,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         if (t.GetInterface(type) == null) {
           continue;
         }
-        ConstructorInfo ctor = t.GetConstructor(new Type[] { });
+        var ctor = t.GetConstructor(new Type[] { });
         if (ctor == null) {
           continue;
         }
@@ -30,11 +29,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
           items.Add(item.Name, item);
         }
-        catch (Exception) { }
+        catch (Exception) {
+        }
       }
     }
-
-
 
 
     public static IDictionary<string, string> ListItems()
@@ -49,7 +47,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public static TInterface Lookup(string name)
     {
       name = name.ToLower().Trim();
-      TInterface result = null;
+      var result = (TInterface)null;
       if (!items.TryGetValue(name, out result)) {
         throw new RepositoryLookupException(name);
       }

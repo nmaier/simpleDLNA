@@ -1,12 +1,14 @@
-
 namespace NMaier.SimpleDlna.Server
 {
   internal sealed class IconHandler : IPrefixHandler
   {
-
-    public string Prefix { get { return "/icon/"; } }
-
-
+    public string Prefix
+    {
+      get
+      {
+        return "/icon/";
+      }
+    }
 
 
     public IResponse HandleRequest(IRequest req)

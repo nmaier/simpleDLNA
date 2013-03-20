@@ -8,11 +8,9 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 {
   internal sealed class Datagram : Logging
   {
-
     public readonly IPEndPoint EndPoint;
     public readonly string Message;
     public readonly bool Sticky;
-
 
 
     public Datagram(IPEndPoint aEndPoint, string aMessage, bool sticky)
@@ -24,7 +22,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     }
 
 
-
     public uint SendCount
     {
       get;
@@ -32,12 +29,10 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     }
 
 
-
-
     public void Send()
     {
       var msg = Encoding.ASCII.GetBytes(Message);
-      foreach (var external in IP.ExternalAddresses) {
+      foreach (var external in IP.ExternalIPAddresses) {
         try {
           var client = new UdpClient(new IPEndPoint(external, 0));
           client.BeginSend(msg, msg.Length, EndPoint, result =>
@@ -49,8 +44,11 @@ namespace NMaier.SimpleDlna.Server.Ssdp
               Error(ex);
             }
             finally {
-              try { client.Close(); }
-              catch (Exception) { };
+              try {
+                client.Close();
+              }
+              catch (Exception) {
+              }
             }
           }, null);
         }

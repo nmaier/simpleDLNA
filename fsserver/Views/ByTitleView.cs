@@ -7,22 +7,42 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
 {
   internal sealed class ByTitleView : IView
   {
-
-    private static Regex regClean = new Regex(@"[^\d\w]+", RegexOptions.Compiled);
-
+    private readonly static Regex regClean = new Regex(@"[^\d\w]+", RegexOptions.Compiled);
 
 
     public string Description
     {
-      get { return "Reorganizes files into folders by title"; }
+      get
+      {
+        return "Reorganizes files into folders by title";
+      }
     }
-
     public string Name
     {
-      get { return "bytitle"; }
+      get
+      {
+        return "bytitle";
+      }
     }
 
 
+    private static void SortFolder(FileServer server, BaseFolder folder, TitlesFolder titles)
+    {
+      foreach (var f in folder.ChildFolders.ToList()) {
+        SortFolder(server, f as BaseFolder, titles);
+      }
+
+      foreach (var c in folder.ChildItems.ToList()) {
+        var pre = regClean.Replace(c.Title, string.Empty);
+        if (string.IsNullOrEmpty(pre)) {
+          pre = "Unnamed";
+        }
+        pre = pre.First().ToString().ToUpper();
+        var file = c as Files.BaseFile;
+        titles.GetFolder(pre).AddFile(file);
+        folder.RemoveFile(file);
+      }
+    }
 
 
     public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
@@ -39,30 +59,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       return root;
     }
 
-    private void SortFolder(FileServer server, BaseFolder folder, TitlesFolder titles)
-    {
-      foreach (var f in folder.ChildFolders.ToList()) {
-        SortFolder(server, f as BaseFolder, titles);
-      }
-
-      foreach (var c in folder.ChildItems.ToList()) {
-        var pre = regClean.Replace(c.Title, "");
-        if (string.IsNullOrEmpty(pre)) {
-          pre = "Unnamed";
-        }
-        pre = pre.First().ToString().ToUpper();
-        var file = c as Files.BaseFile;
-        titles.GetFolder(pre).AddFile(file);
-        folder.RemoveFile(file);
-      }
-    }
-
-
-
 
     private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
     {
-      public TitlesFolder(FileServer aServer, BaseFolder aParent) : base(aServer, aParent, "titles") { }
+      public TitlesFolder(FileServer aServer, BaseFolder aParent)
+        : base(aServer, aParent, "titles")
+      {
+      }
     }
   }
 }

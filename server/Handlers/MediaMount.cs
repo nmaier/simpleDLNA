@@ -7,13 +7,15 @@ namespace NMaier.SimpleDlna.Server
 {
   internal sealed partial class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
-
     private readonly string descriptor;
-    private static uint mount = 0;
-    private readonly string prefix;
-    private readonly IMediaServer server;
-    private uint systemID = 1;
 
+    private static uint mount = 0;
+
+    private readonly string prefix;
+
+    private readonly IMediaServer server;
+
+    private uint systemID = 1;
 
 
     public MediaMount(IMediaServer aServer)
@@ -27,28 +29,58 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
-
     public string DescriptorURI
     {
-      get { return String.Format("{0}description.xml", prefix); }
+      get
+      {
+        return String.Format("{0}description.xml", prefix);
+      }
     }
-
     public string FriendlyName
     {
-      get { return server.FriendlyName; }
+      get
+      {
+        return server.FriendlyName;
+      }
     }
-
     public string Prefix
     {
-      get { return prefix; }
+      get
+      {
+        return prefix;
+      }
     }
-
     public Guid Uuid
     {
-      get { return server.Uuid; }
+      get
+      {
+        return server.Uuid;
+      }
     }
 
 
+    private void ChangedServer(object sender, EventArgs e)
+    {
+      lock (SoapCache) {
+        SoapCache.Clear();
+      }
+      InfoFormat("Rescanned mount {0}", Uuid);
+      systemID++;
+    }
+
+    private string GenerateDescriptor()
+    {
+      var doc = new XmlDocument();
+      doc.LoadXml(Properties.Resources.description);
+      doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", Uuid);
+      doc.GetElementsByTagName("modelNumber").Item(0).InnerText = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+      doc.GetElementsByTagName("friendlyName").Item(0).InnerText = FriendlyName + " — sdlna";
+      doc.GetElementsByTagName("SCPDURL").Item(0).InnerText = String.Format("{0}contentDirectory.xml", prefix);
+      doc.GetElementsByTagName("controlURL").Item(0).InnerText = String.Format("{0}control", prefix);
+      doc.GetElementsByTagName("eventSubURL").Item(0).InnerText = String.Format("{0}events", prefix);
+
+      return doc.OuterXml;
+    }
 
 
     public IMediaItem GetItem(string id)
@@ -92,29 +124,6 @@ namespace NMaier.SimpleDlna.Server
       }
       WarnFormat("Did not understand {0} {1}", request.Method, path);
       throw new Http404Exception();
-    }
-
-    private void ChangedServer(object sender, EventArgs e)
-    {
-      lock (SoapCache) {
-        SoapCache.Clear();
-      }
-      InfoFormat("Rescanned mount {0}", Uuid);
-      systemID++;
-    }
-
-    private string GenerateDescriptor()
-    {
-      var doc = new XmlDocument();
-      doc.LoadXml(Properties.Resources.description);
-      doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", Uuid);
-      doc.GetElementsByTagName("modelNumber").Item(0).InnerText = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-      doc.GetElementsByTagName("friendlyName").Item(0).InnerText = FriendlyName + " — sdlna";
-      doc.GetElementsByTagName("SCPDURL").Item(0).InnerText = String.Format("{0}contentDirectory.xml", prefix);
-      doc.GetElementsByTagName("controlURL").Item(0).InnerText = String.Format("{0}control", prefix);
-      doc.GetElementsByTagName("eventSubURL").Item(0).InnerText = String.Format("{0}events", prefix);
-
-      return doc.OuterXml;
     }
   }
 }

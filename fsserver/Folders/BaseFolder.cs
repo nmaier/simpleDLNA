@@ -8,10 +8,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal abstract class BaseFolder : IFileServerMediaItem, IMediaFolder
   {
-
     protected List<BaseFolder> childFolders;
-    protected List<BaseFile> childItems;
 
+    protected List<BaseFile> childItems;
 
 
     protected BaseFolder(FileServer aServer, BaseFolder aParent)
@@ -21,41 +20,54 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
     }
 
 
-
-    public uint ChildCount
+    IMediaFolder IMediaFolder.Parent
     {
-      get { return (uint)(childFolders.Count + childItems.Count); }
+      get
+      {
+        return Parent;
+      }
     }
 
+
+    internal FileServer Server
+    {
+      get;
+      set;
+    }
+
+
+    public int ChildCount
+    {
+      get
+      {
+        return childFolders.Count + childItems.Count;
+      }
+    }
     public IEnumerable<IMediaFolder> ChildFolders
     {
-      get { return childFolders; }
+      get
+      {
+        return childFolders;
+      }
     }
-
     public IEnumerable<IMediaResource> ChildItems
     {
-      get { return childItems; }
+      get
+      {
+        return childItems;
+      }
     }
-
     public string Id
     {
       get;
       set;
     }
-
-    IMediaFolder IMediaFolder.Parent
-    {
-      get { return Parent; }
-    }
-
     public BaseFolder Parent
     {
       get;
       set;
     }
-
-    abstract public string Path { get; }
-
+    public abstract string Path { get; }
     public virtual IHeaders Properties
     {
       get
@@ -65,16 +77,24 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         return rv;
       }
     }
+    public abstract string Title { get; }
 
-    internal FileServer Server
+
+    internal void AddFile(BaseFile file)
     {
-      get;
-      set;
+      if (file == null) {
+        throw new ArgumentNullException("file");
+      }
+      childItems.Add(file);
     }
 
-    abstract public string Title { get; }
-
-
+    internal void RemoveFile(BaseFile file)
+    {
+      if (file == null) {
+        throw new ArgumentNullException("file");
+      }
+      childItems.Remove(file);
+    }
 
 
     public void AdoptFolder(BaseFolder folder)
@@ -118,22 +138,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         childFolders.Reverse();
         childItems.Reverse();
       }
-    }
-
-    internal void AddFile(BaseFile file)
-    {
-      if (file == null) {
-        throw new ArgumentNullException("file");
-      }
-      childItems.Add(file);
-    }
-
-    internal void RemoveFile(BaseFile file)
-    {
-      if (file == null) {
-        throw new ArgumentNullException("file");
-      }
-      childItems.Remove(file);
     }
   }
 }

@@ -7,45 +7,72 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public sealed class LruDictionary<TKey, TValue> : IDictionary<TKey, TValue>
   {
-
     private readonly uint capacity;
+
     private readonly IDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
+
     private readonly LinkedList<KeyValuePair<TKey, TValue>> order = new LinkedList<KeyValuePair<TKey, TValue>>();
+
     private readonly uint toDrop;
 
 
-
+    [CLSCompliant(false)]
     public LruDictionary(uint capacity)
     {
       this.capacity = capacity;
       toDrop = Math.Min(10, (uint)(capacity * 0.07));
     }
+    public LruDictionary(int capacity)
+      : this((uint)capacity)
+    {
+    }
 
 
-
+    [CLSCompliant(false)]
     public uint Capacity
     {
-      get { return capacity; }
+      get
+      {
+        return capacity;
+      }
     }
-
     public int Count
     {
-      get { return items.Count; }
+      get
+      {
+        return items.Count;
+      }
     }
-
     public bool IsReadOnly
     {
-      get { return false; }
+      get
+      {
+        return false;
+      }
     }
-
     public ICollection<TKey> Keys
     {
-      get { return items.Keys; }
+      get
+      {
+        return items.Keys;
+      }
     }
+    public ICollection<TValue> Values
+    {
+      get
+      {
+        return (from i in items.Values
+                select i.Value.Value).ToList();
+      }
+    }
+
 
     public TValue this[TKey key]
     {
-      get { return items[key].Value.Value; }
+      get
+      {
+        return items[key].Value.Value;
+      }
       [MethodImpl(MethodImplOptions.Synchronized)]
       set
       {
@@ -54,19 +81,23 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
-    public ICollection<TValue> Values
+
+    private void MaybeDropSome()
     {
-      get { return (from i in items.Values select i.Value.Value).ToList(); }
+      if (Count <= capacity) {
+        return;
+      }
+      for (var i = 0; i < toDrop; ++i) {
+        items.Remove(order.Last.Value.Key);
+        order.RemoveLast();
+      }
     }
 
-
-
-
-    [MethodImpl(MethodImplOptions.Synchronized)]
-    public void Add(TKey key, TValue value)
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
-      Add(new KeyValuePair<TKey, TValue>(key, value));
+      return items.GetEnumerator();
     }
+
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Add(KeyValuePair<TKey, TValue> item)
@@ -74,6 +105,12 @@ namespace NMaier.SimpleDlna.Utilities
       var n = order.AddFirst(item);
       items.Add(item.Key, n);
       MaybeDropSome();
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public void Add(TKey key, TValue value)
+    {
+      Add(new KeyValuePair<TKey, TValue>(key, value));
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
@@ -138,22 +175,6 @@ namespace NMaier.SimpleDlna.Utilities
       }
       value = default(TValue);
       return false;
-    }
-
-    private void MaybeDropSome()
-    {
-      if (Count <= capacity) {
-        return;
-      }
-      for (var i = 0; i < toDrop; ++i) {
-        items.Remove(order.Last.Value.Key);
-        order.RemoveLast();
-      }
-    }
-
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-      return items.GetEnumerator();
     }
   }
 }

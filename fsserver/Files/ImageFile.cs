@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
@@ -10,20 +9,23 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
   [Serializable]
   internal sealed class ImageFile : BaseFile, IMetaImageItem, ISerializable
   {
-
     private string creator;
     private string description;
-    private uint? width, height;
+    private int? width, height;
     private bool initialized = false;
     private string title;
 
 
 
-    internal ImageFile(FileServer server, FileInfo aFile, DlnaType aType) : base(server, aFile, aType, MediaTypes.IMAGE) { }
+    internal ImageFile(FileServer server, FileInfo aFile, DlnaMime aType)
+      : base(server, aFile, aType, DlnaMediaTypes.Image)
+    {
+    }
 
     private ImageFile(SerializationInfo info, StreamingContext ctx)
       : this((ctx.Context as DeserializeInfo).Server, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
-    { }
+    {
+    }
 
     private ImageFile(SerializationInfo info, DeserializeInfo di)
       : this(di.Server, di.Info, di.Type)
@@ -31,8 +33,8 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       creator = info.GetString("cr");
       description = info.GetString("d");
       title = info.GetString("t");
-      width = info.GetUInt32("w");
-      height = info.GetUInt32("h");
+      width = info.GetInt32("w");
+      height = info.GetInt32("h");
 
       initialized = true;
     }
@@ -57,7 +59,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-    public uint? MetaHeight
+    public int? MetaHeight
     {
       get
       {
@@ -66,7 +68,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-    public uint? MetaWidth
+    public int? MetaWidth
     {
       get
       {
@@ -127,8 +129,8 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       try {
         using (var tl = TagLib.File.Create(Item.FullName)) {
           try {
-            width = (uint)tl.Properties.PhotoWidth;
-            height = (uint)tl.Properties.PhotoHeight;
+            width = tl.Properties.PhotoWidth;
+            height = tl.Properties.PhotoHeight;
           }
           catch (Exception ex) {
             Debug("Failed to transpose Properties props", ex);

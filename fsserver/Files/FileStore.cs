@@ -9,33 +9,14 @@ using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 using System.Timers;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer.Files
 {
-  internal sealed class DeserializeInfo
-  {
-
-    public FileInfo Info;
-    public FileServer Server;
-    public DlnaType Type;
-
-
-
-    public DeserializeInfo(FileServer server, FileInfo info, DlnaType type)
-    {
-      Server = server;
-      Info = info;
-      Type = type;
-    }
-  }
-
   internal sealed class FileStore : Logging, IDisposable
   {
-
-    private readonly System.Data.IDbConnection connection;
+    private readonly IDbConnection connection;
     private readonly IDbCommand insert;
     private readonly IDbDataParameter insertCover;
     private readonly IDbDataParameter insertData;
@@ -136,7 +117,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-    internal BaseFile MaybeGetFile(FileServer server, BaseFolder aParent, FileInfo info, DlnaType type)
+    internal BaseFile MaybeGetFile(FileServer server, FileInfo info, DlnaMime type)
     {
       if (connection == null) {
         return null;
@@ -154,9 +135,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       try {
         using (var s = new MemoryStream(data)) {
           var ctx = new StreamingContext(StreamingContextStates.Persistence, new DeserializeInfo(server, info, type));
-          var formatter = new BinaryFormatter(null, ctx);
-          formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
-          formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
+          var formatter = new BinaryFormatter(null, ctx) { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
           var rv = formatter.Deserialize(s) as BaseFile;
           rv.Item = info;
           return rv;
@@ -206,9 +185,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
       try {
         using (var s = new MemoryStream(data)) {
-          var formatter = new BinaryFormatter();
-          formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
-          formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
+          var formatter = new BinaryFormatter() { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
           var rv = formatter.Deserialize(s) as Cover;
           return rv;
         }
@@ -234,9 +211,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       try {
         using (var s = new MemoryStream()) {
           var ctx = new StreamingContext(StreamingContextStates.Persistence, null);
-          var formatter = new BinaryFormatter(null, ctx);
-          formatter.TypeFormat = FormatterTypeStyle.TypesWhenNeeded;
-          formatter.AssemblyFormat = FormatterAssemblyStyle.Simple;
+          var formatter = new BinaryFormatter(null, ctx) { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
           formatter.Serialize(s, file);
 
           lock (connection) {
@@ -261,7 +236,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
         }
       }
       catch (Exception ex) {
-        Error("Failed to serialize an object of type " + file.GetType().ToString(), ex);
+        Error("Failed to serialize an object of type " + file.GetType(), ex);
         throw;
       }
     }
@@ -314,6 +289,5 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
       vacuumer.Interval = 30 * 60 * 1000;
     }
-
   }
 }

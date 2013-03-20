@@ -16,11 +16,9 @@ namespace NMaier.SimpleDlna
 {
   public static class Program
   {
+    private readonly static ManualResetEvent BlockEvent = new ManualResetEvent(false);
 
-    private static ManualResetEvent BlockEvent = new ManualResetEvent(false);
     private static uint CancelHitCount = 0;
-
-
 
 
     private static void CancelKeyPressed(object sender, ConsoleCancelEventArgs e)
@@ -65,7 +63,7 @@ namespace NMaier.SimpleDlna
       }
     }
 
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
       Console.WriteLine();
       var options = new Options();
@@ -100,13 +98,13 @@ namespace NMaier.SimpleDlna
 
         options.SetupLogging();
 
-        HttpServer server = new HttpServer(options.Port);
+        var server = new HttpServer(options.Port);
         try {
           server.Info("CTRL-C to terminate");
 
           Console.Title = "simple DLNA - starting ...";
 
-          MediaTypes types = options.Types[0];
+          var types = options.Types[0];
           foreach (var t in options.Types) {
             types = types | t;
             server.InfoFormat("Enabled type {0}", t);
@@ -152,14 +150,13 @@ namespace NMaier.SimpleDlna
 
     private static void Run(HttpServer server)
     {
-      // Basically the main loop, except we don't loop here at all ;)
       BlockEvent.WaitOne();
 
       server.Info("Going down!");
       server.Info("Closed!");
     }
 
-    private static FileServer SetupFileServer(Options options, MediaTypes types, DirectoryInfo[] d)
+    private static FileServer SetupFileServer(Options options, DlnaMediaTypes types, DirectoryInfo[] d)
     {
       var fs = new FileServer(types, d);
       try {
@@ -174,7 +171,6 @@ namespace NMaier.SimpleDlna
 
         if (options.Order != null) {
           try {
-
             fs.SetOrder(options.Order);
           }
           catch (RepositoryLookupException) {
@@ -214,17 +210,18 @@ namespace NMaier.SimpleDlna
       Console.WriteLine("Server: {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
       a = Assembly.GetAssembly(typeof(Utilities.AttributeCollection));
       v = a.GetName().Version;
-      Console.WriteLine("Util:   {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
+      Console.WriteLine("Utils:  {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
 
       Console.WriteLine("Http:   {0}", HttpServer.Signature);
     }
 
 
-
-
     [GetOptOptions(AcceptPrefixType = ArgumentPrefixTypes.Dashes)]
     private class Options : GetOpt
     {
+      private int port = 0;
+
+
       [Argument("cache", HelpVar = "file", HelpText = "Cache file to use for storing meta data (default: none)")]
       [ShortArgument('c')]
       public FileInfo CacheFile = null;
@@ -234,6 +231,13 @@ namespace NMaier.SimpleDlna
       public bool DescendingOrder = false;
       [Parameters(HelpVar = "Directory")]
       public DirectoryInfo[] Directories = new DirectoryInfo[] { new DirectoryInfo(".") };
+      [Argument("type", HelpText = "Types to serv (IMAGE, VIDEO, AUDIO; default: all)")]
+      [ArgumentAlias("what")]
+      [ShortArgument('t')]
+      public DlnaMediaTypes[] Types = new DlnaMediaTypes[] { DlnaMediaTypes.Video, DlnaMediaTypes.Image, DlnaMediaTypes.Audio };
+      [Argument("view", HelpText = "Apply a view (default: no views applied)", HelpVar = "view")]
+      [ShortArgument('v')]
+      public string[] Views = new string[0];
       [Argument("list-sort-orders", HelpText = "List all available sort orders")]
       [FlagArgument(true)]
       public bool ListOrders = false;
@@ -248,61 +252,62 @@ namespace NMaier.SimpleDlna
       [Argument("sort", HelpText = "Sort order; see --list-sort-orders", HelpVar = "order")]
       [ShortArgument('s')]
       public string Order = null;
-      private int port = 0;
+      [Argument("seperate", HelpText = "Mount directories as seperate servers")]
+      [ShortArgument('m')]
+      [FlagArgument(true)]
+      public bool Seperate = false;
       [Argument("help", HelpText = "Print usage")]
       [ShortArgument('?')]
       [ShortArgumentAlias('h')]
       [FlagArgument(true)]
       public bool ShowHelp = false;
-      [Argument("version", HelpText = "Print version")]
-      [ShortArgument('V')]
-      [FlagArgument(true)]
-      public bool ShowVersion = false;
       [Argument("license", HelpText = "Print license")]
       [ShortArgument('L')]
       [FlagArgument(true)]
       public bool ShowLicense = false;
-      [Argument("type", HelpText = "Types to serv (IMAGE, VIDEO, AUDIO; default: all)")]
-      [ArgumentAlias("what")]
-      [ShortArgument('t')]
-      public MediaTypes[] Types = new MediaTypes[] { MediaTypes.VIDEO, MediaTypes.IMAGE, MediaTypes.AUDIO };
-      [Argument("view", HelpText = "Apply a view (default: no views applied)", HelpVar = "view")]
-      [ShortArgument('v')]
-      public string[] Views = new string[0];
-      [Argument("seperate", HelpText = "Mount directories as seperate servers")]
-      [ShortArgument('m')]
+      [Argument("version", HelpText = "Print version")]
+      [ShortArgument('V')]
       [FlagArgument(true)]
-      public bool Seperate = false;
+      public bool ShowVersion = false;
+
 
       [Argument("port", HelpVar = "port", HelpText = "Webserver listen port (default: 0, bind an available port)")]
       [ShortArgument('p')]
       public int Port
       {
-        get { return port; }
+        get
+        {
+          return port;
+        }
         set
         {
           if (value != 0 && (value < 1 || value > ushort.MaxValue)) {
-            throw new GetOptException("Port must be between 2 and " + ushort.MaxValue.ToString());
+            throw new GetOptException("Port must be between 2 and " + ushort.MaxValue);
           }
           port = value;
         }
       }
 
+
       public void SetupLogging()
       {
         var appender = new ConsoleAppender();
-        var layout = new PatternLayout();
-        layout.ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception";
+        var layout = new PatternLayout()
+        {
+          ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception"
+        };
         layout.ActivateOptions();
         appender.Layout = layout;
         appender.ActivateOptions();
         if (LogFile != null) {
-          var fileAppender = new RollingFileAppender();
-          fileAppender.File = LogFile.FullName;
-          fileAppender.Layout = layout;
-          fileAppender.MaximumFileSize = "1MB";
-          fileAppender.MaxSizeRollBackups = 10;
-          fileAppender.RollingStyle = RollingFileAppender.RollingMode.Size;
+          var fileAppender = new RollingFileAppender()
+          {
+            File = LogFile.FullName,
+            Layout = layout,
+            MaximumFileSize = "1MB",
+            MaxSizeRollBackups = 10,
+            RollingStyle = RollingFileAppender.RollingMode.Size
+          };
           fileAppender.ActivateOptions();
           BasicConfigurator.Configure(appender, fileAppender);
         }

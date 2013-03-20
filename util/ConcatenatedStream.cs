@@ -6,31 +6,37 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public sealed class ConcatenatedStream : Stream
   {
-
-    Queue<Stream> streams = new Queue<Stream>();
-
+    private readonly Queue<Stream> streams = new Queue<Stream>();
 
 
     public override bool CanRead
     {
-      get { return true; }
+      get
+      {
+        return true;
+      }
     }
-
     public override bool CanSeek
     {
-      get { return false; }
+      get
+      {
+        return false;
+      }
     }
-
     public override bool CanWrite
     {
-      get { return false; }
+      get
+      {
+        return false;
+      }
     }
-
     public override long Length
     {
-      get { throw new NotImplementedException(); }
+      get
+      {
+        throw new NotImplementedException();
+      }
     }
-
     public override long Position
     {
       get
@@ -42,8 +48,6 @@ namespace NMaier.SimpleDlna.Utilities
         throw new NotImplementedException();
       }
     }
-
-
 
 
     public void AddStream(Stream stream)
@@ -61,7 +65,7 @@ namespace NMaier.SimpleDlna.Utilities
         return 0;
       }
 
-      int read = streams.Peek().Read(buffer, offset, count);
+      var read = streams.Peek().Read(buffer, offset, count);
       if (read < count) {
         streams.Dequeue().Dispose();
         return read + Read(buffer, offset + read, count - read);

@@ -6,38 +6,23 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
 {
   internal sealed class FlattenView : IView
   {
-
     public string Description
     {
-      get { return "Removes empty intermediate folders and flattens folders with only few files"; }
+      get
+      {
+        return "Removes empty intermediate folders and flattens folders with only few files";
+      }
     }
-
     public string Name
     {
-      get { return "flatten"; }
-    }
-
-
-
-
-    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
-    {
-      var r = new VirtualClonedFolder(Root as BaseFolder);
-      var cross = from f in r.ChildFolders
-                  from t in r.ChildFolders
-                  where f != t
-                  orderby f.Title, t.Title
-                  select new { f = f as BaseFolder, t = t as BaseFolder };
-      foreach (var c in cross) {
-        MergeFolders(c.f, c.t);
+      get
+      {
+        return "flatten";
       }
-
-      TransformInternal(r, r);
-      MergeFolders(r, r);
-      return r;
     }
 
-    private void MergeFolders(BaseFolder aFrom, BaseFolder aTo)
+
+    private static void MergeFolders(BaseFolder aFrom, BaseFolder aTo)
     {
       var merges = from f in aFrom.ChildFolders
                    join t in aTo.ChildFolders on f.Title equals t.Title
@@ -57,7 +42,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       }
     }
 
-    bool TransformInternal(BaseFolder root, BaseFolder current)
+    private static bool TransformInternal(BaseFolder root, BaseFolder current)
     {
       foreach (var f in current.ChildFolders.ToList()) {
         var bf = f as BaseFolder;
@@ -86,6 +71,24 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         }
       }
       return true;
+    }
+
+
+    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
+    {
+      var r = new VirtualClonedFolder(Root as BaseFolder);
+      var cross = from f in r.ChildFolders
+                  from t in r.ChildFolders
+                  where f != t
+                  orderby f.Title, t.Title
+                  select new { f = f as BaseFolder, t = t as BaseFolder };
+      foreach (var c in cross) {
+        MergeFolders(c.f, c.t);
+      }
+
+      TransformInternal(r, r);
+      MergeFolders(r, r);
+      return r;
     }
   }
 }

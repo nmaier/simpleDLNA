@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Comparers\DateComparer.cs" />
     <Compile Include="Comparers\FileSizeComparer.cs" />
+    <Compile Include="Files\DeserializeInfo.cs" />
     <Compile Include="Files\FileStore.cs" />
     <Compile Include="Files\AudioFile.cs" />
     <Compile Include="ByteVectorExtend.cs" />
@@ -92,7 +93,7 @@
     <Compile Include="Folders\BaseFolder.cs" />
     <Compile Include="Folders\PlainFolder.cs" />
     <Compile Include="Folders\VirtualFolder.cs" />
-    <Compile Include="Server.cs" />
+    <Compile Include="FileServer.cs" />
     <Compile Include="Files\BaseFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\ViewRepository.cs" />

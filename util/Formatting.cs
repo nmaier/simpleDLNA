@@ -1,16 +1,13 @@
-﻿
-namespace NMaier.SimpleDlna.Utilities
+﻿namespace NMaier.SimpleDlna.Utilities
 {
   public static class Formatting
   {
-
-
-    public static string FormatFileSize(long size)
+    public static string FormatFileSize(this long size)
     {
       if (size < 900) {
         return string.Format("{0} B", size);
       }
-      double ds = size / 1024.0;
+      var ds = size / 1024.0;
       if (ds < 900) {
         return string.Format("{0:F2} KB", ds);
       }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
@@ -10,7 +9,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
   [Serializable]
   internal sealed class AudioFile : BaseFile, IMetaAudioItem, ISerializable
   {
-
     private string album;
     private string artist;
     private string description;
@@ -20,12 +18,12 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     private bool initialized = false;
     private string performer;
     private string title;
-    private uint? track;
+    private int? track;
 
 
 
-    internal AudioFile(FileServer server, FileInfo aFile, DlnaType aType)
-      : base(server, aFile, aType, MediaTypes.AUDIO)
+    internal AudioFile(FileServer server, FileInfo aFile, DlnaMime aType)
+      : base(server, aFile, aType, DlnaMediaTypes.Audio)
     {
     }
 
@@ -38,7 +36,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       genre = info.GetString("g");
       performer = info.GetString("p");
       title = info.GetString("ti");
-      track = info.GetUInt32("tr");
+      track = info.GetInt32("tr");
       var ts = info.GetInt64("d");
       if (ts > 0) {
         duration = new TimeSpan(ts);
@@ -46,9 +44,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       initialized = true;
     }
 
-    private AudioFile(SerializationInfo info, StreamingContext ctx) :
+    private AudioFile(SerializationInfo info, StreamingContext ctx)
+      :
       this(info, ctx.Context as DeserializeInfo)
-    { }
+    {
+    }
 
 
 
@@ -117,7 +117,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-    public uint? MetaTrack
+    public int? MetaTrack
     {
       get
       {
@@ -255,7 +255,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
             }
 
             if (t.Track != 0 && t.Track < (1 << 10)) {
-              track = t.Track;
+              track = (int)t.Track;
             }
 
 
@@ -269,9 +269,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
               description = null;
             }
 
-            performer = t.JoinedPerformersSort;
             if (string.IsNullOrWhiteSpace(artist)) {
               performer = t.JoinedPerformers;
+            }
+            else {
+              performer = t.JoinedPerformersSort;
             }
             if (string.IsNullOrWhiteSpace(performer)) {
               performer = null;

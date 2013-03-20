@@ -12,10 +12,9 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public static class FFmpeg
   {
-
     public static readonly string FFidentifyExecutable = FindExecutable("ffidentify");
     public static readonly string FFmpegExecutable = FindExecutable("ffmpeg");
-    private static LruDictionary<FileInfo, IDictionary<string, string>> infoCache = new LruDictionary<FileInfo, IDictionary<string, string>>(500);
+    private readonly static LruDictionary<FileInfo, IDictionary<string, string>> infoCache = new LruDictionary<FileInfo, IDictionary<string, string>>(500);
     private static readonly Regex RegLine = new Regex(@"^(?:ID|META)_([\w\d_]+)=(.+)$", RegexOptions.Compiled);
 
 
@@ -111,7 +110,8 @@ namespace NMaier.SimpleDlna.Utilities
       try {
         places.Add(new DirectoryInfo(Environment.GetEnvironmentVariable("FFMPEG_HOME")));
       }
-      catch (Exception) { }
+      catch (Exception) {
+      }
       try {
         places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), "ffmpeg")));
         places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), "ffmpeg")));
@@ -120,12 +120,14 @@ namespace NMaier.SimpleDlna.Utilities
         places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "ffmpeg")));
         places.Add(new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)));
       }
-      catch (Exception) { }
+      catch (Exception) {
+      }
       foreach (var p in Environment.GetEnvironmentVariable("PATH").Split(isWin ? ';' : ':')) {
         try {
           places.Add(new DirectoryInfo(p.Trim()));
         }
-        catch (Exception) { }
+        catch (Exception) {
+        }
       }
 
       foreach (var i in places) {
@@ -141,7 +143,8 @@ namespace NMaier.SimpleDlna.Utilities
               return rv.FullName;
             }
           }
-          catch (Exception) { }
+          catch (Exception) {
+          }
         }
       }
       LogManager.GetLogger(typeof(FFmpeg)).Warn("Did not find " + executable);

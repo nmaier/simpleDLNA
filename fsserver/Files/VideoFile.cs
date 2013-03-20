@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
@@ -11,29 +10,29 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
   [Serializable]
   internal sealed class VideoFile : BaseFile, IMetaVideoItem, ISerializable, IBookmarkable
   {
-
     private string[] actors;
-    private ulong? bookmark;
+    private long? bookmark;
     private string description;
     private string director;
     private TimeSpan? duration;
     private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
     private string genre;
-    private uint? height;
+    private int? height;
     private bool initialized = false;
     private string title;
-    private uint? width;
+    private int? width;
 
 
 
-    internal VideoFile(FileServer server, FileInfo aFile, DlnaType aType)
-      : base(server, aFile, aType, MediaTypes.VIDEO)
+    internal VideoFile(FileServer server, FileInfo aFile, DlnaMime aType)
+      : base(server, aFile, aType, DlnaMediaTypes.Video)
     {
     }
 
     private VideoFile(SerializationInfo info, StreamingContext ctx)
       : this(info, ctx.Context as DeserializeInfo)
-    { }
+    {
+    }
 
     private VideoFile(SerializationInfo info, DeserializeInfo di)
       : this(di.Server, di.Info, di.Type)
@@ -43,24 +42,28 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       director = info.GetString("di");
       genre = info.GetString("g");
       title = info.GetString("t");
-      width = info.GetUInt32("w");
-      height = info.GetUInt32("h");
+      width = info.GetInt32("w");
+      height = info.GetInt32("h");
       var ts = info.GetInt64("du");
       if (ts > 0) {
         duration = new TimeSpan(ts);
       }
       try {
-        bookmark = info.GetUInt64("b");
+        bookmark = info.GetInt64("b");
       }
-      catch (Exception) { }
+      catch (Exception) {
+      }
       initialized = true;
     }
 
 
 
-    public ulong? Bookmark
+    public long? Bookmark
     {
-      get { return bookmark; }
+      get
+      {
+        return bookmark;
+      }
       set
       {
         bookmark = value;
@@ -116,7 +119,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-    public uint? MetaHeight
+    public int? MetaHeight
     {
       get
       {
@@ -125,7 +128,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-    public uint? MetaWidth
+    public int? MetaWidth
     {
       get
       {
@@ -203,8 +206,8 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
             if (duration.HasValue && duration.Value.TotalSeconds < 0.1) {
               duration = null;
             }
-            width = (uint)tl.Properties.VideoWidth;
-            height = (uint)tl.Properties.VideoHeight;
+            width = tl.Properties.VideoWidth;
+            height = tl.Properties.VideoHeight;
           }
           catch (Exception ex) {
             Debug("Failed to transpose Properties props", ex);
@@ -226,7 +229,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
                 actors = t.Performers;
                 if (actors == null || actors.Length == 0) {
                   actors = t.AlbumArtists;
-
                 }
               }
             }

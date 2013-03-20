@@ -4,12 +4,10 @@ namespace NMaier.SimpleDlna.Server
 {
   internal sealed class UpnpDevice
   {
-
     public readonly Uri Descriptor;
     public readonly string Type;
     public readonly string USN;
     public readonly Guid Uuid;
-
 
 
     public UpnpDevice(Guid aUuid, string aType, Uri aDescriptor)

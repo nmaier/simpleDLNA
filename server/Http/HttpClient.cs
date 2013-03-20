@@ -10,43 +10,52 @@ namespace NMaier.SimpleDlna.Server
 {
   internal sealed class HttpClient : Logging, IRequest, IDisposable
   {
+    private const uint BEGIN_TIMEOUT = 30;
 
-    private readonly uint BEGIN_TIMEOUT = 30;
-    private string body;
-    private uint bodyBytes = 0;
-    private readonly byte[] buffer = new byte[2048];
     private const int BUFFER_SIZE = 1 << 16;
+
+
+    private string body;
+
+    private uint bodyBytes = 0;
+
+    private readonly byte[] buffer = new byte[2048];
+
     private static readonly Regex bytes = new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
-    private readonly TcpClient client;
-    private static IHandler Error404 = new StaticHandler(new StringResponse(HttpCodes.NOT_FOUND, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
-    private static IHandler Error416 = new StaticHandler(new StringResponse(HttpCodes.RANGE_NOT_SATISFIABLE, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
-    private static IHandler Error500 = new StaticHandler(new StringResponse(HttpCodes.INTERNAL_ERROR, "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"));
-    private bool hasHeaders = false;
+
+    private readonly static IHandler Error404 = new StaticHandler(new StringResponse(HttpCodes.NOT_FOUND, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
+
+    private readonly static IHandler Error416 = new StaticHandler(new StringResponse(HttpCodes.RANGE_NOT_SATISFIABLE, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
+
+    private readonly static IHandler Error500 = new StaticHandler(new StringResponse(HttpCodes.INTERNAL_ERROR, "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"));
+
     private readonly IHeaders headers = new Headers();
-    private DateTime lastActivity;
-    private string method;
-    private readonly HttpServer owner;
-    private string path;
+
     private readonly uint READ_TIMEOUT = (uint)TimeSpan.FromMinutes(1).TotalSeconds;
-    private MemoryStream readStream;
-    private uint requestCount = 0;
-    private IResponse response;
-    private HttpStates state;
-    private readonly NetworkStream stream;
+
     private readonly uint WRITE_TIMEOUT = (uint)TimeSpan.FromMinutes(180).TotalSeconds;
 
+    private readonly TcpClient client;
 
+    private bool hasHeaders = false;
 
-    internal enum HttpStates
-    {
-      ACCEPTED,
-      READBEGIN,
-      READING,
-      WRITEBEGIN,
-      WRITING,
-      CLOSED
-    }
+    private DateTime lastActivity;
 
+    private string method;
+
+    private readonly HttpServer owner;
+
+    private string path;
+
+    private MemoryStream readStream;
+
+    private uint requestCount = 0;
+
+    private IResponse response;
+
+    private HttpStates state;
+
+    private readonly NetworkStream stream;
 
 
     public HttpClient(HttpServer aOwner, TcpClient aClient)
@@ -64,17 +73,31 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
+    internal enum HttpStates
+    {
+      ACCEPTED,
+      CLOSED,
+      READBEGIN,
+      READING,
+      WRITEBEGIN,
+      WRITING
+    }
+
 
     public string Body
     {
-      get { return body; }
+      get
+      {
+        return body;
+      }
     }
-
     public IHeaders Headers
     {
-      get { return headers; }
+      get
+      {
+        return headers;
+      }
     }
-
     public bool IsATimeout
     {
       get
@@ -88,8 +111,6 @@ namespace NMaier.SimpleDlna.Server
           case HttpStates.READING:
             return diff > READ_TIMEOUT;
           case HttpStates.WRITING:
-            // DLNA renderers might suspend the download when having buffered enough
-            // and resume the same stream latter when buffer is emptied
             return diff > WRITE_TIMEOUT;
           case HttpStates.CLOSED:
             return true;
@@ -98,32 +119,36 @@ namespace NMaier.SimpleDlna.Server
         }
       }
     }
-
     public IPEndPoint LocalEndPoint
     {
       get;
       private set;
     }
-
     public string Method
     {
-      get { return method; }
+      get
+      {
+        return method;
+      }
     }
-
     public string Path
     {
-      get { return path; }
+      get
+      {
+        return path;
+      }
     }
-
     public IPEndPoint RemoteEndpoint
     {
       get;
       private set;
     }
-
     public HttpStates State
     {
-      get { return state; }
+      get
+      {
+        return state;
+      }
       private set
       {
         lastActivity = DateTime.Now;
@@ -131,26 +156,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-
-
-
-    public void Dispose()
-    {
-      Close();
-      if (readStream != null) {
-        readStream.Dispose();
-      }
-    }
-
-    public void Start()
-    {
-      ReadNext();
-    }
-
-    public override string ToString()
-    {
-      return RemoteEndpoint.ToString();
-    }
 
     private void Read()
     {
@@ -171,7 +176,7 @@ namespace NMaier.SimpleDlna.Server
 
       State = HttpStates.READING;
 
-      int read = 0;
+      var read = 0;
       try {
         read = stream.EndRead(result);
         if (read < 0) {
@@ -192,7 +197,7 @@ namespace NMaier.SimpleDlna.Server
       try {
         if (!hasHeaders) {
           readStream.Seek(0, SeekOrigin.Begin);
-          StreamReader reader = new StreamReader(readStream);
+          var reader = new StreamReader(readStream);
           for (var line = reader.ReadLine(); line != null; line = reader.ReadLine()) {
             line = line.Trim();
             if (string.IsNullOrEmpty(line)) {
@@ -262,20 +267,7 @@ namespace NMaier.SimpleDlna.Server
       var responseBody = response.Body;
       var st = response.Status;
 
-      long contentLength = -1;
-      string clf;
-      if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
-        try {
-          contentLength = responseBody.Length - responseBody.Position;
-          if (contentLength < 0) {
-            throw new InvalidDataException();
-          }
-          response.Headers["Content-Length"] = contentLength.ToString();
-        }
-        catch (Exception) {
-          // pass
-        }
-      }
+      long contentLength = GetContentLengthFromStream(responseBody);
 
       string ar;
       if (st == HttpCodes.OK && contentLength > 0 && headers.TryGetValue("Range", out ar)) {
@@ -285,7 +277,8 @@ namespace NMaier.SimpleDlna.Server
             throw new InvalidDataException("Not parsed!");
           }
           var totalLength = contentLength;
-          long start = 0, end = totalLength - 1;
+          var start = 0L;
+          var end = totalLength - 1;
           if (!long.TryParse(m.Groups[1].Value, out start) || start < 0) {
             throw new InvalidDataException("Not parsed");
           }
@@ -348,6 +341,24 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
+    private long GetContentLengthFromStream(Stream responseBody)
+    {
+      long contentLength = -1;
+      string clf;
+      if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
+        try {
+          contentLength = responseBody.Length - responseBody.Position;
+          if (contentLength < 0) {
+            throw new InvalidDataException();
+          }
+          response.Headers["Content-Length"] = contentLength.ToString();
+        }
+        catch (Exception) {
+        }
+      }
+      return contentLength;
+    }
+
     private void SetupResponse()
     {
       State = HttpStates.WRITEBEGIN;
@@ -362,7 +373,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       catch (Http404Exception ex) {
-        Info(String.Format("{0} - Got a 404: {1}", this, this.path), ex);
+        Info(String.Format("{0} - Got a 404: {1}", this, path), ex);
         response = Error404.HandleRequest(this);
       }
       catch (Exception ex) {
@@ -372,6 +383,7 @@ namespace NMaier.SimpleDlna.Server
       SendResponse();
     }
 
+
     internal void Close()
     {
       State = HttpStates.CLOSED;
@@ -380,8 +392,35 @@ namespace NMaier.SimpleDlna.Server
       try {
         client.Close();
       }
-      catch (Exception) { }
+      catch (Exception) {
+      }
       owner.RemoveClient(this);
+      if (stream != null) {
+        try {
+          stream.Dispose();
+        }
+        catch (ObjectDisposedException) {
+        }
+      }
+    }
+
+
+    public void Dispose()
+    {
+      Close();
+      if (readStream != null) {
+        readStream.Dispose();
+      }
+    }
+
+    public void Start()
+    {
+      ReadNext();
+    }
+
+    public override string ToString()
+    {
+      return RemoteEndpoint.ToString();
     }
   }
 }

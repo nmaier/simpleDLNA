@@ -5,8 +5,6 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public static class MoreDom
   {
-
-
     public static XmlElement EL(this XmlDocument doc, string name, string text = null)
     {
       return doc.EL(name, null, text);
@@ -23,7 +21,7 @@ namespace NMaier.SimpleDlna.Utilities
       }
       if (attributes != null) {
         foreach (var i in attributes) {
-          rv.SetAttribute(i.Key, i.Value.ToString());
+          rv.SetAttribute(i.Key, i.Value);
         }
       }
       return rv;

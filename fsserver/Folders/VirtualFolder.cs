@@ -7,13 +7,21 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class VirtualFolder : BaseFolder
   {
-
     private readonly string id;
-    private List<BaseFolder> merged = new List<BaseFolder>();
+
+    private readonly List<BaseFolder> merged = new List<BaseFolder>();
+
     private string path = null;
 
 
-
+    public VirtualFolder()
+      : this(null, null, null)
+    {
+    }
+    public VirtualFolder(FileServer server, BaseFolder parent, string name)
+      : this(server, parent, name, name)
+    {
+    }
     public VirtualFolder(FileServer server, BaseFolder parent, string name, string id)
       : base(server, parent)
     {
@@ -23,20 +31,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       childItems = new List<BaseFile>();
     }
 
-    public VirtualFolder(FileServer server, BaseFolder parent, string name)
-      : this(server, parent, name, name)
-    {
-    }
-
-    public VirtualFolder() : this(null, null, null) { }
-
-
 
     internal string Name
     {
       get;
       set;
     }
+
 
     public override string Path
     {
@@ -54,22 +55,14 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         return path;
       }
     }
-
     public override string Title
     {
-      get { return Name; }
-    }
-
-
-
-
-    public override void Cleanup()
-    {
-      base.Cleanup();
-      foreach (var m in merged) {
-        m.Cleanup();
+      get
+      {
+        return Name;
       }
     }
+
 
     internal void Merge(BaseFolder folder)
     {
@@ -81,15 +74,24 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         AddFile(item as Files.BaseFile);
       }
       foreach (var cf in folder.ChildFolders) {
-        VirtualFolder ownFolder = (from f in childFolders
-                                   where f is VirtualFolder && f.Title == cf.Title
-                                   select f as VirtualFolder
-                                   ).FirstOrDefault();
+        var ownFolder = (from f in childFolders
+                         where f is VirtualFolder && f.Title == cf.Title
+                         select f as VirtualFolder
+        ).FirstOrDefault();
         if (ownFolder == null) {
           ownFolder = new VirtualFolder(Server, this, cf.Title, cf.Id);
           childFolders.Add(ownFolder);
         }
         ownFolder.Merge(cf as BaseFolder);
+      }
+    }
+
+
+    public override void Cleanup()
+    {
+      base.Cleanup();
+      foreach (var m in merged) {
+        m.Cleanup();
       }
     }
   }

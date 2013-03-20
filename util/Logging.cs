@@ -1,57 +1,68 @@
 using System;
 using log4net;
 
+[assembly:CLSCompliant(true)]
 namespace NMaier.SimpleDlna.Utilities
 {
   public class Logging : ILog
   {
-
     private ILog _logger;
 
-
-
-    public bool IsDebugEnabled
-    {
-      get { return logger.IsDebugEnabled; }
-    }
-
-    public bool IsErrorEnabled
-    {
-      get { return logger.IsErrorEnabled; }
-    }
-
-    public bool IsFatalEnabled
-    {
-      get { return logger.IsFatalEnabled; }
-    }
-
-    public bool IsInfoEnabled
-    {
-      get { return logger.IsInfoEnabled; }
-    }
-
-    public bool IsWarnEnabled
-    {
-      get { return logger.IsWarnEnabled; }
-    }
 
     private ILog logger
     {
       get
       {
         if (_logger == null) {
-          _logger = LogManager.GetLogger(this.GetType());
+          _logger = LogManager.GetLogger(GetType());
         }
         return _logger;
       }
     }
 
+
+    public bool IsDebugEnabled
+    {
+      get
+      {
+        return logger.IsDebugEnabled;
+      }
+    }
+    public bool IsErrorEnabled
+    {
+      get
+      {
+        return logger.IsErrorEnabled;
+      }
+    }
+    public bool IsFatalEnabled
+    {
+      get
+      {
+        return logger.IsFatalEnabled;
+      }
+    }
+    public bool IsInfoEnabled
+    {
+      get
+      {
+        return logger.IsInfoEnabled;
+      }
+    }
+    public bool IsWarnEnabled
+    {
+      get
+      {
+        return logger.IsWarnEnabled;
+      }
+    }
     public log4net.Core.ILogger Logger
     {
-      get { return logger.Logger; }
+      get
+      {
+        return logger.Logger;
+      }
     }
-
-
 
 
     public void Debug(object message)

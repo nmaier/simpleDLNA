@@ -4,13 +4,21 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class VirtualClonedFolder : VirtualFolder
   {
-
     private readonly BaseFolder clone;
-    private readonly MediaTypes types;
+
+    private readonly DlnaMediaTypes types;
 
 
-
-    public VirtualClonedFolder(FileServer server, BaseFolder parent, string name, MediaTypes types = MediaTypes.AUDIO | MediaTypes.IMAGE | MediaTypes.VIDEO)
+    public VirtualClonedFolder(BaseFolder parent)
+      : this(parent.Server, parent, parent.Path)
+    {
+    }
+    public VirtualClonedFolder(BaseFolder parent, string name)
+      : this(parent.Server, parent, name)
+    {
+    }
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public VirtualClonedFolder(FileServer server, BaseFolder parent, string name, DlnaMediaTypes types = DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
       : base(server, null, name)
     {
       this.types = types;
@@ -20,22 +28,15 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       Cleanup();
     }
 
-    public VirtualClonedFolder(BaseFolder parent, string name) : this(parent.Server, parent, name) { }
 
-    public VirtualClonedFolder(BaseFolder parent) : this(parent.Server, parent, parent.Path) { }
-
-
-
-    public override string Path { get { return Name; } }
-
-
-
-
-    public override void Cleanup()
+    public override string Path
     {
-      base.Cleanup();
-      clone.Cleanup();
+      get
+      {
+        return Name;
+      }
     }
+
 
     private void CloneFolder(VirtualFolder parent, IMediaFolder folder)
     {
@@ -49,6 +50,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
           parent.AddFile(i as Files.BaseFile);
         }
       }
+    }
+
+
+    public override void Cleanup()
+    {
+      base.Cleanup();
+      clone.Cleanup();
     }
   }
 }

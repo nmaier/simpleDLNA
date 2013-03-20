@@ -8,19 +8,24 @@ using System.Timers;
 using NMaier.SimpleDlna.Server.Ssdp;
 using NMaier.SimpleDlna.Utilities;
 
+[assembly:CLSCompliant(true)]
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpServer : Logging, IDisposable
   {
-
     private readonly Dictionary<HttpClient, DateTime> clients = new Dictionary<HttpClient, DateTime>();
-    private readonly TcpListener listener;
+
     private readonly Dictionary<string, IPrefixHandler> prefixes = new Dictionary<string, IPrefixHandler>();
+
     private readonly Dictionary<Guid, MediaMount> servers = new Dictionary<Guid, MediaMount>();
+
     public static readonly string Signature = GenerateServerSignature();
-    private readonly SsdpHandler ssdpServer;
+
     private readonly Timer timeouter = new Timer(10 * 1000);
 
+    private readonly TcpListener listener;
+
+    private readonly SsdpHandler ssdpServer;
 
 
     public HttpServer(int port = 0)
@@ -42,67 +47,16 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
-
-
-    public void Dispose()
-    {
-      Debug("Disposing HTTP");
-      timeouter.Enabled = false;
-      foreach (var s in servers.Values.ToList()) {
-        UnregisterMediaServer(s);
-      }
-      ssdpServer.Dispose();
-      timeouter.Dispose();
-      listener.Stop();
-      lock (clients) {
-        foreach (var c in clients.ToList()) {
-          c.Key.Dispose();
-        }
-        clients.Clear();
-      }
-    }
-
-    public void RegisterMediaServer(IMediaServer server)
-    {
-      var guid = server.Uuid;
-      if (servers.ContainsKey(guid)) {
-        throw new ArgumentException("Attempting to register more than once");
-      }
-
-      var end = listener.LocalEndpoint as IPEndPoint;
-      var mount = new MediaMount(server);
-      servers[guid] = mount;
-      RegisterHandler(mount);
-
-      foreach (var address in IP.ExternalAddresses) {
-        var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
-        ssdpServer.RegisterNotification(guid, uri);
-        InfoFormat("New mount at: {0}", uri);
-      }
-    }
-
-    public void UnregisterMediaServer(IMediaServer server)
-    {
-      MediaMount mount;
-      if (!servers.TryGetValue(server.Uuid, out mount)) {
-        return;
-      }
-
-      ssdpServer.UnregisterNotification(server.Uuid);
-      UnregisterHandler(mount);
-      servers.Remove(server.Uuid);
-      InfoFormat("Unregistered Media Server {0}", server.Uuid);
-    }
-
     private void Accept()
     {
       try {
         if (!listener.Server.IsBound) {
           return;
         }
-        listener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallback), null);
+        listener.BeginAcceptTcpClient(AcceptCallback, null);
       }
-      catch (ObjectDisposedException) { }
+      catch (ObjectDisposedException) {
+      }
       catch (Exception ex) {
         Fatal("Failed to accept", ex);
       }
@@ -125,7 +79,8 @@ namespace NMaier.SimpleDlna.Server
           throw;
         }
       }
-      catch (ObjectDisposedException) { }
+      catch (ObjectDisposedException) {
+      }
       catch (Exception ex) {
         Error("Failed to accept a client", ex);
       }
@@ -143,6 +98,8 @@ namespace NMaier.SimpleDlna.Server
         case PlatformID.Win32S:
         case PlatformID.Win32Windows:
           pstring = "WIN";
+          break;
+        default:
           break;
       }
       return String.Format(
@@ -168,6 +125,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
     }
+
 
     internal IPrefixHandler FindHandler(string prefix)
     {
@@ -212,6 +170,57 @@ namespace NMaier.SimpleDlna.Server
     {
       prefixes.Remove(handler.Prefix);
       DebugFormat("Unregistered Handler for {0}", handler.Prefix);
+    }
+
+
+    public void Dispose()
+    {
+      Debug("Disposing HTTP");
+      timeouter.Enabled = false;
+      foreach (var s in servers.Values.ToList()) {
+        UnregisterMediaServer(s);
+      }
+      ssdpServer.Dispose();
+      timeouter.Dispose();
+      listener.Stop();
+      lock (clients) {
+        foreach (var c in clients.ToList()) {
+          c.Key.Dispose();
+        }
+        clients.Clear();
+      }
+    }
+
+    public void RegisterMediaServer(IMediaServer server)
+    {
+      var guid = server.Uuid;
+      if (servers.ContainsKey(guid)) {
+        throw new ArgumentException("Attempting to register more than once");
+      }
+
+      var end = listener.LocalEndpoint as IPEndPoint;
+      var mount = new MediaMount(server);
+      servers[guid] = mount;
+      RegisterHandler(mount);
+
+      foreach (var address in IP.ExternalIPAddresses) {
+        var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
+        ssdpServer.RegisterNotification(guid, uri);
+        InfoFormat("New mount at: {0}", uri);
+      }
+    }
+
+    public void UnregisterMediaServer(IMediaServer server)
+    {
+      MediaMount mount;
+      if (!servers.TryGetValue(server.Uuid, out mount)) {
+        return;
+      }
+
+      ssdpServer.UnregisterNotification(server.Uuid);
+      UnregisterHandler(mount);
+      servers.Remove(server.Uuid);
+      InfoFormat("Unregistered Media Server {0}", server.Uuid);
     }
   }
 }

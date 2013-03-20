@@ -12,7 +12,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 {
   internal sealed class SsdpHandler : Logging, IDisposable
   {
-
     private readonly UdpClient client = new UdpClient();
     private readonly Threading.AutoResetEvent datagramPosted = new Threading.AutoResetEvent(false);
     private const int DATAGRAMS_PER_MESSAGE = 3;
@@ -62,7 +61,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       queueTimer.Enabled = false;
       notificationTimer.Dispose();
       queueTimer.Dispose();
-
+      datagramPosted.Dispose();
     }
 
     private void ProcessQueue(object sender, Timers.ElapsedEventArgs e)
@@ -90,9 +89,10 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private void Receive()
     {
       try {
-        client.BeginReceive(new AsyncCallback(ReceiveCallback), null);
+        client.BeginReceive(ReceiveCallback, null);
       }
-      catch (ObjectDisposedException) { }
+      catch (ObjectDisposedException) {
+      }
     }
 
     private void ReceiveCallback(IAsyncResult result)
@@ -149,7 +149,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private void SendSearchResponse(IPEndPoint endpoint, UpnpDevice dev)
     {
       var headers = new RawHeaders();
-      var method = "HTTP/1.1 200 OK\r\n";
       headers.Add("CACHE-CONTROL", "max-age = 720");
       headers.Add("DATE", DateTime.Now.ToString("R"));
       headers.Add("EXT", "");
@@ -158,7 +157,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       headers.Add("ST", dev.Type);
       headers.Add("USN", dev.USN);
 
-      SendDatagram(endpoint, method + headers.HeaderBlock + "\r\n", false);
+      SendDatagram(endpoint, String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock), false);
       InfoFormat("{1} - Responded to a {0} request", dev.Type, endpoint);
     }
 
@@ -183,7 +182,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     {
       Debug("NotifyDevice");
       var headers = new RawHeaders();
-      var method = "NOTIFY * HTTP/1.1\r\n";
       headers.Add("HOST", "239.255.255.250:1900");
       headers.Add("CACHE-CONTROL", "max-age = 720");
       headers.Add("LOCATION", dev.Descriptor.ToString());
@@ -192,7 +190,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       headers.Add("NT", dev.Type);
       headers.Add("USN", dev.USN);
 
-      SendDatagram(SSDP_ENDP, method + headers.HeaderBlock + "\r\n", sticky);
+      SendDatagram(SSDP_ENDP, String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock), sticky);
       DebugFormat("{0} said {1}", dev.USN, type);
     }
 
@@ -202,7 +200,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       if (!devices.TryGetValue(UUID, out list)) {
         devices.Add(UUID, list = new List<UpnpDevice>());
       }
-      foreach (var t in new string[] { "upnp:rootdevice", "urn:schemas-upnp-org:device:MediaServer:1", "urn:schemas-upnp-org:service:ContentDirectory:1", "uuid:" + UUID.ToString() }) {
+      foreach (var t in new string[] { "upnp:rootdevice", "urn:schemas-upnp-org:device:MediaServer:1", "urn:schemas-upnp-org:service:ContentDirectory:1", "uuid:" + UUID }) {
         list.Add(new UpnpDevice(UUID, t, Descriptor));
       }
 

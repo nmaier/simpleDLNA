@@ -3,20 +3,22 @@ using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer.Comparers
 {
-  class DateComparer : TitleComparer
+  internal class DateComparer : TitleComparer
   {
-
     public override string Description
     {
-      get { return "Sort by file date"; }
+      get
+      {
+        return "Sort by file date";
+      }
     }
-
     public override string Name
     {
-      get { return "date"; }
+      get
+      {
+        return "date";
+      }
     }
-
-
 
 
     public override int Compare(IMediaItem x, IMediaItem y)

@@ -9,12 +9,9 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  internal sealed class VideoThumbnailer : Logging, IThumbnailer
+  internal sealed class VideoThumbnailer : Logging, IThumbnailer, IDisposable
   {
-
     private Semaphore semaphore = new Semaphore(2, 2);
-
-
 
     public VideoThumbnailer()
     {
@@ -23,15 +20,21 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
-
-
-    public MediaTypes Handling
+    public DlnaMediaTypes Handling
     {
-      get { return MediaTypes.VIDEO; }
+      get
+      {
+        return DlnaMediaTypes.Video;
+      }
     }
 
-
-
+    public void Dispose()
+    {
+      if (semaphore != null) {
+        semaphore.Dispose();
+        semaphore = null;
+      }
+    }
 
     public MemoryStream GetThumbnail(object item, ref int width, ref int height)
     {
@@ -94,14 +97,17 @@ namespace NMaier.SimpleDlna.Thumbnails
           if (length < 10 * (1 << 20)) {
             pos = 5;
           }
-          else if (length > 100 * (1 << 20)) {
-            pos = 60;
-          }
-          else if (length > 50 * (1 << 20)) {
-            pos = 60;
-          }
+          else
+            if (length > 100 * (1 << 20)) {
+              pos = 60;
+            }
+            else
+              if (length > 50 * (1 << 20)) {
+                pos = 60;
+              }
         }
-        catch (Exception) { }
+        catch (Exception) {
+        }
 
         var sti = p.StartInfo;
 #if !DEBUG
@@ -129,7 +135,6 @@ namespace NMaier.SimpleDlna.Thumbnails
     private MemoryStream GetThumbnailInternal(FileInfo file, ref int width, ref int height)
     {
       using (var p = new Process()) {
-
         var sti = p.StartInfo;
 #if !DEBUG
         sti.CreateNoWindow = true;

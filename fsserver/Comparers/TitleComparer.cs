@@ -5,24 +5,25 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer.Comparers
 {
-  class TitleComparer : IItemComparer, IComparer
+  internal class TitleComparer : IItemComparer, IComparer
   {
-
-    private static StringComparer comp = new NaturalStringComparer();
-
+    private readonly static StringComparer comp = new NaturalStringComparer();
 
 
     public virtual string Description
     {
-      get { return "Sort alphabetically"; }
+      get
+      {
+        return "Sort alphabetically";
+      }
     }
-
     public virtual string Name
     {
-      get { return "title"; }
+      get
+      {
+        return "title";
+      }
     }
-
-
 
 
     public virtual int Compare(IMediaItem x, IMediaItem y)

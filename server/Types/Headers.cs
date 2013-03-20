@@ -9,14 +9,11 @@ namespace NMaier.SimpleDlna.Server
 {
   public class Headers : IHeaders
   {
-
     private readonly bool asIs = false;
-    private Dictionary<string, string> dict = new Dictionary<string, string>();
-    static private Regex validator = new Regex(
-      @"^[a-z\d][a-z\d_.-]+$",
-      RegexOptions.Compiled | RegexOptions.IgnoreCase
-      );
 
+    private readonly Dictionary<string, string> dict = new Dictionary<string, string>();
+
+    private readonly static Regex validator = new Regex(@"^[a-z\d][a-z\d_.-]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 
     protected Headers(bool asIs = false)
@@ -24,15 +21,20 @@ namespace NMaier.SimpleDlna.Server
       this.asIs = asIs;
     }
 
-    public Headers() : this(false) { }
 
+    public Headers()
+      : this(false)
+    {
+    }
 
 
     public int Count
     {
-      get { return dict.Count; }
+      get
+      {
+        return dict.Count;
+      }
     }
-
     public string HeaderBlock
     {
       get
@@ -44,7 +46,6 @@ namespace NMaier.SimpleDlna.Server
         return hb.ToString();
       }
     }
-
     public Stream HeaderStream
     {
       get
@@ -52,16 +53,28 @@ namespace NMaier.SimpleDlna.Server
         return new MemoryStream(Encoding.ASCII.GetBytes(HeaderBlock));
       }
     }
-
     public bool IsReadOnly
     {
-      get { return false; }
+      get
+      {
+        return false;
+      }
     }
-
     public ICollection<string> Keys
     {
-      get { return dict.Keys; }
+      get
+      {
+        return dict.Keys;
+      }
     }
+    public ICollection<string> Values
+    {
+      get
+      {
+        return dict.Values;
+      }
+    }
+
 
     public string this[string key]
     {
@@ -75,22 +88,33 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public ICollection<string> Values
+
+    private string Normalize(string header)
     {
-      get { return dict.Values; }
+      if (!asIs) {
+        header = header.ToLower();
+      }
+      header = header.Trim();
+      if (!validator.IsMatch(header)) {
+        throw new ArgumentException("Invalid header: " + header);
+      }
+      return header;
     }
 
-
-
-
-    public void Add(string key, string value)
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
-      dict.Add(Normalize(key), value);
+      return dict.GetEnumerator();
     }
+
 
     public void Add(KeyValuePair<string, string> item)
     {
       Add(item.Key, item.Value);
+    }
+
+    public void Add(string key, string value)
+    {
+      dict.Add(Normalize(key), value);
     }
 
     public void Clear()
@@ -129,31 +153,15 @@ namespace NMaier.SimpleDlna.Server
       return Remove(item.Key);
     }
 
+    public override string ToString()
+    {
+      return string.Format("({0})", string.Join(", ", (from x in dict
+                                                       select string.Format("{0}={1}", x.Key, x.Value))));
+    }
+
     public bool TryGetValue(string key, out string value)
     {
       return dict.TryGetValue(Normalize(key), out value);
-    }
-
-    private string Normalize(string header)
-    {
-      if (!asIs) {
-        header = header.ToLower();
-      }
-      header = header.Trim();
-      if (!validator.IsMatch(header)) {
-        throw new ArgumentException("Invalid header: " + header);
-      }
-      return header;
-    }
-
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-    {
-      return dict.GetEnumerator();
-    }
-
-    public override string ToString()
-    {
-      return string.Format("({0})", string.Join(", ", (from x in dict select string.Format("{0}={1}", x.Key, x.Value))));
     }
   }
 }

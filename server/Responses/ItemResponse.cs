@@ -1,17 +1,17 @@
-using System;
-using System.IO;
 using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
+using System;
+using System.IO;
 
 namespace NMaier.SimpleDlna.Server
 {
   internal sealed class ItemResponse : Logging, IResponse
   {
-
     private readonly Headers headers = new ResponseHeaders();
-    private readonly IMediaResource item;
-    private HttpCodes status = HttpCodes.OK;
 
+    private readonly HttpCodes status = HttpCodes.OK;
+
+    private readonly IMediaResource item;
 
 
     public ItemResponse(IRequest request, IMediaResource aItem, string transferMode = "Streaming")
@@ -25,7 +25,7 @@ namespace NMaier.SimpleDlna.Server
       headers.Add("Accept-Ranges", "bytes");
       headers.Add("Content-Type", DlnaMaps.Mime[item.Type]);
       if (request.Headers.ContainsKey("getcontentFeatures.dlna.org")) {
-        if (item.Type == DlnaType.JPEG) {
+        if (item.Type == DlnaMime.JPEG) {
           headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=00D00000000000000000000000000000", item.PN));
         }
         else {
@@ -38,20 +38,26 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
-
     public Stream Body
     {
-      get { return item.Content; }
+      get
+      {
+        return item.Content;
+      }
     }
-
     public IHeaders Headers
     {
-      get { return headers; }
+      get
+      {
+        return headers;
+      }
     }
-
     public HttpCodes Status
     {
-      get { return status; }
+      get
+      {
+        return status;
+      }
     }
   }
 }

@@ -11,16 +11,12 @@ namespace NMaier.SimpleDlna.Thumbnails
 {
   public sealed class Thumbnailer : Logging
   {
-
     private static readonly LruDictionary<string, CacheItem> cache = new LruDictionary<string, CacheItem>(1 << 11);
-    private static readonly Dictionary<MediaTypes, List<IThumbnailer>> thumbers = new Dictionary<MediaTypes, List<IThumbnailer>>();
-
-
-
+    private static readonly Dictionary<DlnaMediaTypes, List<IThumbnailer>> thumbers = new Dictionary<DlnaMediaTypes, List<IThumbnailer>>();
     static Thumbnailer()
     {
-      var types = Enum.GetValues(typeof(MediaTypes));
-      foreach (MediaTypes i in types) {
+      var types = Enum.GetValues(typeof(DlnaMediaTypes));
+      foreach (DlnaMediaTypes i in types) {
         thumbers.Add(i, new List<IThumbnailer>());
       }
       var a = Assembly.GetExecutingAssembly();
@@ -36,16 +32,13 @@ namespace NMaier.SimpleDlna.Thumbnails
         if (thumber == null) {
           continue;
         }
-        foreach (MediaTypes i in types) {
+        foreach (DlnaMediaTypes i in types) {
           if (thumber.Handling.HasFlag(i)) {
             thumbers[i].Add(thumber);
           }
         }
       }
     }
-
-
-
 
     public byte[] GetThumbnail(FileSystemInfo file, ref int width, ref int height)
     {
@@ -64,7 +57,8 @@ namespace NMaier.SimpleDlna.Thumbnails
       return GetThumbnailInternal(key, file, mediaType, ref width, ref height);
     }
 
-    public byte[] GetThumbnail(string key, MediaTypes type, Stream stream, ref int width, ref int height)
+    [CLSCompliant(false)]
+    public byte[] GetThumbnail(string key, DlnaMediaTypes type, Stream stream, ref int width, ref int height)
     {
       byte[] rv;
       if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
@@ -87,7 +81,7 @@ namespace NMaier.SimpleDlna.Thumbnails
       return false;
     }
 
-    private byte[] GetThumbnailInternal(string key, object item, MediaTypes type, ref int width, ref int height)
+    private byte[] GetThumbnailInternal(string key, object item, DlnaMediaTypes type, ref int width, ref int height)
     {
       var thumbnailers = thumbers[type];
       var rw = width;

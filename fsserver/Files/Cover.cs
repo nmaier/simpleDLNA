@@ -10,19 +10,16 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
   [Serializable]
   internal sealed class Cover : Logging, IMediaCoverResource, ISerializable
   {
-
     private byte[] _bytes;
+
     private readonly FileInfo file;
+
     private int height = 240;
+
     private static readonly Thumbnailer thumber = new Thumbnailer();
+
     private int width = 240;
 
-
-
-    internal Cover(FileInfo aFile, Stream aStream)
-    {
-      _bytes = thumber.GetThumbnail(aFile.FullName, MediaTypes.IMAGE, aStream, ref width, ref height);
-    }
 
     private Cover(SerializationInfo info, StreamingContext ctx)
     {
@@ -31,11 +28,20 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       height = info.GetInt32("height");
     }
 
+
+    internal Cover(FileInfo aFile, Stream aStream)
+    {
+      _bytes = thumber.GetThumbnail(aFile.FullName, DlnaMediaTypes.Image, aStream, ref width, ref height);
+    }
+
+
     public Cover(FileInfo aFile)
     {
       file = aFile;
     }
 
+
+    internal event EventHandler OnCoverLazyLoaded;
 
 
     private byte[] bytes
@@ -52,75 +58,71 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
+
     public Stream Content
     {
-      get { return new MemoryStream(bytes); }
+      get
+      {
+        return new MemoryStream(bytes);
+      }
     }
-
     public string Id
     {
-      get { throw new NotImplementedException(); }
+      get
+      {
+        throw new NotImplementedException();
+      }
     }
-
-    public MediaTypes MediaType
+    public DlnaMediaTypes MediaType
     {
-      get { return MediaTypes.IMAGE; }
+      get
+      {
+        return DlnaMediaTypes.Image;
+      }
     }
-
-    public uint? MetaHeight
+    public int? MetaHeight
     {
-      get { return (uint)height; }
+      get
+      {
+        return height;
+      }
     }
-
-    public uint? MetaWidth
+    public int? MetaWidth
     {
-      get { return (uint)width; }
+      get
+      {
+        return width;
+      }
     }
-
-    public IMediaFolder Parent
-    {
-      get { throw new NotImplementedException(); }
-    }
-
     public string PN
     {
-      get { return "DLNA.ORG_PN=JPEG_TN"; }
+      get
+      {
+        return "DLNA.ORG_PN=JPEG_TN";
+      }
     }
-
     public IHeaders Properties
     {
-      get { throw new NotImplementedException(); }
+      get
+      {
+        throw new NotImplementedException();
+      }
     }
-
     public string Title
     {
-      get { throw new NotImplementedException(); }
+      get
+      {
+        throw new NotImplementedException();
+      }
     }
-
-    public DlnaType Type
+    public DlnaMime Type
     {
-      get { return DlnaType.JPEG; }
+      get
+      {
+        return DlnaMime.JPEG;
+      }
     }
 
-
-
-
-    internal event EventHandler OnCoverLazyLoaded;
-
-
-
-
-    public int CompareTo(IMediaItem other)
-    {
-      throw new NotImplementedException();
-    }
-
-    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
-    {
-      info.AddValue("bytes", _bytes);
-      info.AddValue("width", width);
-      info.AddValue("height", height);
-    }
 
     internal void ForceLoad()
     {
@@ -138,6 +140,19 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       if (OnCoverLazyLoaded != null) {
         OnCoverLazyLoaded(this, null);
       }
+    }
+
+
+    public int CompareTo(IMediaItem other)
+    {
+      throw new NotImplementedException();
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      info.AddValue("bytes", _bytes);
+      info.AddValue("width", width);
+      info.AddValue("height", height);
     }
   }
 }

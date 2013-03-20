@@ -5,8 +5,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class PlainRootFolder : PlainFolder
   {
-
-    public PlainRootFolder(string aID, FileServer server, MediaTypes types, DirectoryInfo di)
+    public PlainRootFolder(string aID, FileServer server, DlnaMediaTypes types, DirectoryInfo di)
       : base(server, types, null, di)
     {
       Id = aID;

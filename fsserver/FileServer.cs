@@ -9,25 +9,27 @@ using System.Timers;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
 
+[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
-
     private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
     private Comparers.IItemComparer comparer = new Comparers.TitleComparer();
     private bool descending = false;
     private readonly DirectoryInfo[] directories;
     private readonly string friendlyName;
     private static readonly Random idGen = new Random();
-    private Dictionary<string, WeakReference> ids = new Dictionary<string, WeakReference>();
+    private readonly Dictionary<string, WeakReference> ids = new Dictionary<string, WeakReference>();
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private Folders.BaseFolder master;
     private Dictionary<string, string> paths = new Dictionary<string, string>();
     private Files.FileStore store = null;
     private Task thumberTask;
     private readonly List<Views.IView> transformations = new List<Views.IView>();
-    private MediaTypes types;
+    private readonly DlnaMediaTypes types;
     private readonly Guid uuid = Guid.NewGuid();
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private IMediaFolder root, images, audio, video;
     private readonly FileSystemWatcher[] watchers;
     private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
@@ -35,7 +37,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
 
 
-    public FileServer(MediaTypes types, IEnumerable<DirectoryInfo> directories)
+    public FileServer(DlnaMediaTypes types, IEnumerable<DirectoryInfo> directories)
     {
       this.types = types;
       this.directories = directories.Distinct().ToArray();
@@ -48,11 +50,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
       else {
         friendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, this.directories[0].Parent.FullName, this.directories.Length - 1);
       }
-      watchers = (from d in directories select new FileSystemWatcher(d.FullName)).ToArray();
+      watchers = (from d in directories
+                                          select new FileSystemWatcher(d.FullName)).ToArray();
       uuid = DeriveUUID();
     }
 
-    public FileServer(MediaTypes types, DirectoryInfo directory)
+    public FileServer(DlnaMediaTypes types, DirectoryInfo directory)
       : this(types, new DirectoryInfo[] { directory })
     {
     }
@@ -61,18 +64,26 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public bool DescendingOrder
     {
-      get { return descending; }
-      set { descending = value; }
+      get {
+        return descending;
+      }
+      set {
+        descending = value;
+      }
     }
 
     public string FriendlyName
     {
-      get { return friendlyName; }
+      get {
+        return friendlyName;
+      }
     }
 
     public Guid Uuid
     {
-      get { return uuid; }
+      get {
+        return uuid;
+      }
     }
 
 
@@ -96,8 +107,19 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (changeTimer != null) {
         changeTimer.Dispose();
       }
+      if (watchTimer != null) {
+        watchTimer.Dispose();
+      }
       if (store != null) {
         store.Dispose();
+      }
+      if (thumberTask != null) {
+        try {
+          thumberTask.Dispose();
+          thumberTask = null;
+        }
+        catch (ObjectDisposedException) {
+        }
       }
     }
 
@@ -108,7 +130,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public void Load()
     {
-      if (types == MediaTypes.AUDIO && transformations.Count == 0) {
+      if (types == DlnaMediaTypes.Audio && transformations.Count == 0) {
         AddView("music");
       }
       DoRoot();
@@ -118,9 +140,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
       foreach (var watcher in watchers) {
         watcher.IncludeSubdirectories = true;
-        watcher.Created += new FileSystemEventHandler(OnChanged);
-        watcher.Deleted += new FileSystemEventHandler(OnChanged);
-        watcher.Renamed += new RenamedEventHandler(OnRenamed);
+        watcher.Created += OnChanged;
+        watcher.Deleted += OnChanged;
+        watcher.Renamed += OnRenamed;
         watcher.EnableRaisingEvents = true;
       }
 
@@ -144,9 +166,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
       comparer = ComparerRepository.Lookup(order);
     }
 
-    private IMediaFolder BuildView(Folders.BaseFolder root)
+    private IMediaFolder BuildView(Folders.BaseFolder rootFolder)
     {
-      var rv = root;
+      var rv = rootFolder;
       RegisterFolderTree(rv);
       foreach (var t in transformations) {
         rv = t.Transform(this, rv) as Folders.BaseFolder;
@@ -209,13 +231,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
         ids["0"] = new WeakReference(root = BuildView(newMaster));
 
-        images = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "I", types & MediaTypes.IMAGE));
+        images = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "I", types & DlnaMediaTypes.Image));
         ids["I"] = new WeakReference(images);
 
-        audio = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "A", types & MediaTypes.AUDIO));
+        audio = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "A", types & DlnaMediaTypes.Audio));
         ids["A"] = new WeakReference(audio);
 
-        video = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "V", types & MediaTypes.VIDEO));
+        video = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "V", types & DlnaMediaTypes.Video));
         ids["V"] = new WeakReference(video);
 
         master = newMaster;
@@ -325,37 +347,39 @@ namespace NMaier.SimpleDlna.FileMediaServer
           return;
         }
         var files = (from i in ids.Values
-                     let f = (i.Target as Files.BaseFile)
-                     where f != null
-                     select new WeakReference(f)).ToList();
+                                               let f = (i.Target as Files.BaseFile)
+                                               where f != null
+                                               select new WeakReference(f)).ToList();
         thumberTask = new Task(() =>
         {
-          try {
-            foreach (var i in files) {
-              try {
-                var item = (i.Target as Files.BaseFile);
-                if (item == null) {
-                  continue;
+          using (thumberTask) {
+            try {
+              foreach (var i in files) {
+                try {
+                  var item = (i.Target as Files.BaseFile);
+                  if (item == null) {
+                    continue;
+                  }
+                  if (store.HasCover(item)) {
+                    continue;
+                  }
+                  item.LoadCover();
+                  using (var k = item.Cover.Content) {
+                    k.ReadByte();
+                  }
                 }
-                if (store.HasCover(item)) {
-                  continue;
+                catch (Exception ex) {
+                  Debug("Failed to thumb", ex);
                 }
-                item.LoadCover();
-                using (var k = item.Cover.Content) {
-                  k.ReadByte();
-                }
-              }
-              catch (Exception ex) {
-                Debug("Failed to thumb", ex);
               }
             }
-          }
-          catch (Exception ex) {
-            Error(ex);
-          }
-          finally {
-            thumberTask = null;
-            GC.Collect();
+            catch (Exception ex) {
+              Error(ex);
+            }
+            finally {
+              thumberTask = null;
+              GC.Collect();
+            }
           }
         }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
         thumberTask.Start();
@@ -388,7 +412,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       var mediaType = DlnaMaps.Ext2Media[ext];
 
       if (store != null) {
-        var sv = store.MaybeGetFile(this, aParent, info, type);
+        var sv = store.MaybeGetFile(this, info, type);
         if (sv != null) {
           return sv;
         }

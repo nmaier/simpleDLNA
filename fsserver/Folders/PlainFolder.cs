@@ -10,12 +10,10 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 {
   internal class PlainFolder : BaseFolder, IMetaInfo
   {
-
     private readonly DirectoryInfo dir;
 
 
-
-    public PlainFolder(FileServer server, MediaTypes types, BaseFolder aParent, DirectoryInfo aDir)
+    public PlainFolder(FileServer server, DlnaMediaTypes types, BaseFolder aParent, DirectoryInfo aDir)
       : base(server, aParent)
     {
       dir = aDir;
@@ -32,7 +30,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
         foreach (var ext in i.Value) {
           var _files = from f in dir.GetFiles("*." + ext)
                        select f;
-          var files = new List<Files.BaseFile>();
+          var files = new List<BaseFile>();
           foreach (var f in _files) {
             try {
               files.Add(server.GetFile(this, f));
@@ -48,25 +46,33 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
     }
 
 
-
     public DateTime InfoDate
     {
-      get { return dir.LastWriteTimeUtc; }
+      get
+      {
+        return dir.LastWriteTimeUtc;
+      }
     }
-
     public long? InfoSize
     {
-      get { return null; }
+      get
+      {
+        return null;
+      }
     }
-
     public override string Path
     {
-      get { return dir.FullName; }
+      get
+      {
+        return dir.FullName;
+      }
     }
-
     public override string Title
     {
-      get { return dir.Name; }
+      get
+      {
+        return dir.Name;
+      }
     }
   }
 }

@@ -7,10 +7,14 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public static class Sqlite
   {
-
-
     public static IDbConnection GetDatabaseConnection(FileInfo database)
     {
+      if (database == null) {
+        throw new ArgumentNullException("database");
+      }
+      if (database.Exists && database.IsReadOnly) {
+        throw new ArgumentException("Database file is read only", "database");
+      }
       var cs = string.Format("Uri=file:{0}", database.FullName);
       IDbConnection rv = null;
       if (Type.GetType("Mono.Runtime") == null) {

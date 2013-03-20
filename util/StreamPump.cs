@@ -4,22 +4,13 @@ using System.Threading;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  public enum StreamPumpResult
+  public sealed class StreamPump : Logging, IDisposable
   {
-    Delivered,
-    Aborted
-  };
+    private readonly byte[] buffer;
 
-  public delegate void StreamPumpCallback(StreamPump pump, StreamPumpResult result);
+    private readonly StreamPumpCallback callback;
 
-  public class StreamPump : Logging
-  {
-
-    byte[] buffer;
-    private StreamPumpCallback callback;
-    public readonly Stream Input, Output;
-    SemaphoreSlim sem = new SemaphoreSlim(0, 1);
-
+    private readonly SemaphoreSlim sem = new SemaphoreSlim(0, 1);
 
 
     public StreamPump(Stream inputStream, Stream outputStream, StreamPumpCallback callback, int bufferSize)
@@ -32,17 +23,17 @@ namespace NMaier.SimpleDlna.Utilities
     }
 
 
+    public Stream Input { get; private set; }
+    public Stream Output { get; private set; }
 
-
-    public bool Wait(int timeout)
-    {
-      return sem.Wait(timeout);
-    }
 
     private void Finish(StreamPumpResult result)
     {
       if (callback != null) {
-        callback.BeginInvoke(this, result, ir => { callback.EndInvoke(ir); }, null);
+        callback.BeginInvoke(this, result, ir =>
+        {
+          callback.EndInvoke(ir);
+        }, null);
       }
       sem.Release();
     }
@@ -87,6 +78,17 @@ namespace NMaier.SimpleDlna.Utilities
         Error(ex);
         Finish(StreamPumpResult.Aborted);
       }
+    }
+
+
+    public void Dispose()
+    {
+      sem.Dispose();
+    }
+
+    public bool Wait(int timeout)
+    {
+      return sem.Wait(timeout);
     }
   }
 }
