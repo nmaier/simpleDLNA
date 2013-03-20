@@ -222,59 +222,59 @@ namespace NMaier.SimpleDlna
 
 
 
-    [GetOptOptions(AcceptPrefixType = ArgumentPrefixType.Dashes)]
+    [GetOptOptions(AcceptPrefixType = ArgumentPrefixTypes.Dashes)]
     private class Options : GetOpt
     {
-      [Argument("cache", Helpvar = "file", Helptext = "Cache file to use for storing meta data (default: none)")]
+      [Argument("cache", HelpVar = "file", HelpText = "Cache file to use for storing meta data (default: none)")]
       [ShortArgument('c')]
       public FileInfo CacheFile = null;
-      [Argument("sort-descending", Helptext = "Sort order; see --list-sort-orders")]
+      [Argument("sort-descending", HelpText = "Sort order; see --list-sort-orders")]
       [ShortArgument('d')]
       [FlagArgument(true)]
       public bool DescendingOrder = false;
       [Parameters(HelpVar = "Directory")]
       public DirectoryInfo[] Directories = new DirectoryInfo[] { new DirectoryInfo(".") };
-      [Argument("list-sort-orders", Helptext = "List all available sort orders")]
+      [Argument("list-sort-orders", HelpText = "List all available sort orders")]
       [FlagArgument(true)]
       public bool ListOrders = false;
-      [Argument("list-views", Helptext = "List all available views")]
+      [Argument("list-views", HelpText = "List all available views")]
       [FlagArgument(true)]
       public bool ListViews = false;
-      [Argument("log-file", Helptext = "Log to specified file as well (default: none)", Helpvar = "File")]
+      [Argument("log-file", HelpText = "Log to specified file as well (default: none)", HelpVar = "File")]
       public FileInfo LogFile = null;
-      [Argument("log-level", Helptext = "Log level of OFF, DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)", Helpvar = "level")]
+      [Argument("log-level", HelpText = "Log level of OFF, DEBUG, INFO, WARN, ERROR, FATAL (default: INFO)", HelpVar = "level")]
       [ShortArgument('l')]
       public string LogLevel = "INFO";
-      [Argument("sort", Helptext = "Sort order; see --list-sort-orders", Helpvar = "order")]
+      [Argument("sort", HelpText = "Sort order; see --list-sort-orders", HelpVar = "order")]
       [ShortArgument('s')]
       public string Order = null;
       private int port = 0;
-      [Argument("help", Helptext = "Print usage")]
+      [Argument("help", HelpText = "Print usage")]
       [ShortArgument('?')]
       [ShortArgumentAlias('h')]
       [FlagArgument(true)]
       public bool ShowHelp = false;
-      [Argument("version", Helptext = "Print version")]
+      [Argument("version", HelpText = "Print version")]
       [ShortArgument('V')]
       [FlagArgument(true)]
       public bool ShowVersion = false;
-      [Argument("license", Helptext = "Print license")]
+      [Argument("license", HelpText = "Print license")]
       [ShortArgument('L')]
       [FlagArgument(true)]
       public bool ShowLicense = false;
-      [Argument("type", Helptext = "Types to serv (IMAGE, VIDEO, AUDIO; default: all)")]
+      [Argument("type", HelpText = "Types to serv (IMAGE, VIDEO, AUDIO; default: all)")]
       [ArgumentAlias("what")]
       [ShortArgument('t')]
       public MediaTypes[] Types = new MediaTypes[] { MediaTypes.VIDEO, MediaTypes.IMAGE, MediaTypes.AUDIO };
-      [Argument("view", Helptext = "Apply a view (default: no views applied)", Helpvar = "view")]
+      [Argument("view", HelpText = "Apply a view (default: no views applied)", HelpVar = "view")]
       [ShortArgument('v')]
       public string[] Views = new string[0];
-      [Argument("seperate", Helptext = "Mount directories as seperate servers")]
+      [Argument("seperate", HelpText = "Mount directories as seperate servers")]
       [ShortArgument('m')]
       [FlagArgument(true)]
       public bool Seperate = false;
 
-      [Argument("port", Helpvar = "port", Helptext = "Webserver listen port (default: 0, bind an available port)")]
+      [Argument("port", HelpVar = "port", HelpText = "Webserver listen port (default: 0, bind an available port)")]
       [ShortArgument('p')]
       public int Port
       {
