@@ -41,7 +41,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
               client.EndSend(result);
             }
             catch (Exception ex) {
-              Error(ex);
+              Debug(ex);
             }
             finally {
               try {
