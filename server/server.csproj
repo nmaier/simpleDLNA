@@ -121,6 +121,7 @@
     <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Views\IView.cs" />
     <Compile Include="Views\KeyedVirtualFolder.cs" />
+    <Compile Include="Views\LargeView.cs" />
     <Compile Include="Views\MusicView.cs" />
     <Compile Include="Views\PlainView.cs" />
     <Compile Include="Views\SeriesView.cs" />
