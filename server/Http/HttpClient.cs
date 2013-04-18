@@ -84,6 +84,16 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
+    private HttpStates State
+    {
+      set
+      {
+        lastActivity = DateTime.Now;
+        state = value;
+      }
+    }
+
+
     public string Body
     {
       get
@@ -115,7 +125,7 @@ namespace NMaier.SimpleDlna.Server
           case HttpStates.CLOSED:
             return true;
           default:
-            throw new ApplicationException("Invalid state");
+            throw new InvalidOperationException("Invalid state");
         }
       }
     }
@@ -143,19 +153,25 @@ namespace NMaier.SimpleDlna.Server
       get;
       private set;
     }
-    public HttpStates State
-    {
-      get
-      {
-        return state;
-      }
-      private set
-      {
-        lastActivity = DateTime.Now;
-        state = value;
-      }
-    }
 
+
+    private long GetContentLengthFromStream(Stream responseBody)
+    {
+      long contentLength = -1;
+      string clf;
+      if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
+        try {
+          contentLength = responseBody.Length - responseBody.Position;
+          if (contentLength < 0) {
+            throw new InvalidDataException();
+          }
+          response.Headers["Content-Length"] = contentLength.ToString();
+        }
+        catch (Exception) {
+        }
+      }
+      return contentLength;
+    }
 
     private void Read()
     {
@@ -262,12 +278,14 @@ namespace NMaier.SimpleDlna.Server
       Read();
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "NMaier.SimpleDlna.Utilities.StreamPump"),
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void SendResponse()
     {
       var responseBody = response.Body;
       var st = response.Status;
 
-      long contentLength = GetContentLengthFromStream(responseBody);
+      var contentLength = GetContentLengthFromStream(responseBody);
 
       string ar;
       if (st == HttpCodes.OK && contentLength > 0 && headers.TryGetValue("Range", out ar)) {
@@ -339,24 +357,6 @@ namespace NMaier.SimpleDlna.Server
         rs.Dispose();
         throw;
       }
-    }
-
-    private long GetContentLengthFromStream(Stream responseBody)
-    {
-      long contentLength = -1;
-      string clf;
-      if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
-        try {
-          contentLength = responseBody.Length - responseBody.Position;
-          if (contentLength < 0) {
-            throw new InvalidDataException();
-          }
-          response.Headers["Content-Length"] = contentLength.ToString();
-        }
-        catch (Exception) {
-        }
-      }
-      return contentLength;
     }
 
     private void SetupResponse()

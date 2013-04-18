@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Comparers
+namespace NMaier.SimpleDlna.Server.Comparers
 {
   public interface IItemComparer : IComparer<IMediaItem>, IRepositoryItem
   {

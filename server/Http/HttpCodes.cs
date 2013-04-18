@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace NMaier.SimpleDlna.Server
 {
   internal enum HttpCodes : uint

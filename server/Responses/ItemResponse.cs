@@ -1,7 +1,7 @@
-using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
 using System;
 using System.IO;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {

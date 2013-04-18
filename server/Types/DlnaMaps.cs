@@ -54,6 +54,7 @@ namespace NMaier.SimpleDlna.Server
     private static readonly string[] wmvs = new string[] { "wmv", "asf", "wma", "wmf" };
 
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
     static DlnaMaps()
     {
       var e2d = new[] {

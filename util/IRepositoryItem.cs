@@ -1,4 +1,4 @@
-namespace NMaier.SimpleDlna.FileMediaServer
+namespace NMaier.SimpleDlna.Utilities
 {
   public interface IRepositoryItem
   {

@@ -11,6 +11,9 @@ using log4net.Layout;
 using NMaier.GetOptNet;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Views;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna
 {
@@ -117,7 +120,7 @@ namespace NMaier.SimpleDlna
               server.InfoFormat("Mounting FileServer for {0}", d.FullName);
               var fs = SetupFileServer(options, types, new DirectoryInfo[] { d });
               friendlyName = fs.FriendlyName;
-              server.RegisterMediaServer(fs);
+              server.RegisterMediaServer(fs, options.Order, options.DescendingOrder);
               server.InfoFormat("{0} mounted", d.FullName);
             }
           }
@@ -125,7 +128,7 @@ namespace NMaier.SimpleDlna
             server.InfoFormat("Mounting FileServer for {0} ({1})", options.Directories[0], options.Directories.Length);
             var fs = SetupFileServer(options, types, options.Directories);
             friendlyName = fs.FriendlyName;
-            server.RegisterMediaServer(fs);
+            server.RegisterMediaServer(fs, options.Order, options.DescendingOrder);
             server.InfoFormat("{0} ({1}) mounted", options.Directories[0], options.Directories.Length);
           }
 
@@ -158,31 +161,20 @@ namespace NMaier.SimpleDlna
 
     private static FileServer SetupFileServer(Options options, DlnaMediaTypes types, DirectoryInfo[] d)
     {
-      var fs = new FileServer(types, d);
+      var ids = new Identifiers();
+      foreach (var v in options.Views) {
+        try {
+          ids.AddView(v);
+        }
+        catch (RepositoryLookupException) {
+          throw new GetOptException("Invalid view " + v);
+        }
+      }
+      var fs = new FileServer(types, ids, d);
       try {
-        foreach (var v in options.Views) {
-          try {
-            fs.AddView(v);
-          }
-          catch (RepositoryLookupException) {
-            throw new GetOptException("Invalid view " + v);
-          }
-        }
-
-        if (options.Order != null) {
-          try {
-            fs.SetOrder(options.Order);
-          }
-          catch (RepositoryLookupException) {
-            throw new GetOptException("Invalid order" + options.Order);
-          }
-        }
-        fs.DescendingOrder = options.DescendingOrder;
-
         if (options.CacheFile != null) {
           fs.SetCacheFile(options.CacheFile);
         }
-
         fs.Load();
       }
       catch (Exception) {
@@ -208,7 +200,7 @@ namespace NMaier.SimpleDlna
       a = Assembly.GetAssembly(typeof(HttpServer));
       v = a.GetName().Version;
       Console.WriteLine("Server: {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-      a = Assembly.GetAssembly(typeof(Utilities.AttributeCollection));
+      a = Assembly.GetAssembly(typeof(AttributeCollection));
       v = a.GetName().Version;
       Console.WriteLine("Utils:  {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
 

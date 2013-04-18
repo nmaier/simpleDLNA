@@ -1,7 +1,7 @@
 using System.IO;
 using NMaier.SimpleDlna.Server;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class DeserializeInfo
   {

@@ -1,8 +1,6 @@
 ﻿using System.Linq;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
-using NMaier.SimpleDlna.Server;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Views
+namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class FlattenView : IView
   {
@@ -22,66 +20,65 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
     }
 
 
-    private static void MergeFolders(BaseFolder aFrom, BaseFolder aTo)
+    private static void MergeFolders(VirtualFolder aFrom, VirtualFolder aTo)
     {
       var merges = from f in aFrom.ChildFolders
                    join t in aTo.ChildFolders on f.Title equals t.Title
                    where f != t
-                   select new { f = f as BaseFolder, t = t as BaseFolder };
+                   select new { f = f as VirtualFolder, t = t as VirtualFolder };
       foreach (var m in merges.ToList()) {
         MergeFolders(m.f, m.t);
         foreach (var c in m.f.ChildFolders.ToList()) {
-          m.t.AdoptFolder(c as BaseFolder);
+          m.t.AdoptFolder(c);
         }
         foreach (var c in m.f.ChildItems.ToList()) {
-          var file = c as Files.BaseFile;
-          m.t.AddFile(file);
-          m.f.RemoveFile(file);
+          m.t.AddResource(c);
+          m.f.RemoveResource(c);
         }
-        (m.f.Parent as BaseFolder).ReleaseFolder(m.f);
+        (m.f.Parent as VirtualFolder).ReleaseFolder(m.f);
       }
     }
 
-    private static bool TransformInternal(BaseFolder root, BaseFolder current)
+    private static bool TransformInternal(VirtualFolder root, VirtualFolder current)
     {
       foreach (var f in current.ChildFolders.ToList()) {
-        var bf = f as BaseFolder;
-        if (TransformInternal(root, bf)) {
-          current.ReleaseFolder(bf);
+        var vf = f as VirtualFolder;
+        if (TransformInternal(root, vf)) {
+          current.ReleaseFolder(vf);
         }
       }
 
       if (current == root || current.ChildItems.Count() > 3) {
         return false;
       }
-      var newParent = current.Parent as BaseFolder;
+      var newParent = current.Parent as VirtualFolder;
       foreach (var c in current.ChildItems.ToList()) {
-        newParent.AddFile(c as Files.BaseFile);
+        current.RemoveResource(c);
+        newParent.AddResource(c);
       }
 
       if (current.ChildCount != 0) {
         MergeFolders(current, newParent);
         foreach (var f in current.ChildFolders.ToList()) {
-          newParent.AdoptFolder(f as BaseFolder);
+          newParent.AdoptFolder(f);
         }
         foreach (var f in current.ChildItems.ToList()) {
-          var file = f as Files.BaseFile;
-          newParent.AddFile(file);
-          current.RemoveFile(file);
+          current.RemoveResource(f);
+          newParent.AddResource(f);
         }
       }
       return true;
     }
 
 
-    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
+    public IMediaFolder Transform(IMediaFolder Root)
     {
-      var r = new VirtualClonedFolder(Root as BaseFolder);
+      var r = new VirtualClonedFolder(Root);
       var cross = from f in r.ChildFolders
                   from t in r.ChildFolders
                   where f != t
                   orderby f.Title, t.Title
-                  select new { f = f as BaseFolder, t = t as BaseFolder };
+                  select new { f = f as VirtualFolder, t = t as VirtualFolder };
       foreach (var c in cross) {
         MergeFolders(c.f, c.t);
       }

@@ -12,7 +12,7 @@ using System.Timers;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStore : Logging, IDisposable
   {

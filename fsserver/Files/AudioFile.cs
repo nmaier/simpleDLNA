@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
   internal sealed class AudioFile : BaseFile, IMetaAudioItem, ISerializable
@@ -189,6 +189,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
     {
+      if (info == null) {
+        throw new ArgumentNullException("info");
+      }
       info.AddValue("al", album);
       info.AddValue("ar", artist);
       info.AddValue("g", genre);

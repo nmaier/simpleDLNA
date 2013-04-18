@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  public sealed class LruDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+  public sealed class LeastRecentlyUsedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
   {
     private readonly uint capacity;
 
@@ -17,12 +17,12 @@ namespace NMaier.SimpleDlna.Utilities
 
 
     [CLSCompliant(false)]
-    public LruDictionary(uint capacity)
+    public LeastRecentlyUsedDictionary(uint capacity)
     {
       this.capacity = capacity;
       toDrop = Math.Min(10, (uint)(capacity * 0.07));
     }
-    public LruDictionary(int capacity)
+    public LeastRecentlyUsedDictionary(int capacity)
       : this((uint)capacity)
     {
     }

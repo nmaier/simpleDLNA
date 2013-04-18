@@ -1,22 +1,21 @@
-using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Comparers
+namespace NMaier.SimpleDlna.Server.Comparers
 {
-  internal class DateComparer : TitleComparer
+  internal class FileSizeComparer : TitleComparer
   {
     public override string Description
     {
       get
       {
-        return "Sort by file date";
+        return "Sort by file size";
       }
     }
     public override string Name
     {
       get
       {
-        return "date";
+        return "size";
       }
     }
 
@@ -25,8 +24,8 @@ namespace NMaier.SimpleDlna.FileMediaServer.Comparers
     {
       var xm = x as IMetaInfo;
       var ym = y as IMetaInfo;
-      if (xm != null && ym != null) {
-        var rv = xm.InfoDate.CompareTo(ym.InfoDate);
+      if (xm != null && ym != null && xm.InfoSize.HasValue && ym.InfoSize.HasValue) {
+        var rv = xm.InfoSize.Value.CompareTo(ym.InfoSize.Value);
         if (rv != 0) {
           return rv;
         }

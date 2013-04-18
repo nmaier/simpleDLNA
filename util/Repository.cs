@@ -1,19 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
-namespace NMaier.SimpleDlna.FileMediaServer
+namespace NMaier.SimpleDlna.Utilities
 {
   public abstract class Repository<TInterface>
     where TInterface : class, IRepositoryItem
   {
-    private static readonly Dictionary<string, TInterface> items = new Dictionary<string, TInterface>();
+    private static readonly Dictionary<string, TInterface> items = BuildRepository();
 
 
-    static Repository()
+    private static Dictionary<string, TInterface> BuildRepository()
     {
+      var items = new Dictionary<string, TInterface>();
       var type = typeof(TInterface).Name;
-      var a = Assembly.GetExecutingAssembly();
+      var a = typeof(TInterface).Assembly;
       foreach (Type t in a.GetTypes()) {
         if (t.GetInterface(type) == null) {
           continue;
@@ -30,11 +30,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
           items.Add(item.Name, item);
         }
         catch (Exception) {
+          continue;
         }
       }
+      return items;
     }
 
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
     public static IDictionary<string, string> ListItems()
     {
       var rv = new Dictionary<string, string>();
@@ -44,8 +47,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
       return rv;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
     public static TInterface Lookup(string name)
     {
+      if (string.IsNullOrWhiteSpace(name)) {
+        throw new ArgumentException("Invalid repository name", "name");
+      }
       name = name.ToLower().Trim();
       var result = (TInterface)null;
       if (!items.TryGetValue(name, out result)) {

@@ -5,7 +5,7 @@ using NMaier.SimpleDlna.Server;
 [assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  internal interface IThumbnailer
+  internal interface IThumbnails
   {
     DlnaMediaTypes Handling { get; }
 

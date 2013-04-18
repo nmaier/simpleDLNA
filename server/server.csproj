@@ -56,6 +56,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comparers\ComparerRepository.cs" />
+    <Compile Include="Comparers\DateComparer.cs" />
+    <Compile Include="Comparers\FileSizeComparer.cs" />
+    <Compile Include="Comparers\IItemComparer.cs" />
+    <Compile Include="Comparers\TitleComparer.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Http\HttpPhrases.cs" />
     <Compile Include="Interfaces\IBookmarkable.cs" />
@@ -108,7 +113,18 @@
     <Compile Include="Responses\StringResponse.cs" />
     <Compile Include="Types\RawHeaders.cs" />
     <Compile Include="Http\ResponseHeaders.cs" />
+    <Compile Include="Types\Identifiers.cs" />
     <Compile Include="Types\UpnpDevice.cs" />
+    <Compile Include="Types\VirtualClonedFolder.cs" />
+    <Compile Include="Types\VirtualFolder.cs" />
+    <Compile Include="Views\ByTitleView.cs" />
+    <Compile Include="Views\FlattenView.cs" />
+    <Compile Include="Views\IView.cs" />
+    <Compile Include="Views\KeyedVirtualFolder.cs" />
+    <Compile Include="Views\MusicView.cs" />
+    <Compile Include="Views\PlainView.cs" />
+    <Compile Include="Views\SeriesView.cs" />
+    <Compile Include="Views\ViewRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

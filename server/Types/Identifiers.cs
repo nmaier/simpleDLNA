@@ -1,0 +1,124 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using NMaier.SimpleDlna.Server.Views;
+using NMaier.SimpleDlna.Utilities;
+
+namespace NMaier.SimpleDlna.Server
+{
+  public sealed class Identifiers : Logging
+  {
+    private static readonly Random idGen = new Random();
+
+    private readonly Dictionary<string, WeakReference> ids = new Dictionary<string, WeakReference>();
+
+    private readonly Dictionary<string, IMediaItem> hardRefs = new Dictionary<string, IMediaItem>();
+
+    private Dictionary<string, string> paths = new Dictionary<string, string>();
+
+    private readonly List<IView> views = new List<IView>();
+
+
+    public bool HasViews
+    {
+      get
+      {
+        return views.Count != 0;
+      }
+    }
+    public IEnumerable<WeakReference> Resources
+    {
+      get
+      {
+        return from i in ids.Values
+               where (i.Target is IMediaResource)
+               select i;
+      }
+    }
+
+
+    private void RegisterFolderTree(IMediaFolder folder)
+    {
+      foreach (var f in folder.ChildFolders) {
+        RegisterPath(f);
+        RegisterFolderTree(f);
+      }
+      foreach (var i in folder.ChildItems) {
+        RegisterPath(i);
+      }
+    }
+
+    private void RegisterPath(IMediaItem item)
+    {
+      var path = item.Path;
+      string id;
+      if (!paths.ContainsKey(path)) {
+        while (ids.ContainsKey(id = idGen.Next(1000, int.MaxValue).ToString("X8"))) {
+          ;
+        }
+        paths[path] = id;
+      }
+      else {
+        id = paths[path];
+      }
+      ids[id] = new WeakReference(item);
+
+      item.Id = id;
+    }
+
+
+    public void AddView(string name)
+    {
+      views.Add(ViewRepository.Lookup(name));
+    }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.GC.Collect")]
+    public void Cleanup()
+    {
+      GC.Collect();
+      lock (this) {
+        var pc = paths.Count;
+        var ic = ids.Count;
+        var npaths = new Dictionary<string, string>();
+        foreach (var p in paths) {
+          if (ids[p.Value].Target == null) {
+            ids.Remove(p.Value);
+          }
+          else {
+            npaths.Add(p.Key, p.Value);
+          }
+        }
+        paths = npaths;
+        DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
+      }
+    }
+
+    public IMediaItem GetItemById(string id)
+    {
+      return ids[id].Target as IMediaItem;
+    }
+
+    public IMediaItem GetItemByPath(string path)
+    {
+      string id;
+      if (!paths.TryGetValue(path, out id)) {
+        return null;
+      }
+      return GetItemById(id);
+    }
+
+    public IMediaFolder RegisterFolder(string id, IMediaFolder item)
+    {
+      var rv = item;
+      RegisterFolderTree(rv);
+      foreach (var v in views) {
+        rv = v.Transform(rv);
+        RegisterFolderTree(rv);
+      }
+      rv.Cleanup();
+      ids[id] = new WeakReference(rv);
+      hardRefs[id] = rv;
+      return rv;
+    }
+  }
+}

@@ -34,7 +34,7 @@ namespace NMaier.SimpleDlna.Server
 
       var head = doc.EL("head");
       doc.DocumentElement.AppendChild(head);
-      head.AppendChild(doc.EL("title", string.Format("{0} — simple DLNA", item.Title)));
+      head.AppendChild(doc.EL("title", text: string.Format("{0} — simple DLNA", item.Title)));
       head.AppendChild(doc.EL(
         "link",
         new AttributeCollection() { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", prefix + "browse.css" } }
@@ -45,7 +45,7 @@ namespace NMaier.SimpleDlna.Server
       var article = doc.EL("article");
       body.AppendChild(article);
 
-      article.AppendChild(doc.EL("h1", string.Format("Folder: {0}", item.Title)));
+      article.AppendChild(doc.EL("h1", text: string.Format("Folder: {0}", item.Title)));
 
       XmlNode e;
       var folders = doc.EL("ul", new AttributeCollection() { { "class", "folders" } });
@@ -94,8 +94,8 @@ namespace NMaier.SimpleDlna.Server
           string v;
           if (props.TryGetValue(p, out v)) {
             table.AppendChild(e = doc.EL("tr"));
-            e.AppendChild(doc.EL("th", p));
-            e.AppendChild(doc.EL("td", v));
+            e.AppendChild(doc.EL("th", text: p));
+            e.AppendChild(doc.EL("td", text: v));
           }
         }
         if (table.ChildNodes.Count != 0) {
@@ -111,7 +111,7 @@ namespace NMaier.SimpleDlna.Server
 
       var footer = doc.EL("footer");
       footer.AppendChild(doc.EL("img", new AttributeCollection() { { "src", "/icon/smallPNG" } }));
-      footer.AppendChild(doc.EL("h3", string.Format(
+      footer.AppendChild(doc.EL("h3", text: string.Format(
         "simple DLNA Media Server: sdlna/{0}.{1}",
         Assembly.GetExecutingAssembly().GetName().Version.Major,
         Assembly.GetExecutingAssembly().GetName().Version.Minor

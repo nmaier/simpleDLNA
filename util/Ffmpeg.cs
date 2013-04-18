@@ -10,14 +10,24 @@ using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
+  [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fmpeg")]
   public static class FFmpeg
   {
-    public static readonly string FFidentifyExecutable = FindExecutable("ffidentify");
-    public static readonly string FFmpegExecutable = FindExecutable("ffmpeg");
-    private readonly static LruDictionary<FileInfo, IDictionary<string, string>> infoCache = new LruDictionary<FileInfo, IDictionary<string, string>>(500);
+    private static readonly DirectoryInfo[] specialLocations = new DirectoryInfo[] {
+        new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), "ffmpeg")),
+        new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), "ffmpeg")),
+        new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "ffmpeg")),
+        new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "ffmpeg")),
+        new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "ffmpeg")),
+        new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+    };
+    private readonly static LeastRecentlyUsedDictionary<FileInfo, IDictionary<string, string>> infoCache = new LeastRecentlyUsedDictionary<FileInfo, IDictionary<string, string>>(500);
     private static readonly Regex RegLine = new Regex(@"^(?:ID|META)_([\w\d_]+)=(.+)$", RegexOptions.Compiled);
 
-
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fidentify")]
+    public static readonly string FFidentifyExecutable = FindExecutable("ffidentify");
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fmpeg")]
+    public static readonly string FFmpegExecutable = FindExecutable("ffmpeg");
 
 
     public static Size GetFileDimensions(FileInfo file)
@@ -92,8 +102,8 @@ namespace NMaier.SimpleDlna.Utilities
             }
           }
         }
-        catch (Exception) {
-          // pass
+        catch (Exception ex) {
+          throw new NotSupportedException(ex.Message, ex);
         }
       }
       throw new NotSupportedException();
@@ -112,21 +122,20 @@ namespace NMaier.SimpleDlna.Utilities
       }
       catch (Exception) {
       }
-      try {
-        places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), "ffmpeg")));
-        places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86), "ffmpeg")));
-        places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "ffmpeg")));
-        places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "ffmpeg")));
-        places.Add(new DirectoryInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "ffmpeg")));
-        places.Add(new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)));
-      }
-      catch (Exception) {
+      foreach (var l in specialLocations) {
+        try {
+          places.Add(l);
+        }
+        catch (Exception) {
+          continue;
+        }
       }
       foreach (var p in Environment.GetEnvironmentVariable("PATH").Split(isWin ? ';' : ':')) {
         try {
           places.Add(new DirectoryInfo(p.Trim()));
         }
         catch (Exception) {
+          continue;
         }
       }
 
@@ -144,6 +153,7 @@ namespace NMaier.SimpleDlna.Utilities
             }
           }
           catch (Exception) {
+            continue;
           }
         }
       }

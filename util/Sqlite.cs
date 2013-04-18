@@ -5,8 +5,10 @@ using System.Reflection;
 
 namespace NMaier.SimpleDlna.Utilities
 {
+  [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Sqlite")]
   public static class Sqlite
   {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     public static IDbConnection GetDatabaseConnection(FileInfo database)
     {
       if (database == null) {
@@ -16,27 +18,30 @@ namespace NMaier.SimpleDlna.Utilities
         throw new ArgumentException("Database file is read only", "database");
       }
       var cs = string.Format("Uri=file:{0}", database.FullName);
-      IDbConnection rv = null;
       if (Type.GetType("Mono.Runtime") == null) {
-        rv = new System.Data.SQLite.SQLiteConnection(cs);
-      }
-      else {
-        Assembly monoSqlite;
-        try {
-          monoSqlite = Assembly.Load("Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756");
+        var rv = new System.Data.SQLite.SQLiteConnection(cs);
+        if (rv == null) {
+          throw new ArgumentException("no connection");
         }
-        catch (Exception) {
-          monoSqlite = Assembly.Load("Mono.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756");
-        }
-        var dbconn = monoSqlite.GetType("Mono.Data.Sqlite.SqliteConnection");
-        var ctor = dbconn.GetConstructor(new[] { typeof(string) });
-        rv = ctor.Invoke(new[] { cs }) as IDbConnection;
+        rv.Open();
+        return rv;
       }
-      if (rv == null) {
+
+      Assembly monoSqlite;
+      try {
+        monoSqlite = Assembly.Load("Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756");
+      }
+      catch (Exception) {
+        monoSqlite = Assembly.Load("Mono.Data.Sqlite, Version=2.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756");
+      }
+      var dbconn = monoSqlite.GetType("Mono.Data.Sqlite.SqliteConnection");
+      var ctor = dbconn.GetConstructor(new[] { typeof(string) });
+      var mrv = ctor.Invoke(new[] { cs }) as IDbConnection;
+      if (mrv == null) {
         throw new ArgumentException("no connection");
       }
-      rv.Open();
-      return rv;
+      mrv.Open();
+      return mrv;
     }
   }
 }

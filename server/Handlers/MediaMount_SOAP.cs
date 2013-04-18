@@ -24,7 +24,7 @@ namespace NMaier.SimpleDlna.Server
 
     private static readonly string featureList = Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
 
-    private readonly static IDictionary<string, AttributeCollection> SoapCache = new LruDictionary<string, AttributeCollection>(200);
+    private readonly static IDictionary<string, AttributeCollection> SoapCache = new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
 
 
     private static void AddActors(IMediaResource resource, XmlElement item)
@@ -44,6 +44,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       catch (Exception) {
+        return;
       }
     }
 
@@ -109,6 +110,7 @@ namespace NMaier.SimpleDlna.Server
         item.AppendChild(res);
       }
       catch (Exception) {
+        return;
       }
     }
 

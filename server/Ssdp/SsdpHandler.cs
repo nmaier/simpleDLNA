@@ -47,6 +47,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
 
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "client")]
     public void Dispose()
     {
       Debug("Disposing SSDP");
@@ -95,6 +96,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void ReceiveCallback(IAsyncResult result)
     {
       try {
@@ -103,7 +105,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 #if DUMP_ALL_SSDP
         DebugFormat("{0} - SSDP Received a datagram", endpoint);
 #endif
-
         using (var reader = new StreamReader(new MemoryStream(received), Encoding.ASCII)) {
           var proto = reader.ReadLine().Trim();
           var method = proto.Split(new char[] { ' ' }, 2)[0];

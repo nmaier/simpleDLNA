@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NMaier.SimpleDlna.Server
+﻿namespace NMaier.SimpleDlna.Server
 {
   public interface IBookmarkable
   {

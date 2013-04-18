@@ -6,4 +6,9 @@
   <Include Path="extendeddesignguidelinerules.ruleset" Action="Default" />
   <Include Path="minimumrecommendedrules.ruleset" Action="Default" />
   <Include Path="securityrules.ruleset" Action="Default" />
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1031" Action="None" />
+    <Rule Id="CA1059" Action="None" />
+    <Rule Id="CA1303" Action="None" />
+  </Rules>
 </RuleSet>

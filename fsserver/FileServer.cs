@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,31 +14,23 @@ namespace NMaier.SimpleDlna.FileMediaServer
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
     private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
-    private Comparers.IItemComparer comparer = new Comparers.TitleComparer();
-    private bool descending = false;
     private readonly DirectoryInfo[] directories;
+    private readonly Identifiers ids;
     private readonly string friendlyName;
-    private static readonly Random idGen = new Random();
-    private readonly Dictionary<string, WeakReference> ids = new Dictionary<string, WeakReference>();
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-    private Folders.BaseFolder master;
-    private Dictionary<string, string> paths = new Dictionary<string, string>();
-    private Files.FileStore store = null;
+    private FileStore store = null;
     private Task thumberTask;
-    private readonly List<Views.IView> transformations = new List<Views.IView>();
     private readonly DlnaMediaTypes types;
     private readonly Guid uuid = Guid.NewGuid();
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
-    private IMediaFolder root, images, audio, video;
     private readonly FileSystemWatcher[] watchers;
     private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
     private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
 
-
-
-    public FileServer(DlnaMediaTypes types, IEnumerable<DirectoryInfo> directories)
+    public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
     {
       this.types = types;
+      this.ids = ids;
       this.directories = directories.Distinct().ToArray();
       if (this.directories.Length == 0) {
         throw new ArgumentException("Provide one or more directories", "directories");
@@ -51,52 +42,31 @@ namespace NMaier.SimpleDlna.FileMediaServer
         friendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, this.directories[0].Parent.FullName, this.directories.Length - 1);
       }
       watchers = (from d in directories
-                                          select new FileSystemWatcher(d.FullName)).ToArray();
+                  select new FileSystemWatcher(d.FullName)).ToArray();
       uuid = DeriveUUID();
-    }
-
-    public FileServer(DlnaMediaTypes types, DirectoryInfo directory)
-      : this(types, new DirectoryInfo[] { directory })
-    {
-    }
-
-
-
-    public bool DescendingOrder
-    {
-      get {
-        return descending;
-      }
-      set {
-        descending = value;
-      }
     }
 
     public string FriendlyName
     {
-      get {
+      get
+      {
         return friendlyName;
       }
     }
 
     public Guid Uuid
     {
-      get {
+      get
+      {
         return uuid;
       }
     }
 
-
-
-
     public event EventHandler Changed;
-
-
-
 
     public void AddView(string name)
     {
-      transformations.Add(ViewRepository.Lookup(name));
+      ids.AddView(name);
     }
 
     public void Dispose()
@@ -119,19 +89,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
           thumberTask = null;
         }
         catch (ObjectDisposedException) {
+          thumberTask = null; // Silence of the Warnings
         }
       }
     }
 
     public IMediaItem GetItem(string id)
     {
-      return ids[id].Target as IMediaItem;
+      return ids.GetItemById(id);
     }
 
     public void Load()
     {
-      if (types == DlnaMediaTypes.Audio && transformations.Count == 0) {
-        AddView("music");
+      if (types == DlnaMediaTypes.Audio && !ids.HasViews) {
+        ids.AddView("music");
       }
       DoRoot();
 
@@ -153,48 +124,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public void SetCacheFile(FileInfo info)
     {
       try {
-        store = new Files.FileStore(info);
+        store = new FileStore(info);
       }
       catch (Exception ex) {
         Warn("FileStore is not availble; failed to load SQLite Adapter", ex);
         store = null;
-      }
-    }
-
-    public void SetOrder(string order)
-    {
-      comparer = ComparerRepository.Lookup(order);
-    }
-
-    private IMediaFolder BuildView(Folders.BaseFolder rootFolder)
-    {
-      var rv = rootFolder;
-      RegisterFolderTree(rv);
-      foreach (var t in transformations) {
-        rv = t.Transform(this, rv) as Folders.BaseFolder;
-        RegisterFolderTree(rv);
-      }
-      rv.Cleanup();
-      rv.Sort(comparer, descending);
-      return rv;
-    }
-
-    private void Cleanup()
-    {
-      GC.Collect();
-      lock (this) {
-        int pc = paths.Count, ic = ids.Count;
-        var npaths = new Dictionary<string, string>();
-        foreach (var p in paths) {
-          if (ids[p.Value].Target == null) {
-            ids.Remove(p.Value);
-          }
-          else {
-            npaths.Add(p.Key, p.Value);
-          }
-        }
-        paths = npaths;
-        DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
       }
     }
 
@@ -216,43 +150,22 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private void DoRoot()
     {
       lock (this) {
-        Folders.BaseFolder newMaster;
+        IMediaFolder newMaster;
         if (directories.Length == 1) {
-          newMaster = new Folders.PlainRootFolder(friendlyName, this, types, directories[0]);
+          newMaster = new PlainRootFolder(friendlyName, this, types, directories[0]);
         }
         else {
-          var virtualMaster = new Folders.VirtualFolder(this, null, friendlyName, "0");
+          var virtualMaster = new VirtualFolder(null, friendlyName, "0");
           foreach (var d in directories) {
-            var pr = new Folders.PlainRootFolder(friendlyName, this, types, d);
-            RegisterFolderTree(pr);
-            virtualMaster.Merge(pr);
+            virtualMaster.Merge(new PlainRootFolder(friendlyName, this, types, d));
           }
           newMaster = virtualMaster;
         }
-        ids["0"] = new WeakReference(root = BuildView(newMaster));
-
-        images = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "I", types & DlnaMediaTypes.Image));
-        ids["I"] = new WeakReference(images);
-
-        audio = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "A", types & DlnaMediaTypes.Audio));
-        ids["A"] = new WeakReference(audio);
-
-        video = BuildView(new Folders.VirtualClonedFolder(this, newMaster, "V", types & DlnaMediaTypes.Video));
-        ids["V"] = new WeakReference(video);
-
-        master = newMaster;
+        ids.RegisterFolder("0", newMaster);
+        ids.RegisterFolder("I", new VirtualClonedFolder(newMaster, "I", types & DlnaMediaTypes.Image));
+        ids.RegisterFolder("A", new VirtualClonedFolder(newMaster, "A", types & DlnaMediaTypes.Audio));
+        ids.RegisterFolder("V", new VirtualClonedFolder(newMaster, "V", types & DlnaMediaTypes.Video));
       }
-      Cleanup();
-
-#if DUMP_TREE
-      using (var s = new FileStream("tree.dump", FileMode.Create, FileAccess.Write)) {
-        using (var w = new StreamWriter(s)) {
-          DumpTree(w, root);
-          w.WriteLine();
-          DumpTree(w, master);
-        }
-      }
-#endif
 
       Thumbnail();
     }
@@ -284,33 +197,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       DebugFormat("File System changed (rename): {0}", e.FullPath);
       changeTimer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
       changeTimer.Enabled = true;
-    }
-
-    private void RegisterFolderTree(IMediaFolder folder)
-    {
-      foreach (var f in folder.ChildFolders) {
-        RegisterPath(f as IFileServerMediaItem);
-        RegisterFolderTree(f);
-      }
-      foreach (var i in folder.ChildItems) {
-        RegisterPath(i as IFileServerMediaItem);
-      }
-    }
-
-    private void RegisterPath(IFileServerMediaItem item)
-    {
-      var path = item.Path;
-      string id;
-      if (!paths.ContainsKey(path)) {
-        while (ids.ContainsKey(id = idGen.Next(1000, int.MaxValue).ToString("X8")))
-          ;
-        paths[path] = id;
-      }
-      else {
-        id = paths[path];
-      }
-      ids[id] = new WeakReference(item);
-      item.Id = id;
     }
 
     private void Rescan()
@@ -346,17 +232,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
         if (thumberTask != null) {
           return;
         }
-        var files = (from i in ids.Values
-                                               let f = (i.Target as Files.BaseFile)
-                                               where f != null
-                                               select new WeakReference(f)).ToList();
+        var files = ids.Resources.ToList();
         thumberTask = new Task(() =>
         {
           using (thumberTask) {
             try {
               foreach (var i in files) {
                 try {
-                  var item = (i.Target as Files.BaseFile);
+                  var item = (i.Target as BaseFile);
                   if (item == null) {
                     continue;
                   }
@@ -386,7 +269,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    internal Files.Cover GetCover(Files.BaseFile file)
+    internal Cover GetCover(BaseFile file)
     {
       if (store != null) {
         return store.MaybeGetCover(file);
@@ -394,17 +277,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       return null;
     }
 
-    internal Files.BaseFile GetFile(Folders.BaseFolder aParent, FileInfo info)
+    internal BaseFile GetFile(PlainFolder aParent, FileInfo info)
     {
-      string key;
-      if (paths.TryGetValue(info.FullName, out key)) {
-        WeakReference wr;
-        Files.BaseFile file;
-        if (ids.TryGetValue(key, out wr) && (file = wr.Target as Files.BaseFile) != null) {
-          if (file.InfoDate == info.LastWriteTimeUtc && file.InfoSize == info.Length) {
-            return file;
-          }
-        }
+      var item = ids.GetItemByPath(info.FullName) as BaseFile;
+      if (item != null && item.InfoDate == info.LastAccessTimeUtc && item.InfoSize == info.Length) {
+        return item;
       }
 
       var ext = re_sansitizeExt.Replace(info.Extension.ToLower().Substring(1), "");
@@ -412,34 +289,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
       var mediaType = DlnaMaps.Ext2Media[ext];
 
       if (store != null) {
-        var sv = store.MaybeGetFile(this, info, type);
-        if (sv != null) {
-          return sv;
+        item = store.MaybeGetFile(this, info, type);
+        if (item != null) {
+          return item;
         }
       }
 
-      return Files.BaseFile.GetFile(aParent, info, type, mediaType);
+      return BaseFile.GetFile(aParent, info, type, mediaType);
     }
 
-    internal void UpdateFileCache(Files.BaseFile aFile)
+    internal void UpdateFileCache(BaseFile aFile)
     {
       if (store != null) {
         store.MaybeStoreFile(aFile);
       }
     }
-
-
-#if DUMP_TREE
-    private void DumpTree(StreamWriter w, IMediaFolder folder, string prefix = "/")
-    {
-      foreach (IMediaFolder f in folder.ChildFolders) {
-        w.WriteLine("{0} {1} - ({3}) {2}", prefix, f.Title, f.GetType().ToString(), f.Id);
-        DumpTree(w, f, prefix + f.Title + "/");
-      }
-      foreach (IMediaResource r in folder.ChildItems) {
-        w.WriteLine("{0} {1} - ({3}) {2}", prefix, r.Title, r.GetType().ToString(), r.Id);
-      }
-    }
-#endif
   }
 }

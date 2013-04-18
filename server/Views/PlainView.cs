@@ -1,8 +1,6 @@
 using System.Linq;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
-using NMaier.SimpleDlna.Server;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Views
+namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class PlainView : IView
   {
@@ -22,20 +20,20 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
     }
 
 
-    private static void EatAll(BaseFolder root, IMediaFolder folder)
+    private static void EatAll(IMediaFolder root, IMediaFolder folder)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
         EatAll(root, f);
       }
       foreach (var c in folder.ChildItems.ToList()) {
-        root.AddFile(c as Files.BaseFile);
+        root.AddResource(c);
       }
     }
 
 
-    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
+    public IMediaFolder Transform(IMediaFolder Root)
     {
-      var rv = new VirtualFolder(Server, null, "0");
+      var rv = new VirtualFolder(null, Root.Title, Root.Id);
       EatAll(rv, Root);
       return rv;
     }

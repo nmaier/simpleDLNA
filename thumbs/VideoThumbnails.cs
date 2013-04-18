@@ -9,11 +9,11 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  internal sealed class VideoThumbnailer : Logging, IThumbnailer, IDisposable
+  internal sealed class VideoThumbnails : Logging, IThumbnails, IDisposable
   {
     private Semaphore semaphore = new Semaphore(2, 2);
 
-    public VideoThumbnailer()
+    public VideoThumbnails()
     {
       if (FFmpeg.FFmpegExecutable == null) {
         throw new NotSupportedException("No ffmpeg available");
@@ -55,6 +55,7 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
     {
       Debug("Starting ffmpeg");
@@ -73,7 +74,7 @@ namespace NMaier.SimpleDlna.Thumbnails
         }
 
         using (var img = Image.FromStream(thumb)) {
-          using (var scaled = Thumbnailer.ResizeImage(img, ref width, ref height)) {
+          using (var scaled = ThumbnailMaker.ResizeImage(img, ref width, ref height)) {
             var rv = new MemoryStream();
             try {
               scaled.Save(rv, ImageFormat.Jpeg);
@@ -88,6 +89,8 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "NMaier.SimpleDlna.Utilities.StreamPump"),
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private MemoryStream GetThumbnailInternal(Stream stream, ref int width, ref int height)
     {
       using (var p = new Process()) {

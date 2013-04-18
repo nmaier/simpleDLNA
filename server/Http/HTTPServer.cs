@@ -8,7 +8,7 @@ using System.Timers;
 using NMaier.SimpleDlna.Server.Ssdp;
 using NMaier.SimpleDlna.Utilities;
 
-[assembly:CLSCompliant(true)]
+[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpServer : Logging, IDisposable
@@ -28,7 +28,11 @@ namespace NMaier.SimpleDlna.Server
     private readonly SsdpHandler ssdpServer;
 
 
-    public HttpServer(int port = 0)
+    public HttpServer()
+      : this(port: 0)
+    {
+    }
+    public HttpServer(int port)
     {
       listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
       timeouter.Elapsed += TimeouterCallback;
@@ -62,6 +66,7 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void AcceptCallback(IAsyncResult result)
     {
       try {
@@ -191,15 +196,18 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public void RegisterMediaServer(IMediaServer server)
+    public void RegisterMediaServer(IMediaServer server, string order, bool descending)
     {
+      if (server == null) {
+        throw new ArgumentNullException("server");
+      }
       var guid = server.Uuid;
       if (servers.ContainsKey(guid)) {
         throw new ArgumentException("Attempting to register more than once");
       }
 
       var end = listener.LocalEndpoint as IPEndPoint;
-      var mount = new MediaMount(server);
+      var mount = new MediaMount(server, order, descending);
       servers[guid] = mount;
       RegisterHandler(mount);
 
@@ -212,6 +220,9 @@ namespace NMaier.SimpleDlna.Server
 
     public void UnregisterMediaServer(IMediaServer server)
     {
+      if (server == null) {
+        throw new ArgumentNullException("server");
+      }
       MediaMount mount;
       if (!servers.TryGetValue(server.Uuid, out mount)) {
         return;

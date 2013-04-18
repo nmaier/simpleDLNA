@@ -6,7 +6,8 @@ using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  internal sealed class ImageThumbnailer : IThumbnailer
+  [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+  internal sealed class ImageThumbnails : IThumbnails
   {
     public DlnaMediaTypes Handling
     {
@@ -30,7 +31,7 @@ namespace NMaier.SimpleDlna.Thumbnails
           throw new NotSupportedException();
         }
       using (img) {
-        using (var scaled = Thumbnailer.ResizeImage(img, ref width, ref height)) {
+        using (var scaled = ThumbnailMaker.ResizeImage(img, ref width, ref height)) {
           var rv = new MemoryStream();
           try {
             scaled.Save(rv, ImageFormat.Jpeg);

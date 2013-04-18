@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
   internal sealed class ImageFile : BaseFile, IMetaImageItem, ISerializable
@@ -15,15 +15,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     private bool initialized = false;
     private string title;
 
-
-
     internal ImageFile(FileServer server, FileInfo aFile, DlnaMime aType)
       : base(server, aFile, aType, DlnaMediaTypes.Image)
     {
     }
 
-    private ImageFile(SerializationInfo info, StreamingContext ctx)
-      : this((ctx.Context as DeserializeInfo).Server, (ctx.Context as DeserializeInfo).Info, (ctx.Context as DeserializeInfo).Type)
+    private ImageFile(SerializationInfo info, StreamingContext context)
+      : this((context.Context as DeserializeInfo).Server, (context.Context as DeserializeInfo).Info, (context.Context as DeserializeInfo).Type)
     {
     }
 
@@ -38,8 +36,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
       initialized = true;
     }
-
-
 
     public string MetaCreator
     {
@@ -107,11 +103,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-
-
-
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
     {
+      if (info == null) {
+        throw new ArgumentNullException("info");
+      }
       MaybeInit();
       info.AddValue("cr", creator);
       info.AddValue("d", description);

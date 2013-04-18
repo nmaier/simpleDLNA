@@ -1,9 +1,8 @@
 using System;
 using System.Collections;
-using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Comparers
+namespace NMaier.SimpleDlna.Server.Comparers
 {
   internal class TitleComparer : IItemComparer, IComparer
   {
@@ -28,11 +27,23 @@ namespace NMaier.SimpleDlna.FileMediaServer.Comparers
 
     public virtual int Compare(IMediaItem x, IMediaItem y)
     {
+      if (x == null) {
+        throw new ArgumentNullException("x");
+      }
+      if (y == null) {
+        throw new ArgumentNullException("y");
+      }
       return comp.Compare(x.Title, y.Title);
     }
 
     public int Compare(object x, object y)
     {
+      if (x == null) {
+        throw new ArgumentNullException("x");
+      }
+      if (y == null) {
+        throw new ArgumentNullException("y");
+      }
       return comp.Compare(x, y);
     }
   }

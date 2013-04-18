@@ -2,27 +2,26 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NMaier.SimpleDlna.FileMediaServer.Files;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Folders
+namespace NMaier.SimpleDlna.FileMediaServer
 {
-  internal class PlainFolder : BaseFolder, IMetaInfo
+  internal class PlainFolder : VirtualFolder, IMetaInfo
   {
     private readonly DirectoryInfo dir;
 
 
-    public PlainFolder(FileServer server, DlnaMediaTypes types, BaseFolder aParent, DirectoryInfo aDir)
-      : base(server, aParent)
+    public PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir)
+      : base(parent, dir.Name)
     {
-      dir = aDir;
-      childFolders = (from d in dir.GetDirectories()
-                      let m = new PlainFolder(server, types, this, d)
-                      where m.ChildCount > 0
-                      select m as BaseFolder).ToList();
+      Server = server;
+      this.dir = dir;
+      folders = (from d in dir.GetDirectories()
+                 let m = new PlainFolder(server, types, this, d)
+                 where m.ChildCount > 0
+                 select m as IMediaFolder).ToList();
 
-      childItems = new List<BaseFile>();
       foreach (var i in DlnaMaps.Media2Ext) {
         if (!types.HasFlag(i.Key)) {
           continue;
@@ -40,7 +39,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
               server.Warn(ex);
             }
           }
-          childItems.AddRange(files);
+          resources.AddRange(files);
         }
       }
     }
@@ -66,6 +65,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       {
         return dir.FullName;
       }
+    }
+    public FileServer Server
+    {
+      get;
+      protected set;
     }
     public override string Title
     {

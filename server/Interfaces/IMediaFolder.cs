@@ -7,6 +7,11 @@ namespace NMaier.SimpleDlna.Server
     int ChildCount { get; }
     IEnumerable<IMediaFolder> ChildFolders { get; }
     IEnumerable<IMediaResource> ChildItems { get; }
-    IMediaFolder Parent { get; }
+    IMediaFolder Parent { get; set; }
+
+    void AddResource(IMediaResource res);
+    void Cleanup();
+    void RemoveResource(IMediaResource res);
+    void Sort(IComparer<IMediaItem> comparer, bool descending);
   }
 }

@@ -1,10 +1,7 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using NMaier.SimpleDlna.FileMediaServer.Files;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
-using NMaier.SimpleDlna.Server;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Views
+namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class SeriesView : IView
   {
@@ -40,17 +37,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       }
     }
 
-    private static void SortFolder(FileServer server, BaseFolder folder, SimpleKeyedVirtualFolder series)
+    private static void SortFolder(IMediaFolder folder, SimpleKeyedVirtualFolder series)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
-        SortFolder(server, f as BaseFolder, series);
+        SortFolder(f, series);
       }
       foreach (var i in folder.ChildItems.ToList()) {
-        var vi = i as VideoFile;
-        if (vi == null) {
-          continue;
-        }
-        var title = vi.Title;
+        var title = i.Title;
         if (string.IsNullOrWhiteSpace(title)) {
           continue;
         }
@@ -62,21 +55,21 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
         if (string.IsNullOrEmpty(ser)) {
           continue;
         }
-        series.GetFolder(ser).AddFile(vi);
-        folder.RemoveFile(vi);
+        series.GetFolder(ser).AddResource(i);
+        folder.RemoveResource(i);
       }
     }
 
 
-    public IMediaFolder Transform(FileServer Server, IMediaFolder Root)
+    public IMediaFolder Transform(IMediaFolder Root)
     {
-      var root = new VirtualClonedFolder(Root as BaseFolder);
-      var series = new SimpleKeyedVirtualFolder(Server, root, "Series");
-      SortFolder(Server, root, series);
+      var root = new VirtualClonedFolder(Root);
+      var series = new SimpleKeyedVirtualFolder(root, "Series");
+      SortFolder(root, series);
       foreach (var f in series.ChildFolders.ToList()) {
         if (f.ChildCount < 2) {
           foreach (var file in f.ChildItems) {
-            root.AddFile(file as BaseFile);
+            root.AddResource(file);
           }
           continue;
         }
@@ -92,8 +85,8 @@ namespace NMaier.SimpleDlna.FileMediaServer.Views
       public SimpleKeyedVirtualFolder()
       {
       }
-      public SimpleKeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
-        : base(server, aParent, aName)
+      public SimpleKeyedVirtualFolder(IMediaFolder aParent, string aName)
+        : base(aParent, aName)
       {
       }
     }

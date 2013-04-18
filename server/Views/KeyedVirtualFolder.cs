@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Folders
+namespace NMaier.SimpleDlna.Server.Views
 {
   internal class KeyedVirtualFolder<T> : VirtualFolder
     where T : VirtualFolder, new()
@@ -9,11 +9,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
 
 
     protected KeyedVirtualFolder()
-      : this(null, null, null)
+      : this(null, null)
     {
     }
-    protected KeyedVirtualFolder(FileServer server, BaseFolder aParent, string aName)
-      : base(server, aParent, aName)
+    protected KeyedVirtualFolder(IMediaFolder aParent, string aName)
+      : base(aParent, aName)
     {
     }
 
@@ -24,9 +24,8 @@ namespace NMaier.SimpleDlna.FileMediaServer.Folders
       var lkey = key.ToLower();
       if (!keys.TryGetValue(lkey, out rv)) {
         rv = new T();
-        rv.Server = Server;
         rv.Name = key;
-        AdoptFolder(rv);
+        folders.Add(rv);
         keys.Add(lkey, rv);
       }
       return rv;

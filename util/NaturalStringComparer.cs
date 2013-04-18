@@ -6,7 +6,7 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public class NaturalStringComparer : StringComparer
   {
-    private readonly static LruDictionary<string, BaseSortPart[]> cache = new LruDictionary<string, BaseSortPart[]>(5000);
+    private readonly static LeastRecentlyUsedDictionary<string, BaseSortPart[]> cache = new LeastRecentlyUsedDictionary<string, BaseSortPart[]>(5000);
 
     private static readonly StringComparer comparer = StringComparer.CurrentCultureIgnoreCase;
 
@@ -16,14 +16,15 @@ namespace NMaier.SimpleDlna.Utilities
 
     private readonly static Regex whitespaces = new Regex(@"\s+", RegexOptions.Compiled);
 
+
     private static bool HasPlatformSupport()
     {
       try {
         return SafeNativeMethods.StrCmpLogicalW("a", "b") != 0;
       }
       catch (Exception) {
+        return false;
       }
-      return false;
     }
 
     private static string Sanitize(string str)

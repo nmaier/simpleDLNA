@@ -5,7 +5,7 @@ using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Thumbnails;
 using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
   internal sealed class Cover : Logging, IMediaCoverResource, ISerializable
@@ -16,7 +16,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
     private int height = 240;
 
-    private static readonly Thumbnailer thumber = new Thumbnailer();
+    private static readonly ThumbnailMaker thumber = new ThumbnailMaker();
 
     private int width = 240;
 
@@ -70,7 +70,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     {
       get
       {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
+      }
+      set
+      {
+        throw new NotSupportedException();
       }
     }
     public DlnaMediaTypes MediaType
@@ -94,6 +98,13 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
         return width;
       }
     }
+    public string Path
+    {
+      get
+      {
+        throw new NotSupportedException();
+      }
+    }
     public string PN
     {
       get
@@ -105,14 +116,14 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     {
       get
       {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
       }
     }
     public string Title
     {
       get
       {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
       }
     }
     public DlnaMime Type
@@ -145,11 +156,14 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
     public int CompareTo(IMediaItem other)
     {
-      throw new NotImplementedException();
+      throw new NotSupportedException();
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
     {
+      if (info == null) {
+        throw new ArgumentNullException("info");
+      }
       info.AddValue("bytes", _bytes);
       info.AddValue("width", width);
       info.AddValue("height", height);

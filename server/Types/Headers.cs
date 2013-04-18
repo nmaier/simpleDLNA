@@ -16,14 +16,14 @@ namespace NMaier.SimpleDlna.Server
     private readonly static Regex validator = new Regex(@"^[a-z\d][a-z\d_.-]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 
-    protected Headers(bool asIs = false)
+    protected Headers(bool asIs)
     {
       this.asIs = asIs;
     }
 
 
     public Headers()
-      : this(false)
+      : this(asIs: false)
     {
     }
 

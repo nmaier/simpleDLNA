@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
   internal sealed class VideoFile : BaseFile, IMetaVideoItem, ISerializable, IBookmarkable
@@ -21,8 +21,6 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     private bool initialized = false;
     private string title;
     private int? width;
-
-
 
     internal VideoFile(FileServer server, FileInfo aFile, DlnaMime aType)
       : base(server, aFile, aType, DlnaMediaTypes.Video)
@@ -52,6 +50,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
         bookmark = info.GetInt64("b");
       }
       catch (Exception) {
+        bookmark = 0;
       }
       initialized = true;
     }
@@ -176,11 +175,11 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
       }
     }
 
-
-
-
-    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
     {
+      if (info == null) {
+        throw new ArgumentNullException("info");
+      }
       MaybeInit();
       info.AddValue("a", actors, typeof(string[]));
       info.AddValue("de", description);

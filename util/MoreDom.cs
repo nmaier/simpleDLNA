@@ -5,12 +5,8 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public static class MoreDom
   {
-    public static XmlElement EL(this XmlDocument doc, string name, string text = null)
-    {
-      return doc.EL(name, null, text);
-    }
-
-    public static XmlElement EL(this XmlDocument doc, string name, AttributeCollection attributes, string text = null)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed")]
+    public static XmlElement EL(this XmlDocument doc, string name, AttributeCollection attributes = null, string text = null)
     {
       if (doc == null) {
         throw new ArgumentNullException("doc");

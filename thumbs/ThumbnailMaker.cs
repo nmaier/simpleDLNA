@@ -9,26 +9,28 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  public sealed class Thumbnailer : Logging
+  public sealed class ThumbnailMaker : Logging
   {
-    private static readonly LruDictionary<string, CacheItem> cache = new LruDictionary<string, CacheItem>(1 << 11);
-    private static readonly Dictionary<DlnaMediaTypes, List<IThumbnailer>> thumbers = new Dictionary<DlnaMediaTypes, List<IThumbnailer>>();
-    static Thumbnailer()
+    private static readonly LeastRecentlyUsedDictionary<string, CacheItem> cache = new LeastRecentlyUsedDictionary<string, CacheItem>(1 << 11);
+    private static readonly Dictionary<DlnaMediaTypes, List<IThumbnails>> thumbers = BuildThumbnailers();
+
+    private static Dictionary<DlnaMediaTypes, List<IThumbnails>> BuildThumbnailers()
     {
+      var thumbers = new Dictionary<DlnaMediaTypes, List<IThumbnails>>();
       var types = Enum.GetValues(typeof(DlnaMediaTypes));
       foreach (DlnaMediaTypes i in types) {
-        thumbers.Add(i, new List<IThumbnailer>());
+        thumbers.Add(i, new List<IThumbnails>());
       }
       var a = Assembly.GetExecutingAssembly();
       foreach (Type t in a.GetTypes()) {
-        if (t.GetInterface("IThumbnailer") == null) {
+        if (t.GetInterface("IThumbnails") == null) {
           continue;
         }
         ConstructorInfo ctor = t.GetConstructor(new Type[] { });
         if (ctor == null) {
           continue;
         }
-        var thumber = ctor.Invoke(new object[] { }) as IThumbnailer;
+        var thumber = ctor.Invoke(new object[] { }) as IThumbnails;
         if (thumber == null) {
           continue;
         }
@@ -38,8 +40,11 @@ namespace NMaier.SimpleDlna.Thumbnails
           }
         }
       }
+      return thumbers;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "2#"),
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "1#")]
     public byte[] GetThumbnail(FileSystemInfo file, ref int width, ref int height)
     {
       if (file == null) {
@@ -57,7 +62,9 @@ namespace NMaier.SimpleDlna.Thumbnails
       return GetThumbnailInternal(key, file, mediaType, ref width, ref height);
     }
 
-    [CLSCompliant(false)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "4#"),
+    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "3#"),
+    CLSCompliant(false)]
     public byte[] GetThumbnail(string key, DlnaMediaTypes type, Stream stream, ref int width, ref int height)
     {
       byte[] rv;
@@ -128,7 +135,7 @@ namespace NMaier.SimpleDlna.Thumbnails
           result.SetResolution(image.HorizontalResolution, image.VerticalResolution);
         }
         catch (Exception ex) {
-          LogManager.GetLogger(typeof(Thumbnailer)).Debug("Failed to set resolution", ex);
+          LogManager.GetLogger(typeof(ThumbnailMaker)).Debug("Failed to set resolution", ex);
         }
         using (Graphics graphics = Graphics.FromImage(result)) {
           if (result.Width > image.Width && result.Height > image.Height) {

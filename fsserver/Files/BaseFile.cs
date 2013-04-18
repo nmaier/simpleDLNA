@@ -1,17 +1,16 @@
 ﻿using System;
 using System.IO;
-using NMaier.SimpleDlna.FileMediaServer.Folders;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
 
-namespace NMaier.SimpleDlna.FileMediaServer.Files
+namespace NMaier.SimpleDlna.FileMediaServer
 {
-  internal class BaseFile : Logging, IMediaResource, IFileServerMediaItem, IMediaCover, IMetaInfo
+  internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo
   {
     private WeakReference _cover = new WeakReference(null);
 
-    private static readonly LruDictionary<string, Cover> coverCache = new LruDictionary<string, Cover>(500);
+    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache = new LeastRecentlyUsedDictionary<string, Cover>(500);
 
     private DateTime? lastModified = null;
 
@@ -193,7 +192,7 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
     }
 
 
-    internal static BaseFile GetFile(BaseFolder aParentFolder, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
+    internal static BaseFile GetFile(PlainFolder aParentFolder, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
     {
       switch (aMediaType) {
         case DlnaMediaTypes.Video:
@@ -215,6 +214,9 @@ namespace NMaier.SimpleDlna.FileMediaServer.Files
 
     public virtual int CompareTo(IMediaItem other)
     {
+      if (other == null) {
+        throw new ArgumentNullException("other");
+      }
       return Title.ToLower().CompareTo(other.Title.ToLower());
     }
 
