@@ -12,11 +12,6 @@ namespace NMaier.SimpleDlna.Utilities
 
     private static readonly bool platformSupport = HasPlatformSupport();
 
-    private readonly static Regex sanitizer = new Regex(@"\b(?:the|an?|ein(?:e[rs]?)?|der|die|das)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-    private readonly static Regex whitespaces = new Regex(@"\s+", RegexOptions.Compiled);
-
-
     private static bool HasPlatformSupport()
     {
       try {
@@ -25,11 +20,6 @@ namespace NMaier.SimpleDlna.Utilities
       catch (Exception) {
         return false;
       }
-    }
-
-    private static string Sanitize(string str)
-    {
-      return whitespaces.Replace(sanitizer.Replace(str, string.Empty), " ").Trim();
     }
 
     private static BaseSortPart[] Split(string str)
@@ -82,8 +72,8 @@ namespace NMaier.SimpleDlna.Utilities
 
     public override int Compare(string x, string y)
     {
-      x = Sanitize(x);
-      y = Sanitize(y);
+      x = x.StemCompareBase();
+      y = y.StemCompareBase();
       if (platformSupport) {
         return SafeNativeMethods.StrCmpLogicalW(x, y);
       }

@@ -1,13 +1,11 @@
 using System.Linq;
 using System.Text.RegularExpressions;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class ByTitleView : IView
   {
-    private readonly static Regex regClean = new Regex(@"[^\d\w]+", RegexOptions.Compiled);
-
-
     public string Description
     {
       get
@@ -31,7 +29,7 @@ namespace NMaier.SimpleDlna.Server.Views
       }
 
       foreach (var c in folder.ChildItems.ToList()) {
-        var pre = regClean.Replace(c.Title, string.Empty);
+        var pre = c.Title.StemCompareBase();
         if (string.IsNullOrEmpty(pre)) {
           pre = "Unnamed";
         }

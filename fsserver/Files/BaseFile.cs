@@ -42,11 +42,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (!string.IsNullOrWhiteSpace(title)) {
         title = Uri.UnescapeDataString(title);
       }
-      if (!title.Contains(" ")) {
-        foreach (var c in new char[] { '_', '+', '.' }) {
-          title = title.Replace(c, ' ');
-        }
-      }
+      title = title.StemNameBase();
     }
 
 

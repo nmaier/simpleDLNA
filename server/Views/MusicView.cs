@@ -1,5 +1,6 @@
 using System.Linq;
 using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
@@ -30,9 +31,9 @@ namespace NMaier.SimpleDlna.Server.Views
         return;
       }
       folder
-        .GetFolder(key1.TrimStart().First().ToString().ToUpper())
-        .GetFolder(key1)
-        .GetFolder(key2)
+        .GetFolder(key1.StemCompareBase().First().ToString().ToUpper())
+        .GetFolder(key1.StemNameBase())
+        .GetFolder(key2.StemNameBase())
         .AddResource(r);
     }
 
@@ -50,12 +51,12 @@ namespace NMaier.SimpleDlna.Server.Views
         if (album == null) {
           album = "Unspecified album";
         }
-        albums.GetFolder(album.TrimStart().First().ToString().ToUpper()).GetFolder(album).AddResource(i);
+        albums.GetFolder(album.StemCompareBase().First().ToString().ToUpper()).GetFolder(album.StemNameBase()).AddResource(i);
         LinkTriple(artists, i, ai.MetaArtist, album);
         LinkTriple(performers, i, ai.MetaPerformer, album);
         var genre = ai.MetaGenre;
         if (genre != null) {
-          genres.GetFolder(genre).AddResource(i);
+          genres.GetFolder(genre.StemNameBase()).AddResource(i);
         }
         folder.RemoveResource(i);
       }

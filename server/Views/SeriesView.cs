@@ -1,14 +1,12 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class SeriesView : IView
   {
-    private readonly static Regex re_sanitize = new Regex(@"^[^\w\d]+|[^\w\d]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
     private readonly static Regex re_series = new Regex(@"^(.+?)(?:s\d+[\s_-]*e\d+|\d+[\s_-]*x[\s_-]*\d+|\b[1-9](?:0[1-9]|[1-3]\d)\b)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
 
     public string Description
     {
@@ -22,18 +20,6 @@ namespace NMaier.SimpleDlna.Server.Views
       get
       {
         return "series";
-      }
-    }
-
-
-    private static string Sanitize(string s)
-    {
-      for (; ; ) {
-        var i = s.Trim();
-        s = re_sanitize.Replace(i, string.Empty).Trim();
-        if (i == s) {
-          return s;
-        }
       }
     }
 
@@ -51,11 +37,11 @@ namespace NMaier.SimpleDlna.Server.Views
         if (!m.Success) {
           continue;
         }
-        var ser = Sanitize(m.Groups[1].Value);
+        var ser = m.Groups[1].Value;
         if (string.IsNullOrEmpty(ser)) {
           continue;
         }
-        series.GetFolder(ser).AddResource(i);
+        series.GetFolder(ser.StemNameBase()).AddResource(i);
         folder.RemoveResource(i);
       }
     }
