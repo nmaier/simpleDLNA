@@ -235,34 +235,38 @@ namespace NMaier.SimpleDlna.FileMediaServer
         var files = ids.Resources.ToList();
         thumberTask = new Task(() =>
         {
-          using (thumberTask) {
-            try {
-              foreach (var i in files) {
-                try {
-                  var item = (i.Target as BaseFile);
-                  if (item == null) {
-                    continue;
-                  }
-                  if (store.HasCover(item)) {
-                    continue;
-                  }
-                  item.LoadCover();
-                  using (var k = item.Cover.Content) {
-                    k.ReadByte();
-                  }
+          try {
+            foreach (var i in files) {
+              try {
+                var item = (i.Target as BaseFile);
+                if (item == null) {
+                  continue;
                 }
-                catch (Exception ex) {
-                  Debug("Failed to thumb", ex);
+                if (store.HasCover(item)) {
+                  continue;
+                }
+                item.LoadCover();
+                using (var k = item.Cover.Content) {
+                  k.ReadByte();
                 }
               }
+              catch (Exception ex) {
+                Debug("Failed to thumb", ex);
+              }
             }
-            catch (Exception ex) {
-              Error(ex);
+          }
+          catch (Exception ex) {
+            Error(ex);
+          }
+          finally {
+            try {
+              thumberTask.Dispose();
             }
-            finally {
-              thumberTask = null;
-              GC.Collect();
+            catch (Exception iex) {
+              Debug("thumberTask.Dispose()", iex);
             }
+            thumberTask = null;
+            GC.Collect();
           }
         }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
         thumberTask.Start();
