@@ -7,23 +7,29 @@
     private readonly DlnaMediaTypes types;
 
 
-    public VirtualClonedFolder(IMediaFolder parent)
-      : this(parent, parent.Id, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
-    {
-    }
-    public VirtualClonedFolder(IMediaFolder parent, string name)
-      : this(parent, name, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
-    {
-    }
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-    public VirtualClonedFolder(IMediaFolder parent, string name, DlnaMediaTypes types)
-      : base(parent, name, name)
+    protected VirtualClonedFolder(IMediaFolder parent, string name, string id, DlnaMediaTypes types)
+      : base(parent, name, id)
     {
       this.types = types;
-      Id = name;
+      Id = id;
       clone = parent;
       CloneFolder(this, parent);
       Cleanup();
+    }
+
+
+    public VirtualClonedFolder(IMediaFolder parent)
+      : this(parent, parent.Id, parent.Id, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
+    {
+    }
+    public VirtualClonedFolder(IMediaFolder parent, string name)
+      : this(parent, name, parent.Id, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
+    {
+    }
+    public VirtualClonedFolder(IMediaFolder parent, string name, DlnaMediaTypes types)
+      : this(parent, name, parent.Id, types)
+    {
     }
 
 

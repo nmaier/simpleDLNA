@@ -196,7 +196,7 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public void RegisterMediaServer(IMediaServer server, string order, bool descending)
+    public void RegisterMediaServer(IMediaServer server)
     {
       if (server == null) {
         throw new ArgumentNullException("server");
@@ -207,7 +207,7 @@ namespace NMaier.SimpleDlna.Server
       }
 
       var end = listener.LocalEndpoint as IPEndPoint;
-      var mount = new MediaMount(server, order, descending);
+      var mount = new MediaMount(server);
       servers[guid] = mount;
       RegisterHandler(mount);
 

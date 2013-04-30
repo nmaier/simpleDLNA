@@ -152,12 +152,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
       lock (this) {
         IMediaFolder newMaster;
         if (directories.Length == 1) {
-          newMaster = new PlainRootFolder(friendlyName, this, types, directories[0]);
+          newMaster = new PlainRootFolder(this, types, directories[0]);
         }
         else {
           var virtualMaster = new VirtualFolder(null, friendlyName, "0");
           foreach (var d in directories) {
-            virtualMaster.Merge(new PlainRootFolder(friendlyName, this, types, d));
+            virtualMaster.Merge(new PlainRootFolder(this, types, d));
           }
           newMaster = virtualMaster;
         }

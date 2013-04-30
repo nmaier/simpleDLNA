@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Reflection;
 using System.Xml;
-using NMaier.SimpleDlna.Server.Comparers;
 using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   internal sealed partial class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
-    private readonly IItemComparer comparer;
-
-    private readonly bool desc;
-
     private readonly string descriptor;
 
     private static uint mount = 0;
@@ -23,17 +18,9 @@ namespace NMaier.SimpleDlna.Server
     private uint systemID = 1;
 
 
-    public MediaMount(IMediaServer aServer, string order, bool desc)
+    public MediaMount(IMediaServer aServer)
     {
       server = aServer;
-      this.desc = desc;
-      if (string.IsNullOrWhiteSpace(order)) {
-        order = "title";
-      }
-      comparer = ComparerRepository.Lookup(order);
-      if (comparer == null) {
-        throw new ArgumentException("Invalid order");
-      }
       prefix = String.Format("/mm-{0}/", ++mount);
       descriptor = GenerateDescriptor();
       if (server is IVolatileMediaServer) {
@@ -98,12 +85,7 @@ namespace NMaier.SimpleDlna.Server
 
     public IMediaItem GetItem(string id)
     {
-      var i = server.GetItem(id);
-      var f = i as IMediaFolder;
-      if (f != null) {
-        f.Sort(comparer, desc);
-      }
-      return i;
+      return server.GetItem(id);
     }
 
     public IResponse HandleRequest(IRequest request)

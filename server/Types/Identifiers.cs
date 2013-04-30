@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NMaier.SimpleDlna.Server.Comparers;
 using NMaier.SimpleDlna.Server.Views;
 using NMaier.SimpleDlna.Utilities;
 
@@ -8,6 +9,8 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class Identifiers : Logging
   {
+    private readonly IItemComparer comparer;
+
     private static readonly Random idGen = new Random();
 
     private readonly Dictionary<string, WeakReference> ids = new Dictionary<string, WeakReference>();
@@ -17,6 +20,15 @@ namespace NMaier.SimpleDlna.Server
     private Dictionary<string, string> paths = new Dictionary<string, string>();
 
     private readonly List<IView> views = new List<IView>();
+
+    private readonly bool order;
+
+
+    public Identifiers(IItemComparer comparer, bool order)
+    {
+      this.comparer = comparer;
+      this.order = order;
+    }
 
 
     public bool HasViews
@@ -118,6 +130,8 @@ namespace NMaier.SimpleDlna.Server
       rv.Cleanup();
       ids[id] = new WeakReference(rv);
       hardRefs[id] = rv;
+      rv.Id = id;
+      rv.Sort(comparer, order);
       return rv;
     }
   }
