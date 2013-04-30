@@ -4,12 +4,15 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class ResponseHeaders : RawHeaders
   {
-    public ResponseHeaders()
+    public ResponseHeaders() : this(noCache: true) { }
+    public ResponseHeaders(bool noCache)
     {
       this["Server"] = HttpServer.Signature;
-      this["Cache-Control"] = "no-cache";
       this["Date"] = DateTime.Now.ToString("R");
       this["Connection"] = "keep-alive";
+      if (noCache) {
+        this["Cache-Control"] = "no-cache";
+      }
     }
   }
 }

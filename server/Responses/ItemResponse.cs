@@ -7,7 +7,7 @@ namespace NMaier.SimpleDlna.Server
 {
   internal sealed class ItemResponse : Logging, IResponse
   {
-    private readonly Headers headers = new ResponseHeaders();
+    private readonly Headers headers;
 
     private readonly HttpCodes status = HttpCodes.OK;
 
@@ -17,6 +17,7 @@ namespace NMaier.SimpleDlna.Server
     public ItemResponse(IRequest request, IMediaResource aItem, string transferMode = "Streaming")
     {
       item = aItem;
+      headers = new ResponseHeaders(noCache: !(item is IMediaCoverResource));
       var meta = item as IMetaInfo;
       if (meta != null) {
         headers.Add("Content-Length", meta.InfoSize.ToString());

@@ -98,9 +98,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       vacuumer.Enabled = true;
     }
 
-
-
-
     public void Dispose()
     {
       if (insert != null) {
@@ -185,7 +182,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       try {
         using (var s = new MemoryStream(data)) {
-          var formatter = new BinaryFormatter() { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
+          var ctx = new StreamingContext(StreamingContextStates.Persistence, new DeserializeInfo(null, info, DlnaMime.JPEG));
+          var formatter = new BinaryFormatter(null, ctx) { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
           var rv = formatter.Deserialize(s) as Cover;
           return rv;
         }

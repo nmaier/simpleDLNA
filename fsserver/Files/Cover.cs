@@ -2,13 +2,14 @@
 using System.IO;
 using System.Runtime.Serialization;
 using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Thumbnails;
 using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
-  internal sealed class Cover : Logging, IMediaCoverResource, ISerializable
+  internal sealed class Cover : Logging, IMediaCoverResource, IMetaInfo, ISerializable
   {
     private byte[] _bytes;
 
@@ -23,9 +24,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private Cover(SerializationInfo info, StreamingContext ctx)
     {
-      _bytes = info.GetValue("bytes", typeof(byte[])) as byte[];
-      width = info.GetInt32("width");
-      height = info.GetInt32("height");
+      _bytes = info.GetValue("b", typeof(byte[])) as byte[];
+      width = info.GetInt32("w");
+      height = info.GetInt32("h");
+      var di = ctx.Context as DeserializeInfo;
+      if (di != null) {
+        file = di.Info;
+      }
     }
 
 
@@ -75,6 +80,32 @@ namespace NMaier.SimpleDlna.FileMediaServer
       set
       {
         throw new NotSupportedException();
+      }
+    }
+    public DateTime InfoDate
+    {
+      get
+      {
+        if (file != null) {
+          return file.LastWriteTimeUtc;
+        }
+        return DateTime.Now;
+      }
+    }
+    public long? InfoSize
+    {
+      get
+      {
+        try {
+          var b = bytes;
+          if (b != null) {
+            return b.Length;
+          }
+          return null;
+        }
+        catch (NotSupportedException) {
+          return null;
+        }
       }
     }
     public DlnaMediaTypes MediaType
@@ -164,9 +195,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (info == null) {
         throw new ArgumentNullException("info");
       }
-      info.AddValue("bytes", _bytes);
-      info.AddValue("width", width);
-      info.AddValue("height", height);
+      info.AddValue("b", _bytes);
+      info.AddValue("w", width);
+      info.AddValue("h", height);
     }
   }
 }
