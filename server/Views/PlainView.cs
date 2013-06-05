@@ -2,16 +2,16 @@ using System.Linq;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal sealed class PlainView : IView
+  internal sealed class PlainView : BaseView
   {
-    public string Description
+    public override string Description
     {
       get
       {
         return "Mushes all files together into the root folder";
       }
     }
-    public string Name
+    public override string Name
     {
       get
       {
@@ -31,7 +31,7 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
 
-    public IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder Root)
     {
       var rv = new VirtualFolder(null, Root.Title, Root.Id);
       EatAll(rv, Root);

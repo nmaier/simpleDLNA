@@ -4,19 +4,19 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Comparers
 {
-  internal class TitleComparer : IItemComparer, IComparer
+  internal class TitleComparer : BaseComparer
   {
     private readonly static StringComparer comp = new NaturalStringComparer();
 
 
-    public virtual string Description
+    public override string Description
     {
       get
       {
         return "Sort alphabetically";
       }
     }
-    public virtual string Name
+    public override string Name
     {
       get
       {
@@ -25,7 +25,7 @@ namespace NMaier.SimpleDlna.Server.Comparers
     }
 
 
-    public virtual int Compare(IMediaItem x, IMediaItem y)
+    public override int Compare(IMediaItem x, IMediaItem y)
     {
       if (x == null) {
         throw new ArgumentNullException("x");
@@ -34,17 +34,6 @@ namespace NMaier.SimpleDlna.Server.Comparers
         throw new ArgumentNullException("y");
       }
       return comp.Compare(x.Title, y.Title);
-    }
-
-    public int Compare(object x, object y)
-    {
-      if (x == null) {
-        throw new ArgumentNullException("x");
-      }
-      if (y == null) {
-        throw new ArgumentNullException("y");
-      }
-      return comp.Compare(x, y);
     }
   }
 }

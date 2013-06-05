@@ -37,13 +37,12 @@ namespace NMaier.SimpleDlna
     {
       var items = from v in ComparerRepository.ListItems()
                   orderby v.Key
-                  select v;
+                  select v.Value;
       Console.WriteLine("Available orders:");
       Console.WriteLine("----------------");
       Console.WriteLine();
       foreach (var i in items) {
-        Console.WriteLine("  - " + i.Key);
-        Console.WriteLine(i.Value);
+        Console.WriteLine("  - " + i);
         Console.WriteLine();
       }
     }
@@ -52,13 +51,12 @@ namespace NMaier.SimpleDlna
     {
       var items = from v in ViewRepository.ListItems()
                   orderby v.Key
-                  select v;
+                  select v.Value;
       Console.WriteLine("Available views:");
       Console.WriteLine("----------------");
       Console.WriteLine();
       foreach (var i in items) {
-        Console.WriteLine("  - " + i.Key);
-        Console.WriteLine(i.Value);
+        Console.WriteLine("  - " + i);
         Console.WriteLine();
       }
     }

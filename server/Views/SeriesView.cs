@@ -4,24 +4,26 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal sealed class SeriesView : IView
+  internal sealed class SeriesView : BaseView
   {
     private readonly static Regex re_series = new Regex(@"^(.+?)(?:s\d+[\s_-]*e\d+|\d+[\s_-]*x[\s_-]*\d+|\b[1-9](?:0[1-9]|[1-3]\d)\b)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public string Description
+
+    public override string Description
     {
       get
       {
         return "Try to determine (TV) series from title and categorize accordingly";
       }
     }
-    public string Name
+    public override string Name
     {
       get
       {
         return "series";
       }
     }
+
 
     private static void SortFolder(IMediaFolder folder, SimpleKeyedVirtualFolder series)
     {
@@ -47,7 +49,7 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
 
-    public IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
       var series = new SimpleKeyedVirtualFolder(root, "Series");

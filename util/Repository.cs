@@ -38,11 +38,11 @@ namespace NMaier.SimpleDlna.Utilities
 
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes")]
-    public static IDictionary<string, string> ListItems()
+    public static IDictionary<string, IRepositoryItem> ListItems()
     {
-      var rv = new Dictionary<string, string>();
+      var rv = new Dictionary<string, IRepositoryItem>();
       foreach (var v in items.Values) {
-        rv.Add(v.Name, v.Description);
+        rv.Add(v.Name, v);
       }
       return rv;
     }

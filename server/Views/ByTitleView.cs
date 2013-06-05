@@ -1,19 +1,18 @@
 using System.Linq;
-using System.Text.RegularExpressions;
 using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal sealed class ByTitleView : IView
+  internal sealed class ByTitleView : BaseView
   {
-    public string Description
+    public override string Description
     {
       get
       {
         return "Reorganizes files into folders by title";
       }
     }
-    public string Name
+    public override string Name
     {
       get
       {
@@ -40,7 +39,7 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
 
-    public IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
       var titles = new TitlesFolder(root);

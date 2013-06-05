@@ -2,16 +2,16 @@
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal sealed class FlattenView : IView
+  internal sealed class FlattenView : BaseView
   {
-    public string Description
+    public override string Description
     {
       get
       {
         return "Removes empty intermediate folders and flattens folders with only few files";
       }
     }
-    public string Name
+    public override string Name
     {
       get
       {
@@ -71,7 +71,7 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
 
-    public IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder Root)
     {
       var r = new VirtualClonedFolder(Root);
       var cross = from f in r.ChildFolders

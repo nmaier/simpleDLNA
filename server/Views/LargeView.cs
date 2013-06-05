@@ -3,22 +3,20 @@ using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal class LargeView : IView
+  internal class LargeView : BaseView
   {
     private const long MIN_SIZE = 300 * 1024 * 1024;
 
 
-    public string Description
+    public override string Description
     {
-      get
-      {
+      get {
         return "Show only large files";
       }
     }
-    public string Name
+    public override string Name
     {
-      get
-      {
+      get {
         return "large";
       }
     }
@@ -42,7 +40,7 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
 
-    public IMediaFolder Transform(IMediaFolder root)
+    public override IMediaFolder Transform(IMediaFolder root)
     {
       root = new VirtualClonedFolder(root);
       ProcessFolder(root);

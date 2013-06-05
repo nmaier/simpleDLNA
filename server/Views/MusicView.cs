@@ -4,16 +4,16 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal sealed class MusicView : IView
+  internal sealed class MusicView : BaseView
   {
-    public string Description
+    public override string Description
     {
       get
       {
         return "Reorganizes files into a proper music collection";
       }
     }
-    public string Name
+    public override string Name
     {
       get
       {
@@ -63,7 +63,7 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
 
-    public IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
       var artists = new TripleKeyedVirtualFolder(root, "Artists");

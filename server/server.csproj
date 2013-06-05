@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Comparers\BaseComparer.cs" />
     <Compile Include="Comparers\ComparerRepository.cs" />
     <Compile Include="Comparers\DateComparer.cs" />
     <Compile Include="Comparers\FileSizeComparer.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="Types\UpnpDevice.cs" />
     <Compile Include="Types\VirtualClonedFolder.cs" />
     <Compile Include="Types\VirtualFolder.cs" />
+    <Compile Include="Views\BaseView.cs" />
     <Compile Include="Views\ByTitleView.cs" />
     <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Views\IView.cs" />
