@@ -10,7 +10,6 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
-using log4net.Layout;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
@@ -20,65 +19,48 @@ namespace NMaier.SimpleDlna.GUI
   public partial class FormMain : Form, IAppender, IDisposable
   {
     private readonly Properties.Settings Config = Properties.Settings.Default;
-    private readonly HttpServer httpServer;
-    private readonly ILayout layout;
+    private HttpServer httpServer;
     private readonly FileInfo cacheFile = new FileInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "sdlna.cache"));
     private bool canClose = false;
 
     public FormMain()
     {
       InitializeComponent();
-
-      notifyIcon.Icon = Icon;
-
+      SetupLogging();
       StartPipeNotification();
 
-      layout = SetupLogging();
-
+      notifyIcon.Icon = Icon;
       if (!string.IsNullOrWhiteSpace(Config.cache)) {
         cacheFile = new FileInfo(Config.cache);
       }
-      httpServer = new HttpServer(Config.port);
-
-      Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
-
-      LoadConfig();
     }
 
-    private ILayout SetupLogging()
+    private void SetupLogging()
     {
-      var layout = new PatternLayout()
-      {
-        ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception"
-      };
-      layout.ActivateOptions();
       BasicConfigurator.Configure(this);
       LogManager.GetRepository().Threshold = Level.Info;
-      return layout;
     }
 
     private void StartPipeNotification()
     {
-      var t = new Thread(() =>
-      {
-        for (; ; ) {
-          try {
-            using (var pipe = new NamedPipeServerStream("simpledlnagui", PipeDirection.InOut)) {
-              pipe.WaitForConnection();
-              pipe.ReadByte();
-              BeginInvoke((Action)(() =>
-              {
-                notifyIcon_DoubleClick(null, null);
-                BringToFront();
-              }));
-            }
-          }
-          catch (Exception) {
-          }
-        }
-      });
-      t.IsBackground = true;
-      t.Start();
+      new Thread(() =>
+       {
+         for (; ; ) {
+           try {
+             using (var pipe = new NamedPipeServerStream("simpledlnagui", PipeDirection.InOut)) {
+               pipe.WaitForConnection();
+               pipe.ReadByte();
+               BeginInvoke((Action)(() =>
+               {
+                 notifyIcon_DoubleClick(null, null);
+                 BringToFront();
+               }));
+             }
+           }
+           catch (Exception) {
+           }
+         }
+       }) { IsBackground = true }.Start();
     }
 
     private void ButtonNewServer_Click(object sender, EventArgs e)
@@ -148,15 +130,21 @@ namespace NMaier.SimpleDlna.GUI
       Thread.Sleep(2000);
     }
 
+    private delegate void logDelegate(string level, string logger, string msg);
+
     public void DoAppend(LoggingEvent loggingEvent)
     {
-      using (var tw = new StringWriter()) {
-        layout.Format(tw, loggingEvent);
+      var cls = loggingEvent.LoggerName;
+      cls = cls.Substring(cls.LastIndexOf('.') + 1);
+      BeginInvoke(new logDelegate((lvl, lg, msg) =>
+      {
         if (logger.Items.Count >= 300) {
           logger.Items.RemoveAt(0);
         }
-        logger.Items.Add(tw.ToString());
-      }
+        logger.EnsureVisible(logger.Items.Add(new ListViewItem(new string[] { lvl, lg, msg })).Index);
+        colLogLogger.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+        colLogMessage.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+      }), loggingEvent.Level.DisplayName, cls, loggingEvent.RenderedMessage);
     }
 
     private void notifyIcon_DoubleClick(object sender, EventArgs e)
@@ -217,6 +205,15 @@ namespace NMaier.SimpleDlna.GUI
     private void openInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
     {
       Process.Start(string.Format("http://localhost:{0}/", httpServer.RealPort));
+    }
+
+    private void FormMain_Load(object sender, EventArgs e)
+    {
+      httpServer = new HttpServer(Config.port);
+
+      Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
+
+      LoadConfig();
     }
   }
 }

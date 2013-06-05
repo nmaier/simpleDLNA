@@ -37,7 +37,6 @@
       this.buttonEdit = new System.Windows.Forms.Button();
       this.buttonStartStop = new System.Windows.Forms.Button();
       this.buttonRemove = new System.Windows.Forms.Button();
-      this.logger = new System.Windows.Forms.ListBox();
       this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
       this.notifyContext = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.showContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,18 +44,22 @@
       this.exitContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.mainMenu = new System.Windows.Forms.MenuStrip();
       this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+      this.openInBrowserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
       this.hideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+      this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
-      this.openInBrowserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.logger = new System.Windows.Forms.ListView();
+      this.colLogLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
       // 
-      // ListDescriptions
+      // listDescriptions
       // 
       this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -69,82 +72,71 @@
       this.listDescriptions.HideSelection = false;
       this.listDescriptions.Location = new System.Drawing.Point(12, 27);
       this.listDescriptions.MultiSelect = false;
-      this.listDescriptions.Name = "ListDescriptions";
+      this.listDescriptions.Name = "listDescriptions";
       this.listDescriptions.Size = new System.Drawing.Size(599, 184);
       this.listDescriptions.TabIndex = 0;
       this.listDescriptions.UseCompatibleStateImageBehavior = false;
       this.listDescriptions.View = System.Windows.Forms.View.Details;
       this.listDescriptions.SelectedIndexChanged += new System.EventHandler(this.ListDescriptions_SelectedIndexChanged);
       // 
-      // ColName
+      // colName
       // 
       this.colName.Text = "Name";
       // 
-      // ColDirectories
+      // colDirectories
       // 
       this.colDirectories.Text = "Directories";
       this.colDirectories.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
       // 
-      // ColActive
+      // colActive
       // 
       this.colActive.Text = "Active";
       // 
-      // ButtonNewServer
+      // buttonNewServer
       // 
       this.buttonNewServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.buttonNewServer.Location = new System.Drawing.Point(536, 217);
-      this.buttonNewServer.Name = "ButtonNewServer";
+      this.buttonNewServer.Name = "buttonNewServer";
       this.buttonNewServer.Size = new System.Drawing.Size(75, 23);
       this.buttonNewServer.TabIndex = 1;
       this.buttonNewServer.Text = "New Server";
       this.buttonNewServer.UseVisualStyleBackColor = true;
       this.buttonNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
       // 
-      // ButtonEdit
+      // buttonEdit
       // 
       this.buttonEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonEdit.Enabled = false;
       this.buttonEdit.Location = new System.Drawing.Point(93, 217);
-      this.buttonEdit.Name = "ButtonEdit";
+      this.buttonEdit.Name = "buttonEdit";
       this.buttonEdit.Size = new System.Drawing.Size(75, 23);
       this.buttonEdit.TabIndex = 2;
       this.buttonEdit.Text = "Edit";
       this.buttonEdit.UseVisualStyleBackColor = true;
       this.buttonEdit.Click += new System.EventHandler(this.ButtonEdit_Click);
       // 
-      // ButtonStartStop
+      // buttonStartStop
       // 
       this.buttonStartStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonStartStop.Enabled = false;
       this.buttonStartStop.Location = new System.Drawing.Point(12, 217);
-      this.buttonStartStop.Name = "ButtonStartStop";
+      this.buttonStartStop.Name = "buttonStartStop";
       this.buttonStartStop.Size = new System.Drawing.Size(75, 23);
       this.buttonStartStop.TabIndex = 3;
       this.buttonStartStop.Text = "Start/Stop";
       this.buttonStartStop.UseVisualStyleBackColor = true;
       this.buttonStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
       // 
-      // ButtonRemove
+      // buttonRemove
       // 
       this.buttonRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonRemove.Enabled = false;
       this.buttonRemove.Location = new System.Drawing.Point(174, 217);
-      this.buttonRemove.Name = "ButtonRemove";
+      this.buttonRemove.Name = "buttonRemove";
       this.buttonRemove.Size = new System.Drawing.Size(75, 23);
       this.buttonRemove.TabIndex = 4;
       this.buttonRemove.Text = "Remove";
       this.buttonRemove.UseVisualStyleBackColor = true;
-      // 
-      // Logger
-      // 
-      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-      this.logger.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.logger.FormattingEnabled = true;
-      this.logger.Location = new System.Drawing.Point(12, 246);
-      this.logger.Name = "Logger";
-      this.logger.Size = new System.Drawing.Size(599, 147);
-      this.logger.TabIndex = 5;
       // 
       // notifyIcon
       // 
@@ -202,17 +194,17 @@
       this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
       this.fileToolStripMenuItem.Text = "&File";
       // 
-      // exitToolStripMenuItem
+      // openInBrowserToolStripMenuItem
       // 
-      this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-      this.exitToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
-      this.exitToolStripMenuItem.Text = "&Exit";
-      this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitContextMenuItem_Click);
+      this.openInBrowserToolStripMenuItem.Name = "openInBrowserToolStripMenuItem";
+      this.openInBrowserToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+      this.openInBrowserToolStripMenuItem.Text = "Open in Browser";
+      this.openInBrowserToolStripMenuItem.Click += new System.EventHandler(this.openInBrowserToolStripMenuItem_Click);
       // 
-      // toolStripMenuItem2
+      // toolStripMenuItem3
       // 
-      this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-      this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
+      this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+      this.toolStripMenuItem3.Size = new System.Drawing.Size(158, 6);
       // 
       // hideToolStripMenuItem
       // 
@@ -220,6 +212,18 @@
       this.hideToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.hideToolStripMenuItem.Text = "Hide";
       this.hideToolStripMenuItem.Click += new System.EventHandler(this.hideToolStripMenuItem_Click);
+      // 
+      // toolStripMenuItem2
+      // 
+      this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+      this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
+      // 
+      // exitToolStripMenuItem
+      // 
+      this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+      this.exitToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+      this.exitToolStripMenuItem.Text = "&Exit";
+      this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitContextMenuItem_Click);
       // 
       // helpToolStripMenuItem
       // 
@@ -232,29 +236,49 @@
       // aboutToolStripMenuItem
       // 
       this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
       this.aboutToolStripMenuItem.Text = "About";
       this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
       // 
-      // toolStripMenuItem3
+      // logger
       // 
-      this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-      this.toolStripMenuItem3.Size = new System.Drawing.Size(158, 6);
+      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.logger.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colLogLevel,
+            this.colLogLogger,
+            this.colLogMessage});
+      this.logger.FullRowSelect = true;
+      this.logger.HideSelection = false;
+      this.logger.Location = new System.Drawing.Point(12, 246);
+      this.logger.MultiSelect = false;
+      this.logger.Name = "logger";
+      this.logger.Size = new System.Drawing.Size(599, 148);
+      this.logger.TabIndex = 8;
+      this.logger.UseCompatibleStateImageBehavior = false;
+      this.logger.View = System.Windows.Forms.View.Details;
       // 
-      // openInBrowserToolStripMenuItem
+      // colLogLevel
       // 
-      this.openInBrowserToolStripMenuItem.Name = "openInBrowserToolStripMenuItem";
-      this.openInBrowserToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
-      this.openInBrowserToolStripMenuItem.Text = "Open in Browser";
-      this.openInBrowserToolStripMenuItem.Click += new System.EventHandler(this.openInBrowserToolStripMenuItem_Click);
+      this.colLogLevel.Text = "Level";
+      // 
+      // colLogMessage
+      // 
+      this.colLogMessage.Text = "Message";
+      this.colLogMessage.Width = 200;
+      // 
+      // colLogLogger
+      // 
+      this.colLogLogger.Text = "Logger";
       // 
       // FormMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(623, 406);
-      this.Controls.Add(this.mainMenu);
       this.Controls.Add(this.logger);
+      this.Controls.Add(this.mainMenu);
       this.Controls.Add(this.buttonRemove);
       this.Controls.Add(this.buttonStartStop);
       this.Controls.Add(this.buttonEdit);
@@ -267,6 +291,7 @@
       this.Text = "SimpleDLNA";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
       this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
+      this.Load += new System.EventHandler(this.FormMain_Load);
       this.Resize += new System.EventHandler(this.FormMain_Resize);
       this.notifyContext.ResumeLayout(false);
       this.mainMenu.ResumeLayout(false);
@@ -286,7 +311,6 @@
     private System.Windows.Forms.Button buttonEdit;
     private System.Windows.Forms.Button buttonStartStop;
     private System.Windows.Forms.Button buttonRemove;
-    private System.Windows.Forms.ListBox logger;
     private System.Windows.Forms.NotifyIcon notifyIcon;
     private System.Windows.Forms.ContextMenuStrip notifyContext;
     private System.Windows.Forms.ToolStripMenuItem showContextMenuItem;
@@ -301,6 +325,10 @@
     private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
     private System.Windows.Forms.ToolStripMenuItem openInBrowserToolStripMenuItem;
     private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
+    private System.Windows.Forms.ListView logger;
+    private System.Windows.Forms.ColumnHeader colLogLevel;
+    private System.Windows.Forms.ColumnHeader colLogMessage;
+    private System.Windows.Forms.ColumnHeader colLogLogger;
   }
 }
 
