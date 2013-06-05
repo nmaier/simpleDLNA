@@ -165,7 +165,7 @@ namespace NMaier.SimpleDlna
           throw new GetOptException("Invalid view " + v);
         }
       }
-      var fs = new FileServer(types, ids, d);
+      var fs = new FileServer(types, ids, null, d);
       try {
         if (options.CacheFile != null) {
           fs.SetCacheFile(options.CacheFile);

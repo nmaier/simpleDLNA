@@ -27,7 +27,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
     private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
 
-    public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
+    public FileServer(DlnaMediaTypes types, Identifiers ids, string proposedFriendlyName, params DirectoryInfo[] directories)
     {
       this.types = types;
       this.ids = ids;
@@ -35,7 +35,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (this.directories.Length == 0) {
         throw new ArgumentException("Provide one or more directories", "directories");
       }
-      if (this.directories.Length == 1) {
+      if (!string.IsNullOrWhiteSpace(proposedFriendlyName)) {
+        friendlyName = proposedFriendlyName;
+      }
+      else if (this.directories.Length == 1) {
         friendlyName = string.Format("{0} ({1})", this.directories[0].Name, this.directories[0].Parent.FullName);
       }
       else {
