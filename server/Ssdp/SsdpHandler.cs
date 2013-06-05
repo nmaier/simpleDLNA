@@ -14,7 +14,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
   {
     private readonly UdpClient client = new UdpClient();
     private readonly Threading.AutoResetEvent datagramPosted = new Threading.AutoResetEvent(false);
-    private const int DATAGRAMS_PER_MESSAGE = 3;
+    private const int DATAGRAMS_PER_MESSAGE = 2;
     private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
     private readonly Queue<Datagram> messageQueue = new Queue<Datagram>();
     private readonly Timers.Timer notificationTimer = new Timers.Timer(60000);
