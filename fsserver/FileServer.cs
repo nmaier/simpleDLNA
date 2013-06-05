@@ -88,7 +88,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           thumberTask.Dispose();
           thumberTask = null;
         }
-        catch (ObjectDisposedException) {
+        catch (Exception) {
           thumberTask = null; // Silence of the Warnings
         }
       }

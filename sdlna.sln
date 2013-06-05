@@ -18,14 +18,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{09D30F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "util", "util\util.csproj", "{A8960A7A-887C-40D7-9632-002E94BFC830}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleDLNA", "SimpleDLNA\SimpleDLNA.csproj", "{9BAEFB29-C818-446B-9BB5-014E6A0CBB49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C99E77FD-0728-4A2F-A9C0-47AAC7CAEFED}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{C99E77FD-0728-4A2F-A9C0-47AAC7CAEFED}.Debug|Any CPU.Build.0 = Debug|x86
+		{C99E77FD-0728-4A2F-A9C0-47AAC7CAEFED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C99E77FD-0728-4A2F-A9C0-47AAC7CAEFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C99E77FD-0728-4A2F-A9C0-47AAC7CAEFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C99E77FD-0728-4A2F-A9C0-47AAC7CAEFED}.Release|Any CPU.Build.0 = Release|Any CPU
 		{232A96F6-A2BF-44C8-B623-6E411F6296F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{A8960A7A-887C-40D7-9632-002E94BFC830}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A8960A7A-887C-40D7-9632-002E94BFC830}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A8960A7A-887C-40D7-9632-002E94BFC830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BAEFB29-C818-446B-9BB5-014E6A0CBB49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BAEFB29-C818-446B-9BB5-014E6A0CBB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BAEFB29-C818-446B-9BB5-014E6A0CBB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BAEFB29-C818-446B-9BB5-014E6A0CBB49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
