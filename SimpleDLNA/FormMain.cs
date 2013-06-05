@@ -13,6 +13,7 @@ using log4net.Core;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
+using System.Threading.Tasks;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -101,10 +102,17 @@ namespace NMaier.SimpleDlna.GUI
     }
     private void LoadConfig()
     {
-      foreach (var d in Config.Descriptors) {
-        listDescriptions.Items.Add(new ServerListViewItem(httpServer, cacheFile, d));
-      }
-      SizeDescriptorColumns();
+      Task.Factory.StartNew(() =>
+      {
+        foreach (var d in Config.Descriptors) {
+          var f = new ServerListViewItem(httpServer, cacheFile, d);
+          Invoke((Action)(() =>
+          {
+            listDescriptions.Items.Add(f);
+            SizeDescriptorColumns();
+          }));
+        }
+      });
     }
 
     private void ButtonEdit_Click(object sender, EventArgs e)
