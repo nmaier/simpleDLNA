@@ -39,16 +39,20 @@ namespace NMaier.SimpleDlna.Server
       timeouter.Enabled = true;
 
       prefixes.Add("/favicon.ico", new StaticHandler(new ResourceResponse(HttpCodes.OK, "image/icon", "favicon")));
+      prefixes.Add("/static/browse.css", new StaticHandler(new ResourceResponse(HttpCodes.OK, "text/css", "browse_css")));
       RegisterHandler(new IconHandler());
 
       listener.Server.Ttl = 32;
       listener.Server.UseOnlyOverlappedIO = true;
       listener.Start();
-      var realPort = (listener.LocalEndpoint as IPEndPoint).Port;
-      InfoFormat("Running HTTP Server: {0} on port {1}", Signature, realPort);
+      RealPort = (listener.LocalEndpoint as IPEndPoint).Port;
+      InfoFormat("Running HTTP Server: {0} on port {1}", Signature, RealPort);
       ssdpServer = new SsdpHandler();
       Accept();
     }
+
+
+    public int RealPort { get; private set; }
 
 
     private void Accept()
@@ -134,6 +138,10 @@ namespace NMaier.SimpleDlna.Server
 
     internal IPrefixHandler FindHandler(string prefix)
     {
+      if (prefix == "/") {
+        return new IndexHandler(this);
+      }
+
       foreach (var s in prefixes.Keys) {
         if (prefix.StartsWith(s)) {
           return prefixes[s];
@@ -215,6 +223,18 @@ namespace NMaier.SimpleDlna.Server
         var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
         ssdpServer.RegisterNotification(guid, uri);
         InfoFormat("New mount at: {0}", uri);
+      }
+    }
+
+    public Dictionary<string, string> MediaMounts
+    {
+      get
+      {
+        Dictionary<string, string> rv = new Dictionary<string, string>();
+        foreach (var m in servers) {
+          rv[m.Value.Prefix] = m.Value.FriendlyName;
+        }
+        return rv;
       }
     }
 

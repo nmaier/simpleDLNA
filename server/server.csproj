@@ -63,6 +63,7 @@
     <Compile Include="Comparers\IItemComparer.cs" />
     <Compile Include="Comparers\TitleComparer.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Http\HttpPhrases.cs" />
     <Compile Include="Interfaces\IBookmarkable.cs" />
     <Compile Include="Ssdp\Datagram.cs" />

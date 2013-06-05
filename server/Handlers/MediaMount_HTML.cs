@@ -37,7 +37,7 @@ namespace NMaier.SimpleDlna.Server
       head.AppendChild(doc.EL("title", text: string.Format("{0} — simple DLNA", item.Title)));
       head.AppendChild(doc.EL(
         "link",
-        new AttributeCollection() { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", prefix + "browse.css" } }
+        new AttributeCollection() { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "/static/browse.css" } }
         ));
 
       var body = doc.EL("body");

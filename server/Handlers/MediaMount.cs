@@ -119,9 +119,6 @@ namespace NMaier.SimpleDlna.Server
         var item = GetItem(id);
         return ProcessHtmlRequest(item);
       }
-      if (path == "browse.css") {
-        return new ResourceResponse(HttpCodes.OK, "text/css", "browse_css");
-      }
       WarnFormat("Did not understand {0} {1}", request.Method, path);
       throw new Http404Exception();
     }
