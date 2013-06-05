@@ -25,28 +25,37 @@ namespace NMaier.SimpleDlna.GUI
       this.server = server;
       this.cacheFile = cacheFile;
       Description = description;
-      UpdateInfo();
       StartFileServer();
+      UpdateInfo();
     }
 
 
     private void StartFileServer()
     {
       if (Description.Active) {
-        var ids = new Identifiers(ComparerRepository.Lookup(Description.Order), Description.OrderDescending);
-        foreach (var v in Description.Views) {
-          ids.AddView(v);
+        try {
+          var ids = new Identifiers(ComparerRepository.Lookup(Description.Order), Description.OrderDescending);
+          foreach (var v in Description.Views) {
+            ids.AddView(v);
+          }
+          var dirs = (from i in Description.Directories
+                      let d = new DirectoryInfo(i)
+                      where d.Exists
+                      select d).ToArray();
+          if (dirs.Length == 0) {
+            throw new InvalidOperationException("No remaining directories");
+          }
+          fileServer = new FileServer(Description.Types, ids, dirs);
+          if (cacheFile != null) {
+            fileServer.SetCacheFile(cacheFile);
+          }
+          fileServer.Load();
+          server.RegisterMediaServer(fileServer);
         }
-        var dirs = (from i in Description.Directories
-                    let d = new DirectoryInfo(i)
-                    where d.Exists
-                    select d).ToArray();
-        fileServer = new FileServer(Description.Types, ids, dirs);
-        if (cacheFile != null) {
-          fileServer.SetCacheFile(cacheFile);
+        catch (Exception ex) {
+          server.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
+          Description.ToggleActive();
         }
-        fileServer.Load();
-        server.RegisterMediaServer(fileServer);
       }
     }
 
@@ -81,16 +90,16 @@ namespace NMaier.SimpleDlna.GUI
     {
       StopFileServer();
       Description.ToggleActive();
-      UpdateInfo();
       StartFileServer();
+      UpdateInfo();
     }
 
     public void UpdateInfo(ServerDescription description)
     {
       StopFileServer();
       Description.AdoptInfo(description);
-      UpdateInfo();
       StartFileServer();
+      UpdateInfo();
     }
   }
 }
