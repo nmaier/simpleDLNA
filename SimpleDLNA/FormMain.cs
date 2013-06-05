@@ -215,5 +215,18 @@ namespace NMaier.SimpleDlna.GUI
 
       LoadConfig();
     }
+
+    private void buttonRemove_Click(object sender, EventArgs e)
+    {
+      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
+      if (item == null) {
+        return;
+      }
+      if (item.Description.Active) {
+        item.Toggle();
+      }
+      listDescriptions.Items.Remove(item);
+      SaveConfig();
+    }
   }
 }
