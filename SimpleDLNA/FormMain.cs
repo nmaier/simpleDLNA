@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -12,7 +14,6 @@ using log4net.Layout;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
-using System.Diagnostics;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -29,6 +30,8 @@ namespace NMaier.SimpleDlna.GUI
       InitializeComponent();
 
       notifyIcon.Icon = Icon;
+
+      StartPipeNotification();
 
       var layout = new PatternLayout()
       {
@@ -47,6 +50,28 @@ namespace NMaier.SimpleDlna.GUI
       Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
 
       LoadConfig();
+    }
+
+    private void StartPipeNotification()
+    {
+      new Thread(() =>
+      {
+        for (; ; ) {
+          try {
+            using (var pipe = new NamedPipeServerStream("simpledlnagui", PipeDirection.InOut)) {
+              pipe.WaitForConnection();
+              pipe.ReadByte();
+              BeginInvoke((Action)(() =>
+                          {
+                            notifyIcon_DoubleClick(null, null);
+                            BringToFront();
+                          }));
+            }
+          }
+          catch (Exception) {
+          }
+        }
+      }).Start();
     }
 
     private void ButtonNewServer_Click(object sender, EventArgs e)
