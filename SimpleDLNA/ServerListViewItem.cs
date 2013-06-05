@@ -32,40 +32,42 @@ namespace NMaier.SimpleDlna.GUI
 
     private void StartFileServer()
     {
-      if (Description.Active) {
-        try {
-          var ids = new Identifiers(ComparerRepository.Lookup(Description.Order), Description.OrderDescending);
-          foreach (var v in Description.Views) {
-            ids.AddView(v);
-          }
-          var dirs = (from i in Description.Directories
-                      let d = new DirectoryInfo(i)
-                      where d.Exists
-                      select d).ToArray();
-          if (dirs.Length == 0) {
-            throw new InvalidOperationException("No remaining directories");
-          }
-          fileServer = new FileServer(Description.Types, ids, dirs);
-          if (cacheFile != null) {
-            fileServer.SetCacheFile(cacheFile);
-          }
-          fileServer.Load();
-          server.RegisterMediaServer(fileServer);
+      if (!Description.Active) {
+        return;
+      }
+      try {
+        var ids = new Identifiers(ComparerRepository.Lookup(Description.Order), Description.OrderDescending);
+        foreach (var v in Description.Views) {
+          ids.AddView(v);
         }
-        catch (Exception ex) {
-          server.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
-          Description.ToggleActive();
+        var dirs = (from i in Description.Directories
+                    let d = new DirectoryInfo(i)
+                    where d.Exists
+                    select d).ToArray();
+        if (dirs.Length == 0) {
+          throw new InvalidOperationException("No remaining directories");
         }
+        fileServer = new FileServer(Description.Types, ids, dirs);
+        if (cacheFile != null) {
+          fileServer.SetCacheFile(cacheFile);
+        }
+        fileServer.Load();
+        server.RegisterMediaServer(fileServer);
+      }
+      catch (Exception ex) {
+        server.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
+        Description.ToggleActive();
       }
     }
 
     private void StopFileServer()
     {
-      if (Description.Active && fileServer != null) {
-        server.UnregisterMediaServer(fileServer);
-        fileServer.Dispose();
-        fileServer = null;
+      if (!Description.Active || fileServer == null) {
+        return;
       }
+      server.UnregisterMediaServer(fileServer);
+      fileServer.Dispose();
+      fileServer = null;
     }
 
     private void UpdateInfo()
