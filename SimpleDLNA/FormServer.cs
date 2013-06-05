@@ -14,36 +14,35 @@ namespace NMaier.SimpleDlna.GUI
     {
       Init();
       Text = "New Server";
-      CheckVideo.Checked = true;
+      checkVideo.Checked = true;
       SizeDirectoryColumn();
       SizeViewsColumns();
     }
-
     public FormServer(ServerDescription description)
     {
       Init();
 
-      TextName.Text = description.Name;
+      textName.Text = description.Name;
 
-      CheckVideo.Checked = (description.Types & DlnaMediaTypes.Video) == DlnaMediaTypes.Video;
-      CheckAudio.Checked = (description.Types & DlnaMediaTypes.Audio) == DlnaMediaTypes.Audio;
-      CheckImages.Checked = (description.Types & DlnaMediaTypes.Image) == DlnaMediaTypes.Image;
+      checkVideo.Checked = (description.Types & DlnaMediaTypes.Video) == DlnaMediaTypes.Video;
+      checkAudio.Checked = (description.Types & DlnaMediaTypes.Audio) == DlnaMediaTypes.Audio;
+      checkImages.Checked = (description.Types & DlnaMediaTypes.Image) == DlnaMediaTypes.Image;
 
-      foreach (var i in ComboOrder.Items) {
+      foreach (var i in comboOrder.Items) {
         if (((IItemComparer)i).Name == description.Order) {
-          ComboOrder.SelectedItem = i;
+          comboOrder.SelectedItem = i;
           break;
         }
       }
-      CheckOrderDescending.Checked = description.OrderDescending;
+      checkOrderDescending.Checked = description.OrderDescending;
 
       foreach (var v in description.Views) {
         var i = new ListViewItem(new string[] { v, ViewRepository.Lookup(v).Description });
-        ListViews.Items.Add(i);
+        listViews.Items.Add(i);
       }
       foreach (var d in description.Directories) {
         var i = new ListViewItem(d);
-        ListDirectories.Items.Add(i);
+        listDirectories.Items.Add(i);
       }
 
       SizeDirectoryColumn();
@@ -55,97 +54,103 @@ namespace NMaier.SimpleDlna.GUI
     {
       get
       {
-        var rv = new ServerDescription()
-        {
-          Name = TextName.Text,
-          Order = ((IItemComparer)ComboOrder.SelectedItem).Name,
-          OrderDescending = CheckOrderDescending.Checked,
-          Views = (from ListViewItem i in ListViews.Items
-                   select i.Text).ToArray(),
-          Directories = (from ListViewItem i in ListDirectories.Items
-                         select i.Text).ToArray()
-        };
-        if (CheckVideo.Checked) {
-          rv.Types |= DlnaMediaTypes.Video;
+        DlnaMediaTypes types = 0;
+        if (checkVideo.Checked) {
+          types |= DlnaMediaTypes.Video;
         }
-        if (CheckAudio.Checked) {
-          rv.Types |= DlnaMediaTypes.Audio;
+        if (checkAudio.Checked) {
+          types |= DlnaMediaTypes.Audio;
         }
-        if (CheckImages.Checked) {
-          rv.Types |= DlnaMediaTypes.Image;
+        if (checkImages.Checked) {
+          types |= DlnaMediaTypes.Image;
         }
+        var views = (from ListViewItem i in listViews.Items
+                     select i.Text).ToList();
+        var dirs = (from ListViewItem i in listDirectories.Items
+                    select i.Text).ToList();
+        var rv = new ServerDescription(
+          textName.Text,
+          ((IItemComparer)comboOrder.SelectedItem).Name,
+          checkOrderDescending.Checked,
+          types,
+          views,
+          dirs);
         return rv;
       }
     }
 
 
-    private void ButtonAddDirectory_Click(object sender, EventArgs e)
+    private void AddOrderItems()
     {
-      if (FolderDialog.ShowDialog() == DialogResult.OK) {
-        var path = FolderDialog.SelectedPath;
-        var found = from ListViewItem i in ListDirectories.Items
+      var items = from v in ComparerRepository.ListItems()
+                  orderby v.Key
+                  select v.Value;
+      foreach (var v in items) {
+        var i = comboOrder.Items.Add(v);
+        if (v.Name == "title") {
+          comboOrder.SelectedIndex = i;
+        }
+      }
+    }
+
+    private void AddViewItems()
+    {
+      var items = from v in ViewRepository.ListItems()
+                  orderby v.Key
+                  select v.Value;
+      foreach (var v in items) {
+        comboNewView.Items.Add(v);
+      }
+    }
+
+    private void buttonAddDirectory_Click(object sender, EventArgs e)
+    {
+      if (folderDialog.ShowDialog() == DialogResult.OK) {
+        var path = folderDialog.SelectedPath;
+        var found = from ListViewItem i in listDirectories.Items
                     where StringComparer.InvariantCulture.Equals(path, i.Text)
                     select i;
         if (found.Count() == 0) {
-          ListDirectories.Items.Add(path);
+          listDirectories.Items.Add(path);
         }
       }
       SizeDirectoryColumn();
     }
 
-    private void ButtonAddView_Click(object sender, EventArgs e)
+    private void buttonAddView_Click(object sender, EventArgs e)
     {
-      var i = ComboNewView.SelectedItem as IView;
+      var i = comboNewView.SelectedItem as IView;
       if (i == null) {
         return;
       }
-      ListViews.Items.Add(new ListViewItem(new string[] { i.Name, i.Description }));
+      listViews.Items.Add(new ListViewItem(new string[] { i.Name, i.Description }));
       SizeViewsColumns();
     }
 
-    private void ButtonRemoveDirectory_Click(object sender, EventArgs e)
+    private void buttonRemoveDirectory_Click(object sender, EventArgs e)
     {
-      foreach (var i in ListDirectories.SelectedItems) {
-        ListDirectories.Items.Remove(i as ListViewItem);
+      foreach (var i in listDirectories.SelectedItems) {
+        listDirectories.Items.Remove(i as ListViewItem);
       }
       SizeDirectoryColumn();
     }
 
-    private void SizeDirectoryColumn()
+    private void buttonRemoveView_Click(object sender, EventArgs e)
     {
-      var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
-      if (ListDirectories.Items.Count == 0) {
-        mode = ColumnHeaderAutoResizeStyle.HeaderSize;
-      }
-      ColDirectory.AutoResize(mode);
-    }
-
-    private void ButtonRemoveView_Click(object sender, EventArgs e)
-    {
-      foreach (var i in ListViews.SelectedItems) {
-        ListViews.Items.Remove(i as ListViewItem);
+      foreach (var i in listViews.SelectedItems) {
+        listViews.Items.Remove(i as ListViewItem);
       }
       SizeViewsColumns();
     }
 
-    private void SizeViewsColumns()
+    private void checkTypes_Validating(object sender, CancelEventArgs e)
     {
-      var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
-      if (ListViews.Items.Count == 0) {
-        mode = ColumnHeaderAutoResizeStyle.HeaderSize;
-      }
-      ColViewName.AutoResize(mode);
-      ColViewDesc.AutoResize(mode);
-    }
-
-    private void CheckTypes_Validating(object sender, CancelEventArgs e)
-    {
-      if (!CheckVideo.Checked && !CheckAudio.Checked && !CheckImages.Checked) {
-        errorProvider.SetError(CheckImages, "Must select at least one");
+      if (!checkVideo.Checked && !checkAudio.Checked && !checkImages.Checked) {
+        errorProvider.SetError(checkImages, "Must select at least one");
         e.Cancel = true;
       }
       else {
-        errorProvider.SetError(CheckImages, string.Empty);
+        errorProvider.SetError(checkImages, string.Empty);
       }
     }
 
@@ -161,47 +166,44 @@ namespace NMaier.SimpleDlna.GUI
       AddViewItems();
     }
 
-    private void AddOrderItems()
+    private void listDirectories_Validating(object sender, CancelEventArgs e)
     {
-      var items = from v in ComparerRepository.ListItems()
-                  orderby v.Key
-                  select v.Value;
-      foreach (var v in items) {
-        var i = ComboOrder.Items.Add(v);
-        if (v.Name == "title") {
-          ComboOrder.SelectedIndex = i;
-        }
-      }
-    }
-    private void AddViewItems()
-    {
-      var items = from v in ViewRepository.ListItems()
-                  orderby v.Key
-                  select v.Value;
-      foreach (var v in items) {
-        var i = ComboNewView.Items.Add(v);
-      }
-    }
-
-    private void ListDirectories_Validating(object sender, CancelEventArgs e)
-    {
-      if (ListDirectories.Items.Count == 0) {
-        errorProvider.SetError(ListDirectoriesAnchor, "Must specify at least one directory");
+      if (listDirectories.Items.Count == 0) {
+        errorProvider.SetError(listDirectoriesAnchor, "Must specify at least one directory");
         e.Cancel = true;
       }
       else {
-        errorProvider.SetError(ListDirectoriesAnchor, string.Empty);
+        errorProvider.SetError(listDirectoriesAnchor, string.Empty);
       }
     }
 
-    private void TextName_Validating(object sender, CancelEventArgs e)
+    private void SizeDirectoryColumn()
     {
-      if (string.IsNullOrWhiteSpace(TextName.Text)) {
-        errorProvider.SetError(TextName, "Must specify a name");
+      var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
+      if (listDirectories.Items.Count == 0) {
+        mode = ColumnHeaderAutoResizeStyle.HeaderSize;
+      }
+      colDirectory.AutoResize(mode);
+    }
+
+    private void SizeViewsColumns()
+    {
+      var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
+      if (listViews.Items.Count == 0) {
+        mode = ColumnHeaderAutoResizeStyle.HeaderSize;
+      }
+      colViewName.AutoResize(mode);
+      colViewDesc.AutoResize(mode);
+    }
+
+    private void textName_Validating(object sender, CancelEventArgs e)
+    {
+      if (string.IsNullOrWhiteSpace(textName.Text)) {
+        errorProvider.SetError(textName, "Must specify a name");
         e.Cancel = true;
       }
       else {
-        errorProvider.SetError(TextName, string.Empty);
+        errorProvider.SetError(textName, string.Empty);
       }
     }
   }

@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using NMaier.SimpleDlna.Server;
 using System.IO.Pipes;
 using System.Threading;
+using System.Windows.Forms;
 
+[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.GUI
 {
   static class Program
   {
-    /// <summary>
-    /// The main entry point for the application.
-    /// </summary>
     [STAThread]
     static void Main()
     {

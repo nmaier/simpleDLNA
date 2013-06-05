@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -7,13 +8,17 @@ using NMaier.SimpleDlna.Server.Comparers;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  internal class ServerListViewItem : ListViewItem
+  internal class ServerListViewItem : ListViewItem, IDisposable
   {
-    public readonly ServerDescription Description;
+    private readonly FileInfo cacheFile = null;
+
     private FileServer fileServer;
 
     private readonly HttpServer server;
-    private readonly FileInfo cacheFile = null;
+
+
+    public readonly ServerDescription Description;
+
 
     public ServerListViewItem(HttpServer server, FileInfo cacheFile, ServerDescription description)
     {
@@ -24,29 +29,7 @@ namespace NMaier.SimpleDlna.GUI
       StartFileServer();
     }
 
-    public void Toggle()
-    {
-      StopFileServer();
-      Description.Active = !Description.Active;
-      UpdateInfo();
-      StartFileServer();
-    }
 
-    public void UpdateInfo(ServerDescription description)
-    {
-      StopFileServer();
-      Description.AdoptInfo(description);
-      UpdateInfo();
-      StartFileServer();
-    }
-    private void UpdateInfo()
-    {
-      SubItems.Clear();
-
-      Text = Description.Name;
-      SubItems.Add(Description.Directories.Length.ToString());
-      SubItems.Add(Description.Active ? "Active" : "Inactive");
-    }
     private void StartFileServer()
     {
       if (Description.Active) {
@@ -74,6 +57,40 @@ namespace NMaier.SimpleDlna.GUI
         fileServer.Dispose();
         fileServer = null;
       }
+    }
+
+    private void UpdateInfo()
+    {
+      SubItems.Clear();
+
+      Text = Description.Name;
+      SubItems.Add(Description.Directories.Length.ToString());
+      SubItems.Add(Description.Active ? "Active" : "Inactive");
+    }
+
+
+    public void Dispose()
+    {
+      if (fileServer != null) {
+        fileServer.Dispose();
+        fileServer = null;
+      }
+    }
+
+    public void Toggle()
+    {
+      StopFileServer();
+      Description.ToggleActive();
+      UpdateInfo();
+      StartFileServer();
+    }
+
+    public void UpdateInfo(ServerDescription description)
+    {
+      StopFileServer();
+      Description.AdoptInfo(description);
+      UpdateInfo();
+      StartFileServer();
     }
   }
 }

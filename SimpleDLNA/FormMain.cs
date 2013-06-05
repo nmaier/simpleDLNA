@@ -17,7 +17,7 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  public partial class FormMain : Form, IAppender
+  public partial class FormMain : Form, IAppender, IDisposable
   {
     private readonly Properties.Settings Config = Properties.Settings.Default;
     private readonly HttpServer httpServer;
@@ -33,14 +33,7 @@ namespace NMaier.SimpleDlna.GUI
 
       StartPipeNotification();
 
-      var layout = new PatternLayout()
-      {
-        ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception"
-      };
-      layout.ActivateOptions();
-      this.layout = layout;
-      BasicConfigurator.Configure(this);
-      LogManager.GetRepository().Threshold = Level.Info;
+      layout = SetupLogging();
 
       if (!string.IsNullOrWhiteSpace(Config.cache)) {
         cacheFile = new FileInfo(Config.cache);
@@ -52,9 +45,21 @@ namespace NMaier.SimpleDlna.GUI
       LoadConfig();
     }
 
+    private ILayout SetupLogging()
+    {
+      var layout = new PatternLayout()
+      {
+        ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception"
+      };
+      layout.ActivateOptions();
+      BasicConfigurator.Configure(this);
+      LogManager.GetRepository().Threshold = Level.Info;
+      return layout;
+    }
+
     private void StartPipeNotification()
     {
-      new Thread(() =>
+      var t = new Thread(() =>
       {
         for (; ; ) {
           try {
@@ -62,16 +67,18 @@ namespace NMaier.SimpleDlna.GUI
               pipe.WaitForConnection();
               pipe.ReadByte();
               BeginInvoke((Action)(() =>
-                          {
-                            notifyIcon_DoubleClick(null, null);
-                            BringToFront();
-                          }));
+              {
+                notifyIcon_DoubleClick(null, null);
+                BringToFront();
+              }));
             }
           }
           catch (Exception) {
           }
         }
-      }).Start();
+      });
+      t.IsBackground = true;
+      t.Start();
     }
 
     private void ButtonNewServer_Click(object sender, EventArgs e)
@@ -80,7 +87,7 @@ namespace NMaier.SimpleDlna.GUI
         var rv = ns.ShowDialog();
         if (rv == DialogResult.OK) {
           var item = new ServerListViewItem(httpServer, cacheFile, ns.Description);
-          ListDescriptions.Items.Add(item);
+          listDescriptions.Items.Add(item);
           SaveConfig();
         }
       }
@@ -88,29 +95,29 @@ namespace NMaier.SimpleDlna.GUI
 
     private void ListDescriptions_SelectedIndexChanged(object sender, EventArgs e)
     {
-      var enable = ListDescriptions.SelectedItems.Count != 0;
-      ButtonStartStop.Enabled = ButtonRemove.Enabled = ButtonEdit.Enabled = enable;
+      var enable = listDescriptions.SelectedItems.Count != 0;
+      buttonStartStop.Enabled = buttonRemove.Enabled = buttonEdit.Enabled = enable;
       if (enable) {
-        ButtonStartStop.Text = (ListDescriptions.SelectedItems[0] as ServerListViewItem).Description.Active ? "Stop" : "Start";
+        buttonStartStop.Text = (listDescriptions.SelectedItems[0] as ServerListViewItem).Description.Active ? "Stop" : "Start";
       }
     }
 
     private void SaveConfig()
     {
-      Config.Descriptors = (from ServerListViewItem item in ListDescriptions.Items
+      Config.Descriptors = (from ServerListViewItem item in listDescriptions.Items
                             select item.Description).ToList();
       Config.Save();
     }
     private void LoadConfig()
     {
       foreach (var d in Config.Descriptors) {
-        ListDescriptions.Items.Add(new ServerListViewItem(httpServer, cacheFile, d));
+        listDescriptions.Items.Add(new ServerListViewItem(httpServer, cacheFile, d));
       }
     }
 
     private void ButtonEdit_Click(object sender, EventArgs e)
     {
-      var item = ListDescriptions.SelectedItems[0] as ServerListViewItem;
+      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
       if (item == null) {
         return;
       }
@@ -125,14 +132,14 @@ namespace NMaier.SimpleDlna.GUI
 
     private void ButtonStartStop_Click(object sender, EventArgs e)
     {
-      var item = ListDescriptions.SelectedItems[0] as ServerListViewItem;
+      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
       if (item == null) {
         return;
       }
       item.Toggle();
       SaveConfig();
 
-      ButtonStartStop.Text = item.Description.Active ? "Stop" : "Start";
+      buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
     }
 
     private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
@@ -145,10 +152,10 @@ namespace NMaier.SimpleDlna.GUI
     {
       using (var tw = new StringWriter()) {
         layout.Format(tw, loggingEvent);
-        if (Logger.Items.Count >= 300) {
-          Logger.Items.RemoveAt(0);
+        if (logger.Items.Count >= 300) {
+          logger.Items.RemoveAt(0);
         }
-        Logger.Items.Add(tw.ToString());
+        logger.Items.Add(tw.ToString());
       }
     }
 

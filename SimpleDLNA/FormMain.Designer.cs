@@ -29,15 +29,15 @@
     {
       this.components = new System.ComponentModel.Container();
       System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
-      this.ListDescriptions = new System.Windows.Forms.ListView();
-      this.ColName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.ColDirectories = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.ColActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.ButtonNewServer = new System.Windows.Forms.Button();
-      this.ButtonEdit = new System.Windows.Forms.Button();
-      this.ButtonStartStop = new System.Windows.Forms.Button();
-      this.ButtonRemove = new System.Windows.Forms.Button();
-      this.Logger = new System.Windows.Forms.ListBox();
+      this.listDescriptions = new System.Windows.Forms.ListView();
+      this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.colDirectories = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.colActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.buttonNewServer = new System.Windows.Forms.Button();
+      this.buttonEdit = new System.Windows.Forms.Button();
+      this.buttonStartStop = new System.Windows.Forms.Button();
+      this.buttonRemove = new System.Windows.Forms.Button();
+      this.logger = new System.Windows.Forms.ListBox();
       this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
       this.notifyContext = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.showContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,93 +58,93 @@
       // 
       // ListDescriptions
       // 
-      this.ListDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.ListDescriptions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.ColName,
-            this.ColDirectories,
-            this.ColActive});
-      this.ListDescriptions.FullRowSelect = true;
-      this.ListDescriptions.HideSelection = false;
-      this.ListDescriptions.Location = new System.Drawing.Point(12, 27);
-      this.ListDescriptions.MultiSelect = false;
-      this.ListDescriptions.Name = "ListDescriptions";
-      this.ListDescriptions.Size = new System.Drawing.Size(599, 184);
-      this.ListDescriptions.TabIndex = 0;
-      this.ListDescriptions.UseCompatibleStateImageBehavior = false;
-      this.ListDescriptions.View = System.Windows.Forms.View.Details;
-      this.ListDescriptions.SelectedIndexChanged += new System.EventHandler(this.ListDescriptions_SelectedIndexChanged);
+      this.listDescriptions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colName,
+            this.colDirectories,
+            this.colActive});
+      this.listDescriptions.FullRowSelect = true;
+      this.listDescriptions.HideSelection = false;
+      this.listDescriptions.Location = new System.Drawing.Point(12, 27);
+      this.listDescriptions.MultiSelect = false;
+      this.listDescriptions.Name = "ListDescriptions";
+      this.listDescriptions.Size = new System.Drawing.Size(599, 184);
+      this.listDescriptions.TabIndex = 0;
+      this.listDescriptions.UseCompatibleStateImageBehavior = false;
+      this.listDescriptions.View = System.Windows.Forms.View.Details;
+      this.listDescriptions.SelectedIndexChanged += new System.EventHandler(this.ListDescriptions_SelectedIndexChanged);
       // 
       // ColName
       // 
-      this.ColName.Text = "Name";
+      this.colName.Text = "Name";
       // 
       // ColDirectories
       // 
-      this.ColDirectories.Text = "Directories";
-      this.ColDirectories.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+      this.colDirectories.Text = "Directories";
+      this.colDirectories.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
       // 
       // ColActive
       // 
-      this.ColActive.Text = "Active";
+      this.colActive.Text = "Active";
       // 
       // ButtonNewServer
       // 
-      this.ButtonNewServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.ButtonNewServer.Location = new System.Drawing.Point(536, 217);
-      this.ButtonNewServer.Name = "ButtonNewServer";
-      this.ButtonNewServer.Size = new System.Drawing.Size(75, 23);
-      this.ButtonNewServer.TabIndex = 1;
-      this.ButtonNewServer.Text = "New Server";
-      this.ButtonNewServer.UseVisualStyleBackColor = true;
-      this.ButtonNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
+      this.buttonNewServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+      this.buttonNewServer.Location = new System.Drawing.Point(536, 217);
+      this.buttonNewServer.Name = "ButtonNewServer";
+      this.buttonNewServer.Size = new System.Drawing.Size(75, 23);
+      this.buttonNewServer.TabIndex = 1;
+      this.buttonNewServer.Text = "New Server";
+      this.buttonNewServer.UseVisualStyleBackColor = true;
+      this.buttonNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
       // 
       // ButtonEdit
       // 
-      this.ButtonEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.ButtonEdit.Enabled = false;
-      this.ButtonEdit.Location = new System.Drawing.Point(93, 217);
-      this.ButtonEdit.Name = "ButtonEdit";
-      this.ButtonEdit.Size = new System.Drawing.Size(75, 23);
-      this.ButtonEdit.TabIndex = 2;
-      this.ButtonEdit.Text = "Edit";
-      this.ButtonEdit.UseVisualStyleBackColor = true;
-      this.ButtonEdit.Click += new System.EventHandler(this.ButtonEdit_Click);
+      this.buttonEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.buttonEdit.Enabled = false;
+      this.buttonEdit.Location = new System.Drawing.Point(93, 217);
+      this.buttonEdit.Name = "ButtonEdit";
+      this.buttonEdit.Size = new System.Drawing.Size(75, 23);
+      this.buttonEdit.TabIndex = 2;
+      this.buttonEdit.Text = "Edit";
+      this.buttonEdit.UseVisualStyleBackColor = true;
+      this.buttonEdit.Click += new System.EventHandler(this.ButtonEdit_Click);
       // 
       // ButtonStartStop
       // 
-      this.ButtonStartStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.ButtonStartStop.Enabled = false;
-      this.ButtonStartStop.Location = new System.Drawing.Point(12, 217);
-      this.ButtonStartStop.Name = "ButtonStartStop";
-      this.ButtonStartStop.Size = new System.Drawing.Size(75, 23);
-      this.ButtonStartStop.TabIndex = 3;
-      this.ButtonStartStop.Text = "Start/Stop";
-      this.ButtonStartStop.UseVisualStyleBackColor = true;
-      this.ButtonStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
+      this.buttonStartStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.buttonStartStop.Enabled = false;
+      this.buttonStartStop.Location = new System.Drawing.Point(12, 217);
+      this.buttonStartStop.Name = "ButtonStartStop";
+      this.buttonStartStop.Size = new System.Drawing.Size(75, 23);
+      this.buttonStartStop.TabIndex = 3;
+      this.buttonStartStop.Text = "Start/Stop";
+      this.buttonStartStop.UseVisualStyleBackColor = true;
+      this.buttonStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
       // 
       // ButtonRemove
       // 
-      this.ButtonRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-      this.ButtonRemove.Enabled = false;
-      this.ButtonRemove.Location = new System.Drawing.Point(174, 217);
-      this.ButtonRemove.Name = "ButtonRemove";
-      this.ButtonRemove.Size = new System.Drawing.Size(75, 23);
-      this.ButtonRemove.TabIndex = 4;
-      this.ButtonRemove.Text = "Remove";
-      this.ButtonRemove.UseVisualStyleBackColor = true;
+      this.buttonRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.buttonRemove.Enabled = false;
+      this.buttonRemove.Location = new System.Drawing.Point(174, 217);
+      this.buttonRemove.Name = "ButtonRemove";
+      this.buttonRemove.Size = new System.Drawing.Size(75, 23);
+      this.buttonRemove.TabIndex = 4;
+      this.buttonRemove.Text = "Remove";
+      this.buttonRemove.UseVisualStyleBackColor = true;
       // 
       // Logger
       // 
-      this.Logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.Logger.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.Logger.FormattingEnabled = true;
-      this.Logger.Location = new System.Drawing.Point(12, 246);
-      this.Logger.Name = "Logger";
-      this.Logger.Size = new System.Drawing.Size(599, 147);
-      this.Logger.TabIndex = 5;
+      this.logger.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.logger.FormattingEnabled = true;
+      this.logger.Location = new System.Drawing.Point(12, 246);
+      this.logger.Name = "Logger";
+      this.logger.Size = new System.Drawing.Size(599, 147);
+      this.logger.TabIndex = 5;
       // 
       // notifyIcon
       // 
@@ -254,12 +254,12 @@
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(623, 406);
       this.Controls.Add(this.mainMenu);
-      this.Controls.Add(this.Logger);
-      this.Controls.Add(this.ButtonRemove);
-      this.Controls.Add(this.ButtonStartStop);
-      this.Controls.Add(this.ButtonEdit);
-      this.Controls.Add(this.ButtonNewServer);
-      this.Controls.Add(this.ListDescriptions);
+      this.Controls.Add(this.logger);
+      this.Controls.Add(this.buttonRemove);
+      this.Controls.Add(this.buttonStartStop);
+      this.Controls.Add(this.buttonEdit);
+      this.Controls.Add(this.buttonNewServer);
+      this.Controls.Add(this.listDescriptions);
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MainMenuStrip = this.mainMenu;
       this.Name = "FormMain";
@@ -278,15 +278,15 @@
 
     #endregion
 
-    private System.Windows.Forms.ListView ListDescriptions;
-    private System.Windows.Forms.Button ButtonNewServer;
-    private System.Windows.Forms.ColumnHeader ColName;
-    private System.Windows.Forms.ColumnHeader ColDirectories;
-    private System.Windows.Forms.ColumnHeader ColActive;
-    private System.Windows.Forms.Button ButtonEdit;
-    private System.Windows.Forms.Button ButtonStartStop;
-    private System.Windows.Forms.Button ButtonRemove;
-    private System.Windows.Forms.ListBox Logger;
+    private System.Windows.Forms.ListView listDescriptions;
+    private System.Windows.Forms.Button buttonNewServer;
+    private System.Windows.Forms.ColumnHeader colName;
+    private System.Windows.Forms.ColumnHeader colDirectories;
+    private System.Windows.Forms.ColumnHeader colActive;
+    private System.Windows.Forms.Button buttonEdit;
+    private System.Windows.Forms.Button buttonStartStop;
+    private System.Windows.Forms.Button buttonRemove;
+    private System.Windows.Forms.ListBox logger;
     private System.Windows.Forms.NotifyIcon notifyIcon;
     private System.Windows.Forms.ContextMenuStrip notifyContext;
     private System.Windows.Forms.ToolStripMenuItem showContextMenuItem;
