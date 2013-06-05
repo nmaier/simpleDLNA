@@ -285,7 +285,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Debug("Vacuum done!");
       }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
 
-      vacuumer.Interval = 30 * 60 * 1000;
+      vacuumer.Interval = 120 * 60 * 1000;
     }
   }
 }
