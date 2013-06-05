@@ -89,12 +89,22 @@ namespace NMaier.SimpleDlna.GUI
       Config.Descriptors = (from ServerListViewItem item in listDescriptions.Items
                             select item.Description).ToList();
       Config.Save();
+      SizeDescriptorColumns();
+    }
+
+    private void SizeDescriptorColumns()
+    {
+      var mode = listDescriptions.Items.Count == 0 ? ColumnHeaderAutoResizeStyle.HeaderSize : ColumnHeaderAutoResizeStyle.ColumnContent;
+      foreach (var c in listDescriptions.Columns) {
+        (c as ColumnHeader).AutoResize(mode);
+      }
     }
     private void LoadConfig()
     {
       foreach (var d in Config.Descriptors) {
         listDescriptions.Items.Add(new ServerListViewItem(httpServer, cacheFile, d));
       }
+      SizeDescriptorColumns();
     }
 
     private void ButtonEdit_Click(object sender, EventArgs e)

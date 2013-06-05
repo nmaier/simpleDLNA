@@ -79,6 +79,7 @@ namespace NMaier.SimpleDlna.GUI
       Text = Description.Name;
       SubItems.Add(Description.Directories.Length.ToString());
       SubItems.Add(Description.Active ? "Active" : "Inactive");
+      ImageIndex = Description.Active ? 1 : 2;
     }
 
 

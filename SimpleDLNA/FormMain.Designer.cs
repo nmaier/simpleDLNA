@@ -53,8 +53,9 @@
       this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.logger = new System.Windows.Forms.ListView();
       this.colLogLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.listImages = new System.Windows.Forms.ImageList(this.components);
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -74,6 +75,7 @@
       this.listDescriptions.MultiSelect = false;
       this.listDescriptions.Name = "listDescriptions";
       this.listDescriptions.Size = new System.Drawing.Size(599, 184);
+      this.listDescriptions.SmallImageList = this.listImages;
       this.listDescriptions.TabIndex = 0;
       this.listDescriptions.UseCompatibleStateImageBehavior = false;
       this.listDescriptions.View = System.Windows.Forms.View.Details;
@@ -263,14 +265,22 @@
       // 
       this.colLogLevel.Text = "Level";
       // 
+      // colLogLogger
+      // 
+      this.colLogLogger.Text = "Logger";
+      // 
       // colLogMessage
       // 
       this.colLogMessage.Text = "Message";
       this.colLogMessage.Width = 200;
       // 
-      // colLogLogger
+      // listImages
       // 
-      this.colLogLogger.Text = "Logger";
+      this.listImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("listImages.ImageStream")));
+      this.listImages.TransparentColor = System.Drawing.Color.Transparent;
+      this.listImages.Images.SetKeyName(0, "server");
+      this.listImages.Images.SetKeyName(1, "active");
+      this.listImages.Images.SetKeyName(2, "inactive");
       // 
       // FormMain
       // 
@@ -329,6 +339,7 @@
     private System.Windows.Forms.ColumnHeader colLogLevel;
     private System.Windows.Forms.ColumnHeader colLogMessage;
     private System.Windows.Forms.ColumnHeader colLogLogger;
+    private System.Windows.Forms.ImageList listImages;
   }
 }
 
