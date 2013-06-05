@@ -21,7 +21,7 @@ namespace NMaier.SimpleDlna.GUI
   {
     private readonly Properties.Settings Config = Properties.Settings.Default;
     private HttpServer httpServer;
-    private readonly FileInfo cacheFile = new FileInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "sdlna.cache"));
+    private readonly FileInfo cacheFile = new FileInfo(Path.Combine(Path.GetTempPath(), "sdlna.cache"));
     private bool canClose = false;
 
     public FormMain()
