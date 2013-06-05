@@ -48,9 +48,11 @@ namespace NMaier.SimpleDlna.GUI
           throw new InvalidOperationException("No remaining directories");
         }
         fileServer = new FileServer(Description.Types, ids, Description.Name, dirs);
+#if !DEBUG
         if (cacheFile != null) {
           fileServer.SetCacheFile(cacheFile);
         }
+#endif
         fileServer.Load();
         server.RegisterMediaServer(fileServer);
       }

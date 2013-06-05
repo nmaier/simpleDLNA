@@ -222,6 +222,9 @@ namespace NMaier.SimpleDlna.GUI
       if (item == null) {
         return;
       }
+      if (MessageBox.Show(string.Format("Would you like to remove {0}?", item.Description.Name), "Remove Server", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) {
+        return;
+      }
       if (item.Description.Active) {
         item.Toggle();
       }
