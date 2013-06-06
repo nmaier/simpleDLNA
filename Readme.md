@@ -19,6 +19,8 @@ Basic use
    Serve videos from dir1 and dir2 (and subdirectories), storing meta data and thumbnails in the persistent cache store `cache.sqlite`.
 * `sdlna.exe --help`
   Display usage help
+* `SimpleDLNA.exe`
+  Or just use the WinForms GUI. (This probably won't work to well on non-Windows platforms)
 
 
 Features
@@ -74,6 +76,7 @@ The structure is as follows:
   * `HttpServer` and `HttpClient` - Custom, stripped down HTTP/1.0 implementation
   * `Handlers` - Request processing and response composition
   * `Responses` - Implementing an interface the HttpClient knows how to ship over the net.
+  * `Views` - Transformations of media trees
   * Some interfaces, types, enums, etc. to bring things together
 * `fsserver` class library - Serving stuff from a file sytem. To be "mounted" by the `server`
  * Virtual folder/file trees the HTTPServer MediaMount will understand
@@ -82,6 +85,8 @@ The structure is as follows:
  * Image thumbnailer, using .Net System.Drawing
  * Video thumbnailer, using ffmpeg via async pipes and the .Net Process API
 * `sdlna` CLI application - Bringing the various pieces together
+* `SimpleDLNA` GUI application - Alternative to the CLI and with persistent configuration. This thing is especially rough, as im not an UX guy.
+* `util` Various low-level utility stuff
 
 Contributing
 ---
@@ -106,4 +111,4 @@ Mini FAQ
 Thanks
 ---
 To Microsoft, the UPnP(-AV) folks and Samsung and DLNA gurus for designing such a set of specs and protocols, that includes HTTP-alike over multicast UDP sockets, SOAP and XML, dozens of poorly documented namespaces used in SOAP responses, the contentFeatures.dlna.org HTTP header and other fancy tech.
-Also a big Kudos also to software engineers for messing up even the most basic things like http header field names are usually case insensitive or the Reason-Phrase of http status lines is purely informal.
+Also a big Kudos to software engineers for messing up even the most basic things like http header field names are usually case insensitive or the Reason-Phrase of http status lines is purely informal.
