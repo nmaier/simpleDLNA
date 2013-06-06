@@ -73,6 +73,7 @@
     <Compile Include="FileServer.cs" />
     <Compile Include="Files\BaseFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Thumbnailer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\server\server.csproj">

@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Timers;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
@@ -19,7 +18,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly string friendlyName;
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private FileStore store = null;
-    private Task thumberTask;
     private readonly DlnaMediaTypes types;
     private readonly Guid uuid = Guid.NewGuid();
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
@@ -85,15 +83,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       if (store != null) {
         store.Dispose();
-      }
-      if (thumberTask != null) {
-        try {
-          thumberTask.Dispose();
-          thumberTask = null;
-        }
-        catch (Exception) {
-          thumberTask = null; // Silence of the Warnings
-        }
       }
     }
 
@@ -232,47 +221,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return;
       }
       lock (ids) {
-        if (thumberTask != null) {
-          return;
-        }
-        var files = ids.Resources.ToList();
-        thumberTask = new Task(() =>
-        {
-          try {
-            foreach (var i in files) {
-              try {
-                var item = (i.Target as BaseFile);
-                if (item == null) {
-                  continue;
-                }
-                if (store.HasCover(item)) {
-                  continue;
-                }
-                item.LoadCover();
-                using (var k = item.Cover.Content) {
-                  k.ReadByte();
-                }
-              }
-              catch (Exception ex) {
-                Debug("Failed to thumb", ex);
-              }
-            }
-          }
-          catch (Exception ex) {
-            Error(ex);
-          }
-          finally {
-            try {
-              thumberTask.Dispose();
-            }
-            catch (Exception iex) {
-              Debug("thumberTask.Dispose()", iex);
-            }
-            thumberTask = null;
-            GC.Collect();
-          }
-        }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
-        thumberTask.Start();
+        Thumbnailer.AddFiles(store, ids.Resources.ToList());
       }
     }
 
