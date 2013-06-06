@@ -20,7 +20,9 @@ Basic use
 * `sdlna.exe --help`
   Display usage help
 * `SimpleDLNA.exe`
-  Or just use the WinForms GUI. (This probably won't work to well on non-Windows platforms)
+  Or just use the WinForms GUI. (This probably won't work too well on non-Windows platforms)
+
+Also, you'll want to have a working ffmpeg binary somewhere within your `$PATH`, so that video thumbnailing works.
 
 
 Features
@@ -47,7 +49,7 @@ Non-Features, maybe TODO
 Run requirements
 ---
 
-* Some .Net 4 compatible implementation to run the app
+* Some .Net 4 Client Profile compatible implementation to run the app
  * Tested on .Net 4 and Fedora17 + mono, OSX Lion + mono
 * File system and networking :p
 * Some DLNA renderer (e.g. TV) to actually display the served media.
@@ -80,7 +82,6 @@ The structure is as follows:
   * Some interfaces, types, enums, etc. to bring things together
 * `fsserver` class library - Serving stuff from a file sytem. To be "mounted" by the `server`
  * Virtual folder/file trees the HTTPServer MediaMount will understand
- * "Views" that transform the virtual trees
 * `thumbs` class library - Generating thumbnail pictures from arbriary stream sources
  * Image thumbnailer, using .Net System.Drawing
  * Video thumbnailer, using ffmpeg via async pipes and the .Net Process API
@@ -91,6 +92,7 @@ The structure is as follows:
 Contributing
 ---
 Feel free to drop me pull requests. If you plan to implement something more than a few lines, then open the pull request early so that there aren't any nasty surprises later.
+Please try not to introduce too many new FXCop warnings. ;)
 
 If you want to add something that will require some for of persistence incl. persistent configuration or API keys, etc., then open a pull request/issue especially early!
 
