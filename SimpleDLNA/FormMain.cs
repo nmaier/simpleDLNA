@@ -5,15 +5,15 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
+using log4net.Layout;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
-using System.Threading.Tasks;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -22,6 +22,7 @@ namespace NMaier.SimpleDlna.GUI
     private readonly Properties.Settings Config = Properties.Settings.Default;
     private HttpServer httpServer;
     private readonly FileInfo cacheFile = new FileInfo(Path.Combine(Path.GetTempPath(), "sdlna.cache"));
+    private readonly FileInfo logFile = new FileInfo(Path.Combine(Path.GetTempPath(), "sdlna.log"));
     private bool canClose = false;
 
     public FormMain()
@@ -38,8 +39,21 @@ namespace NMaier.SimpleDlna.GUI
 
     private void SetupLogging()
     {
-      BasicConfigurator.Configure(this);
-      LogManager.GetRepository().Threshold = Level.Info;
+      var layout = new PatternLayout()
+      {
+        ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception"
+      };
+      layout.ActivateOptions();
+      var fileAppender = new RollingFileAppender()
+      {
+        File = logFile.FullName,
+        Layout = layout,
+        MaximumFileSize = "10MB",
+        MaxSizeRollBackups = 3,
+        RollingStyle = RollingFileAppender.RollingMode.Size
+      };
+      fileAppender.ActivateOptions();
+      BasicConfigurator.Configure(this, fileAppender);
     }
 
     private void StartPipeNotification()
@@ -158,21 +172,27 @@ namespace NMaier.SimpleDlna.GUI
       Thread.Sleep(2000);
     }
 
-    private delegate void logDelegate(string level, string logger, string msg);
+    private delegate void logDelegate(string level, string logger, string msg, string ex);
 
     public void DoAppend(LoggingEvent loggingEvent)
     {
+      if (loggingEvent.Level < Level.Info) {
+        return;
+      }
       var cls = loggingEvent.LoggerName;
       cls = cls.Substring(cls.LastIndexOf('.') + 1);
-      BeginInvoke(new logDelegate((lvl, lg, msg) =>
+      BeginInvoke(new logDelegate((lvl, lg, msg, ex) =>
       {
         if (logger.Items.Count >= 300) {
           logger.Items.RemoveAt(0);
         }
         logger.EnsureVisible(logger.Items.Add(new ListViewItem(new string[] { lvl, lg, msg })).Index);
+        if (!string.IsNullOrWhiteSpace(ex)) {
+          logger.EnsureVisible(logger.Items.Add(new ListViewItem(new string[] { lvl, lg, ex })).Index);
+        }
         colLogLogger.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         colLogMessage.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-      }), loggingEvent.Level.DisplayName, cls, loggingEvent.RenderedMessage);
+      }), loggingEvent.Level.DisplayName, cls, loggingEvent.RenderedMessage, loggingEvent.GetExceptionString());
     }
 
     private void notifyIcon_DoubleClick(object sender, EventArgs e)
