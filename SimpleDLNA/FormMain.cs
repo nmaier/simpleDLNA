@@ -124,8 +124,12 @@ namespace NMaier.SimpleDlna.GUI
       using (var ns = new FormServer(item.Description)) {
         var rv = ns.ShowDialog();
         if (rv == DialogResult.OK) {
-          item.UpdateInfo(ns.Description);
-          SaveConfig();
+          var desc = ns.Description;
+          Task.Factory.StartNew(() =>
+          {
+            item.UpdateInfo(desc);
+            SaveConfig();
+          });
         }
       }
     }
@@ -136,10 +140,16 @@ namespace NMaier.SimpleDlna.GUI
       if (item == null) {
         return;
       }
-      item.Toggle();
-      SaveConfig();
+      Task.Factory.StartNew(() =>
+      {
+        item.Toggle();
+        BeginInvoke((Action)(() =>
+        {
+          SaveConfig();
+          buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
+        }));
+      });
 
-      buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
     }
 
     private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
