@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,7 @@ namespace NMaier.SimpleDlna.Utilities
   {
     private readonly uint capacity;
 
-    private readonly IDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
+    private readonly IDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items;
 
     private readonly LinkedList<KeyValuePair<TKey, TValue>> order = new LinkedList<KeyValuePair<TKey, TValue>>();
 
@@ -17,13 +18,19 @@ namespace NMaier.SimpleDlna.Utilities
 
 
     [CLSCompliant(false)]
-    public LeastRecentlyUsedDictionary(uint capacity)
+    public LeastRecentlyUsedDictionary(uint capacity, ConcurrencyLevel concurrent = ConcurrencyLevel.NonConcurrent)
     {
+      if (concurrent == ConcurrencyLevel.Concurrent) {
+        items = new ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
+      }
+      else {
+        items = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
+      }
       this.capacity = capacity;
       toDrop = Math.Min(10, (uint)(capacity * 0.07));
     }
-    public LeastRecentlyUsedDictionary(int capacity)
-      : this((uint)capacity)
+    public LeastRecentlyUsedDictionary(int capacity, ConcurrencyLevel concurrent = ConcurrencyLevel.NonConcurrent)
+      : this((uint)capacity, concurrent)
     {
     }
 

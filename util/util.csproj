@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="BaseSortPart.cs" />
     <Compile Include="ConcatenatedStream.cs" />
+    <Compile Include="ConcurrencyLevel.cs" />
     <Compile Include="FFmpeg.cs" />
     <Compile Include="Formatting.cs" />
     <Compile Include="GlobalSuppressions.cs" />
