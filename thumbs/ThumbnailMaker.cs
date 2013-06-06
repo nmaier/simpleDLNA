@@ -78,11 +78,13 @@ namespace NMaier.SimpleDlna.Thumbnails
     {
       key = string.Format("{0}x{1} {2}", width, height, key);
       CacheItem ci;
-      if (cache.TryGetValue(key, out ci)) {
-        rv = ci.Data;
-        width = ci.Width;
-        height = ci.Height;
-        return true;
+      lock (cache) {
+        if (cache.TryGetValue(key, out ci)) {
+          rv = ci.Data;
+          width = ci.Width;
+          height = ci.Height;
+          return true;
+        }
       }
       rv = null;
       return false;
@@ -97,7 +99,9 @@ namespace NMaier.SimpleDlna.Thumbnails
         try {
           using (var i = thumber.GetThumbnail(item, ref width, ref height)) {
             var rv = i.ToArray();
-            cache.Add(key, new CacheItem(rv, rw, rh));
+            lock (cache) {
+              cache[key] = new CacheItem(rv, rw, rh);
+            }
             return rv;
           }
         }
