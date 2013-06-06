@@ -232,21 +232,8 @@ namespace NMaier.SimpleDlna.GUI
 
     private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      using (var w = new StringWriter()) {
-        var a = Assembly.GetEntryAssembly();
-        var v = a.GetName().Version;
-        w.WriteLine("App:    {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-        a = Assembly.GetAssembly(typeof(FileServer));
-        v = a.GetName().Version;
-        w.WriteLine("Files:  {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-        a = Assembly.GetAssembly(typeof(HttpServer));
-        v = a.GetName().Version;
-        w.WriteLine("Server: {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-        a = Assembly.GetAssembly(typeof(AttributeCollection));
-        v = a.GetName().Version;
-        w.WriteLine("Utils:  {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-        w.WriteLine("Http:   {0}", HttpServer.Signature);
-        MessageBox.Show(w.ToString(), "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+      using (var about = new FormAbout()) {
+        about.ShowDialog();
       }
     }
 
