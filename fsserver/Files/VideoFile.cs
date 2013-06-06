@@ -199,7 +199,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
 
       try {
-        using (var tl = TagLib.File.Create(Item.FullName)) {
+        using (var tl = TagLib.File.Create(new TagLibFileAbstraction(Item))) {
           try {
             duration = tl.Properties.Duration;
             if (duration.HasValue && duration.Value.TotalSeconds < 0.1) {

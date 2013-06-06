@@ -65,6 +65,7 @@
     <Compile Include="ByteVectorExtend.cs" />
     <Compile Include="Files\Cover.cs" />
     <Compile Include="Files\ImageFile.cs" />
+    <Compile Include="Files\TagLibFileAbstraction.cs" />
     <Compile Include="Files\VideoFile.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="PlainRootFolder.cs" />

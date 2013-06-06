@@ -123,7 +123,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
 
       try {
-        using (var tl = TagLib.File.Create(Item.FullName)) {
+        using (var tl = TagLib.File.Create(new TagLibFileAbstraction(Item))) {
           try {
             width = tl.Properties.PhotoWidth;
             height = tl.Properties.PhotoHeight;
