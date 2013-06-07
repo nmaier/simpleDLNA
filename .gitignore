@@ -7,4 +7,5 @@ packages/
 *.user
 setup/Debug
 setup/Release
+setup/*.cmd
 pages/
