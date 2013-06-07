@@ -5,3 +5,5 @@ packages/
 */obj
 *.suo
 *.user
+setup/Debug
+setup/Release
