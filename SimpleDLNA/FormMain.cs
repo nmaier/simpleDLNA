@@ -171,8 +171,8 @@ namespace NMaier.SimpleDlna.GUI
 
     private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
     {
+      Text = "Going down...";
       httpServer.Dispose();
-      Thread.Sleep(2000);
     }
 
     private delegate void logDelegate(string level, string logger, string msg, string ex);
