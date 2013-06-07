@@ -34,6 +34,19 @@ namespace NMaier.SimpleDlna.GUI
       }
     }
 
+    public override string Text
+    {
+      get
+      {
+        return base.Text;
+      }
+      set
+      {
+        base.Text = value;
+        notifyIcon.Text = value;
+      }
+    }
+
     private void SetupLogging()
     {
       var layout = new PatternLayout()
