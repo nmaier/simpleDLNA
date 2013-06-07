@@ -20,3 +20,10 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Taglib# is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
+Please see: https://github.com/mono/taglib-sharp/blob/master/COPYING
+
+log4net is licensed under the Apache License, Version 2.0
+Please see: http://logging.apache.org/log4net/license.html
