@@ -28,7 +28,6 @@
     private void InitializeComponent()
     {
       this.components = new System.ComponentModel.Container();
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormServer));
       this.groupName = new System.Windows.Forms.GroupBox();
       this.textName = new System.Windows.Forms.TextBox();
       this.groupOrder = new System.Windows.Forms.GroupBox();
@@ -372,7 +371,6 @@
       this.Controls.Add(this.groupTypes);
       this.Controls.Add(this.groupOrder);
       this.Controls.Add(this.groupName);
-      this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
       this.Name = "FormServer";
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

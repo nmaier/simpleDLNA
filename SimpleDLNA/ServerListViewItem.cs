@@ -29,7 +29,7 @@ namespace NMaier.SimpleDlna.GUI
       Text = Description.Name;
       SubItems.Add(Description.Directories.Length.ToString());
       SubItems.Add("Loading...");
-      ImageIndex = 2;
+      ImageIndex = 0;
     }
 
 

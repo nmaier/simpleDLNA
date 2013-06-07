@@ -160,6 +160,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\banner.png" />
+    <None Include="Resources\active.png" />
+    <None Include="Resources\inactive.png" />
+    <None Include="Resources\server.png" />
+    <None Include="Resources\server.ico" />
     <Content Include="sdlna.ico" />
   </ItemGroup>
   <ItemGroup>

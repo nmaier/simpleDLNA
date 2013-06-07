@@ -37,6 +37,9 @@ namespace NMaier.SimpleDlna.GUI
     public FormMain()
     {
       InitializeComponent();
+      listImages.Images.Add("server", Properties.Resources.server);
+      listImages.Images.Add("active", Properties.Resources.active);
+      listImages.Images.Add("inactive", Properties.Resources.inactive);
       SetupLogging();
       StartPipeNotification();
 

@@ -51,10 +51,11 @@
       this.exitContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.mainMenu = new System.Windows.Forms.MenuStrip();
       this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
       this.openInBrowserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
       this.hideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
       this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,7 +63,6 @@
       this.colLogLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -103,11 +103,9 @@
       // 
       // listImages
       // 
-      this.listImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("listImages.ImageStream")));
+      this.listImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+      this.listImages.ImageSize = new System.Drawing.Size(16, 16);
       this.listImages.TransparentColor = System.Drawing.Color.Transparent;
-      this.listImages.Images.SetKeyName(0, "server");
-      this.listImages.Images.SetKeyName(1, "active");
-      this.listImages.Images.SetKeyName(2, "inactive");
       // 
       // buttonNewServer
       // 
@@ -213,6 +211,18 @@
       this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
       this.fileToolStripMenuItem.Text = "&File";
       // 
+      // settingsToolStripMenuItem
+      // 
+      this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+      this.settingsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+      this.settingsToolStripMenuItem.Text = "Settings";
+      this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
+      // 
+      // toolStripMenuItem2
+      // 
+      this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+      this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
+      // 
       // openInBrowserToolStripMenuItem
       // 
       this.openInBrowserToolStripMenuItem.Name = "openInBrowserToolStripMenuItem";
@@ -231,11 +241,6 @@
       this.hideToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.hideToolStripMenuItem.Text = "Hide";
       this.hideToolStripMenuItem.Click += new System.EventHandler(this.hideToolStripMenuItem_Click);
-      // 
-      // toolStripMenuItem2
-      // 
-      this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-      this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
       // 
       // exitToolStripMenuItem
       // 
@@ -289,13 +294,6 @@
       // 
       this.colLogMessage.Text = "Message";
       this.colLogMessage.Width = 200;
-      // 
-      // settingsToolStripMenuItem
-      // 
-      this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-      this.settingsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
-      this.settingsToolStripMenuItem.Text = "Settings";
-      this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
       // 
       // FormMain
       // 

@@ -60,9 +60,23 @@ namespace NMaier.SimpleDlna.GUI.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap active {
+            get {
+                object obj = ResourceManager.GetObject("active", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap banner {
             get {
                 object obj = ResourceManager.GetObject("banner", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap inactive {
+            get {
+                object obj = ResourceManager.GetObject("inactive", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -71,6 +85,13 @@ namespace NMaier.SimpleDlna.GUI.Properties {
             get {
                 object obj = ResourceManager.GetObject("LICENSE", resourceCulture);
                 return ((byte[])(obj));
+            }
+        }
+        
+        internal static System.Drawing.Icon server {
+            get {
+                object obj = ResourceManager.GetObject("server", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

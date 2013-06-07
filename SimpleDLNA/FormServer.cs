@@ -162,6 +162,7 @@ namespace NMaier.SimpleDlna.GUI
     private void Init()
     {
       InitializeComponent();
+      Icon = Properties.Resources.server;
       AddOrderItems();
       AddViewItems();
     }
