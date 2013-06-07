@@ -7,6 +7,7 @@ using System.Text;
 using NMaier.SimpleDlna.Utilities;
 using Threading = System.Threading;
 using Timers = System.Timers;
+using System.Collections.Concurrent;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
 {
@@ -16,7 +17,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private readonly Threading.AutoResetEvent datagramPosted = new Threading.AutoResetEvent(false);
     private const int DATAGRAMS_PER_MESSAGE = 2;
     private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
-    private readonly Queue<Datagram> messageQueue = new Queue<Datagram>();
+    private readonly ConcurrentQueue<Datagram> messageQueue = new ConcurrentQueue<Datagram>();
     private readonly Timers.Timer notificationTimer = new Timers.Timer(60000);
     private readonly Timers.Timer queueTimer = new Timers.Timer(1000);
     private static readonly Random random = new Random();
@@ -67,19 +68,20 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     private void ProcessQueue(object sender, Timers.ElapsedEventArgs e)
     {
-      lock (messageQueue) {
-        while (messageQueue.Count != 0) {
-          var msg = messageQueue.Peek();
-          if (msg != null && (running || msg.Sticky)) {
-            msg.Send();
-            if (msg.SendCount > DATAGRAMS_PER_MESSAGE) {
-              messageQueue.Dequeue();
-            }
-            break;
+      while (messageQueue.Count != 0) {
+        Datagram msg = null;
+        if (!messageQueue.TryPeek(out msg)) {
+          continue;
+        }
+        if (msg != null && (running || msg.Sticky)) {
+          msg.Send();
+          if (msg.SendCount > DATAGRAMS_PER_MESSAGE) {
+            messageQueue.TryDequeue(out msg);
           }
-          else {
-            messageQueue.Dequeue();
-          }
+          break;
+        }
+        else {
+          messageQueue.TryDequeue(out msg);
         }
       }
       datagramPosted.Set();
@@ -138,12 +140,10 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         return;
       }
       var dgram = new Datagram(endpoint, msg, sticky);
-      lock (messageQueue) {
-        if (messageQueue.Count == 0) {
-          dgram.Send();
-        }
-        messageQueue.Enqueue(dgram);
+      if (messageQueue.Count == 0) {
+        dgram.Send();
       }
+      messageQueue.Enqueue(dgram);
       queueTimer.Enabled = true;
     }
 
