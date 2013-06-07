@@ -1,4 +1,4 @@
-simple DLNA
+SimpleDLNA
 ===
 A simple, zero-config DLNA media server, that you can just fire up and be done with it.
 
