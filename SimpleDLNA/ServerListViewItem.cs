@@ -1,10 +1,10 @@
+using NMaier.SimpleDlna.FileMediaServer;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Comparers;
 using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using NMaier.SimpleDlna.FileMediaServer;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Comparers;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -74,12 +74,15 @@ namespace NMaier.SimpleDlna.GUI
 
     private void UpdateInfo()
     {
-      SubItems.Clear();
+      ListView.Parent.BeginInvoke((Action)(() =>
+      {
+        SubItems.Clear();
 
-      Text = Description.Name;
-      SubItems.Add(Description.Directories.Length.ToString());
-      SubItems.Add(Description.Active ? "Active" : "Inactive");
-      ImageIndex = Description.Active ? 1 : 2;
+        Text = Description.Name;
+        SubItems.Add(Description.Directories.Length.ToString());
+        SubItems.Add(Description.Active ? "Active" : "Inactive");
+        ImageIndex = Description.Active ? 1 : 2;
+      }));
     }
 
 
