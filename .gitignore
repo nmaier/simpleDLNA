@@ -7,3 +7,4 @@ packages/
 *.user
 setup/Debug
 setup/Release
+pages/
