@@ -10,7 +10,7 @@ using System.Resources;
 [assembly: AssemblyDescription("Graphical User Interface to Simple DLNA")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nils Maier")]
-[assembly: AssemblyProduct("sdlna")]
+[assembly: AssemblyProduct("SimpleDLNA")]
 [assembly: AssemblyCopyright("Copyright ©  2013 Nils Maier")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -33,6 +33,6 @@ using System.Resources;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.9.0.0")]
+[assembly: AssemblyFileVersion("0.9.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
