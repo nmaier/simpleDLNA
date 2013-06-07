@@ -373,6 +373,7 @@
       this.Controls.Add(this.groupName);
       this.MaximizeBox = false;
       this.Name = "FormServer";
+      this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "Edit Server";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormServer_FormClosing);
