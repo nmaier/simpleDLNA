@@ -1,0 +1,126 @@
+﻿namespace NMaier.SimpleDlna.GUI
+{
+  partial class FormSettings
+  {
+    /// <summary>
+    /// Required designer variable.
+    /// </summary>
+    private System.ComponentModel.IContainer components = null;
+
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    protected override void Dispose(bool disposing)
+    {
+      if (disposing && (components != null)) {
+        components.Dispose();
+      }
+      base.Dispose(disposing);
+    }
+
+    #region Windows Form Designer generated code
+
+    /// <summary>
+    /// Required method for Designer support - do not modify
+    /// the contents of this method with the code editor.
+    /// </summary>
+    private void InitializeComponent()
+    {
+      this.components = new System.ComponentModel.Container();
+      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.numericPort = new System.Windows.Forms.NumericUpDown();
+      this.toolTip = new System.Windows.Forms.ToolTip(this.components);
+      this.textCacheFile = new System.Windows.Forms.TextBox();
+      this.groupBox2 = new System.Windows.Forms.GroupBox();
+      this.buttonBrowseCacheFile = new System.Windows.Forms.Button();
+      this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+      this.groupBox1.SuspendLayout();
+      ((System.ComponentModel.ISupportInitialize)(this.numericPort)).BeginInit();
+      this.groupBox2.SuspendLayout();
+      this.SuspendLayout();
+      // 
+      // groupBox1
+      // 
+      this.groupBox1.Controls.Add(this.numericPort);
+      this.groupBox1.Location = new System.Drawing.Point(12, 12);
+      this.groupBox1.Name = "groupBox1";
+      this.groupBox1.Size = new System.Drawing.Size(260, 48);
+      this.groupBox1.TabIndex = 0;
+      this.groupBox1.TabStop = false;
+      this.groupBox1.Text = "Port";
+      // 
+      // numericPort
+      // 
+      this.numericPort.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "port", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+      this.numericPort.Location = new System.Drawing.Point(6, 19);
+      this.numericPort.Name = "numericPort";
+      this.numericPort.Size = new System.Drawing.Size(69, 20);
+      this.numericPort.TabIndex = 0;
+      this.toolTip.SetToolTip(this.numericPort, "Port of the http server.\r\nLeave at 0 to automatically have a port selected on sta" +
+        "rtup.\r\n\r\n(Requires restart)");
+      this.numericPort.Value = global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.port;
+      // 
+      // textCacheFile
+      // 
+      this.textCacheFile.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "cache", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+      this.textCacheFile.Location = new System.Drawing.Point(6, 19);
+      this.textCacheFile.Name = "textCacheFile";
+      this.textCacheFile.Size = new System.Drawing.Size(167, 20);
+      this.textCacheFile.TabIndex = 0;
+      this.textCacheFile.Text = global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.cache;
+      this.toolTip.SetToolTip(this.textCacheFile, "Location of the cache directory.\r\nLeave blank to use the default location (TEMP)." +
+        "\r\n\r\n(Requires restart)");
+      // 
+      // groupBox2
+      // 
+      this.groupBox2.Controls.Add(this.buttonBrowseCacheFile);
+      this.groupBox2.Controls.Add(this.textCacheFile);
+      this.groupBox2.Location = new System.Drawing.Point(12, 66);
+      this.groupBox2.Name = "groupBox2";
+      this.groupBox2.Size = new System.Drawing.Size(260, 48);
+      this.groupBox2.TabIndex = 1;
+      this.groupBox2.TabStop = false;
+      this.groupBox2.Text = "Cache directory";
+      // 
+      // buttonBrowseCacheFile
+      // 
+      this.buttonBrowseCacheFile.Location = new System.Drawing.Point(179, 17);
+      this.buttonBrowseCacheFile.Name = "buttonBrowseCacheFile";
+      this.buttonBrowseCacheFile.Size = new System.Drawing.Size(75, 23);
+      this.buttonBrowseCacheFile.TabIndex = 1;
+      this.buttonBrowseCacheFile.Text = "Browse";
+      this.buttonBrowseCacheFile.UseVisualStyleBackColor = true;
+      this.buttonBrowseCacheFile.Click += new System.EventHandler(this.buttonBrowseCacheFile_Click);
+      // 
+      // FormSettings
+      // 
+      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+      this.ClientSize = new System.Drawing.Size(284, 127);
+      this.Controls.Add(this.groupBox2);
+      this.Controls.Add(this.groupBox1);
+      this.Name = "FormSettings";
+      this.ShowIcon = false;
+      this.ShowInTaskbar = false;
+      this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+      this.Text = "Settings";
+      this.groupBox1.ResumeLayout(false);
+      ((System.ComponentModel.ISupportInitialize)(this.numericPort)).EndInit();
+      this.groupBox2.ResumeLayout(false);
+      this.groupBox2.PerformLayout();
+      this.ResumeLayout(false);
+
+    }
+
+    #endregion
+
+    private System.Windows.Forms.GroupBox groupBox1;
+    private System.Windows.Forms.NumericUpDown numericPort;
+    private System.Windows.Forms.ToolTip toolTip;
+    private System.Windows.Forms.GroupBox groupBox2;
+    private System.Windows.Forms.Button buttonBrowseCacheFile;
+    private System.Windows.Forms.TextBox textCacheFile;
+    private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+  }
+}

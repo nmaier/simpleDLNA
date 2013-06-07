@@ -5,7 +5,7 @@
     <Setting Name="cache" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="port" Type="System.Int32" Scope="User">
+    <Setting Name="port" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
   </Settings>

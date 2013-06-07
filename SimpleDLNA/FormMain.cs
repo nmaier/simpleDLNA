@@ -16,11 +16,23 @@ namespace NMaier.SimpleDlna.GUI
 {
   public partial class FormMain : Form, IAppender, IDisposable
   {
-    private readonly Properties.Settings Config = Properties.Settings.Default;
+    private static readonly Properties.Settings Config = Properties.Settings.Default;
     private HttpServer httpServer;
-    private readonly FileInfo cacheFile = new FileInfo(Path.Combine(Path.GetTempPath(), "sdlna.cache"));
-    private readonly FileInfo logFile = new FileInfo(Path.Combine(Path.GetTempPath(), "sdlna.log"));
+    private readonly FileInfo cacheFile = new FileInfo(Path.Combine(cacheDir, "sdlna.cache"));
+    private readonly FileInfo logFile = new FileInfo(Path.Combine(cacheDir, "sdlna.log"));
     private bool canClose = false;
+
+    private static string cacheDir
+    {
+      get
+      {
+        var rv = Config.cache;
+        if (!string.IsNullOrWhiteSpace(rv) && Directory.Exists(rv)) {
+          return rv;
+        }
+        return Path.GetTempPath();
+      }
+    }
 
     public FormMain()
     {
@@ -261,7 +273,7 @@ namespace NMaier.SimpleDlna.GUI
 
     private void FormMain_Load(object sender, EventArgs e)
     {
-      httpServer = new HttpServer(Config.port);
+      httpServer = new HttpServer((int)Config.port);
 
       Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
 
@@ -282,6 +294,14 @@ namespace NMaier.SimpleDlna.GUI
       }
       listDescriptions.Items.Remove(item);
       SaveConfig();
+    }
+
+    private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      using (var settings = new FormSettings()) {
+        settings.ShowDialog();
+        Config.Save();
+      }
     }
   }
 }

@@ -39,6 +39,7 @@
       this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colDirectories = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.listImages = new System.Windows.Forms.ImageList(this.components);
       this.buttonNewServer = new System.Windows.Forms.Button();
       this.buttonEdit = new System.Windows.Forms.Button();
       this.buttonStartStop = new System.Windows.Forms.Button();
@@ -61,15 +62,15 @@
       this.colLogLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-      this.listImages = new System.Windows.Forms.ImageList(this.components);
+      this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
       // 
       // listDescriptions
       // 
-      this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+      this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.listDescriptions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colName,
@@ -99,6 +100,14 @@
       // colActive
       // 
       this.colActive.Text = "Active";
+      // 
+      // listImages
+      // 
+      this.listImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("listImages.ImageStream")));
+      this.listImages.TransparentColor = System.Drawing.Color.Transparent;
+      this.listImages.Images.SetKeyName(0, "server");
+      this.listImages.Images.SetKeyName(1, "active");
+      this.listImages.Images.SetKeyName(2, "inactive");
       // 
       // buttonNewServer
       // 
@@ -194,10 +203,11 @@
       // fileToolStripMenuItem
       // 
       this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.settingsToolStripMenuItem,
+            this.toolStripMenuItem2,
             this.openInBrowserToolStripMenuItem,
             this.toolStripMenuItem3,
             this.hideToolStripMenuItem,
-            this.toolStripMenuItem2,
             this.exitToolStripMenuItem});
       this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
       this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -251,7 +261,7 @@
       // 
       // logger
       // 
-      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.logger.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colLogLevel,
@@ -280,13 +290,12 @@
       this.colLogMessage.Text = "Message";
       this.colLogMessage.Width = 200;
       // 
-      // listImages
+      // settingsToolStripMenuItem
       // 
-      this.listImages.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("listImages.ImageStream")));
-      this.listImages.TransparentColor = System.Drawing.Color.Transparent;
-      this.listImages.Images.SetKeyName(0, "server");
-      this.listImages.Images.SetKeyName(1, "active");
-      this.listImages.Images.SetKeyName(2, "inactive");
+      this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+      this.settingsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+      this.settingsToolStripMenuItem.Text = "Settings";
+      this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
       // 
       // FormMain
       // 
@@ -346,6 +355,7 @@
     private System.Windows.Forms.ColumnHeader colLogMessage;
     private System.Windows.Forms.ColumnHeader colLogLogger;
     private System.Windows.Forms.ImageList listImages;
+    private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
   }
 }
 

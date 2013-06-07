@@ -38,9 +38,9 @@ namespace NMaier.SimpleDlna.GUI.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int port {
+        public decimal port {
             get {
-                return ((int)(this["port"]));
+                return ((decimal)(this["port"]));
             }
             set {
                 this["port"] = value;
