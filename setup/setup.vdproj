@@ -347,6 +347,48 @@
     {
         "CustomAction"
         {
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_2DB3E06ADD2B4B768C233310277DA233"
+            {
+            "Name" = "8:Primary output from SimpleDLNA (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+            "FileType" = "3:2"
+            "InstallAction" = "3:1"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_BA6A93EC_79DB_47C8_9B40_34390CFBBECA"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_6C66D35A142E4BA981141352DF824B33"
+            {
+            "Name" = "8:Primary output from SimpleDLNA (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+            "FileType" = "3:2"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_F1F56558_9E4A_4B50_9D65_19C596ED4FAA"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_9E408D24E6BE43ADBE44D054D3FFB179"
+            {
+            "Name" = "8:Primary output from SimpleDLNA (Active)"
+            "Condition" = "8:"
+            "Object" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+            "FileType" = "3:2"
+            "InstallAction" = "3:3"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_E090906C_4FA4_4AF1_9AE4_C9219B448401"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
         }
         "DefaultFeature"
         {
