@@ -186,6 +186,7 @@ namespace NMaier.SimpleDlna.GUI
     {
       Text = "Going down...";
       httpServer.Dispose();
+      httpServer = null;
     }
 
     private delegate void logDelegate(string level, string logger, string msg, string ex);

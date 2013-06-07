@@ -13,8 +13,14 @@
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing)
     {
-      if (disposing && (components != null)) {
-        components.Dispose();
+      if (disposing) {
+        if (components != null) {
+          components.Dispose();
+        }
+        if (httpServer != null) {
+          httpServer.Dispose();
+          httpServer = null;
+        }
       }
       base.Dispose(disposing);
     }
@@ -62,8 +68,8 @@
       // 
       // listDescriptions
       // 
-      this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+      this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
       this.listDescriptions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colName,
@@ -245,7 +251,7 @@
       // 
       // logger
       // 
-      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
       this.logger.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colLogLevel,
