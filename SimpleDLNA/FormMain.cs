@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -11,9 +10,7 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
 using log4net.Layout;
-using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -59,23 +56,23 @@ namespace NMaier.SimpleDlna.GUI
     private void StartPipeNotification()
     {
       new Thread(() =>
-       {
-         for (; ; ) {
-           try {
-             using (var pipe = new NamedPipeServerStream("simpledlnagui", PipeDirection.InOut)) {
-               pipe.WaitForConnection();
-               pipe.ReadByte();
-               BeginInvoke((Action)(() =>
-               {
-                 notifyIcon_DoubleClick(null, null);
-                 BringToFront();
-               }));
-             }
-           }
-           catch (Exception) {
-           }
-         }
-       }) { IsBackground = true }.Start();
+      {
+        for (; ; ) {
+          try {
+            using (var pipe = new NamedPipeServerStream("simpledlnagui", PipeDirection.InOut)) {
+              pipe.WaitForConnection();
+              pipe.ReadByte();
+              BeginInvoke((Action)(() =>
+              {
+                notifyIcon_DoubleClick(null, null);
+                BringToFront();
+              }));
+            }
+          }
+          catch (Exception) {
+          }
+        }
+      }) { IsBackground = true }.Start();
     }
 
     private void ButtonNewServer_Click(object sender, EventArgs e)
@@ -85,6 +82,7 @@ namespace NMaier.SimpleDlna.GUI
         if (rv == DialogResult.OK) {
           var item = new ServerListViewItem(httpServer, cacheFile, ns.Description);
           listDescriptions.Items.Add(item);
+          item.Load();
           SaveConfig();
         }
       }
@@ -116,16 +114,22 @@ namespace NMaier.SimpleDlna.GUI
     }
     private void LoadConfig()
     {
+      var descs = (from d in Config.Descriptors
+                   let i = new ServerListViewItem(httpServer, cacheFile, d)
+                   select i).ToArray();
+      listDescriptions.Items.AddRange(descs);
+      SizeDescriptorColumns();
+
       Task.Factory.StartNew(() =>
       {
-        foreach (var d in Config.Descriptors) {
-          var f = new ServerListViewItem(httpServer, cacheFile, d);
-          Invoke((Action)(() =>
-          {
-            listDescriptions.Items.Add(f);
-            SizeDescriptorColumns();
-          }));
+        foreach (var i in descs) {
+          i.Load();
         }
+        ;
+        Invoke((Action)(() =>
+        {
+          SizeDescriptorColumns();
+        }));
       });
     }
 
@@ -163,7 +167,6 @@ namespace NMaier.SimpleDlna.GUI
           buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
         }));
       });
-
     }
 
     private void FormMain_FormClosed(object sender, FormClosedEventArgs e)

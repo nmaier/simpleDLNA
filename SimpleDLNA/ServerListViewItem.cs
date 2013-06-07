@@ -25,8 +25,11 @@ namespace NMaier.SimpleDlna.GUI
       this.server = server;
       this.cacheFile = cacheFile;
       Description = description;
-      StartFileServer();
-      UpdateInfo();
+
+      Text = Description.Name;
+      SubItems.Add(Description.Directories.Length.ToString());
+      SubItems.Add("Loading...");
+      ImageIndex = 2;
     }
 
 
@@ -92,6 +95,12 @@ namespace NMaier.SimpleDlna.GUI
         fileServer.Dispose();
         fileServer = null;
       }
+    }
+
+    public void Load()
+    {
+      StartFileServer();
+      UpdateInfo();
     }
 
     public void Toggle()
