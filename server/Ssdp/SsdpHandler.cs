@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using NMaier.SimpleDlna.Utilities;
 using Threading = System.Threading;
 using Timers = System.Timers;
-using System.Collections.Concurrent;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
 {
@@ -169,13 +170,26 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       NotifyAll();
     }
 
+    private UpnpDevice[] Devices
+    {
+      get
+      {
+        UpnpDevice[] devs;
+        lock (devices) {
+          devs = devices.Values.SelectMany(i =>
+          {
+            return i;
+          }).ToArray();
+        }
+        return devs;
+      }
+    }
+
     internal void NotifyAll()
     {
       Debug("NotifyAll");
-      foreach (var dl in devices.Values) {
-        foreach (var d in dl) {
-          NotifyDevice(d, "alive", false);
-        }
+      foreach (var d in Devices) {
+        NotifyDevice(d, "alive", false);
       }
     }
 
@@ -198,8 +212,10 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     internal void RegisterNotification(Guid UUID, Uri Descriptor)
     {
       List<UpnpDevice> list;
-      if (!devices.TryGetValue(UUID, out list)) {
-        devices.Add(UUID, list = new List<UpnpDevice>());
+      lock (devices) {
+        if (!devices.TryGetValue(UUID, out list)) {
+          devices.Add(UUID, list = new List<UpnpDevice>());
+        }
       }
       foreach (var t in new string[] { "upnp:rootdevice", "urn:schemas-upnp-org:device:MediaServer:1", "urn:schemas-upnp-org:service:ContentDirectory:1", "uuid:" + UUID }) {
         list.Add(new UpnpDevice(UUID, t, Descriptor));
@@ -216,26 +232,26 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
 
       Debug("RespondToSearch");
-      foreach (var dl in devices.Values) {
-        foreach (var d in dl) {
-          if (!string.IsNullOrEmpty(req) && req != d.Type) {
-            continue;
-          }
-          SendSearchResponse(endpoint, d);
+      foreach (var d in Devices) {
+        if (!string.IsNullOrEmpty(req) && req != d.Type) {
+          continue;
         }
+        SendSearchResponse(endpoint, d);
       }
     }
 
     internal void UnregisterNotification(Guid UUID)
     {
       List<UpnpDevice> dl;
-      if (!devices.TryGetValue(UUID, out dl)) {
-        return;
+      lock (devices) {
+        if (!devices.TryGetValue(UUID, out dl)) {
+          return;
+        }
+        devices.Remove(UUID);
       }
       foreach (var d in dl) {
         NotifyDevice(d, "byebye", true);
       }
-      devices.Remove(UUID);
       DebugFormat("Unregistered mount {0}", UUID);
     }
   }
