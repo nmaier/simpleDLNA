@@ -12,6 +12,7 @@ namespace NMaier.SimpleDlna.GUI
     static void Main()
     {
       using (Mutex mutex = new Mutex(false, @"Global\simpledlnaguilock")) {
+#if !DEBUG
         if (!mutex.WaitOne(0, false)) {
           using (var pipe = new NamedPipeClientStream(".", "simpledlnagui", PipeDirection.Out)) {
             try {
@@ -24,6 +25,8 @@ namespace NMaier.SimpleDlna.GUI
           }
         }
         GC.Collect();
+#endif
+
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.Run(new FormMain());

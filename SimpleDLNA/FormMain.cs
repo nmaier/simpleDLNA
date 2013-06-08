@@ -53,6 +53,7 @@ namespace NMaier.SimpleDlna.GUI
       listImages.Images.Add("refreshing", Properties.Resources.refreshing);
 
       SetupLogging();
+
       StartPipeNotification();
 
       notifyIcon.Icon = Icon;
@@ -95,6 +96,9 @@ namespace NMaier.SimpleDlna.GUI
 
     private void StartPipeNotification()
     {
+#if DEBUG
+      log4net.LogManager.GetLogger(this.GetType()).Info("Debug mode / Skipping one-instance-only stuff");
+#else
       new Thread(() =>
       {
         for (; ; ) {
@@ -113,6 +117,7 @@ namespace NMaier.SimpleDlna.GUI
           }
         }
       }) { IsBackground = true }.Start();
+#endif
     }
 
     private void ButtonNewServer_Click(object sender, EventArgs e)
