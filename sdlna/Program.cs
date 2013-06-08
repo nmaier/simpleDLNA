@@ -30,7 +30,7 @@ namespace NMaier.SimpleDlna
       e.Cancel = true;
       BlockEvent.Set();
       LogManager.GetLogger(typeof(Program)).Info("Shutdown requested");
-      Console.Title = "simple DLNA - shutting down ...";
+      Console.Title = "SimpleDLNA - shutting down ...";
     }
 
     private static void ListOrders()
@@ -100,7 +100,7 @@ namespace NMaier.SimpleDlna
         try {
           server.Info("CTRL-C to terminate");
 
-          Console.Title = "simple DLNA - starting ...";
+          Console.Title = "SimpleDLNA - starting ...";
 
           var types = options.Types[0];
           foreach (var t in options.Types) {
