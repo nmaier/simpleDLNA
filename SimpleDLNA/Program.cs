@@ -29,7 +29,15 @@ namespace NMaier.SimpleDlna.GUI
 
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new FormMain());
+        using (var main = new FormMain()) {
+          try {
+            Application.Run(main);
+          }
+          catch (Exception ex) {
+            log4net.LogManager.GetLogger(typeof(Program)).Fatal("Encountered fatal unhandled exception", ex);
+            throw;
+          }
+        }
       }
     }
   }
