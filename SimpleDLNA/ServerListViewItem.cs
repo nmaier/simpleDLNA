@@ -1,10 +1,10 @@
-using NMaier.SimpleDlna.FileMediaServer;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Comparers;
 using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+using NMaier.SimpleDlna.FileMediaServer;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Comparers;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -14,20 +14,10 @@ namespace NMaier.SimpleDlna.GUI
 
     private FileServer fileServer;
 
+    private State internalState = State.Loading;
+
     private readonly HttpServer server;
-    private State internalState;
-    private State state
-    {
-      get
-      {
-        return internalState;
-      }
-      set
-      {
-        internalState = value;
-        UpdateInfo();
-      }
-    }
+
 
     public readonly ServerDescription Description;
 
@@ -37,21 +27,38 @@ namespace NMaier.SimpleDlna.GUI
       this.server = server;
       this.cacheFile = cacheFile;
       Description = description;
+
+      Text = Description.Name;
+      SubItems.Add(Description.Directories.Length.ToString());
+      ImageIndex = 0;
     }
 
 
     private enum State : int
     {
-      Running = 1,
-      Stopped = 2,
       Loading = 0,
-      Refreshing = 3
+      Refreshing = 3,
+      Running = 1,
+      Stopped = 2
+    }
+
+
+    private State state
+    {
+      get {
+        return internalState;
+      }
+      set {
+        internalState = value;
+        UpdateInfo();
+      }
     }
 
 
     private void BeginInvoke(Action func)
     {
-      ListView.BeginInvoke((Action)(() => {
+      ListView.BeginInvoke((Action)(() =>
+      {
         try {
           func();
         }
@@ -79,9 +86,9 @@ namespace NMaier.SimpleDlna.GUI
           ids.AddView(v);
         }
         var dirs = (from i in Description.Directories
-                    let d = new DirectoryInfo(i)
-                    where d.Exists
-                    select d).ToArray();
+                                            let d = new DirectoryInfo(i)
+                                            where d.Exists
+                                            select d).ToArray();
         if (dirs.Length == 0) {
           throw new InvalidOperationException("No remaining directories");
         }
@@ -92,6 +99,14 @@ namespace NMaier.SimpleDlna.GUI
           fileServer.SetCacheFile(cacheFile);
         }
 #endif
+        fileServer.Changing += (o, e) =>
+        {
+          state = State.Refreshing;
+        };
+        fileServer.Changed += (o, e) =>
+        {
+          state = Description.Active ? State.Running : State.Stopped;
+        };
         fileServer.Load();
         server.RegisterMediaServer(fileServer);
         state = State.Running;

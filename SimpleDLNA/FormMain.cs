@@ -50,6 +50,8 @@ namespace NMaier.SimpleDlna.GUI
       listImages.Images.Add("server", Properties.Resources.server);
       listImages.Images.Add("active", Properties.Resources.active);
       listImages.Images.Add("inactive", Properties.Resources.inactive);
+      listImages.Images.Add("refreshing", Properties.Resources.refreshing);
+
       SetupLogging();
       StartPipeNotification();
 

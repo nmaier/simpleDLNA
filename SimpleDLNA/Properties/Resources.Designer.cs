@@ -88,6 +88,13 @@ namespace NMaier.SimpleDlna.GUI.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap refreshing {
+            get {
+                object obj = ResourceManager.GetObject("refreshing", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Icon server {
             get {
                 object obj = ResourceManager.GetObject("server", resourceCulture);

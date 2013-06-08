@@ -171,6 +171,7 @@
     <None Include="Resources\inactive.png" />
     <None Include="Resources\server.png" />
     <None Include="Resources\server.ico" />
+    <None Include="Resources\refreshing.png" />
     <Content Include="sdlna.ico" />
   </ItemGroup>
   <ItemGroup>

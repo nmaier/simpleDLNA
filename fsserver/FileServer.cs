@@ -54,6 +54,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
 
     public event EventHandler Changed;
+    public event EventHandler Changing;
 
 
     public string FriendlyName { get; set; }
@@ -135,20 +136,22 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void Rescan()
     {
+      if (Changing != null) {
+        Changing(this, new EventArgs());
+      }
       lock (this) {
         try {
           InfoFormat("Rescanning...");
           DoRoot();
           InfoFormat("Done rescanning...");
-
-          if (Changed != null) {
-            InfoFormat("Notifying...");
-            Changed(this, null);
-          }
         }
         catch (Exception ex) {
           Error(ex);
         }
+      }
+
+      if (Changed != null) {
+        Changed(this, new EventArgs());
       }
     }
 
