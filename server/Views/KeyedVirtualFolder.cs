@@ -25,6 +25,7 @@ namespace NMaier.SimpleDlna.Server.Views
       if (!keys.TryGetValue(lkey, out rv)) {
         rv = new T();
         rv.Name = key;
+        rv.Parent = this;
         folders.Add(rv);
         keys.Add(lkey, rv);
       }

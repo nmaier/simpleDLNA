@@ -24,11 +24,11 @@
     {
     }
     public VirtualClonedFolder(IMediaFolder parent, string name)
-      : this(parent, name, parent.Id, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
+      : this(parent, name, name, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
     {
     }
     public VirtualClonedFolder(IMediaFolder parent, string name, DlnaMediaTypes types)
-      : this(parent, name, parent.Id, types)
+      : this(parent, name, name, types)
     {
     }
 

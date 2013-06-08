@@ -58,7 +58,6 @@ namespace NMaier.SimpleDlna.Server.Views
         if (genre != null) {
           genres.GetFolder(genre.StemNameBase()).AddResource(i);
         }
-        folder.RemoveResource(i);
       }
     }
 
