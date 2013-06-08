@@ -130,34 +130,20 @@ namespace NMaier.SimpleDlna.GUI
       Config.Descriptors = (from ServerListViewItem item in listDescriptions.Items
                             select item.Description).ToList();
       Config.Save();
-      SizeDescriptorColumns();
     }
 
-    private void SizeDescriptorColumns()
-    {
-      var mode = listDescriptions.Items.Count == 0 ? ColumnHeaderAutoResizeStyle.HeaderSize : ColumnHeaderAutoResizeStyle.ColumnContent;
-      foreach (var c in listDescriptions.Columns) {
-        (c as ColumnHeader).AutoResize(mode);
-      }
-    }
     private void LoadConfig()
     {
       var descs = (from d in Config.Descriptors
                    let i = new ServerListViewItem(httpServer, cacheFile, d)
                    select i).ToArray();
       listDescriptions.Items.AddRange(descs);
-      SizeDescriptorColumns();
 
       Task.Factory.StartNew(() =>
       {
         foreach (var i in descs) {
           i.Load();
         }
-        ;
-        Invoke((Action)(() =>
-        {
-          SizeDescriptorColumns();
-        }));
       });
     }
 

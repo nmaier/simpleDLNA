@@ -15,7 +15,19 @@ namespace NMaier.SimpleDlna.GUI
     private FileServer fileServer;
 
     private readonly HttpServer server;
-
+    private State internalState;
+    private State state
+    {
+      get
+      {
+        return internalState;
+      }
+      set
+      {
+        internalState = value;
+        UpdateInfo();
+      }
+    }
 
     public readonly ServerDescription Description;
 
@@ -25,20 +37,43 @@ namespace NMaier.SimpleDlna.GUI
       this.server = server;
       this.cacheFile = cacheFile;
       Description = description;
-
-      Text = Description.Name;
-      SubItems.Add(Description.Directories.Length.ToString());
-      SubItems.Add("Loading...");
-      ImageIndex = 0;
     }
 
+
+    private enum State : int
+    {
+      Running = 1,
+      Stopped = 2,
+      Loading = 0,
+      Refreshing = 3
+    }
+
+
+    private void BeginInvoke(Action func)
+    {
+      ListView.BeginInvoke((Action)(() => {
+        try {
+          func();
+        }
+        finally {
+          var mode = ListView.Items.Count == 0
+            ? ColumnHeaderAutoResizeStyle.HeaderSize
+            : ColumnHeaderAutoResizeStyle.ColumnContent;
+          foreach (var c in ListView.Columns) {
+            (c as ColumnHeader).AutoResize(mode);
+          }
+        }
+      }));
+    }
 
     private void StartFileServer()
     {
       if (!Description.Active) {
+        state = State.Stopped;
         return;
       }
       try {
+        state = State.Loading;
         var ids = new Identifiers(ComparerRepository.Lookup(Description.Order), Description.OrderDescending);
         foreach (var v in Description.Views) {
           ids.AddView(v);
@@ -59,10 +94,12 @@ namespace NMaier.SimpleDlna.GUI
 #endif
         fileServer.Load();
         server.RegisterMediaServer(fileServer);
+        state = State.Running;
       }
       catch (Exception ex) {
         server.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
         Description.ToggleActive();
+        state = State.Stopped;
       }
     }
 
@@ -74,19 +111,21 @@ namespace NMaier.SimpleDlna.GUI
       server.UnregisterMediaServer(fileServer);
       fileServer.Dispose();
       fileServer = null;
+
+      state = State.Stopped;
     }
 
     private void UpdateInfo()
     {
-      ListView.Parent.BeginInvoke((Action)(() =>
+      BeginInvoke(() =>
       {
         SubItems.Clear();
 
         Text = Description.Name;
         SubItems.Add(Description.Directories.Length.ToString());
-        SubItems.Add(Description.Active ? "Active" : "Inactive");
-        ImageIndex = Description.Active ? 1 : 2;
-      }));
+        SubItems.Add(state.ToString());
+        ImageIndex = (int)state;
+      });
     }
 
 
@@ -100,8 +139,8 @@ namespace NMaier.SimpleDlna.GUI
 
     public void Load()
     {
+      state = State.Loading;
       StartFileServer();
-      UpdateInfo();
     }
 
     public void Toggle()
@@ -109,7 +148,6 @@ namespace NMaier.SimpleDlna.GUI
       StopFileServer();
       Description.ToggleActive();
       StartFileServer();
-      UpdateInfo();
     }
 
     public void UpdateInfo(ServerDescription description)
@@ -117,7 +155,6 @@ namespace NMaier.SimpleDlna.GUI
       StopFileServer();
       Description.AdoptInfo(description);
       StartFileServer();
-      UpdateInfo();
     }
   }
 }
