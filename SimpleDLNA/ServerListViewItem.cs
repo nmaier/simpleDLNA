@@ -50,7 +50,8 @@ namespace NMaier.SimpleDlna.GUI
         if (dirs.Length == 0) {
           throw new InvalidOperationException("No remaining directories");
         }
-        fileServer = new FileServer(Description.Types, ids, Description.Name, dirs);
+        fileServer = new FileServer(Description.Types, ids, dirs);
+        fileServer.FriendlyName = Description.Name;
 #if !DEBUG
         if (cacheFile != null) {
           fileServer.SetCacheFile(cacheFile);

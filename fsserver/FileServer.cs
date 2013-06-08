@@ -15,7 +15,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
     private readonly DirectoryInfo[] directories;
     private readonly Identifiers ids;
-    private readonly string friendlyName;
+    public string FriendlyName { get; set; }
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private FileStore store = null;
     private readonly DlnaMediaTypes types;
@@ -25,7 +25,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
     private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
 
-    public FileServer(DlnaMediaTypes types, Identifiers ids, string proposedFriendlyName, params DirectoryInfo[] directories)
+    public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
     {
       this.types = types;
       this.ids = ids;
@@ -33,26 +33,15 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (this.directories.Length == 0) {
         throw new ArgumentException("Provide one or more directories", "directories");
       }
-      if (!string.IsNullOrWhiteSpace(proposedFriendlyName)) {
-        friendlyName = proposedFriendlyName;
-      }
-      else if (this.directories.Length == 1) {
-        friendlyName = string.Format("{0} ({1})", this.directories[0].Name, this.directories[0].Parent.FullName);
+      if (this.directories.Length == 1) {
+        FriendlyName = string.Format("{0} ({1})", this.directories[0].Name, this.directories[0].Parent.FullName);
       }
       else {
-        friendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, this.directories[0].Parent.FullName, this.directories.Length - 1);
+        FriendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, this.directories[0].Parent.FullName, this.directories.Length - 1);
       }
       watchers = (from d in directories
                   select new FileSystemWatcher(d.FullName)).ToArray();
       uuid = DeriveUUID();
-    }
-
-    public string FriendlyName
-    {
-      get
-      {
-        return friendlyName;
-      }
     }
 
     public Guid Uuid
@@ -132,7 +121,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       for (; i < copy.Length; ++i) {
         bytes[i] = copy[i];
       }
-      copy = Encoding.UTF8.GetBytes(friendlyName);
+      copy = Encoding.UTF8.GetBytes(FriendlyName);
       for (var j = 0; j < copy.Length && i < bytes.Length - 1; ++i, ++j) {
         bytes[i] = copy[j];
       }
@@ -147,7 +136,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           newMaster = new PlainRootFolder(this, types, directories[0]);
         }
         else {
-          var virtualMaster = new VirtualFolder(null, friendlyName, "0");
+          var virtualMaster = new VirtualFolder(null, FriendlyName, "0");
           foreach (var d in directories) {
             virtualMaster.Merge(new PlainRootFolder(this, types, d));
           }
