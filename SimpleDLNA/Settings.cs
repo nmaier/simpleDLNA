@@ -15,7 +15,7 @@ namespace NMaier.SimpleDlna.GUI.Properties
           Save();
         }
       }
-      catch (Exception ex) {
+      catch (Exception) {
       }
     }
 

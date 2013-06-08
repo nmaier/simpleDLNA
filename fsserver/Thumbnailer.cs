@@ -1,8 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using NMaier.SimpleDlna.Utilities;
-using System.Collections.Concurrent;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -20,13 +19,18 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    private static readonly Thread thread = new Thread(Run) { IsBackground = true, Priority = ThreadPriority.Lowest };
-    private static readonly ConcurrentQueue<Item> queue = new ConcurrentQueue<Item>();
+    private static readonly ConcurrentQueue<Item> queue = CreateQueue();
     private static readonly AutoResetEvent signal = new AutoResetEvent(false);
 
-    static Thumbnailer()
+    private static ConcurrentQueue<Item> CreateQueue()
     {
-      thread.Start();
+      new Thread(Run)
+      {
+        IsBackground = true,
+        Priority = ThreadPriority.Lowest
+      }.Start();
+
+      return new ConcurrentQueue<Item>();
     }
 
     private static void Run()

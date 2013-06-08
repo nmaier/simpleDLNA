@@ -16,19 +16,22 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public string Name
     {
-      get {
+      get
+      {
         return info.FullName;
       }
     }
     public Stream ReadStream
     {
-      get {
+      get
+      {
         return info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
     }
     public Stream WriteStream
     {
-      get {
+      get
+      {
         throw new NotImplementedException();
       }
     }
@@ -36,6 +39,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public void CloseStream(Stream stream)
     {
+      if (stream == null) {
+        return;
+      }
       stream.Close();
       stream.Dispose();
     }

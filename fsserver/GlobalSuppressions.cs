@@ -14,3 +14,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dlna")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "NMaier.SimpleDlna.FileMediaServer.ImageFile.#.ctor(System.Runtime.Serialization.SerializationInfo,NMaier.SimpleDlna.FileMediaServer.DeserializeInfo)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "NMaier.SimpleDlna.FileMediaServer")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope = "member", Target = "NMaier.SimpleDlna.FileMediaServer.TagLibFileAbstraction.#CloseStream(System.IO.Stream)")]
