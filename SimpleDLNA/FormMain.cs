@@ -16,6 +16,7 @@ namespace NMaier.SimpleDlna.GUI
 {
   public partial class FormMain : Form, IAppender, IDisposable
   {
+    private bool logging = false;
     private static readonly Properties.Settings Config = Properties.Settings.Default;
     private HttpServer httpServer;
     private readonly FileInfo cacheFile = new FileInfo(Path.Combine(cacheDir, "sdlna.cache"));
@@ -36,6 +37,15 @@ namespace NMaier.SimpleDlna.GUI
 
     public FormMain()
     {
+      HandleCreated += (o, e) =>
+      {
+        logging = true;
+      };
+      HandleDestroyed += (o, e) =>
+      {
+        logging = false;
+      };
+
       InitializeComponent();
       listImages.Images.Add("server", Properties.Resources.server);
       listImages.Images.Add("active", Properties.Resources.active);
@@ -194,6 +204,9 @@ namespace NMaier.SimpleDlna.GUI
 
     public void DoAppend(LoggingEvent loggingEvent)
     {
+      if (!logging) {
+        return;
+      }
       if (loggingEvent.Level < Level.Info) {
         return;
       }
@@ -201,6 +214,9 @@ namespace NMaier.SimpleDlna.GUI
       cls = cls.Substring(cls.LastIndexOf('.') + 1);
       BeginInvoke(new logDelegate((lvl, lg, msg, ex) =>
       {
+        if (!logging) {
+          return;
+        }
         if (logger.Items.Count >= 300) {
           logger.Items.RemoveAt(0);
         }
