@@ -18,7 +18,16 @@ namespace NMaier.SimpleDlna.Utilities
 
 
     [CLSCompliant(false)]
-    public LeastRecentlyUsedDictionary(uint capacity, ConcurrencyLevel concurrent = ConcurrencyLevel.NonConcurrent)
+    public LeastRecentlyUsedDictionary(uint capacity)
+      : this(capacity, ConcurrencyLevel.NonConcurrent)
+    {
+    }
+    public LeastRecentlyUsedDictionary(int capacity)
+      : this((uint)capacity)
+    {
+    }
+    [CLSCompliant(false)]
+    public LeastRecentlyUsedDictionary(uint capacity, ConcurrencyLevel concurrent)
     {
       if (concurrent == ConcurrencyLevel.Concurrent) {
         items = new ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
@@ -29,7 +38,7 @@ namespace NMaier.SimpleDlna.Utilities
       this.capacity = capacity;
       toDrop = Math.Min(10, (uint)(capacity * 0.07));
     }
-    public LeastRecentlyUsedDictionary(int capacity, ConcurrencyLevel concurrent = ConcurrencyLevel.NonConcurrent)
+    public LeastRecentlyUsedDictionary(int capacity, ConcurrencyLevel concurrent)
       : this((uint)capacity, concurrent)
     {
     }

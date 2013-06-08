@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
+
 namespace NMaier.SimpleDlna.Utilities
 {
   public static class Formatting
@@ -6,29 +8,12 @@ namespace NMaier.SimpleDlna.Utilities
     private readonly static Regex sanitizer = new Regex(@"\b(?:the|an?|ein(?:e[rs]?)?|der|die|das)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     private readonly static Regex trim = new Regex(@"\s+|^[._+)}\]-]+|[._+({\[-]+$", RegexOptions.Compiled);
+
     private readonly static Regex trimmore = new Regex(@"^[^\d\w]+|[^\d\w]+$", RegexOptions.Compiled);
+
     private readonly static Regex respace = new Regex(@"[._+-]+", RegexOptions.Compiled);
 
-    public static string StemNameBase(this string str)
-    {
-      if (!str.Contains(" ")) {
-        str = respace.Replace(str, " ").Trim();
-      }
-      var ws = trim.Replace(str, " ").Trim();
-      if (string.IsNullOrWhiteSpace(ws)) {
-        return str;
-      }
-      return ws;
-    }
 
-    public static string StemCompareBase(this string str)
-    {
-      var san = trimmore.Replace(sanitizer.Replace(str, string.Empty), string.Empty).Trim();
-      if (string.IsNullOrWhiteSpace(san)) {
-        return str;
-      }
-      return san.StemNameBase();
-    }
     public static string FormatFileSize(this long size)
     {
       if (size < 900) {
@@ -52,6 +37,35 @@ namespace NMaier.SimpleDlna.Utilities
       }
       ds /= 1024.0;
       return string.Format("{0:F4} PB", ds);
+    }
+
+    public static string StemCompareBase(this string name)
+    {
+      if (name == null) {
+        throw new ArgumentNullException("name");
+      }
+
+      var san = trimmore.Replace(sanitizer.Replace(name, string.Empty), string.Empty).Trim();
+      if (string.IsNullOrWhiteSpace(san)) {
+        return name;
+      }
+      return san.StemNameBase();
+    }
+
+    public static string StemNameBase(this string name)
+    {
+      if (name == null) {
+        throw new ArgumentNullException("name");
+      }
+
+      if (!name.Contains(" ")) {
+        name = respace.Replace(name, " ").Trim();
+      }
+      var ws = trim.Replace(name, " ").Trim();
+      if (string.IsNullOrWhiteSpace(ws)) {
+        return name;
+      }
+      return ws;
     }
   }
 }
