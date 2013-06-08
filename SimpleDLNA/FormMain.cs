@@ -20,7 +20,11 @@ namespace NMaier.SimpleDlna.GUI
     private static readonly Properties.Settings Config = Properties.Settings.Default;
     private HttpServer httpServer;
     private readonly FileInfo cacheFile = new FileInfo(Path.Combine(cacheDir, "sdlna.cache"));
+#if DEBUG
+    private readonly FileInfo logFile = new FileInfo(Path.Combine(cacheDir, "sdlna.dbg.log"));
+#else
     private readonly FileInfo logFile = new FileInfo(Path.Combine(cacheDir, "sdlna.log"));
+#endif
     private bool canClose = false;
 
     private static string cacheDir
