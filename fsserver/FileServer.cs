@@ -89,16 +89,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
           newMaster = new PlainRootFolder(this, types, directories[0]);
         }
         else {
-          var virtualMaster = new VirtualFolder(null, FriendlyName, "0");
+          var virtualMaster = new VirtualFolder(null, FriendlyName, Identifiers.KeyRoot);
           foreach (var d in directories) {
             virtualMaster.Merge(new PlainRootFolder(this, types, d));
           }
           newMaster = virtualMaster;
         }
-        ids.RegisterFolder("0", newMaster);
-        ids.RegisterFolder("I", new VirtualClonedFolder(newMaster, "I", types & DlnaMediaTypes.Image));
-        ids.RegisterFolder("A", new VirtualClonedFolder(newMaster, "A", types & DlnaMediaTypes.Audio));
-        ids.RegisterFolder("V", new VirtualClonedFolder(newMaster, "V", types & DlnaMediaTypes.Video));
+        ids.RegisterFolder(Identifiers.KeyRoot, newMaster);
+        ids.RegisterFolder(Identifiers.KeyImages, new VirtualClonedFolder(newMaster, Identifiers.KeyImages, types & DlnaMediaTypes.Image));
+        ids.RegisterFolder(Identifiers.KeyAudio, new VirtualClonedFolder(newMaster, Identifiers.KeyAudio, types & DlnaMediaTypes.Audio));
+        ids.RegisterFolder(Identifiers.KeyVideo, new VirtualClonedFolder(newMaster, Identifiers.KeyVideo, types & DlnaMediaTypes.Video));
       }
 
       Thumbnail();

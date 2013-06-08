@@ -9,6 +9,15 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class Identifiers : Logging
   {
+    public const string KeyAudio = "A";
+
+    public const string KeyImages = "I";
+
+    public const string KeyRoot = "0";
+
+    public const string KeyVideo = "V";
+
+
     private readonly IItemComparer comparer;
 
     private static readonly Random idGen = new Random();
