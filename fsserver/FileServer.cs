@@ -13,17 +13,25 @@ namespace NMaier.SimpleDlna.FileMediaServer
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
     private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
+
+    private readonly Guid uuid = Guid.NewGuid();
+
+    private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
+
+    private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
+
     private readonly DirectoryInfo[] directories;
+
     private readonly Identifiers ids;
-    public string FriendlyName { get; set; }
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private FileStore store = null;
+
     private readonly DlnaMediaTypes types;
-    private readonly Guid uuid = Guid.NewGuid();
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private readonly FileSystemWatcher[] watchers;
-    private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
-    private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
+
 
     public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
     {
@@ -44,6 +52,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       uuid = DeriveUUID();
     }
 
+
+    public event EventHandler Changed;
+
+
+    public string FriendlyName { get; set; }
     public Guid Uuid
     {
       get
@@ -52,70 +65,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    public event EventHandler Changed;
-
-    public void AddView(string name)
-    {
-      ids.AddView(name);
-    }
-
-    public void Dispose()
-    {
-      foreach (var w in watchers) {
-        w.Dispose();
-      }
-      if (changeTimer != null) {
-        changeTimer.Dispose();
-      }
-      if (watchTimer != null) {
-        watchTimer.Dispose();
-      }
-      if (store != null) {
-        store.Dispose();
-      }
-    }
-
-    public IMediaItem GetItem(string id)
-    {
-      return ids.GetItemById(id);
-    }
-
-    public void Load()
-    {
-      if (types == DlnaMediaTypes.Audio && !ids.HasViews) {
-        ids.AddView("music");
-      }
-      DoRoot();
-
-      changeTimer.AutoReset = false;
-      changeTimer.Elapsed += RescanTimer;
-
-      foreach (var watcher in watchers) {
-        watcher.IncludeSubdirectories = true;
-        watcher.Created += OnChanged;
-        watcher.Deleted += OnChanged;
-        watcher.Renamed += OnRenamed;
-        watcher.EnableRaisingEvents = true;
-      }
-
-      watchTimer.Elapsed += RescanTimer;
-      watchTimer.Enabled = true;
-    }
-
-    public void SetCacheFile(FileInfo info)
-    {
-      try {
-        store = new FileStore(info);
-      }
-      catch (Exception ex) {
-        Warn("FileStore is not availble; failed to load SQLite Adapter", ex);
-        store = null;
-      }
-    }
 
     private Guid DeriveUUID()
     {
-      byte[] bytes = Guid.NewGuid().ToByteArray();
+      var bytes = Guid.NewGuid().ToByteArray();
       var i = 0;
       var copy = Encoding.ASCII.GetBytes("sdlnafs");
       for (; i < copy.Length; ++i) {
@@ -214,6 +167,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
+
     internal Cover GetCover(BaseFile file)
     {
       if (store != null) {
@@ -229,7 +183,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return item;
       }
 
-      var ext = re_sansitizeExt.Replace(info.Extension.ToLower().Substring(1), "");
+      var ext = re_sansitizeExt.Replace(info.Extension.ToLower().Substring(1), string.Empty);
       var type = DlnaMaps.Ext2Dlna[ext];
       var mediaType = DlnaMaps.Ext2Media[ext];
 
@@ -247,6 +201,66 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       if (store != null) {
         store.MaybeStoreFile(aFile);
+      }
+    }
+
+
+    public void AddView(string name)
+    {
+      ids.AddView(name);
+    }
+
+    public void Dispose()
+    {
+      foreach (var w in watchers) {
+        w.Dispose();
+      }
+      if (changeTimer != null) {
+        changeTimer.Dispose();
+      }
+      if (watchTimer != null) {
+        watchTimer.Dispose();
+      }
+      if (store != null) {
+        store.Dispose();
+      }
+    }
+
+    public IMediaItem GetItem(string id)
+    {
+      return ids.GetItemById(id);
+    }
+
+    public void Load()
+    {
+      if (types == DlnaMediaTypes.Audio && !ids.HasViews) {
+        ids.AddView("music");
+      }
+      DoRoot();
+
+      changeTimer.AutoReset = false;
+      changeTimer.Elapsed += RescanTimer;
+
+      foreach (var watcher in watchers) {
+        watcher.IncludeSubdirectories = true;
+        watcher.Created += OnChanged;
+        watcher.Deleted += OnChanged;
+        watcher.Renamed += OnRenamed;
+        watcher.EnableRaisingEvents = true;
+      }
+
+      watchTimer.Elapsed += RescanTimer;
+      watchTimer.Enabled = true;
+    }
+
+    public void SetCacheFile(FileInfo info)
+    {
+      try {
+        store = new FileStore(info);
+      }
+      catch (Exception ex) {
+        Warn("FileStore is not availble; failed to load SQLite Adapter", ex);
+        store = null;
       }
     }
   }
