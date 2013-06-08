@@ -20,6 +20,12 @@ article {
     padding-left: 40px;
     padding-right: 40px;
 }
+article:after {
+  content: '.';
+  visibility: hidden;
+  display: block;
+  clear: both;
+}
 footer {
     border-top: 2px solid #244050;
     background: -webkit-linear-gradient(270deg, rgba(36,64,80,0.8), transparent 20%);

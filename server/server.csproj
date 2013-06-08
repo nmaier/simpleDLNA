@@ -90,6 +90,7 @@
     <Compile Include="Types\Headers.cs" />
     <Compile Include="Http\HttpClient.cs" />
     <Compile Include="Http\HttpCodes.cs" />
+    <Compile Include="Types\HtmlTools.cs" />
     <Compile Include="Types\Http404Exception.cs" />
     <Compile Include="Types\HttpException.cs" />
     <Compile Include="Http\HttpServer.cs" />
