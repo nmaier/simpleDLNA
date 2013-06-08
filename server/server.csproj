@@ -57,6 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Comparers\BaseComparer.cs" />
     <Compile Include="Comparers\ComparerRepository.cs" />
     <Compile Include="Comparers\DateComparer.cs" />
