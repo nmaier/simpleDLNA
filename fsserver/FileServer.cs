@@ -7,7 +7,6 @@ using System.Timers;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
 
-[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable

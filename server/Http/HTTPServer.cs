@@ -8,7 +8,6 @@ using System.Timers;
 using NMaier.SimpleDlna.Server.Ssdp;
 using NMaier.SimpleDlna.Utilities;
 
-[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpServer : Logging, IDisposable

@@ -1,7 +1,6 @@
 using System;
 using log4net;
 
-[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.Utilities
 {
   public class Logging : ILog

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using NMaier.SimpleDlna.Server;
 
-[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.Thumbnails
 {
   internal interface IThumbnails

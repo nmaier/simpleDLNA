@@ -3,7 +3,6 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Windows.Forms;
 
-[assembly: CLSCompliant(true)]
 namespace NMaier.SimpleDlna.GUI
 {
   static class Program
