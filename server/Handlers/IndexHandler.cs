@@ -1,4 +1,5 @@
 using NMaier.SimpleDlna.Utilities;
+using System.Linq;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -28,7 +29,8 @@ namespace NMaier.SimpleDlna.Server
       var document = article.OwnerDocument;
 
       var list = document.EL("ul");
-      foreach (var m in owner.MediaMounts) {
+      var mounts = owner.MediaMounts.OrderBy(m => { return m.Value; }, NaturalStringComparer.CurrentCultureIgnoreCase);
+      foreach (var m in mounts) {
         var li = document.EL("li");
         li.AppendChild(document.EL("a", new AttributeCollection() { { "href", m.Key } }, m.Value));
         list.AppendChild(li);
