@@ -54,6 +54,11 @@
       // 
       this.numericPort.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "port", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
       this.numericPort.Location = new System.Drawing.Point(6, 19);
+      this.numericPort.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
       this.numericPort.Name = "numericPort";
       this.numericPort.Size = new System.Drawing.Size(69, 20);
       this.numericPort.TabIndex = 0;
