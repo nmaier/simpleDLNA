@@ -11,8 +11,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStoreVacuumer : Logging, IDisposable
   {
-    private const int minimumTime = 30 * 60 * 1000;
-    private const int maximumTime = 240 * 60 * 1000;
+    private const int MIN_TIME = 30 * 60 * 1000;
+    private const int MAX_TIME = 240 * 60 * 1000;
 
     private readonly Dictionary<string, WeakReference> connections = new Dictionary<string, WeakReference>();
     private readonly Timer timer = new Timer();
@@ -20,7 +20,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public FileStoreVacuumer()
     {
-      timer.Interval = rnd.Next(minimumTime, maximumTime);
+      timer.Interval = rnd.Next(MIN_TIME, MAX_TIME);
       timer.Elapsed += Run;
     }
 
@@ -46,7 +46,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void Run(object sender, ElapsedEventArgs e)
     {
-      timer.Interval = rnd.Next(minimumTime, maximumTime);
+      timer.Interval = rnd.Next(MIN_TIME, MAX_TIME);
 
       IDbConnection[] conns;
       lock (connections) {

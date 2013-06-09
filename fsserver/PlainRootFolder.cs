@@ -8,7 +8,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public PlainRootFolder(FileServer server, DlnaMediaTypes types, DirectoryInfo di)
       : base(server, types, null, di)
     {
-      Id = Identifiers.KeyRoot;
+      Id = Identifiers.ROOT;
     }
   }
 }

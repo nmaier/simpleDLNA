@@ -12,9 +12,9 @@ namespace NMaier.SimpleDlna.GUI
   [RunInstaller(true)]
   public class PathEnvironmentInstaller : Installer
   {
-    private const string keyEnvironmentPath = "EnvironmentPath";
-    private const string keyRegPath = "PATH";
-    private const string keyRegEnvironment = "Environment";
+    private const string ENV_PATH = "EnvironmentPath";
+    private const string REG_PATH = "PATH";
+    private const string REG_ENV = "Environment";
     private readonly DirectoryInfo directory = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
     public override void Install(IDictionary stateSaver)
     {
@@ -23,8 +23,8 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
 
-      using (var registry = Registry.CurrentUser.OpenSubKey(keyRegEnvironment, true)) {
-        var path = registry.GetValue(keyRegPath, string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
+      using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
+        var path = registry.GetValue(REG_PATH, string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
         if (path == null) {
           return;
         }
@@ -34,12 +34,12 @@ namespace NMaier.SimpleDlna.GUI
         if (exists.Count() > 0) {
           return;
         }
-        stateSaver[keyEnvironmentPath] = path;
+        stateSaver[ENV_PATH] = path;
         var newpath = directory.FullName;
         if (!string.IsNullOrWhiteSpace(path)) {
           newpath = string.Format("{0};{1}", path, newpath);
         }
-        registry.SetValue(keyRegPath, newpath, registry.GetValueKind(keyRegPath));
+        registry.SetValue(REG_PATH, newpath, registry.GetValueKind(REG_PATH));
       }
     }
     public override void Uninstall(IDictionary savedState)
@@ -49,8 +49,8 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
 
-      using (var registry = Registry.CurrentUser.OpenSubKey(keyRegEnvironment, true)) {
-        var path = registry.GetValue(keyRegPath, string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
+      using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
+        var path = registry.GetValue(REG_PATH, string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
         if (path == null) {
           return;
         }
@@ -60,18 +60,18 @@ namespace NMaier.SimpleDlna.GUI
         if (StringComparer.CurrentCultureIgnoreCase.Equals(path, cleaned)) {
           return;
         }
-        registry.SetValue(keyRegPath, cleaned, registry.GetValueKind(keyRegPath));
+        registry.SetValue(REG_PATH, cleaned, registry.GetValueKind(REG_PATH));
       }
     }
 
     public override void Rollback(IDictionary savedState)
     {
       base.Rollback(savedState);
-      if (!savedState.Contains(keyEnvironmentPath)) {
+      if (!savedState.Contains(ENV_PATH)) {
         return;
       }
-      using (var registry = Registry.CurrentUser.OpenSubKey(keyRegEnvironment, true)) {
-        registry.SetValue(keyRegPath, savedState[keyEnvironmentPath], registry.GetValueKind(keyRegPath));
+      using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
+        registry.SetValue(REG_PATH, savedState[ENV_PATH], registry.GetValueKind(REG_PATH));
       }
     }
   }

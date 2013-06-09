@@ -9,13 +9,13 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class Identifiers : Logging
   {
-    public const string KeyAudio = "A";
+    public const string AUDIO = "A";
 
-    public const string KeyImages = "I";
+    public const string IMAGES = "I";
 
-    public const string KeyRoot = "0";
+    public const string ROOT = "0";
 
-    public const string KeyVideo = "V";
+    public const string VIDEO = "V";
 
 
     private readonly IItemComparer comparer;
