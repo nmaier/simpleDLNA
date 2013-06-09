@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
+using System.Data.Common;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -111,7 +112,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
         selectKey.Value = info.FullName;
         selectSize.Value = info.Length;
         selectTime.Value = info.LastWriteTimeUtc.Ticks;
-        data = select.ExecuteScalar() as byte[];
+        try {
+          data = select.ExecuteScalar() as byte[];
+        }
+        catch (DbException ex) {
+          Error("Failed to lookup file from store", ex);
+          return null;
+        }
       }
       if (data == null) {
         return null;
@@ -145,8 +152,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
         selectCoverKey.Value = info.FullName;
         selectCoverSize.Value = info.Length;
         selectCoverTime.Value = info.LastWriteTimeUtc.Ticks;
-        var data = selectCover.ExecuteScalar();
-        return (data as byte[]) != null;
+        try {
+          var data = selectCover.ExecuteScalar();
+          return (data as byte[]) != null;
+        }
+        catch (DbException ex) {
+          Error("Failed to lookup file cover existence from store", ex);
+          return false;
+        }
       }
     }
 
@@ -162,7 +175,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
         selectCoverKey.Value = info.FullName;
         selectCoverSize.Value = info.Length;
         selectCoverTime.Value = info.LastWriteTimeUtc.Ticks;
-        data = selectCover.ExecuteScalar() as byte[];
+        try {
+          data = selectCover.ExecuteScalar() as byte[];
+        }
+        catch (DbException ex) {
+          Error("Failed to lookup file cover from store", ex);
+          return null;
+        }
       }
       if (data == null) {
         return null;
@@ -216,7 +235,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
               insertCover.Value = null;
             }
 
-            insert.ExecuteNonQuery();
+            try {
+              insert.ExecuteNonQuery();
+            }
+            catch (DbException ex) {
+              Error("Failed to put file cover into store", ex);
+              return;
+            }
           }
         }
       }
