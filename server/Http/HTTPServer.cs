@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -12,17 +13,17 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpServer : Logging, IDisposable
   {
-    private readonly Dictionary<HttpClient, DateTime> clients = new Dictionary<HttpClient, DateTime>();
+    private readonly ConcurrentDictionary<HttpClient, DateTime> clients = new ConcurrentDictionary<HttpClient, DateTime>();
 
-    private readonly Dictionary<string, IPrefixHandler> prefixes = new Dictionary<string, IPrefixHandler>();
+    private readonly ConcurrentDictionary<string, IPrefixHandler> prefixes = new ConcurrentDictionary<string, IPrefixHandler>();
 
-    private readonly Dictionary<Guid, MediaMount> servers = new Dictionary<Guid, MediaMount>();
+    private readonly ConcurrentDictionary<Guid, MediaMount> servers = new ConcurrentDictionary<Guid, MediaMount>();
 
     public static readonly string Signature = GenerateServerSignature();
 
     private readonly Timer timeouter = new Timer(10 * 1000);
 
-    private readonly TcpListener listener;
+    private readonly TcpListener listener = null;
 
     private readonly SsdpHandler ssdpServer;
 
@@ -33,24 +34,38 @@ namespace NMaier.SimpleDlna.Server
     }
     public HttpServer(int port)
     {
-      listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
-      timeouter.Elapsed += TimeouterCallback;
-      timeouter.Enabled = true;
-
-      prefixes.Add("/favicon.ico", new StaticHandler(new ResourceResponse(HttpCodes.OK, "image/icon", "favicon")));
-      prefixes.Add("/static/browse.css", new StaticHandler(new ResourceResponse(HttpCodes.OK, "text/css", "browse_css")));
+      prefixes.TryAdd("/favicon.ico", new StaticHandler(new ResourceResponse(HttpCodes.OK, "image/icon", "favicon")));
+      prefixes.TryAdd("/static/browse.css", new StaticHandler(new ResourceResponse(HttpCodes.OK, "text/css", "browse_css")));
       RegisterHandler(new IconHandler());
 
+      listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
       listener.Server.Ttl = 32;
       listener.Server.UseOnlyOverlappedIO = true;
       listener.Start();
+
       RealPort = (listener.LocalEndpoint as IPEndPoint).Port;
+
       InfoFormat("Running HTTP Server: {0} on port {1}", Signature, RealPort);
       ssdpServer = new SsdpHandler();
+
+      timeouter.Elapsed += TimeouterCallback;
+      timeouter.Enabled = true;
+
       Accept();
     }
 
 
+    public Dictionary<string, string> MediaMounts
+    {
+      get
+      {
+        var rv = new Dictionary<string, string>();
+        foreach (var m in servers) {
+          rv[m.Value.Prefix] = m.Value.FriendlyName;
+        }
+        return rv;
+      }
+    }
     public int RealPort { get; private set; }
 
 
@@ -76,9 +91,10 @@ namespace NMaier.SimpleDlna.Server
         var tcpclient = listener.EndAcceptTcpClient(result);
         var client = new HttpClient(this, tcpclient);
         try {
-          lock (clients) {
-            clients.Add(client, DateTime.Now);
-          }
+          clients.AddOrUpdate(client, DateTime.Now, (k, v) =>
+          {
+            return DateTime.Now;
+          });
           DebugFormat("Accepted client {0}", client);
           client.Start();
         }
@@ -124,12 +140,10 @@ namespace NMaier.SimpleDlna.Server
     private void TimeouterCallback(object sender, ElapsedEventArgs e)
     {
       Debug("Timeouter");
-      lock (clients) {
-        foreach (var c in clients.ToList()) {
-          if (c.Key.IsATimeout) {
-            DebugFormat("Collected timeout client {0}", c);
-            c.Key.Close();
-          }
+      foreach (var c in clients.ToList()) {
+        if (c.Key.IsATimeout) {
+          DebugFormat("Collected timeout client {0}", c);
+          c.Key.Close();
         }
       }
     }
@@ -162,26 +176,26 @@ namespace NMaier.SimpleDlna.Server
         throw new ArgumentException("Invalid prefix; must end with /");
       }
       if (FindHandler(prefix) != null) {
-        throw new ArgumentException("Invalid prefix; already taken /");
+        throw new ArgumentException("Invalid prefix; already taken");
       }
-      prefixes.Add(prefix, handler);
+      if (!prefixes.TryAdd(prefix, handler)) {
+        throw new ArgumentException("Invalid preifx; already taken");
+      }
       DebugFormat("Registered Handler for {0}", prefix);
     }
 
     internal void RemoveClient(HttpClient client)
     {
-      lock (clients) {
-        if (!clients.ContainsKey(client)) {
-          return;
-        }
-        clients.Remove(client);
-      }
+      DateTime ignored;
+      clients.TryRemove(client, out ignored);
     }
 
     internal void UnregisterHandler(IPrefixHandler handler)
     {
-      prefixes.Remove(handler.Prefix);
-      DebugFormat("Unregistered Handler for {0}", handler.Prefix);
+      IPrefixHandler ignored;
+      if (prefixes.TryRemove(handler.Prefix, out ignored)) {
+        DebugFormat("Unregistered Handler for {0}", handler.Prefix);
+      }
     }
 
 
@@ -195,12 +209,10 @@ namespace NMaier.SimpleDlna.Server
       ssdpServer.Dispose();
       timeouter.Dispose();
       listener.Stop();
-      lock (clients) {
-        foreach (var c in clients.ToList()) {
-          c.Key.Dispose();
-        }
-        clients.Clear();
+      foreach (var c in clients.ToList()) {
+        c.Key.Dispose();
       }
+      clients.Clear();
     }
 
     public void RegisterMediaServer(IMediaServer server)
@@ -225,18 +237,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public Dictionary<string, string> MediaMounts
-    {
-      get
-      {
-        Dictionary<string, string> rv = new Dictionary<string, string>();
-        foreach (var m in servers) {
-          rv[m.Value.Prefix] = m.Value.FriendlyName;
-        }
-        return rv;
-      }
-    }
-
     public void UnregisterMediaServer(IMediaServer server)
     {
       if (server == null) {
@@ -249,8 +249,11 @@ namespace NMaier.SimpleDlna.Server
 
       ssdpServer.UnregisterNotification(server.Uuid);
       UnregisterHandler(mount);
-      servers.Remove(server.Uuid);
-      InfoFormat("Unregistered Media Server {0}", server.Uuid);
+
+      MediaMount ignored;
+      if (servers.TryRemove(server.Uuid, out ignored)) {
+        InfoFormat("Unregistered Media Server {0}", server.Uuid);
+      }
     }
   }
 }
