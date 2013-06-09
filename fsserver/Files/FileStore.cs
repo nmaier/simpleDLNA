@@ -1,14 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Threading.Tasks;
-using System.Timers;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
 
@@ -16,6 +12,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStore : Logging, IDisposable
   {
+    private static readonly FileStoreVacuumer vacuumer = new FileStoreVacuumer();
     private readonly IDbConnection connection;
     private readonly IDbCommand insert;
     private readonly IDbDataParameter insertCover;
@@ -31,18 +28,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly IDbDataParameter selectCoverKey;
     private readonly IDbDataParameter selectCoverSize;
     private readonly IDbDataParameter selectCoverTime;
-    private readonly Timer vacuumer = new Timer();
     public readonly FileInfo StoreFile;
 
     internal FileStore(FileInfo storeFile)
     {
       StoreFile = storeFile;
-      if (storeFile.Exists) {
-        vacuumer.Interval = 120 * 1000;
-      }
-      else {
-        vacuumer.Interval = 30 * 60 * 1000;
-      }
       connection = Sqlite.GetDatabaseConnection(storeFile);
 
       using (var transaction = connection.BeginTransaction()) {
@@ -94,8 +84,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
       InfoFormat("FileStore at {0} is ready", storeFile.FullName);
 
-      vacuumer.Elapsed += Vacuum;
-      vacuumer.Enabled = true;
+      vacuumer.Add(connection);
     }
 
     public void Dispose()
@@ -107,10 +96,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
         select.Dispose();
       }
       if (connection != null) {
+        vacuumer.Remove(connection);
         connection.Dispose();
-      }
-      if (vacuumer != null) {
-        vacuumer.Dispose();
       }
     }
 
@@ -237,55 +224,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Error("Failed to serialize an object of type " + file.GetType(), ex);
         throw;
       }
-    }
-
-    private void Vacuum(object source, ElapsedEventArgs e)
-    {
-      Debug("VACUUM");
-      Task.Factory.StartNew(() =>
-      {
-        var files = new List<string>();
-        lock (connection) {
-          using (var q = connection.CreateCommand()) {
-            q.CommandText = "SELECT key FROM store";
-            using (var r = q.ExecuteReader()) {
-              while (r.Read()) {
-                files.Add(r.GetString(0));
-              }
-            }
-          }
-        }
-        var gone = (from f in files
-                    let m = new FileInfo(f)
-                    where !m.Exists
-                    select f);
-        using (var q = connection.CreateCommand()) {
-          q.CommandText = "DELETE FROM store WHERE key = ?";
-          var p = q.CreateParameter();
-          p.DbType = DbType.String;
-          q.Parameters.Add(p);
-          foreach (var f in gone) {
-            p.Value = f;
-            lock (connection) {
-              q.ExecuteNonQuery();
-            }
-          }
-        }
-        lock (connection) {
-          using (var q = connection.CreateCommand()) {
-            q.CommandText = "VACUUM";
-            try {
-              q.ExecuteNonQuery();
-            }
-            catch (Exception ex) {
-              Error("Failed to vacuum", ex);
-            }
-          }
-        }
-        Debug("Vacuum done!");
-      }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
-
-      vacuumer.Interval = 120 * 60 * 1000;
     }
   }
 }
