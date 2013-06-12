@@ -151,6 +151,10 @@ namespace NMaier.SimpleDlna.Server
 
     internal IPrefixHandler FindHandler(string prefix)
     {
+      if (string.IsNullOrEmpty(prefix)) {
+        throw new ArgumentNullException("prefix");
+      }
+
       if (prefix == "/") {
         return new IndexHandler(this);
       }
