@@ -1,3 +1,5 @@
+using NMaier.SimpleDlna.Utilities;
+
 namespace NMaier.SimpleDlna.Server.Comparers
 {
   internal abstract class BaseComparer : IItemComparer
@@ -7,6 +9,10 @@ namespace NMaier.SimpleDlna.Server.Comparers
 
 
     public abstract int Compare(IMediaItem x, IMediaItem y);
+
+    public virtual void SetParameters(AttributeCollection parameters)
+    {
+    }
 
     public override string ToString()
     {

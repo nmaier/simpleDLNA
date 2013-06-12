@@ -1,3 +1,5 @@
+using NMaier.SimpleDlna.Utilities;
+
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal abstract class BaseView : IView
@@ -5,6 +7,10 @@ namespace NMaier.SimpleDlna.Server.Views
     public abstract string Description { get; }
     public abstract string Name { get; }
 
+
+    public virtual void SetParameters(AttributeCollection parameters)
+    {
+    }
 
     public override string ToString()
     {

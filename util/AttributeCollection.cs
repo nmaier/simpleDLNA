@@ -4,6 +4,7 @@ using System.Linq;
 namespace NMaier.SimpleDlna.Utilities
 {
   using Attribute = KeyValuePair<string, string>;
+  using System;
 
   public sealed class AttributeCollection : IEnumerable<Attribute>
   {
@@ -64,6 +65,13 @@ namespace NMaier.SimpleDlna.Utilities
     public IEnumerator<Attribute> GetEnumerator()
     {
       return list.GetEnumerator();
+    }
+
+    public IEnumerable<string> GetValues(string key)
+    {
+      return from i in list
+             where StringComparer.CurrentCultureIgnoreCase.Equals(i.Key, key)
+             select i.Value;
     }
   }
 }

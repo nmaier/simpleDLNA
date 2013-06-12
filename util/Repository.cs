@@ -53,12 +53,41 @@ namespace NMaier.SimpleDlna.Utilities
       if (string.IsNullOrWhiteSpace(name)) {
         throw new ArgumentException("Invalid repository name", "name");
       }
-      name = name.ToLower().Trim();
+      var n_p = name.Split(new char[] { ':' }, 2);
+      name = n_p[0].ToLower().Trim();
       var result = (TInterface)null;
       if (!items.TryGetValue(name, out result)) {
         throw new RepositoryLookupException(name);
       }
-      return result;
+      if (n_p.Length == 1) {
+        return result;
+      }
+
+      var ctor = result.GetType().GetConstructor(new Type[] { });
+      if (ctor == null) {
+        throw new RepositoryLookupException(name);
+      }
+      var parameters = new AttributeCollection();
+      foreach (var p in n_p[1].Split(',')) {
+        var k_v = p.Split(new char[] { '=' }, 2);
+        if (k_v.Length == 2) {
+          parameters.Add(k_v[0], k_v[1]);
+        }
+        else {
+          parameters.Add(k_v[0], null);
+        }
+      }
+      try {
+        var item = ctor.Invoke(new object[] { }) as TInterface;
+        if (item == null) {
+          throw new RepositoryLookupException(name);
+        }
+        item.SetParameters(parameters);
+        return item;
+      }
+      catch (Exception ex) {
+        throw new RepositoryLookupException(string.Format("Cannot construct repository item: {0}", ex.Message), ex);
+      }
     }
   }
 }

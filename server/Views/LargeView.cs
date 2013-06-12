@@ -1,28 +1,44 @@
-﻿using System.Linq;
-using NMaier.SimpleDlna.Server.Metadata;
+﻿using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
+using System.Linq;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal class LargeView : BaseView
   {
-    private const long MIN_SIZE = 300 * 1024 * 1024;
+    private long minSize = 300 * 1024 * 1024;
+
+    public override void SetParameters(AttributeCollection parameters)
+    {
+      base.SetParameters(parameters);
+
+      foreach (var v in parameters.GetValues("size")) {
+        var min = 0L;
+        if (long.TryParse(v, out min) && min > 0) {
+          minSize = min * 1024 * 1024;
+          break;
+        }
+      }
+    }
 
 
     public override string Description
     {
-      get {
+      get
+      {
         return "Show only large files";
       }
     }
     public override string Name
     {
-      get {
+      get
+      {
         return "large";
       }
     }
 
 
-    private static void ProcessFolder(IMediaFolder root)
+    private void ProcessFolder(IMediaFolder root)
     {
       foreach (var f in root.ChildFolders) {
         ProcessFolder(f);
@@ -32,7 +48,7 @@ namespace NMaier.SimpleDlna.Server.Views
         if (i == null) {
           continue;
         }
-        if (i.InfoSize.HasValue && i.InfoSize.Value >= MIN_SIZE) {
+        if (i.InfoSize.HasValue && i.InfoSize.Value >= minSize) {
           continue;
         }
         root.RemoveResource(f);
