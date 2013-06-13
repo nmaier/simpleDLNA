@@ -83,7 +83,7 @@ namespace NMaier.SimpleDlna.GUI
     {
       var layout = new PatternLayout()
       {
-        ConversionPattern = "%6level [%3thread] %-14.14logger{1} - %message%newline%exception"
+        ConversionPattern = "%date %6level [%3thread] %-14.14logger{1} - %message%newline%exception"
       };
       layout.ActivateOptions();
       var fileAppender = new RollingFileAppender()
