@@ -166,7 +166,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private void Tick(object sender, Timers.ElapsedEventArgs e)
     {
       Debug("Sending SSDP notifications!");
-      notificationTimer.Interval = random.Next(5000, 30000);
+      notificationTimer.Interval = random.Next(60000, 12000);
       NotifyAll();
     }
 
