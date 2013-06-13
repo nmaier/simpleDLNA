@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Timers;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
@@ -95,10 +96,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
           newMaster = virtualMaster;
         }
-        ids.RegisterFolder(Identifiers.ROOT, newMaster);
-        ids.RegisterFolder(Identifiers.IMAGES, new VirtualClonedFolder(newMaster, Identifiers.IMAGES, types & DlnaMediaTypes.Image));
-        ids.RegisterFolder(Identifiers.AUDIO, new VirtualClonedFolder(newMaster, Identifiers.AUDIO, types & DlnaMediaTypes.Audio));
-        ids.RegisterFolder(Identifiers.VIDEO, new VirtualClonedFolder(newMaster, Identifiers.VIDEO, types & DlnaMediaTypes.Video));
+        lock (ids) {
+          ids.RegisterFolder(Identifiers.ROOT, newMaster);
+          ids.RegisterFolder(Identifiers.IMAGES, new VirtualClonedFolder(newMaster, Identifiers.IMAGES, types & DlnaMediaTypes.Image));
+          ids.RegisterFolder(Identifiers.AUDIO, new VirtualClonedFolder(newMaster, Identifiers.AUDIO, types & DlnaMediaTypes.Audio));
+          ids.RegisterFolder(Identifiers.VIDEO, new VirtualClonedFolder(newMaster, Identifiers.VIDEO, types & DlnaMediaTypes.Video));
+        }
       }
 
       Thumbnail();
@@ -135,10 +138,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void Rescan()
     {
-      if (Changing != null) {
-        Changing(this, new EventArgs());
-      }
-      lock (this) {
+      Task.Factory.StartNew(() =>
+      {
+        if (Changing != null) {
+          Changing.Invoke(this, EventArgs.Empty);
+        }
+
         try {
           InfoFormat("Rescanning...");
           DoRoot();
@@ -147,11 +152,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
         catch (Exception ex) {
           Error(ex);
         }
-      }
 
-      if (Changed != null) {
-        Changed(this, new EventArgs());
-      }
+
+        if (Changed != null) {
+          Changed.Invoke(this, EventArgs.Empty);
+        }
+      }, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
     }
 
     private void RescanTimer(object sender, ElapsedEventArgs e)
@@ -165,7 +171,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return;
       }
       lock (ids) {
-        Thumbnailer.AddFiles(store, ids.Resources.ToList());
+        Thumbnailer.AddFiles(store, ids.Resources);
       }
     }
 
@@ -180,7 +186,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     internal BaseFile GetFile(PlainFolder aParent, FileInfo info)
     {
-      var item = ids.GetItemByPath(info.FullName) as BaseFile;
+      BaseFile item;
+      lock (ids) {
+        item = ids.GetItemByPath(info.FullName) as BaseFile;
+      }
       if (item != null && item.InfoDate == info.LastAccessTimeUtc && item.InfoSize == info.Length) {
         return item;
       }
@@ -207,11 +216,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
     }
 
 
-    public void AddView(string name)
-    {
-      ids.AddView(name);
-    }
-
     public void Dispose()
     {
       foreach (var w in watchers) {
@@ -230,7 +234,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public IMediaItem GetItem(string id)
     {
-      return ids.GetItemById(id);
+      lock (ids) {
+        return ids.GetItemById(id);
+      }
     }
 
     public void Load()

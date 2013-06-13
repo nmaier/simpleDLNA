@@ -51,9 +51,9 @@ namespace NMaier.SimpleDlna.Server
     {
       get
       {
-        return from i in ids.Values
-               where (i.Target is IMediaResource)
-               select i;
+        return (from i in ids.Values
+                where (i.Target is IMediaResource)
+                select i).ToList();
       }
     }
 
@@ -97,21 +97,19 @@ namespace NMaier.SimpleDlna.Server
     public void Cleanup()
     {
       GC.Collect();
-      lock (this) {
-        var pc = paths.Count;
-        var ic = ids.Count;
-        var npaths = new Dictionary<string, string>();
-        foreach (var p in paths) {
-          if (ids[p.Value].Target == null) {
-            ids.Remove(p.Value);
-          }
-          else {
-            npaths.Add(p.Key, p.Value);
-          }
+      var pc = paths.Count;
+      var ic = ids.Count;
+      var npaths = new Dictionary<string, string>();
+      foreach (var p in paths) {
+        if (ids[p.Value].Target == null) {
+          ids.Remove(p.Value);
         }
-        paths = npaths;
-        DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
+        else {
+          npaths.Add(p.Key, p.Value);
+        }
       }
+      paths = npaths;
+      DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
     }
 
     public IMediaItem GetItemById(string id)
