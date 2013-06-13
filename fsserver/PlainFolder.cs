@@ -11,8 +11,18 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private readonly DirectoryInfo dir;
 
+    private static IEnumerable<string> GetExtensions(DlnaMediaTypes types)
+    {
+      return (from i in DlnaMaps.Media2Ext
+              where types.HasFlag(i.Key)
+              select i.Value).SelectMany(i => { return i; });
+    }
 
-    public PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir)
+    protected PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir)
+      : this(server, types, parent, dir, GetExtensions(types))
+    { }
+
+    private PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir, IEnumerable<string> exts)
       : base(parent, dir.Name)
     {
       Server = server;
@@ -22,26 +32,22 @@ namespace NMaier.SimpleDlna.FileMediaServer
                  where m.ChildCount > 0
                  select m as IMediaFolder).ToList();
 
-      foreach (var i in DlnaMaps.Media2Ext) {
-        if (!types.HasFlag(i.Key)) {
+      var rawfiles = from f in dir.GetFiles("*.*")
+                     select f;
+      var files = new List<BaseFile>();
+      foreach (var f in rawfiles) {
+        var ext = f.Extension;
+        if (string.IsNullOrEmpty(ext) || !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
           continue;
         }
-        foreach (var ext in i.Value) {
-          var _files = from f in dir.GetFiles("*." + ext)
-                       select f;
-          var files = new List<BaseFile>();
-          foreach (var f in _files) {
-            try {
-              files.Add(server.GetFile(this, f));
-            }
-            catch (Exception ex) {
-              server.Warn(f);
-              server.Warn(ex);
-            }
-          }
-          resources.AddRange(files);
+        try {
+          files.Add(server.GetFile(this, f));
+        }
+        catch (Exception ex) {
+          server.Warn(f, ex);
         }
       }
+      resources.AddRange(files);
     }
 
 
