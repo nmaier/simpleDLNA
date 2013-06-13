@@ -30,7 +30,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private AudioFile(SerializationInfo info, DeserializeInfo di)
       : this(di.Server, di.Info, di.Type)
     {
-      MaybeInit();
       album = info.GetString("al");
       artist = info.GetString("ar");
       genre = info.GetString("g");
