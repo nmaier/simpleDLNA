@@ -5,9 +5,9 @@ namespace NMaier.SimpleDlna.Server
 {
   public static class DlnaMaps
   {
-    private static readonly string[] aacs = new string[] { "aac", "mp4a" };
+    private static readonly string[] aacs = new string[] { "aac", "mp4a", "m4a" };
 
-    private static readonly string[] avcs = new string[] { "avc", "mp4", "mov", "3gp", "3gpp", "flv" };
+    private static readonly string[] avcs = new string[] { "avc", "mp4", "m4v", "mov", "3gp", "3gpp", "flv" };
 
     private static readonly string[] avis = new string[] { "avi", "divx", "xvid" };
 
