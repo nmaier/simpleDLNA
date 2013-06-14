@@ -11,7 +11,7 @@ namespace NMaier.SimpleDlna.Thumbnails
 {
   public sealed class ThumbnailMaker : Logging
   {
-    private static readonly LeastRecentlyUsedDictionary<string, CacheItem> cache = new LeastRecentlyUsedDictionary<string, CacheItem>(1 << 11, ConcurrencyLevel.Concurrent);
+    private static readonly LeastRecentlyUsedDictionary<string, CacheItem> cache = new LeastRecentlyUsedDictionary<string, CacheItem>(1 << 11);
     private static readonly Dictionary<DlnaMediaTypes, List<IThumbnails>> thumbers = BuildThumbnailers();
 
     private static Dictionary<DlnaMediaTypes, List<IThumbnails>> BuildThumbnailers()

@@ -10,7 +10,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private WeakReference _cover = new WeakReference(null);
 
-    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache = new LeastRecentlyUsedDictionary<string, Cover>(500, ConcurrencyLevel.Concurrent);
+    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache = new LeastRecentlyUsedDictionary<string, Cover>(500);
 
     private DateTime? lastModified = null;
 

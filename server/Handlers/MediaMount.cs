@@ -61,9 +61,7 @@ namespace NMaier.SimpleDlna.Server
 
     private void ChangedServer(object sender, EventArgs e)
     {
-      lock (SoapCache) {
-        SoapCache.Clear();
-      }
+      soapCache.Clear();
       InfoFormat("Rescanned mount {0}", Uuid);
       systemID++;
     }

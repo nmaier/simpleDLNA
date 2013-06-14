@@ -24,7 +24,7 @@ namespace NMaier.SimpleDlna.Server
 
     private static readonly string featureList = Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
 
-    private readonly static IDictionary<string, AttributeCollection> SoapCache = new LeastRecentlyUsedDictionary<string, AttributeCollection>(200, ConcurrencyLevel.Concurrent);
+    private readonly static IDictionary<string, AttributeCollection> soapCache = new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
 
 
     private static void AddActors(IMediaResource resource, XmlElement item)
@@ -274,7 +274,7 @@ namespace NMaier.SimpleDlna.Server
     {
       var key = Prefix + sparams.HeaderBlock;
       AttributeCollection rv;
-      if (SoapCache.TryGetValue(key, out rv)) {
+      if (soapCache.TryGetValue(key, out rv)) {
         return rv;
       }
 
@@ -341,7 +341,7 @@ namespace NMaier.SimpleDlna.Server
         { "TotalMatches", root.ChildCount.ToString() },
         { "UpdateID", systemID.ToString() }
       };
-      SoapCache[key] = rv;
+      soapCache[key] = rv;
       return rv;
     }
 
@@ -376,9 +376,7 @@ namespace NMaier.SimpleDlna.Server
         }
         if (newbookmark > 30 || !item.Bookmark.HasValue || item.Bookmark.Value < 60) {
           item.Bookmark = newbookmark;
-          lock (SoapCache) {
-            SoapCache.Clear();
-          }
+          soapCache.Clear();
         }
       }
       return new RawHeaders();
