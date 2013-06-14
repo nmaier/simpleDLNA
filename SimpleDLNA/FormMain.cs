@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Concurrent;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
@@ -16,6 +17,13 @@ namespace NMaier.SimpleDlna.GUI
 {
   public partial class FormMain : Form, IAppender, IDisposable
   {
+    private struct LogEntry
+    {
+      public string Level;
+      public string Message;
+      public string Class;
+      public string Exception;
+    }
     private bool logging = false;
     private static readonly Properties.Settings Config = Properties.Settings.Default;
     private HttpServer httpServer;
@@ -26,6 +34,8 @@ namespace NMaier.SimpleDlna.GUI
     private readonly FileInfo logFile = new FileInfo(Path.Combine(cacheDir, "sdlna.log"));
 #endif
     private bool canClose = false;
+    private readonly System.Timers.Timer logAppendTimer = new System.Timers.Timer(500);
+    private readonly ConcurrentQueue<LogEntry> pendingLogEntries = new ConcurrentQueue<LogEntry>();
 
     private static string cacheDir
     {
@@ -95,6 +105,8 @@ namespace NMaier.SimpleDlna.GUI
         RollingStyle = RollingFileAppender.RollingMode.Size
       };
       fileAppender.ActivateOptions();
+
+      logAppendTimer.Elapsed += DoAppendInternal;
       BasicConfigurator.Configure(this, fileAppender);
     }
 
@@ -228,21 +240,48 @@ namespace NMaier.SimpleDlna.GUI
       }
       var cls = loggingEvent.LoggerName;
       cls = cls.Substring(cls.LastIndexOf('.') + 1);
-      BeginInvoke(new logDelegate((lvl, lg, msg, ex) =>
+      pendingLogEntries.Enqueue(new LogEntry()
       {
-        if (!logging) {
-          return;
+        Class = cls,
+        Exception = loggingEvent.GetExceptionString(),
+        Level = loggingEvent.Level.DisplayName,
+        Message = loggingEvent.RenderedMessage
+      });
+      lock (logAppendTimer) {
+        logAppendTimer.Enabled = true;
+      }
+    }
+
+    public void DoAppendInternal(object sender, System.Timers.ElapsedEventArgs e)
+    {
+      lock (logAppendTimer) {
+        logAppendTimer.Enabled = false;
+      }
+      if (!logging) {
+        return;
+      }
+      LogEntry entry;
+      int last = -1;
+      logger.BeginUpdate();
+      try {
+        while (pendingLogEntries.TryDequeue(out entry)) {
+          if (logger.Items.Count >= 300) {
+            logger.Items.RemoveAt(0);
+          }
+          last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Message })).Index;
+          if (!string.IsNullOrWhiteSpace(entry.Exception)) {
+            last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Exception })).Index;
+          }
         }
-        if (logger.Items.Count >= 300) {
-          logger.Items.RemoveAt(0);
-        }
-        logger.EnsureVisible(logger.Items.Add(new ListViewItem(new string[] { lvl, lg, msg })).Index);
-        if (!string.IsNullOrWhiteSpace(ex)) {
-          logger.EnsureVisible(logger.Items.Add(new ListViewItem(new string[] { lvl, lg, ex })).Index);
-        }
+      }
+      finally {
+        logger.EndUpdate();
+      }
+      if (last != -1) {
+        logger.EnsureVisible(last);
         colLogLogger.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         colLogMessage.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-      }), loggingEvent.Level.DisplayName, cls, loggingEvent.RenderedMessage, loggingEvent.GetExceptionString());
+      }
     }
 
     private void notifyIcon_DoubleClick(object sender, EventArgs e)
