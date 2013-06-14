@@ -221,7 +221,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       Server.UpdateFileCache(this);
     }
 
-    public void LoadCover()
+    public virtual void LoadCover()
     {
       if (cover != null) {
         return;

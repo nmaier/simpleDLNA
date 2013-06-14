@@ -320,5 +320,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
     }
+
+    public override void LoadCover()
+    {
+    }
   }
 }

@@ -55,8 +55,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
               k.ReadByte();
             }
           }
-          catch (Exception ex) {
-            logger.Warn(string.Format("Failed to cache thumb for {0}", file.Item.FullName), ex);
+          catch (Exception) {
+            // Already logged and don't care.
           }
         }
       }

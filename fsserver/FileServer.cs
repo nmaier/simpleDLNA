@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -170,9 +171,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (store == null) {
         return;
       }
+      IEnumerable<WeakReference> items;
       lock (ids) {
-        Thumbnailer.AddFiles(store, ids.Resources);
+        items = ids.Resources.ToList();
       }
+      Thumbnailer.AddFiles(store, items);
     }
 
 

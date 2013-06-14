@@ -173,6 +173,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
           _bytes = thumber.GetThumbnail(file, ref width, ref height);
         }
       }
+      catch (NotSupportedException ex) {
+        Debug("Failed to load thumb for " + file.FullName, ex);
+      }
       catch (Exception ex) {
         Warn("Failed to load thumb for " + file.FullName, ex);
       }
