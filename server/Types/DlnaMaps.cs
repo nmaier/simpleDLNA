@@ -71,7 +71,7 @@ namespace NMaier.SimpleDlna.Server
         { DlnaMime.AVI, "DLNA.ORG_PN=AVI" },
         { DlnaMime.MPEG, "DLNA.ORG_PN=MPEG1" },
         { DlnaMime.JPEG, "DLNA.ORG_PN=JPEG" },
-        { DlnaMime.AVC, "DLNA.ORG_P=AVC_TS_HD" },
+        { DlnaMime.AVC, "DLNA.ORG_PN=AVC_MP4_MP_SD_AAC_MULT5" },
         { DlnaMime.MP3, "DLNA.ORG_PN=MP3" },
         { DlnaMime.AAC, "DLNA.ORG_PN=AAC" },
         { DlnaMime.VORBIS, "DLNA.ORG_PN=OGG" },
@@ -83,7 +83,7 @@ namespace NMaier.SimpleDlna.Server
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
     static DlnaMaps()
     {
-      var e2d = new[] {
+      var e2d = new [] {
           new
       { t = DlnaMime.MATROSKA, e = mkvs },
           new
