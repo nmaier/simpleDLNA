@@ -100,7 +100,7 @@ namespace NMaier.SimpleDlna.GUI
       {
         File = logFile.FullName,
         Layout = layout,
-        MaximumFileSize = "10MB",
+        MaximumFileSize = "5MB",
         MaxSizeRollBackups = 3,
         RollingStyle = RollingFileAppender.RollingMode.Size
       };
