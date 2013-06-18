@@ -95,8 +95,8 @@ namespace NMaier.SimpleDlna.Server
         res.InnerText = curl;
 
         res.SetAttribute("protocolInfo", string.Format(
-            "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=00D00000000000000000000000000000",
-            c.PN, DlnaMaps.Mime[c.Type]
+            "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
+            c.PN, DlnaMaps.Mime[c.Type], DlnaMaps.DefaultStreaming
             ));
         var width = c.MetaWidth;
         var height = c.MetaHeight;
@@ -106,7 +106,10 @@ namespace NMaier.SimpleDlna.Server
         else {
           res.SetAttribute("resolution", "200x200");
         }
-        res.SetAttribute("protocolInfo", "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=00;DLNA.ORG_CI=1;DLNA.ORG_FLAGS=00D00000000000000000000000000000");
+        res.SetAttribute("protocolInfo", string.Format(
+          "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_CI=1;DLNA.ORG_FLAGS={0}",
+          DlnaMaps.DefaultInteractive
+          ));
         item.AppendChild(res);
       }
       catch (Exception) {
@@ -242,8 +245,8 @@ namespace NMaier.SimpleDlna.Server
       }
 
       res.SetAttribute("protocolInfo", String.Format(
-          "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000",
-          resource.PN, DlnaMaps.Mime[resource.Type]
+          "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
+          resource.PN, DlnaMaps.Mime[resource.Type], DlnaMaps.DefaultStreaming
           ));
       item.AppendChild(res);
 

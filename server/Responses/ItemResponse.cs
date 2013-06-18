@@ -26,11 +26,11 @@ namespace NMaier.SimpleDlna.Server
       headers.Add("Accept-Ranges", "bytes");
       headers.Add("Content-Type", DlnaMaps.Mime[item.Type]);
       if (request.Headers.ContainsKey("getcontentFeatures.dlna.org")) {
-        if (item.Type == DlnaMime.JPEG) {
-          headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=00D00000000000000000000000000000", item.PN));
+        if (item.MediaType == DlnaMediaTypes.Image) {
+          headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultInteractive));
         }
         else {
-          headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS=01500000000000000000000000000000", item.PN));
+          headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultStreaming));
         }
       }
       Headers.Add("transferMode.dlna.org", transferMode);
