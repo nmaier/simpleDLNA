@@ -35,7 +35,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
       genre = info.GetString("g");
       performer = info.GetString("p");
       title = info.GetString("ti");
-      track = info.GetInt32("tr");
+      try {
+        track = info.GetInt32("tr");
+      }
+      catch (Exception) {
+        // no op
+      }
       var ts = info.GetInt64("d");
       if (ts > 0) {
         duration = new TimeSpan(ts);
