@@ -40,8 +40,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
       director = info.GetString("di");
       genre = info.GetString("g");
       title = info.GetString("t");
-      width = info.GetInt32("w");
-      height = info.GetInt32("h");
+      try {
+        width = info.GetInt32("w");
+        height = info.GetInt32("h");
+      }
+      catch (Exception) {
+        // no op
+      }
       var ts = info.GetInt64("du");
       if (ts > 0) {
         duration = new TimeSpan(ts);
