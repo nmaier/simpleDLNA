@@ -151,7 +151,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private void SendSearchResponse(IPEndPoint endpoint, UpnpDevice dev)
     {
       var headers = new RawHeaders();
-      headers.Add("CACHE-CONTROL", "max-age = 720");
+      headers.Add("CACHE-CONTROL", "max-age = 600");
       headers.Add("DATE", DateTime.Now.ToString("R"));
       headers.Add("EXT", "");
       headers.Add("LOCATION", dev.Descriptor.ToString());
@@ -166,7 +166,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private void Tick(object sender, Timers.ElapsedEventArgs e)
     {
       Debug("Sending SSDP notifications!");
-      notificationTimer.Interval = random.Next(60000, 12000);
+      notificationTimer.Interval = random.Next(60000, 120000);
       NotifyAll();
     }
 
@@ -198,7 +198,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       Debug("NotifyDevice");
       var headers = new RawHeaders();
       headers.Add("HOST", "239.255.255.250:1900");
-      headers.Add("CACHE-CONTROL", "max-age = 720");
+      headers.Add("CACHE-CONTROL", "max-age = 600");
       headers.Add("LOCATION", dev.Descriptor.ToString());
       headers.Add("SERVER", HttpServer.Signature);
       headers.Add("NTS", "ssdp:" + type);
