@@ -66,6 +66,14 @@ namespace NMaier.SimpleDlna.GUI
       listImages.Images.Add("inactive", Properties.Resources.inactive);
       listImages.Images.Add("refreshing", Properties.Resources.refreshing);
 
+      logAppendTimer.Elapsed += (s, e) =>
+      {
+        BeginInvoke((Action)(() =>
+        {
+          DoAppendInternal(s, e);
+        }));
+      };
+
       SetupLogging();
 
       StartPipeNotification();
@@ -91,6 +99,11 @@ namespace NMaier.SimpleDlna.GUI
 
     private void SetupLogging()
     {
+      if (!Config.filelogging) {
+        BasicConfigurator.Configure(this);
+        return;
+      }
+
       var layout = new PatternLayout()
       {
         ConversionPattern = "%date %6level [%3thread] %-14.14logger{1} - %message%newline%exception"
@@ -106,13 +119,6 @@ namespace NMaier.SimpleDlna.GUI
       };
       fileAppender.ActivateOptions();
 
-      logAppendTimer.Elapsed += (s, e) =>
-      {
-        BeginInvoke((Action)(() =>
-        {
-          DoAppendInternal(s, e);
-        }));
-      };
       BasicConfigurator.Configure(this, fileAppender);
     }
 
@@ -367,6 +373,7 @@ namespace NMaier.SimpleDlna.GUI
       using (var settings = new FormSettings()) {
         settings.ShowDialog();
         Config.Save();
+        SetupLogging();
       }
     }
   }

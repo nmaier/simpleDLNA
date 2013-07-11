@@ -35,9 +35,12 @@
       this.groupBox2 = new System.Windows.Forms.GroupBox();
       this.buttonBrowseCacheFile = new System.Windows.Forms.Button();
       this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+      this.groupBox3 = new System.Windows.Forms.GroupBox();
+      this.checkFileLogging = new System.Windows.Forms.CheckBox();
       this.groupBox1.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.numericPort)).BeginInit();
       this.groupBox2.SuspendLayout();
+      this.groupBox3.SuspendLayout();
       this.SuspendLayout();
       // 
       // groupBox1
@@ -98,11 +101,34 @@
       this.buttonBrowseCacheFile.UseVisualStyleBackColor = true;
       this.buttonBrowseCacheFile.Click += new System.EventHandler(this.buttonBrowseCacheFile_Click);
       // 
+      // groupBox3
+      // 
+      this.groupBox3.Controls.Add(this.checkFileLogging);
+      this.groupBox3.Location = new System.Drawing.Point(12, 120);
+      this.groupBox3.Name = "groupBox3";
+      this.groupBox3.Size = new System.Drawing.Size(260, 48);
+      this.groupBox3.TabIndex = 2;
+      this.groupBox3.TabStop = false;
+      this.groupBox3.Text = "Logging";
+      // 
+      // checkFileLogging
+      // 
+      this.checkFileLogging.AutoSize = true;
+      this.checkFileLogging.Checked = global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.filelogging;
+      this.checkFileLogging.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "filelogging", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
+      this.checkFileLogging.Location = new System.Drawing.Point(6, 19);
+      this.checkFileLogging.Name = "checkFileLogging";
+      this.checkFileLogging.Size = new System.Drawing.Size(182, 17);
+      this.checkFileLogging.TabIndex = 0;
+      this.checkFileLogging.Text = "Log diagnostic messages to a file";
+      this.checkFileLogging.UseVisualStyleBackColor = true;
+      // 
       // FormSettings
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(284, 127);
+      this.ClientSize = new System.Drawing.Size(284, 175);
+      this.Controls.Add(this.groupBox3);
       this.Controls.Add(this.groupBox2);
       this.Controls.Add(this.groupBox1);
       this.Name = "FormSettings";
@@ -114,6 +140,8 @@
       ((System.ComponentModel.ISupportInitialize)(this.numericPort)).EndInit();
       this.groupBox2.ResumeLayout(false);
       this.groupBox2.PerformLayout();
+      this.groupBox3.ResumeLayout(false);
+      this.groupBox3.PerformLayout();
       this.ResumeLayout(false);
 
     }
@@ -127,5 +155,7 @@
     private System.Windows.Forms.Button buttonBrowseCacheFile;
     private System.Windows.Forms.TextBox textCacheFile;
     private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+    private System.Windows.Forms.GroupBox groupBox3;
+    private System.Windows.Forms.CheckBox checkFileLogging;
   }
 }
