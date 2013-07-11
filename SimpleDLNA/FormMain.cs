@@ -106,7 +106,13 @@ namespace NMaier.SimpleDlna.GUI
       };
       fileAppender.ActivateOptions();
 
-      logAppendTimer.Elapsed += DoAppendInternal;
+      logAppendTimer.Elapsed += (s, e) =>
+      {
+        BeginInvoke((Action)(() =>
+        {
+          DoAppendInternal(s, e);
+        }));
+      };
       BasicConfigurator.Configure(this, fileAppender);
     }
 
