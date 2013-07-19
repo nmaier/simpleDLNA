@@ -12,7 +12,7 @@ namespace NMaier.SimpleDlna.Server.Views
     {
       base.SetParameters(parameters);
 
-      foreach (var v in parameters.GetValues("size")) {
+      foreach (var v in parameters.GetValuesForKey("size")) {
         var min = 0L;
         if (long.TryParse(v, out min) && min > 0) {
           minSize = min * 1024 * 1024;

@@ -67,7 +67,7 @@ namespace NMaier.SimpleDlna.Utilities
       return list.GetEnumerator();
     }
 
-    public IEnumerable<string> GetValues(string key)
+    public IEnumerable<string> GetValuesForKey(string key)
     {
       return from i in list
              where StringComparer.CurrentCultureIgnoreCase.Equals(i.Key, key)
