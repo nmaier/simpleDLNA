@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,8 +8,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -110,31 +110,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void OnChanged(Object source, FileSystemEventArgs e)
     {
-      if (changeTimer.Enabled) {
-        return;
-      }
       if (store != null && e.FullPath.ToLower() == store.StoreFile.FullName.ToLower()) {
         return;
       }
-      if (e.ChangeType == WatcherChangeTypes.Deleted) {
-        changeTimer.Interval = TimeSpan.FromSeconds(2).TotalMilliseconds;
-        changeTimer.Enabled = true;
-        return;
-      }
       DebugFormat("File System changed: {0}", e.FullPath);
-      changeTimer.Interval = TimeSpan.FromSeconds(30).TotalMilliseconds;
-      changeTimer.Enabled = true;
+      DelayedRescan(e.ChangeType);
     }
 
     private void OnRenamed(Object source, RenamedEventArgs e)
     {
-      if (changeTimer.Enabled) {
-        return;
-      }
-
       DebugFormat("File System changed (rename): {0}", e.FullPath);
-      changeTimer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
-      changeTimer.Enabled = true;
+      DelayedRescan(e.ChangeType);
     }
 
     private void Rescan()
@@ -178,6 +164,25 @@ namespace NMaier.SimpleDlna.FileMediaServer
       Thumbnailer.AddFiles(store, items);
     }
 
+
+    internal void DelayedRescan(WatcherChangeTypes changeType)
+    {
+      if (changeTimer.Enabled) {
+        return;
+      }
+      switch (changeType) {
+        case WatcherChangeTypes.Deleted:
+          changeTimer.Interval = TimeSpan.FromSeconds(2).TotalMilliseconds;
+          break;
+        case WatcherChangeTypes.Renamed:
+          changeTimer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
+          break;
+        default:
+          changeTimer.Interval = TimeSpan.FromSeconds(30).TotalMilliseconds;
+          break;
+      }
+      changeTimer.Enabled = true;
+    }
 
     internal Cover GetCover(BaseFile file)
     {
