@@ -69,6 +69,7 @@
     <Compile Include="FFmpeg.cs" />
     <Compile Include="Formatting.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="ProductInformation.cs" />
     <Compile Include="IP.cs" />
     <Compile Include="IRepositoryItem.cs" />
     <Compile Include="Logging.cs" />

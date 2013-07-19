@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using log4net;
@@ -181,25 +180,15 @@ namespace NMaier.SimpleDlna
 
     private static void ShowLicense()
     {
+      Console.WriteLine(ProductInformation.Copyright);
+      Console.WriteLine();
       Console.Write(Encoding.UTF8.GetString(Properties.Resources.LICENSE));
     }
 
     private static void ShowVersion()
     {
-      var a = Assembly.GetEntryAssembly();
-      var v = a.GetName().Version;
-      Console.WriteLine("App:    {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-      a = Assembly.GetAssembly(typeof(FileServer));
-      v = a.GetName().Version;
-      Console.WriteLine("Files:  {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-      a = Assembly.GetAssembly(typeof(HttpServer));
-      v = a.GetName().Version;
-      Console.WriteLine("Server: {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-      a = Assembly.GetAssembly(typeof(AttributeCollection));
-      v = a.GetName().Version;
-      Console.WriteLine("Utils:  {0} {1}.{2}.{3}", a.GetName().Name, v.Major, v.Minor, v.Revision);
-
-      Console.WriteLine("Http:   {0}", HttpServer.Signature);
+      Console.WriteLine("Version: {0}", ProductInformation.ProductVersion);
+      Console.WriteLine("Http:    {0}", HttpServer.Signature);
     }
   }
 }
