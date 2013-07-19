@@ -17,7 +17,9 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-[assembly: AssemblyVersion("0.11.*")]
+[assembly: AssemblyVersion("0.12.*")]
+[assembly: AssemblyInformationalVersion("0.12 - Hello Dexter Morgan")]
+
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
 [assembly: CLSCompliant(true)]
