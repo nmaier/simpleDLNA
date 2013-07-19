@@ -80,14 +80,31 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        return new FileStream(
-          Item.FullName,
-          FileMode.Open,
-          FileAccess.Read,
-          FileShare.ReadWrite | FileShare.Delete,
-          1 << 17,
-          FileOptions.Asynchronous | FileOptions.SequentialScan
-          );
+        try {
+          return new FileStream(
+            Item.FullName,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.ReadWrite | FileShare.Delete,
+            1 << 17,
+            FileOptions.Asynchronous | FileOptions.SequentialScan
+            );
+        }
+        catch (FileNotFoundException ex) {
+          Error("Failed to access: " + Item.FullName, ex);
+          server.DelayedRescan(WatcherChangeTypes.Deleted);
+          throw;
+        }
+        catch (UnauthorizedAccessException ex) {
+          Error("Failed to access: " + Item.FullName, ex);
+          server.DelayedRescan(WatcherChangeTypes.Changed);
+          throw;
+        }
+        catch (IOException ex) {
+          Error("Failed to access: " + Item.FullName, ex);
+          server.DelayedRescan(WatcherChangeTypes.Changed);
+          throw;
+        }
       }
     }
     public virtual IMediaCoverResource Cover
