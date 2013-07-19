@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace NMaier.SimpleDlna.Utilities
 {
   using Attribute = KeyValuePair<string, string>;
-  using System;
 
   public sealed class AttributeCollection : IEnumerable<Attribute>
   {
