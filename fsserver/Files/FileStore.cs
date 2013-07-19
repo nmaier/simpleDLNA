@@ -42,7 +42,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           pragma.ExecuteNonQuery();
           pragma.CommandText = "PRAGMA temp_store = MEMORY";
           pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA synchonous = NORMAL";
+          pragma.CommandText = "PRAGMA synchonous = OFF";
           pragma.ExecuteNonQuery();
         }
         using (var create = connection.CreateCommand()) {
