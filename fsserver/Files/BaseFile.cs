@@ -179,7 +179,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
             rv.Add("HasCover", "true");
           }
         }
-        catch (Exception) {
+        catch (Exception ex) {
+          Debug("Failed to access cover", ex);
         }
         return rv;
       }
