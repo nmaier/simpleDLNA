@@ -77,7 +77,6 @@ header h1 {
   color: #fff;
   line-height: 1;
   margin-bottom: 0.2em;
-  max-width: 540px;
 }
 
 header h2 {
@@ -93,6 +92,11 @@ header h2 {
   position: relative;
   width: 940px;
   margin: 0 auto;
+}
+.inner > img {
+  position: absolute;
+  top: 0;
+  right: 90px;
 }
 
 #content-wrapper {
@@ -140,13 +144,8 @@ a.button {
 }
 a.button small {
   display: block;
+  margin-bottom: 0.5ex;
   font-size: 11px;
-}
-header a.button {
-  position: absolute;
-  right: 46px;
-  top: 0;
-  background: transparent url(../images/github-button.png) 0 0 no-repeat;
 }
 aside a.button {
   height: auto;
@@ -161,6 +160,10 @@ aside a.button {
   
   margin-bottom: 20px;
   font-size: 18px;
+}
+a.button.github {
+  background-image: url(../images/github.png);
+  min-height: 48px;
 }
 
 code, pre {
