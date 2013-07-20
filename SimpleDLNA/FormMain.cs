@@ -298,6 +298,7 @@ namespace NMaier.SimpleDlna.GUI
 
     private void notifyIcon_DoubleClick(object sender, EventArgs e)
     {
+      Show();
       WindowState = FormWindowState.Normal;
       ShowInTaskbar = true;
       notifyIcon.Visible = false;
@@ -308,6 +309,7 @@ namespace NMaier.SimpleDlna.GUI
       if (WindowState == FormWindowState.Minimized) {
         notifyIcon.Visible = true;
         ShowInTaskbar = false;
+        Hide();
       }
     }
 
