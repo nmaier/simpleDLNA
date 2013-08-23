@@ -1,16 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 namespace NMaier.SimpleDlna.Utilities
 {
   public class NaturalStringComparer : StringComparer
   {
-    private readonly static LeastRecentlyUsedDictionary<string, BaseSortPart[]> cache = new LeastRecentlyUsedDictionary<string, BaseSortPart[]>(5000);
-
     private static readonly StringComparer comparer = StringComparer.CurrentCultureIgnoreCase;
 
     private static readonly bool platformSupport = HasPlatformSupport();
+
+    private readonly LeastRecentlyUsedDictionary<string, BaseSortPart[]> partsCache = new LeastRecentlyUsedDictionary<string, BaseSortPart[]>(5000);
+
+    private readonly bool stemBase;
+
+
+    public NaturalStringComparer(bool stemBase)
+    {
+      this.stemBase = stemBase;
+    }
+
 
     private static bool HasPlatformSupport()
     {
@@ -22,10 +30,10 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
-    private static BaseSortPart[] Split(string str)
+    private BaseSortPart[] Split(string str)
     {
       BaseSortPart[] rv;
-      if (cache.TryGetValue(str, out rv)) {
+      if (partsCache.TryGetValue(str, out rv)) {
         return rv;
       }
 
@@ -63,8 +71,8 @@ namespace NMaier.SimpleDlna.Utilities
       }
 
       rv = parts.ToArray();
-      lock (cache) {
-        cache[str] = rv;
+      lock (partsCache) {
+        partsCache[str] = rv;
       }
       return rv;
     }
@@ -72,8 +80,10 @@ namespace NMaier.SimpleDlna.Utilities
 
     public override int Compare(string x, string y)
     {
-      x = x.StemCompareBase();
-      y = y.StemCompareBase();
+      if (stemBase) {
+        x = x.StemCompareBase();
+        y = y.StemCompareBase();
+      }
       if (platformSupport) {
         return SafeNativeMethods.StrCmpLogicalW(x, y);
       }

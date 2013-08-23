@@ -70,6 +70,7 @@
     <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Http\HttpPhrases.cs" />
     <Compile Include="Interfaces\IBookmarkable.cs" />
+    <Compile Include="Interfaces\ITitleComparable.cs" />
     <Compile Include="Ssdp\Datagram.cs" />
     <Compile Include="Handlers\MediaMount_HTML.cs" />
     <Compile Include="Handlers\MediaMount_SOAP.cs" />

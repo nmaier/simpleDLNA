@@ -6,7 +6,7 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
-  internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo
+  internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo, ITitleComparable
   {
     private WeakReference _cover = new WeakReference(null);
 
@@ -19,6 +19,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly FileServer server;
 
     private readonly string title;
+    private string comparableTitle;
 
 
     protected BaseFile(FileServer server, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
@@ -248,6 +249,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
       cover.OnCoverLazyLoaded += LazyLoadedCover;
       cover.ForceLoad();
       cover = null;
+    }
+
+    public string ToComparableTitle()
+    {
+      if (comparableTitle == null) {
+        comparableTitle = Title.StemCompareBase();
+      }
+      return comparableTitle;
     }
   }
 }

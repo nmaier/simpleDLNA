@@ -6,7 +6,7 @@ namespace NMaier.SimpleDlna.Server.Comparers
 {
   internal class TitleComparer : BaseComparer
   {
-    private readonly static StringComparer comp = new NaturalStringComparer();
+    private readonly static StringComparer comp = new NaturalStringComparer(false);
 
 
     public override string Description
@@ -33,7 +33,11 @@ namespace NMaier.SimpleDlna.Server.Comparers
       if (y == null) {
         throw new ArgumentNullException("y");
       }
-      return comp.Compare(x.Title, y.Title);
+      ITitleComparable tx = x as ITitleComparable, ty = y as ITitleComparable;
+      return comp.Compare(
+        tx != null ? tx.ToComparableTitle() : x.Title.StemCompareBase(),
+        ty != null ? ty.ToComparableTitle() : y.Title.StemCompareBase()
+        );
     }
   }
 }

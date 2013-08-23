@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
-  public class VirtualFolder : IMediaFolder
+  public class VirtualFolder : IMediaFolder, ITitleComparable
   {
     private readonly List<IMediaFolder> merged = new List<IMediaFolder>();
 
@@ -12,7 +13,8 @@ namespace NMaier.SimpleDlna.Server
 
     protected List<IMediaResource> resources = new List<IMediaResource>();
 
-    private string path = null;
+    private string path;
+    private string comparableTitle;
 
 
     public VirtualFolder()
@@ -193,6 +195,14 @@ namespace NMaier.SimpleDlna.Server
         folders.Reverse();
         resources.Reverse();
       }
+    }
+
+    public string ToComparableTitle()
+    {
+      if (comparableTitle == null) {
+        comparableTitle = Title.StemCompareBase();
+      }
+      return comparableTitle;
     }
   }
 }
