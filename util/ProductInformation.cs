@@ -9,7 +9,7 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
+        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
@@ -20,7 +20,7 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
@@ -42,7 +42,7 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
         if (attributes.Length > 0) {
           var titleAttribute = (AssemblyTitleAttribute)attributes[0];
           if (!string.IsNullOrWhiteSpace(titleAttribute.Title)) {
