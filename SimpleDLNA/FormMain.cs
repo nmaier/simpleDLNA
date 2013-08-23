@@ -166,7 +166,12 @@ namespace NMaier.SimpleDlna.GUI
       var enable = listDescriptions.SelectedItems.Count != 0;
       buttonStartStop.Enabled = buttonRemove.Enabled = buttonEdit.Enabled = enable;
       if (enable) {
-        buttonStartStop.Text = (listDescriptions.SelectedItems[0] as ServerListViewItem).Description.Active ? "Stop" : "Start";
+        var item = (listDescriptions.SelectedItems[0] as ServerListViewItem);
+        buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
+        buttonRescan.Enabled = item.Description.Active;
+      }
+      else {
+        buttonRescan.Enabled = false;
       }
     }
 
@@ -376,6 +381,20 @@ namespace NMaier.SimpleDlna.GUI
         settings.ShowDialog();
         Config.Save();
         SetupLogging();
+      }
+    }
+
+    private void buttonRescan_Click(object sender, EventArgs e)
+    {
+      try {
+        var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
+        if (item == null) {
+          return;
+        }
+        item.Rescan();
+      }
+      catch (Exception ex) {
+        MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
     }
   }

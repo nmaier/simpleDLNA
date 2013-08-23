@@ -45,10 +45,12 @@ namespace NMaier.SimpleDlna.GUI
 
     private State state
     {
-      get {
+      get
+      {
         return internalState;
       }
-      set {
+      set
+      {
         internalState = value;
         UpdateInfo();
       }
@@ -86,9 +88,9 @@ namespace NMaier.SimpleDlna.GUI
           ids.AddView(v);
         }
         var dirs = (from i in Description.Directories
-                                            let d = new DirectoryInfo(i)
-                                            where d.Exists
-                                            select d).ToArray();
+                    let d = new DirectoryInfo(i)
+                    where d.Exists
+                    select d).ToArray();
         if (dirs.Length == 0) {
           throw new InvalidOperationException("No remaining directories");
         }
@@ -155,6 +157,18 @@ namespace NMaier.SimpleDlna.GUI
     {
       state = State.Loading;
       StartFileServer();
+    }
+
+    public void Rescan()
+    {
+      if (fileServer == null) {
+        throw new ArgumentException("Server is not running");
+      }
+      var vs = fileServer as IVolatileMediaServer;
+      if (vs == null) {
+        throw new ArgumentException("Server does not support rescanning");
+      }
+      vs.Rescan();
     }
 
     public void Toggle()

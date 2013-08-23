@@ -176,9 +176,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-
-
-
     public override int CompareTo(IMediaItem other)
     {
       if (track.HasValue && other is AudioFile) {

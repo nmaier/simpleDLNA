@@ -1,6 +1,4 @@
-﻿using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -123,7 +123,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       DelayedRescan(e.ChangeType);
     }
 
-    private void Rescan()
+    private void RescanInternal()
     {
       Task.Factory.StartNew(() =>
       {
@@ -149,7 +149,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void RescanTimer(object sender, ElapsedEventArgs e)
     {
-      Rescan();
+      RescanInternal();
     }
 
     private void Thumbnail()
@@ -267,6 +267,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
       watchTimer.Elapsed += RescanTimer;
       watchTimer.Enabled = true;
+    }
+
+    public void Rescan()
+    {
+      RescanInternal();
     }
 
     public void SetCacheFile(FileInfo info)

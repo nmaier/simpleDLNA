@@ -63,6 +63,7 @@
       this.colLogLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.buttonRescan = new System.Windows.Forms.Button();
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -295,11 +296,24 @@
       this.colLogMessage.Text = "Message";
       this.colLogMessage.Width = 200;
       // 
+      // buttonRescan
+      // 
+      this.buttonRescan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.buttonRescan.Enabled = false;
+      this.buttonRescan.Location = new System.Drawing.Point(255, 217);
+      this.buttonRescan.Name = "buttonRescan";
+      this.buttonRescan.Size = new System.Drawing.Size(75, 23);
+      this.buttonRescan.TabIndex = 9;
+      this.buttonRescan.Text = "Rescan";
+      this.buttonRescan.UseVisualStyleBackColor = true;
+      this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
+      // 
       // FormMain
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(623, 406);
+      this.Controls.Add(this.buttonRescan);
       this.Controls.Add(this.logger);
       this.Controls.Add(this.mainMenu);
       this.Controls.Add(this.buttonRemove);
@@ -354,6 +368,7 @@
     private System.Windows.Forms.ColumnHeader colLogLogger;
     private System.Windows.Forms.ImageList listImages;
     private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+    private System.Windows.Forms.Button buttonRescan;
   }
 }
 
