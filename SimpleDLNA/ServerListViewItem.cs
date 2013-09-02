@@ -65,11 +65,13 @@ namespace NMaier.SimpleDlna.GUI
           func();
         }
         finally {
-          var mode = ListView.Items.Count == 0
-            ? ColumnHeaderAutoResizeStyle.HeaderSize
-            : ColumnHeaderAutoResizeStyle.ColumnContent;
-          foreach (var c in ListView.Columns) {
-            (c as ColumnHeader).AutoResize(mode);
+          if (ListView != null) {
+            var mode = ListView.Items.Count == 0
+              ? ColumnHeaderAutoResizeStyle.HeaderSize
+              : ColumnHeaderAutoResizeStyle.ColumnContent;
+            foreach (var c in ListView.Columns) {
+              (c as ColumnHeader).AutoResize(mode);
+            }
           }
         }
       }));
