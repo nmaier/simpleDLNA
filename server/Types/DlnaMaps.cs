@@ -5,48 +5,26 @@ namespace NMaier.SimpleDlna.Server
 {
   public static class DlnaMaps
   {
-    [Flags]
-    internal enum DlnaFlags : ulong
-    {
-      BackgroundTransferMode = (1 << 22),
-      ByteBasedSeek = (1 << 29),
-      ConnectionStall = (1 << 21),
-      DlnaV15 = (1 << 20),
-      InteractiveTransferMode = (1 << 23),
-      PlayContainer = (1 << 28),
-      RtspPause = (1 << 25),
-      S0Increase = (1 << 27),
-      SenderPaced = (1L << 31),
-      SnIncrease = (1 << 26),
-      StreamingTransferMode = (1 << 24),
-      TimeBasedSeek = (1 << 30)
-    }
-
-    internal static string FlagsToString(DlnaFlags flags)
-    {
-      return string.Format("{0:X8}{1:D24}", (ulong)flags, 0);
-    }
-
-    internal static readonly string DefaultStreaming = FlagsToString(DlnaFlags.StreamingTransferMode | DlnaFlags.BackgroundTransferMode | DlnaFlags.ConnectionStall | DlnaFlags.ByteBasedSeek | DlnaFlags.DlnaV15);
-
-    internal static readonly string DefaultInteractive = FlagsToString(DlnaFlags.InteractiveTransferMode | DlnaFlags.BackgroundTransferMode | DlnaFlags.ConnectionStall | DlnaFlags.ByteBasedSeek | DlnaFlags.DlnaV15);
-
+    internal static readonly string DefaultStreaming =
+      FlagsToString(DlnaFlags.StreamingTransferMode |
+                    DlnaFlags.BackgroundTransferMode |
+                    DlnaFlags.ConnectionStall |
+                    DlnaFlags.ByteBasedSeek |
+                    DlnaFlags.DlnaV15);
+    internal static readonly string DefaultInteractive =
+      FlagsToString(DlnaFlags.InteractiveTransferMode |
+                    DlnaFlags.BackgroundTransferMode |
+                    DlnaFlags.ConnectionStall |
+                    DlnaFlags.ByteBasedSeek |
+                    DlnaFlags.DlnaV15);
     private static readonly string[] aacs = new string[] { "aac", "mp4a", "m4a" };
-
     private static readonly string[] avcs = new string[] { "avc", "mp4", "m4v", "mov", "3gp", "3gpp", "flv" };
-
     private static readonly string[] avis = new string[] { "avi", "divx", "xvid" };
-
     public static readonly Dictionary<DlnaMime, List<string>> Dlna2Ext = new Dictionary<DlnaMime, List<string>>();
-
     public static readonly Dictionary<string, DlnaMime> Ext2Dlna = new Dictionary<string, DlnaMime>();
-
     public static readonly Dictionary<string, DlnaMediaTypes> Ext2Media = new Dictionary<string, DlnaMediaTypes>();
-
     private static readonly string[] jpgs = new string[] { "jpg", "jpe", "jpeg", "jif", "jfif" };
-
     public static readonly Dictionary<DlnaMediaTypes, List<string>> Media2Ext = new Dictionary<DlnaMediaTypes, List<string>>();
-
     public static readonly Dictionary<DlnaMime, string> Mime = new Dictionary<DlnaMime, string>() {
         { DlnaMime.MATROSKA, "video/x-mkv" },
         { DlnaMime.AVI, "video/avi" },
@@ -57,15 +35,10 @@ namespace NMaier.SimpleDlna.Server
         { DlnaMime.AAC, "audio/aac" },
         { DlnaMime.VORBIS, "audio/ogg" },
         { DlnaMime.WMV, "video/x-ms-wmv" } };
-
     private static readonly string[] mkvs = new string[] { "mkv", "matroska", "mk3d", "webm" };
-
     private static readonly string[] mp3s = new string[] { "mp3", "mp3p", "mp3x", "mp3a", "mpa" };
-
     private static readonly string[] mpgs = new string[] { "mpg", "mpe", "mpeg", "mpg2", "mpeg2", "ts", "vob", "m2v" };
-
     private static readonly string[] ogas = new string[] { "ogg", "oga" };
-
     public static readonly Dictionary<DlnaMime, string> PN = new Dictionary<DlnaMime, string>() {
         { DlnaMime.MATROSKA, "DLNA.ORG_PN=MATROSKA" },
         { DlnaMime.AVI, "DLNA.ORG_PN=AVI" },
@@ -76,7 +49,6 @@ namespace NMaier.SimpleDlna.Server
         { DlnaMime.AAC, "DLNA.ORG_PN=AAC" },
         { DlnaMime.VORBIS, "DLNA.ORG_PN=OGG" },
         { DlnaMime.WMV, "DLNA.ORG_PN=WMVHIGH_FULL" } };
-
     private static readonly string[] wmvs = new string[] { "wmv", "asf", "wma", "wmf" };
 
 
@@ -131,6 +103,12 @@ namespace NMaier.SimpleDlna.Server
           Ext2Media.Add(ext, t);
         }
       }
+    }
+
+
+    internal static string FlagsToString(DlnaFlags flags)
+    {
+      return string.Format("{0:X8}{1:D24}", (ulong)flags, 0);
     }
   }
 }
