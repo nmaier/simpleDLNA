@@ -28,8 +28,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       Server = server;
       this.dir = dir;
       folders = (from d in dir.GetDirectories()
-                 let m = new PlainFolder(server, types, this, d)
-                 where m.ChildCount > 0
+                 let m = TryGetFolder(server, types, d)
+                 where m != null && m.ChildCount > 0
                  select m as IMediaFolder).ToList();
 
       var rawfiles = from f in dir.GetFiles("*.*")
@@ -50,6 +50,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
       resources.AddRange(files);
     }
 
+    private PlainFolder TryGetFolder(FileServer server, DlnaMediaTypes types, DirectoryInfo d)
+    {
+      try {
+        return new PlainFolder(server, types, this, d);
+      }
+      catch (Exception ex) {
+        server.Warn("Failed to access folder", ex);
+        return null;
+      }
+    }
 
     public DateTime InfoDate
     {
