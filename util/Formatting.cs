@@ -11,8 +11,7 @@ namespace NMaier.SimpleDlna.Utilities
 
     private readonly static Regex trimmore = new Regex(@"^[^\d\w]+|[^\d\w]+$", RegexOptions.Compiled);
 
-    private readonly static Regex respace = new Regex(@"[._+-]+", RegexOptions.Compiled);
-
+    private readonly static Regex respace = new Regex(@"[.+]+", RegexOptions.Compiled);
 
     public static string FormatFileSize(this long size)
     {
@@ -59,7 +58,11 @@ namespace NMaier.SimpleDlna.Utilities
       }
 
       if (!name.Contains(" ")) {
-        name = respace.Replace(name, " ").Trim();
+        name = name.Replace('_', ' ');
+        if (!name.Contains(" ")) {
+          name = name.Replace('-', ' ');
+        }
+        name = respace.Replace(name, " ");
       }
       var ws = trim.Replace(name, " ").Trim();
       if (string.IsNullOrWhiteSpace(ws)) {
