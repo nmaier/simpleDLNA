@@ -42,11 +42,15 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (this.directories.Length == 0) {
         throw new ArgumentException("Provide one or more directories", "directories");
       }
+      var parent = this.directories[0].Parent;
+      if (parent == null) {
+        parent = this.directories[0];
+      }
       if (this.directories.Length == 1) {
-        FriendlyName = string.Format("{0} ({1})", this.directories[0].Name, this.directories[0].Parent.FullName);
+        FriendlyName = string.Format("{0} ({1})", this.directories[0].Name, parent.FullName);
       }
       else {
-        FriendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, this.directories[0].Parent.FullName, this.directories.Length - 1);
+        FriendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, parent.FullName, this.directories.Length - 1);
       }
       watchers = (from d in directories
                   select new FileSystemWatcher(d.FullName)).ToArray();
