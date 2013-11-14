@@ -2,12 +2,11 @@
 using System.IO;
 using System.Runtime.Serialization;
 using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
-  internal sealed class AudioFile : BaseFile, IMetaAudioItem, ISerializable
+  internal sealed class AudioFile : BaseFile, IMediaAudioResource, ISerializable
   {
     private string album;
     private string artist;

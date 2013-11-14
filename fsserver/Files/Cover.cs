@@ -202,5 +202,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       info.AddValue("w", width);
       info.AddValue("h", height);
     }
+
+    IMediaCoverResource IMediaCover.Cover
+    {
+      get { return this; }
+    }
   }
 }

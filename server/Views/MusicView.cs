@@ -1,5 +1,4 @@
 using System.Linq;
-using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
@@ -22,7 +21,7 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
 
-    private static void LinkTriple(TripleKeyedVirtualFolder folder, IMediaResource r, string key1, string key2)
+    private static void LinkTriple(TripleKeyedVirtualFolder folder, IMediaAudioResource r, string key1, string key2)
     {
       if (string.IsNullOrWhiteSpace(key1)) {
         return;
@@ -30,11 +29,16 @@ namespace NMaier.SimpleDlna.Server.Views
       if (string.IsNullOrWhiteSpace(key2)) {
         return;
       }
-      folder
+      var targetFolder = folder
         .GetFolder(key1.StemCompareBase().First().ToString().ToUpper())
-        .GetFolder(key1.StemNameBase())
+        .GetFolder(key1.StemNameBase());
+      targetFolder
         .GetFolder(key2.StemNameBase())
         .AddResource(r);
+      var allRes = new AlbumInTitleAudioResource(r);
+      targetFolder
+       .GetFolder("All Albums")
+       .AddResource(allRes);
     }
 
     private static void SortFolder(VirtualFolder folder, TripleKeyedVirtualFolder artists, TripleKeyedVirtualFolder performers, DoubleKeyedVirtualFolder albums, SimpleKeyedVirtualFolder genres)
@@ -43,7 +47,7 @@ namespace NMaier.SimpleDlna.Server.Views
         SortFolder(f as VirtualFolder, artists, performers, albums, genres);
       }
       foreach (var i in folder.ChildItems.ToList()) {
-        var ai = i as IMetaAudioItem;
+        var ai = i as IMediaAudioResource;
         if (ai == null) {
           continue;
         }
@@ -52,8 +56,8 @@ namespace NMaier.SimpleDlna.Server.Views
           album = "Unspecified album";
         }
         albums.GetFolder(album.StemCompareBase().First().ToString().ToUpper()).GetFolder(album.StemNameBase()).AddResource(i);
-        LinkTriple(artists, i, ai.MetaArtist, album);
-        LinkTriple(performers, i, ai.MetaPerformer, album);
+        LinkTriple(artists, ai, ai.MetaArtist, album);
+        LinkTriple(performers, ai, ai.MetaPerformer, album);
         var genre = ai.MetaGenre;
         if (genre != null) {
           genres.GetFolder(genre.StemNameBase()).AddResource(i);
@@ -82,6 +86,27 @@ namespace NMaier.SimpleDlna.Server.Views
       return root;
     }
 
+
+    private class AlbumInTitleAudioResource : AudioResourceDecorator
+    {
+      public AlbumInTitleAudioResource(IMediaAudioResource resource)
+        : base(resource)
+      {
+      }
+
+
+      public override string Title
+      {
+        get
+        {
+          var album = MetaAlbum;
+          if (!string.IsNullOrWhiteSpace(album)) {
+            return string.Format("{0} — {1}", album, base.Title);
+          }
+          return base.Title;
+        }
+      }
+    }
 
     private class DoubleKeyedVirtualFolder : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
     {

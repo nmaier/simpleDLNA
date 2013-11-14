@@ -2,12 +2,11 @@
 using System.IO;
 using System.Runtime.Serialization;
 using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
-  internal sealed class ImageFile : BaseFile, IMetaImageItem, ISerializable
+  internal sealed class ImageFile : BaseFile, IMediaImageResource, ISerializable
   {
     private string creator;
     private string description;

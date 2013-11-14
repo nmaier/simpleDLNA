@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
-  internal sealed class VideoFile : BaseFile, IMetaVideoItem, ISerializable, IBookmarkable
+  internal sealed class VideoFile : BaseFile, IMediaVideoResource, ISerializable, IBookmarkable
   {
     private string[] actors;
     private long? bookmark;

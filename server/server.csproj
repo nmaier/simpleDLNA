@@ -70,6 +70,9 @@
     <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Http\HttpPhrases.cs" />
     <Compile Include="Interfaces\IBookmarkable.cs" />
+    <Compile Include="Interfaces\IMediaAudioResource.cs" />
+    <Compile Include="Interfaces\IMediaImageResource.cs" />
+    <Compile Include="Interfaces\IMediaVideoResource.cs" />
     <Compile Include="Interfaces\ITitleComparable.cs" />
     <Compile Include="Ssdp\Datagram.cs" />
     <Compile Include="Handlers\MediaMount_HTML.cs" />
@@ -85,6 +88,7 @@
     <Compile Include="Interfaces\Metadata\IMetaInfo.cs" />
     <Compile Include="Interfaces\Metadata\IMetaResolution.cs" />
     <Compile Include="Interfaces\Metadata\IMetaVideoItem.cs" />
+    <Compile Include="Types\AudioResourceDecorator.cs" />
     <Compile Include="Types\DlnaFlags.cs" />
     <Compile Include="Types\DlnaMaps.cs" />
     <Compile Include="Types\DlnaMime.cs" />
@@ -120,6 +124,7 @@
     <Compile Include="Ssdp\SsdpHandler.cs" />
     <Compile Include="Handlers\StaticHandler.cs" />
     <Compile Include="Responses\StringResponse.cs" />
+    <Compile Include="Types\MediaResourceDecorator.cs" />
     <Compile Include="Types\RawHeaders.cs" />
     <Compile Include="Http\ResponseHeaders.cs" />
     <Compile Include="Types\Identifiers.cs" />
