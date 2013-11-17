@@ -20,6 +20,7 @@ namespace NMaier.SimpleDlna.GUI
     private struct LogEntry
     {
       public string Level;
+      public string Key;
       public string Message;
       public string Class;
       public string Exception;
@@ -65,6 +66,9 @@ namespace NMaier.SimpleDlna.GUI
       listImages.Images.Add("active", Properties.Resources.active);
       listImages.Images.Add("inactive", Properties.Resources.inactive);
       listImages.Images.Add("refreshing", Properties.Resources.refreshing);
+      listImages.Images.Add("info", Properties.Resources.info);
+      listImages.Images.Add("warn", Properties.Resources.warn);
+      listImages.Images.Add("error", Properties.Resources.error);
 
       logAppendTimer.Elapsed += (s, e) =>
       {
@@ -257,11 +261,19 @@ namespace NMaier.SimpleDlna.GUI
       }
       var cls = loggingEvent.LoggerName;
       cls = cls.Substring(cls.LastIndexOf('.') + 1);
+      var key = "info";
+      if (loggingEvent.Level >= Level.Error) {
+        key = "error";
+      }
+      else if (loggingEvent.Level >= Level.Warn) {
+        key = "warn";
+      }
       pendingLogEntries.Enqueue(new LogEntry()
       {
         Class = cls,
         Exception = loggingEvent.GetExceptionString(),
         Level = loggingEvent.Level.DisplayName,
+        Key = key,
         Message = loggingEvent.RenderedMessage
       });
       lock (logAppendTimer) {
@@ -278,24 +290,27 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
       LogEntry entry;
-      int last = -1;
+      ListViewItem last = null;
       logger.BeginUpdate();
       try {
         while (pendingLogEntries.TryDequeue(out entry)) {
           if (logger.Items.Count >= 300) {
             logger.Items.RemoveAt(0);
           }
-          last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Message })).Index;
+          last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Message }));
+          last.ImageKey = entry.Key;
           if (!string.IsNullOrWhiteSpace(entry.Exception)) {
-            last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Exception })).Index;
+            last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Exception }));
+            last.ImageKey = entry.Key;
+            last.IndentCount = 1;
           }
         }
       }
       finally {
         logger.EndUpdate();
       }
-      if (last != -1) {
-        logger.EnsureVisible(last);
+      if (last != null) {
+        logger.EnsureVisible(last.Index);
         colLogLogger.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         colLogMessage.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
       }

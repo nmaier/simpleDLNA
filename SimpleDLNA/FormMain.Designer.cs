@@ -279,6 +279,7 @@
       this.logger.MultiSelect = false;
       this.logger.Name = "logger";
       this.logger.Size = new System.Drawing.Size(599, 148);
+      this.logger.SmallImageList = this.listImages;
       this.logger.TabIndex = 8;
       this.logger.UseCompatibleStateImageBehavior = false;
       this.logger.View = System.Windows.Forms.View.Details;
