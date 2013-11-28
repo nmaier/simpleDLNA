@@ -41,7 +41,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
         title = Item.Name;
       }
       if (!string.IsNullOrWhiteSpace(title)) {
-        title = Uri.UnescapeDataString(title);
+        try {
+          title = Uri.UnescapeDataString(title);
+        }
+        catch (UriFormatException) {
+        }
       }
       title = title.StemNameBase();
     }
