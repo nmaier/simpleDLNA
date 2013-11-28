@@ -45,7 +45,7 @@ namespace NMaier.SimpleDlna.Server
 
       RealPort = (listener.LocalEndpoint as IPEndPoint).Port;
 
-      InfoFormat("Running HTTP Server: {0} on port {1}", Signature, RealPort);
+      NoticeFormat("Running HTTP Server: {0} on port {1}", Signature, RealPort);
       ssdpServer = new SsdpHandler();
 
       timeouter.Elapsed += TimeouterCallback;
@@ -236,7 +236,7 @@ namespace NMaier.SimpleDlna.Server
       foreach (var address in IP.ExternalIPAddresses) {
         var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
         ssdpServer.RegisterNotification(guid, uri);
-        InfoFormat("New mount at: {0}", uri);
+        NoticeFormat("New mount at: {0}", uri);
       }
     }
 

@@ -42,7 +42,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       client.ExclusiveAddressUse = false;
       client.Client.Bind(new IPEndPoint(IPAddress.Any, SSDP_PORT));
       client.JoinMulticastGroup(SSDP_IP, 2);
-      Info("SSDP service started");
+      Notice("SSDP service started");
       Receive();
     }
 

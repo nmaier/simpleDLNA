@@ -373,7 +373,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       catch (Http404Exception ex) {
-        Info(String.Format("{0} - Got a 404: {1}", this, path), ex);
+        Warn(String.Format("{0} - Got a 404: {1}", this, path), ex);
         response = Error404.HandleRequest(this);
       }
       catch (Exception ex) {

@@ -136,9 +136,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
 
         try {
-          InfoFormat("Rescanning...");
+          Notice("Rescanning...");
           DoRoot();
-          InfoFormat("Done rescanning...");
+          Notice("Done rescanning...");
         }
         catch (Exception ex) {
           Error(ex);

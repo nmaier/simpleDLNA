@@ -1,5 +1,6 @@
 using System;
 using log4net;
+using log4net.Core;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -48,6 +49,13 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.IsInfoEnabled;
       }
     }
+    public bool IsNoticeEnabled
+    {
+      get
+      {
+        return Logger.IsEnabledFor(Level.Notice);
+      }
+    }
     public bool IsWarnEnabled
     {
       get
@@ -55,7 +63,7 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.IsWarnEnabled;
       }
     }
-    public log4net.Core.ILogger Logger
+    public ILogger Logger
     {
       get
       {
@@ -202,6 +210,41 @@ namespace NMaier.SimpleDlna.Utilities
     public void InfoFormat(string format, object arg0, object arg1, object arg2)
     {
       logger.InfoFormat(format, arg0, arg1, arg2);
+    }
+
+    public void Notice(object message)
+    {
+      Logger.Log(GetType(), Level.Notice, message, null);
+    }
+
+    public void Notice(object message, Exception exception)
+    {
+      Logger.Log(GetType(), Level.Notice, message, exception);
+    }
+
+    public void NoticeFormat(string format, params object[] args)
+    {
+      Logger.Log(GetType(), Level.Notice, string.Format(format, args), null);
+    }
+
+    public void NoticeFormat(string format, object arg0)
+    {
+      Logger.Log(GetType(), Level.Notice, string.Format(format, arg0), null);
+    }
+
+    public void NoticeFormat(string format, object arg0, object arg1)
+    {
+      Logger.Log(GetType(), Level.Notice, string.Format(format, arg0, arg1), null);
+    }
+
+    public void NoticeFormat(IFormatProvider provider, string format, params object[] args)
+    {
+      Logger.Log(GetType(), Level.Notice, string.Format(provider, format, args), null);
+    }
+
+    public void NoticeFormat(string format, object arg0, object arg1, object arg2)
+    {
+      Logger.Log(GetType(), Level.Notice, string.Format(format, arg0, arg1, arg2), null);
     }
 
     public void Warn(object message)

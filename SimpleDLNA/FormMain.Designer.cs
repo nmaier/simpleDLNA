@@ -60,10 +60,10 @@
       this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.logger = new System.Windows.Forms.ListView();
-      this.colLogLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.buttonRescan = new System.Windows.Forms.Button();
+      this.colLogTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -270,7 +270,7 @@
       this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.logger.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colLogLevel,
+            this.colLogTime,
             this.colLogLogger,
             this.colLogMessage});
       this.logger.FullRowSelect = true;
@@ -283,10 +283,6 @@
       this.logger.TabIndex = 8;
       this.logger.UseCompatibleStateImageBehavior = false;
       this.logger.View = System.Windows.Forms.View.Details;
-      // 
-      // colLogLevel
-      // 
-      this.colLogLevel.Text = "Level";
       // 
       // colLogLogger
       // 
@@ -308,6 +304,11 @@
       this.buttonRescan.Text = "Rescan";
       this.buttonRescan.UseVisualStyleBackColor = true;
       this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
+      // 
+      // colLogTime
+      // 
+      this.colLogTime.Text = "Time";
+      this.colLogTime.Width = 80;
       // 
       // FormMain
       // 
@@ -364,12 +365,12 @@
     private System.Windows.Forms.ToolStripMenuItem openInBrowserToolStripMenuItem;
     private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
     private System.Windows.Forms.ListView logger;
-    private System.Windows.Forms.ColumnHeader colLogLevel;
     private System.Windows.Forms.ColumnHeader colLogMessage;
     private System.Windows.Forms.ColumnHeader colLogLogger;
     private System.Windows.Forms.ImageList listImages;
     private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
     private System.Windows.Forms.Button buttonRescan;
+    private System.Windows.Forms.ColumnHeader colLogTime;
   }
 }
 

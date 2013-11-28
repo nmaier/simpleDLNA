@@ -19,11 +19,11 @@ namespace NMaier.SimpleDlna.GUI
   {
     private struct LogEntry
     {
-      public string Level;
       public string Key;
       public string Message;
       public string Class;
       public string Exception;
+      public string Time;
     }
     private bool logging = false;
     private static readonly Properties.Settings Config = Properties.Settings.Default;
@@ -256,7 +256,7 @@ namespace NMaier.SimpleDlna.GUI
       if (!logging) {
         return;
       }
-      if (loggingEvent.Level < Level.Info) {
+      if (loggingEvent.Level < Level.Notice) {
         return;
       }
       var cls = loggingEvent.LoggerName;
@@ -272,9 +272,9 @@ namespace NMaier.SimpleDlna.GUI
       {
         Class = cls,
         Exception = loggingEvent.GetExceptionString(),
-        Level = loggingEvent.Level.DisplayName,
         Key = key,
-        Message = loggingEvent.RenderedMessage
+        Message = loggingEvent.RenderedMessage,
+        Time = loggingEvent.TimeStamp.ToString("T")
       });
       lock (logAppendTimer) {
         logAppendTimer.Enabled = true;
@@ -297,10 +297,10 @@ namespace NMaier.SimpleDlna.GUI
           if (logger.Items.Count >= 300) {
             logger.Items.RemoveAt(0);
           }
-          last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Message }));
+          last = logger.Items.Add(new ListViewItem(new string[] { entry.Time, entry.Class, entry.Message }));
           last.ImageKey = entry.Key;
           if (!string.IsNullOrWhiteSpace(entry.Exception)) {
-            last = logger.Items.Add(new ListViewItem(new string[] { entry.Level, entry.Class, entry.Exception }));
+            last = logger.Items.Add(new ListViewItem(new string[] { "", entry.Class, entry.Exception }));
             last.ImageKey = entry.Key;
             last.IndentCount = 1;
           }
@@ -311,6 +311,7 @@ namespace NMaier.SimpleDlna.GUI
       }
       if (last != null) {
         logger.EnsureVisible(last.Index);
+        colLogTime.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         colLogLogger.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
         colLogMessage.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
       }
