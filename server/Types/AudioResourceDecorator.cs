@@ -10,13 +10,6 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
-    virtual public IMediaCoverResource Cover
-    {
-      get
-      {
-        return resource.Cover;
-      }
-    }
     public virtual string MetaAlbum
     {
       get
