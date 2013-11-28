@@ -137,27 +137,36 @@ namespace NMaier.SimpleDlna.Thumbnails
 
     private MemoryStream GetThumbnailInternal(FileInfo file, ref int width, ref int height)
     {
-      using (var p = new Process()) {
-        var sti = p.StartInfo;
+      Exception last = null;
+      for (long best = IdentifyBestCapturePosition(file); best >= 0; best -= Math.Max(best / 2, 5)) {
+        try {
+          using (var p = new Process()) {
+            var sti = p.StartInfo;
 #if !DEBUG
-        sti.CreateNoWindow = true;
+            sti.CreateNoWindow = true;
 #endif
-        sti.UseShellExecute = false;
-        sti.FileName = FFmpeg.FFmpegExecutable;
-        sti.Arguments = String.Format(
-          "-v quiet -ss {0} -i \"{1}\" -an -frames:v 1 -f image2  pipe:",
-          IdentifyBestCapturePosition(file),
-          file.FullName
-          );
-        sti.LoadUserProfile = false;
-        sti.RedirectStandardOutput = true;
-        p.Start();
+            sti.UseShellExecute = false;
+            sti.FileName = FFmpeg.FFmpegExecutable;
+            sti.Arguments = String.Format(
+              "-v quiet -ss {0} -i \"{1}\" -an -frames:v 1 -f image2 pipe:",
+              best,
+              file.FullName
+              );
+            sti.LoadUserProfile = false;
+            sti.RedirectStandardOutput = true;
+            p.Start();
 
-        return GetThumbnailFromProcess(p, ref width, ref height);
+            return GetThumbnailFromProcess(p, ref width, ref height);
+          }
+        }
+        catch (Exception ex) {
+          last = ex;
+        }
       }
+      throw last;
     }
 
-    private static long IdentifyBestCapturePosition(FileInfo file)
+    private long IdentifyBestCapturePosition(FileInfo file)
     {
       try {
         var dur = FFmpeg.GetFileDuration(file);
@@ -166,8 +175,8 @@ namespace NMaier.SimpleDlna.Thumbnails
         }
         return (long)(dur / 3.0);
       }
-      catch (Exception) {
-        // pass
+      catch (Exception ex) {
+        Debug("Failed to get file duration", ex);
       }
       var length = file.Length;
       if (length < 10 * (1 << 20)) {
