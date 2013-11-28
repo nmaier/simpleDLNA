@@ -8,6 +8,16 @@ namespace NMaier.SimpleDlna.Utilities
   [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Sqlite")]
   public static class Sqlite
   {
+    private static Action<IDbConnection> clearPool = null;
+
+
+    public static void ClearPool(IDbConnection conn)
+    {
+      if (clearPool != null) {
+        clearPool(conn);
+      }
+    }
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     public static IDbConnection GetDatabaseConnection(FileInfo database)
     {
@@ -24,6 +34,12 @@ namespace NMaier.SimpleDlna.Utilities
           throw new ArgumentException("no connection");
         }
         rv.Open();
+        if (clearPool == null) {
+          clearPool = conn =>
+          {
+            System.Data.SQLite.SQLiteConnection.ClearPool(conn as System.Data.SQLite.SQLiteConnection);
+          };
+        }
         return rv;
       }
 
@@ -41,6 +57,15 @@ namespace NMaier.SimpleDlna.Utilities
         throw new ArgumentException("no connection");
       }
       mrv.Open();
+      if (clearPool == null) {
+        var cp = dbconn.GetMethod("ClearPool");
+        clearPool = conn =>
+        {
+          if (cp != null) {
+            cp.Invoke(null, new object[] { conn });
+          }
+        };
+      }
       return mrv;
     }
   }

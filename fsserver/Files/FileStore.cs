@@ -1,19 +1,23 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
-using System.Data.Common;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStore : Logging, IDisposable
   {
+    private const uint SCHEMA = 0x20131101;
+
     private static readonly FileStoreVacuumer vacuumer = new FileStoreVacuumer();
+    private readonly static object globalLock = new object();
     private readonly IDbConnection connection;
     private readonly IDbCommand insert;
     private readonly IDbDataParameter insertCover;
@@ -34,24 +38,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
     internal FileStore(FileInfo storeFile)
     {
       StoreFile = storeFile;
-      connection = Sqlite.GetDatabaseConnection(storeFile);
 
-      using (var transaction = connection.BeginTransaction()) {
-        using (var pragma = connection.CreateCommand()) {
-          pragma.CommandText = "PRAGMA journal_mode = MEMORY";
-          pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA temp_store = MEMORY";
-          pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA synchonous = OFF";
-          pragma.ExecuteNonQuery();
-        }
-        using (var create = connection.CreateCommand()) {
-          create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, size INT, time INT, data BINARY, cover BINARY)";
-          create.ExecuteNonQuery();
-        }
-        transaction.Commit();
-      }
-
+      OpenConnection(storeFile, out connection);
+      SetupDatabase();
       select = connection.CreateCommand();
       select.CommandText = "SELECT data FROM store WHERE key = ? AND size = ? AND time = ?";
       select.Parameters.Add(selectKey = select.CreateParameter());
@@ -86,6 +75,61 @@ namespace NMaier.SimpleDlna.FileMediaServer
       InfoFormat("FileStore at {0} is ready", storeFile.FullName);
 
       vacuumer.Add(connection);
+    }
+
+    private void SetupDatabase()
+    {
+      using (var transaction = connection.BeginTransaction()) {
+        using (var pragma = connection.CreateCommand()) {
+          pragma.CommandText = string.Format("PRAGMA user_version = {0}", SCHEMA);
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA journal_mode = MEMORY";
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA temp_store = MEMORY";
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA synchonous = OFF";
+          pragma.ExecuteNonQuery();
+        }
+        using (var create = connection.CreateCommand()) {
+          create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, size INT, time INT, data BINARY, cover BINARY)";
+          create.ExecuteNonQuery();
+        }
+        transaction.Commit();
+      }
+    }
+
+    private void OpenConnection(FileInfo storeFile, out IDbConnection connection)
+    {
+      lock (globalLock) {
+        connection = Sqlite.GetDatabaseConnection(storeFile);
+        try {
+          using (var ver = connection.CreateCommand()) {
+            ver.CommandText = "PRAGMA user_version";
+            var currentVersion = (uint)(long)ver.ExecuteScalar();
+            if (!currentVersion.Equals(SCHEMA)) {
+              throw new ArgumentOutOfRangeException("SCHEMA");
+            }
+          }
+        }
+        catch (Exception ex) {
+          NoticeFormat("Recreating database, schema update. ({0})", ex.Message);
+          Sqlite.ClearPool(connection);
+          connection.Close();
+          connection.Dispose();
+          connection = null;
+          for (var i = 0; i < 10; ++i) {
+            try {
+              GC.Collect();
+              storeFile.Delete();
+              break;
+            }
+            catch (IOException) {
+              Thread.Sleep(100);
+            }
+          }
+          connection = Sqlite.GetDatabaseConnection(storeFile);
+        }
+      }
     }
 
     public void Dispose()
