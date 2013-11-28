@@ -20,8 +20,15 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public FileStoreVacuumer()
     {
-      timer.Interval = rnd.Next(MIN_TIME, MAX_TIME);
       timer.Elapsed += Run;
+      Schedule();
+    }
+
+    private void Schedule()
+    {
+      timer.Interval = rnd.Next(MIN_TIME, MAX_TIME);
+      timer.Enabled = true;
+      DebugFormat("Scheduling next vaccuum in {0}", timer.Interval);
     }
 
     public void Add(IDbConnection connection)
@@ -46,8 +53,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void Run(object sender, ElapsedEventArgs e)
     {
-      timer.Interval = rnd.Next(MIN_TIME, MAX_TIME);
-
       IDbConnection[] conns;
       lock (connections) {
         conns = (from c in connections.Values
@@ -70,6 +75,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
         }
       }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
+
+      Schedule();
     }
 
     private void Vacuum(IDbConnection connection)
@@ -100,6 +107,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           lock (connection) {
             q.ExecuteNonQuery();
           }
+          DebugFormat("Purging {0}", f);
         }
       }
       lock (connection) {
