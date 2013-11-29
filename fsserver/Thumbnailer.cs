@@ -19,10 +19,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    private static readonly ConcurrentQueue<Item> queue = CreateQueue();
-    private static readonly AutoResetEvent signal = new AutoResetEvent(false);
+    private static readonly BlockingCollection<Item> queue = CreateQueue();
 
-    private static ConcurrentQueue<Item> CreateQueue()
+    private static BlockingCollection<Item> CreateQueue()
     {
       new Thread(Run)
       {
@@ -30,16 +29,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Priority = ThreadPriority.Lowest
       }.Start();
 
-      return new ConcurrentQueue<Item>();
+      return new BlockingCollection<Item>(new ConcurrentQueue<Item>());
     }
 
     private static void Run()
     {
       var logger = log4net.LogManager.GetLogger(typeof(Thumbnailer));
-      logger.Debug("thumber started");
-      while (signal.WaitOne()) {
-        Item item;
-        while (queue.TryDequeue(out item)) {
+      logger.Debug("Thumber started");
+      try {
+        for (; ; ) {
+          var item = queue.Take();
           var store = item.Store.Target as FileStore;
           var file = item.File.Target as BaseFile;
           if (store == null || file == null) {
@@ -60,15 +59,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
         }
       }
+      finally {
+        logger.Debug("Thumber stopped");
+      }
     }
 
     public static void AddFiles(FileStore store, IEnumerable<WeakReference> items)
     {
       var storeRef = new WeakReference(store);
       foreach (var i in items) {
-        queue.Enqueue(new Item(storeRef, i));
+        queue.Add(new Item(storeRef, i));
       }
-      signal.Set();
     }
   }
 }
