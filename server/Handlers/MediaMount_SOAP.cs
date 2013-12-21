@@ -182,7 +182,7 @@ namespace NMaier.SimpleDlna.Server
       container.SetAttribute("id", f.Id);
       var parent = f.Parent;
       if (parent == null) {
-        container.SetAttribute("parentID", Identifiers.ROOT);
+        container.SetAttribute("parentID", Identifiers.GeneralRoot);
       }
       else {
         container.SetAttribute("parentID", parent.Id);
@@ -210,7 +210,7 @@ namespace NMaier.SimpleDlna.Server
       var item = result.CreateElement(string.Empty, "item", NS_DIDL);
       item.SetAttribute("restricted", "1");
       item.SetAttribute("id", resource.Id);
-      item.SetAttribute("parentID", Identifiers.ROOT);
+      item.SetAttribute("parentID", Identifiers.GeneralRoot);
 
       item.AppendChild(CreateObjectClass(result, resource));
 
