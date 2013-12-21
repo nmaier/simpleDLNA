@@ -14,7 +14,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private string description;
     private string director;
     private TimeSpan? duration;
-    private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
+    private static readonly TimeSpan EmptyDuration =
+      new TimeSpan(0);
     private string genre;
     private int? height;
     private bool initialized = false;
@@ -162,7 +163,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
           rv.Add("Genre", genre);
         }
         if (width != null && height != null) {
-          rv.Add("Resolution", string.Format("{0}x{1}", width.Value, height.Value));
+          rv.Add(
+            "Resolution",
+            string.Format("{0}x{1}", width.Value, height.Value)
+            );
         }
         return rv;
       }
@@ -193,7 +197,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       info.AddValue("w", width);
       info.AddValue("h", height);
       info.AddValue("b", bookmark);
-      info.AddValue("du", duration.GetValueOrDefault(EmptyDuration).Ticks);
+      info.AddValue(
+        "du",
+        duration.GetValueOrDefault(EmptyDuration).Ticks
+        );
     }
 
     private void MaybeInit()

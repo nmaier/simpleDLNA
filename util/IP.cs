@@ -22,7 +22,8 @@ namespace NMaier.SimpleDlna.Utilities
         }
         catch (Exception ex) {
           if (!warned) {
-            LogManager.GetLogger(typeof(IP)).Warn("Failed to retrieve IP addresses the usual way, falling back to naive mode", ex);
+            LogManager.GetLogger(typeof(IP)).Warn(
+              "Failed to retrieve IP addresses the usual way, falling back to naive mode", ex);
             warned = true;
           }
           return GetIPsFallback();

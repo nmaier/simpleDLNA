@@ -85,7 +85,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
           rv.Add("Creator", creator);
         }
         if (width != null && height != null) {
-          rv.Add("Resolution", string.Format("{0}x{1}", width.Value, height.Value));
+          rv.Add(
+            "Resolution",
+            string.Format("{0}x{1}", width.Value, height.Value)
+            );
         }
         return rv;
       }
@@ -133,13 +136,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
           try {
             var t = (tl as TagLib.Image.File).ImageTag;
-            if (string.IsNullOrWhiteSpace(title = t.Title)) {
+            title = t.Title;
+            if (string.IsNullOrWhiteSpace(title)) {
               title = null;
             }
-            if (string.IsNullOrWhiteSpace(description = t.Comment)) {
+            description = t.Comment;
+            if (string.IsNullOrWhiteSpace(description)) {
               description = null;
             }
-            if (string.IsNullOrWhiteSpace(creator = t.Creator)) {
+            creator = t.Creator;
+            if (string.IsNullOrWhiteSpace(creator)) {
               creator = null;
             }
           }

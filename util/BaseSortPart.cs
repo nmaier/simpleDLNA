@@ -23,7 +23,8 @@ namespace NMaier.SimpleDlna.Utilities
         if (sp != null) {
           return ((StringSortPart)this).CompareTo(sp);
         }
-        return ((NumericSortPart)this).CompareTo((NumericSortPart)other);
+        return ((NumericSortPart)this).CompareTo(
+          (NumericSortPart)other);
       }
       if (type == typeof(StringSortPart)) {
         return 1;

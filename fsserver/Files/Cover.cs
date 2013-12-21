@@ -11,20 +11,21 @@ namespace NMaier.SimpleDlna.FileMediaServer
   [Serializable]
   internal sealed class Cover : Logging, IMediaCoverResource, IMetaInfo, ISerializable
   {
-    private byte[] _bytes;
+    private byte[] bytes;
 
     private readonly FileInfo file;
 
     private int height = 240;
 
-    private static readonly ThumbnailMaker thumber = new ThumbnailMaker();
+    private static readonly ThumbnailMaker thumber =
+      new ThumbnailMaker();
 
     private int width = 240;
 
 
     private Cover(SerializationInfo info, StreamingContext ctx)
     {
-      _bytes = info.GetValue("b", typeof(byte[])) as byte[];
+      bytes = info.GetValue("b", typeof(byte[])) as byte[];
       width = info.GetInt32("w");
       height = info.GetInt32("h");
       var di = ctx.Context as DeserializeInfo;
@@ -36,7 +37,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     internal Cover(FileInfo aFile, Stream aStream)
     {
-      _bytes = thumber.GetThumbnail(aFile.FullName, DlnaMediaTypes.Image, aStream, ref width, ref height);
+      bytes = thumber.GetThumbnail(
+        aFile.FullName,
+        DlnaMediaTypes.Image,
+        aStream,
+        ref width,
+        ref height
+        );
     }
 
 
@@ -49,17 +56,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
     internal event EventHandler OnCoverLazyLoaded;
 
 
-    private byte[] bytes
+    private byte[] Bytes
     {
       get
       {
-        if (_bytes == null) {
+        if (bytes == null) {
           ForceLoad();
         }
-        if (_bytes.Length == 0) {
+        if (bytes.Length == 0) {
           throw new NotSupportedException();
         }
-        return _bytes;
+        return bytes;
       }
     }
 
@@ -68,7 +75,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        return new MemoryStream(bytes);
+        return new MemoryStream(Bytes);
       }
     }
     public string Id
@@ -97,7 +104,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       get
       {
         try {
-          var b = bytes;
+          var b = Bytes;
           if (b != null) {
             return b.Length;
           }
@@ -169,8 +176,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
     internal void ForceLoad()
     {
       try {
-        if (_bytes == null) {
-          _bytes = thumber.GetThumbnail(file, ref width, ref height);
+        if (bytes == null) {
+          bytes = thumber.GetThumbnail(
+            file,
+            ref width,
+            ref height
+            );
         }
       }
       catch (NotSupportedException ex) {
@@ -179,8 +190,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       catch (Exception ex) {
         Warn("Failed to load thumb for " + file.FullName, ex);
       }
-      if (_bytes == null) {
-        _bytes = new byte[0];
+      if (bytes == null) {
+        bytes = new byte[0];
       }
       if (OnCoverLazyLoaded != null) {
         OnCoverLazyLoaded(this, null);
@@ -198,7 +209,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (info == null) {
         throw new ArgumentNullException("info");
       }
-      info.AddValue("b", _bytes);
+      info.AddValue("b", bytes);
       info.AddValue("w", width);
       info.AddValue("h", height);
     }

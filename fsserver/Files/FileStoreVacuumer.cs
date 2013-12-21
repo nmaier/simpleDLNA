@@ -14,7 +14,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private const int MIN_TIME = 30 * 60 * 1000;
     private const int MAX_TIME = 240 * 60 * 1000;
 
-    private readonly Dictionary<string, WeakReference> connections = new Dictionary<string, WeakReference>();
+    private readonly Dictionary<string, WeakReference> connections =
+      new Dictionary<string, WeakReference>();
     private readonly Timer timer = new Timer();
     private readonly Random rnd = new Random();
 
@@ -34,7 +35,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public void Add(IDbConnection connection)
     {
       lock (connections) {
-        connections[connection.ConnectionString] = new WeakReference(connection);
+        connections[connection.ConnectionString] =
+          new WeakReference(connection);
       }
     }
     public void Remove(IDbConnection connection)

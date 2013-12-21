@@ -6,17 +6,17 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public class Logging : ILog
   {
-    private ILog _logger;
+    private ILog instance;
 
 
     private ILog logger
     {
       get
       {
-        if (_logger == null) {
-          _logger = LogManager.GetLogger(GetType());
+        if (instance == null) {
+          instance = LogManager.GetLogger(GetType());
         }
-        return _logger;
+        return instance;
       }
     }
 

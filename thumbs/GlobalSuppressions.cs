@@ -3,3 +3,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Scope = "member", Target = "NMaier.SimpleDlna.Thumbnails.VideoThumbnailer.#GetThumbnailFromProcess(System.Diagnostics.Process,System.Int32&,System.Int32&)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dlna", Scope = "namespace", Target = "NMaier.SimpleDlna.Thumbnails")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ffmpeg", Scope = "member", Target = "NMaier.SimpleDlna.Thumbnails.VideoThumbnails.#.ctor()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2243:AttributeStringLiteralsShouldParseCorrectly")]

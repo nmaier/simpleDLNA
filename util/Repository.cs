@@ -51,7 +51,9 @@ namespace NMaier.SimpleDlna.Utilities
     public static TInterface Lookup(string name)
     {
       if (string.IsNullOrWhiteSpace(name)) {
-        throw new ArgumentException("Invalid repository name", "name");
+        throw new ArgumentException(
+          "Invalid repository name",
+          "name");
       }
       var n_p = name.Split(new char[] { ':' }, 2);
       name = n_p[0].ToLower().Trim();
@@ -86,7 +88,9 @@ namespace NMaier.SimpleDlna.Utilities
         return item;
       }
       catch (Exception ex) {
-        throw new RepositoryLookupException(string.Format("Cannot construct repository item: {0}", ex.Message), ex);
+        throw new RepositoryLookupException(string.Format(
+          "Cannot construct repository item: {0}",
+          ex.Message), ex);
       }
     }
   }

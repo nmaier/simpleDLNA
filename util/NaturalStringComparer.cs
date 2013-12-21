@@ -5,11 +5,14 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public class NaturalStringComparer : StringComparer
   {
-    private static readonly StringComparer comparer = StringComparer.CurrentCultureIgnoreCase;
+    private static readonly StringComparer comparer =
+      StringComparer.CurrentCultureIgnoreCase;
 
-    private static readonly bool platformSupport = HasPlatformSupport();
+    private static readonly bool platformSupport =
+      HasPlatformSupport();
 
-    private readonly LeastRecentlyUsedDictionary<string, BaseSortPart[]> partsCache = new LeastRecentlyUsedDictionary<string, BaseSortPart[]>(5000);
+    private readonly LeastRecentlyUsedDictionary<string, BaseSortPart[]> partsCache =
+      new LeastRecentlyUsedDictionary<string, BaseSortPart[]>(5000);
 
     private readonly bool stemBase;
 

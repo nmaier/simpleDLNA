@@ -16,7 +16,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private const uint SCHEMA = 0x20131101;
 
-    private static readonly FileStoreVacuumer vacuumer = new FileStoreVacuumer();
+    private static readonly FileStoreVacuumer vacuumer =
+      new FileStoreVacuumer();
     private readonly static object globalLock = new object();
     private readonly IDbConnection connection;
     private readonly IDbCommand insert;
@@ -41,6 +42,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
       OpenConnection(storeFile, out connection);
       SetupDatabase();
+
       select = connection.CreateCommand();
       select.CommandText = "SELECT data FROM store WHERE key = ? AND size = ? AND time = ?";
       select.Parameters.Add(selectKey = select.CreateParameter());
@@ -98,12 +100,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    private void OpenConnection(FileInfo storeFile, out IDbConnection connection)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly")]
+    private void OpenConnection(FileInfo storeFile, out IDbConnection newConnection)
     {
       lock (globalLock) {
-        connection = Sqlite.GetDatabaseConnection(storeFile);
+        newConnection = Sqlite.GetDatabaseConnection(storeFile);
         try {
-          using (var ver = connection.CreateCommand()) {
+          using (var ver = newConnection.CreateCommand()) {
             ver.CommandText = "PRAGMA user_version";
             var currentVersion = (uint)(long)ver.ExecuteScalar();
             if (!currentVersion.Equals(SCHEMA)) {
@@ -112,11 +115,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
         }
         catch (Exception ex) {
-          NoticeFormat("Recreating database, schema update. ({0})", ex.Message);
-          Sqlite.ClearPool(connection);
-          connection.Close();
-          connection.Dispose();
-          connection = null;
+          NoticeFormat(
+            "Recreating database, schema update. ({0})",
+            ex.Message
+            );
+          Sqlite.ClearPool(newConnection);
+          newConnection.Close();
+          newConnection.Dispose();
+          newConnection = null;
           for (var i = 0; i < 10; ++i) {
             try {
               GC.Collect();
@@ -127,7 +133,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
               Thread.Sleep(100);
             }
           }
-          connection = Sqlite.GetDatabaseConnection(storeFile);
+          newConnection = Sqlite.GetDatabaseConnection(storeFile);
         }
       }
     }
@@ -169,8 +175,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       try {
         using (var s = new MemoryStream(data)) {
-          var ctx = new StreamingContext(StreamingContextStates.Persistence, new DeserializeInfo(server, info, type));
-          var formatter = new BinaryFormatter(null, ctx) { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
+          var ctx = new StreamingContext(
+            StreamingContextStates.Persistence,
+            new DeserializeInfo(server, info, type));
+          var formatter = new BinaryFormatter(null, ctx)
+          {
+            TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
+            AssemblyFormat = FormatterAssemblyStyle.Simple
+          };
           var rv = formatter.Deserialize(s) as BaseFile;
           rv.Item = info;
           return rv;
@@ -232,8 +244,15 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       try {
         using (var s = new MemoryStream(data)) {
-          var ctx = new StreamingContext(StreamingContextStates.Persistence, new DeserializeInfo(null, info, DlnaMime.JPEG));
-          var formatter = new BinaryFormatter(null, ctx) { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
+          var ctx = new StreamingContext(
+            StreamingContextStates.Persistence,
+            new DeserializeInfo(null, info, DlnaMime.JPEG)
+            );
+          var formatter = new BinaryFormatter(null, ctx)
+          {
+            TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
+            AssemblyFormat = FormatterAssemblyStyle.Simple
+          };
           var rv = formatter.Deserialize(s) as Cover;
           return rv;
         }
@@ -258,8 +277,15 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       try {
         using (var s = new MemoryStream()) {
-          var ctx = new StreamingContext(StreamingContextStates.Persistence, null);
-          var formatter = new BinaryFormatter(null, ctx) { TypeFormat = FormatterTypeStyle.TypesWhenNeeded, AssemblyFormat = FormatterAssemblyStyle.Simple };
+          var ctx = new StreamingContext(
+            StreamingContextStates.Persistence,
+            null
+            );
+          var formatter = new BinaryFormatter(null, ctx)
+          {
+            TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
+            AssemblyFormat = FormatterAssemblyStyle.Simple
+          };
           formatter.Serialize(s, file);
 
           lock (connection) {

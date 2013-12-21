@@ -5,13 +5,21 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public static class Formatting
   {
-    private readonly static Regex sanitizer = new Regex(@"\b(?:the|an?|ein(?:e[rs]?)?|der|die|das)\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private readonly static Regex sanitizer = new Regex(
+      @"\b(?:the|an?|ein(?:e[rs]?)?|der|die|das)\b",
+      RegexOptions.IgnoreCase | RegexOptions.Compiled
+      );
 
-    private readonly static Regex trim = new Regex(@"\s+|^[._+)}\]-]+|[._+({\[-]+$", RegexOptions.Compiled);
+    private readonly static Regex trim = new Regex(
+      @"\s+|^[._+)}\]-]+|[._+({\[-]+$",
+      RegexOptions.Compiled
+      );
 
-    private readonly static Regex trimmore = new Regex(@"^[^\d\w]+|[^\d\w]+$", RegexOptions.Compiled);
+    private readonly static Regex trimmore =
+      new Regex(@"^[^\d\w]+|[^\d\w]+$", RegexOptions.Compiled);
 
-    private readonly static Regex respace = new Regex(@"[.+]+", RegexOptions.Compiled);
+    private readonly static Regex respace =
+      new Regex(@"[.+]+", RegexOptions.Compiled);
 
     public static string FormatFileSize(this long size)
     {
@@ -44,7 +52,9 @@ namespace NMaier.SimpleDlna.Utilities
         throw new ArgumentNullException("name");
       }
 
-      var san = trimmore.Replace(sanitizer.Replace(name, string.Empty), string.Empty).Trim();
+      var san = trimmore.Replace(
+        sanitizer.Replace(name, string.Empty),
+        string.Empty).Trim();
       if (string.IsNullOrWhiteSpace(san)) {
         return name;
       }

@@ -22,13 +22,18 @@ namespace NMaier.SimpleDlna.Utilities
         new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
     };
     private readonly static LeastRecentlyUsedDictionary<FileInfo, IDictionary<string, string>> infoCache = new LeastRecentlyUsedDictionary<FileInfo, IDictionary<string, string>>(500);
-    private static readonly Regex RegLine = new Regex(@"^(?:ID|META)_([\w\d_]+)=(.+)$", RegexOptions.Compiled);
-    private static readonly Regex RegDuration = new Regex(@"Duration: ([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.([0-9]+))?", RegexOptions.Compiled);
-    private static readonly Regex RegDimensions = new Regex(@"Video: .+ ([0-9]{2,})x([0-9]{2,}) ", RegexOptions.Compiled);
+    private static readonly Regex RegLine =
+      new Regex(@"^(?:ID|META)_([\w\d_]+)=(.+)$", RegexOptions.Compiled);
+    private static readonly Regex RegDuration =
+      new Regex(@"Duration: ([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.([0-9]+))?", RegexOptions.Compiled);
+    private static readonly Regex RegDimensions =
+      new Regex(@"Video: .+ ([0-9]{2,})x([0-9]{2,}) ", RegexOptions.Compiled);
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fidentify")]
-    public static readonly string FFidentifyExecutable = FindExecutable("ffidentify");
+    public static readonly string FFidentifyExecutable =
+      FindExecutable("ffidentify");
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fmpeg")]
-    public static readonly string FFmpegExecutable = FindExecutable("ffmpeg");
+    public static readonly string FFmpegExecutable =
+      FindExecutable("ffmpeg");
 
 
     public static Size GetFileDimensions(FileInfo file)
@@ -198,16 +203,20 @@ namespace NMaier.SimpleDlna.Utilities
 
     private static string FindExecutable(string executable)
     {
-      var isWin = Environment.OSVersion.Platform.ToString().ToLower().Contains("win");
+      var isWin = Environment.OSVersion.Platform.ToString()
+        .ToLower().Contains("win");
       if (isWin) {
         executable += ".exe";
       }
       List<DirectoryInfo> places = new List<DirectoryInfo>();
-      places.Add(new FileInfo(Assembly.GetExecutingAssembly().Location).Directory);
+      places.Add(new FileInfo(
+        Assembly.GetExecutingAssembly().Location).Directory);
       try {
-        places.Add(new DirectoryInfo(Environment.GetEnvironmentVariable("FFMPEG_HOME")));
+        places.Add(new DirectoryInfo(
+          Environment.GetEnvironmentVariable("FFMPEG_HOME")));
       }
       catch (Exception) {
+        // no op
       }
       foreach (var l in specialLocations) {
         try {
@@ -235,7 +244,11 @@ namespace NMaier.SimpleDlna.Utilities
             var r = di.GetFiles(executable, SearchOption.TopDirectoryOnly);
             if (r.Length != 0) {
               var rv = r[0];
-              LogManager.GetLogger(typeof(FFmpeg)).InfoFormat("Found {0} at {1}", executable, rv.FullName);
+              LogManager.GetLogger(typeof(FFmpeg)).InfoFormat(
+                "Found {0} at {1}",
+                executable,
+                rv.FullName
+                );
               return rv.FullName;
             }
           }
@@ -244,7 +257,8 @@ namespace NMaier.SimpleDlna.Utilities
           }
         }
       }
-      LogManager.GetLogger(typeof(FFmpeg)).Warn("Did not find " + executable);
+      LogManager.GetLogger(typeof(FFmpeg)).WarnFormat(
+        "Did not find {0}", executable);
       return null;
     }
   }

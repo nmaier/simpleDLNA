@@ -167,7 +167,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
         MaybeInit();
         if (!string.IsNullOrWhiteSpace(title)) {
           if (track.HasValue) {
-            return string.Format("{0:D2}. — {1}", track.Value, title);
+            return string.Format(
+              "{0:D2}. — {1}",
+              track.Value,
+              title
+              );
           }
           return title;
         }
@@ -180,7 +184,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (track.HasValue && other is AudioFile) {
         var oa = other as AudioFile;
         int rv;
-        if (oa.track.HasValue && (rv = track.Value.CompareTo(oa.track.Value)) != 0) {
+        if (oa.track.HasValue &&
+          (rv = track.Value.CompareTo(oa.track.Value)) != 0) {
           return rv;
         }
       }
@@ -198,7 +203,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       info.AddValue("p", performer);
       info.AddValue("ti", title);
       info.AddValue("tr", track);
-      info.AddValue("d", duration.GetValueOrDefault(EmptyDuration).Ticks);
+      info.AddValue(
+        "d",
+        duration.GetValueOrDefault(EmptyDuration).Ticks
+        );
     }
 
     private void InitCover(TagLib.Tag tag)
@@ -324,6 +332,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public override void LoadCover()
     {
+      // No op
     }
   }
 }

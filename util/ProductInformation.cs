@@ -9,7 +9,8 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCompanyAttribute), false);
+        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(
+          typeof(AssemblyCompanyAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
@@ -20,7 +21,8 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(
+          typeof(AssemblyCopyrightAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
@@ -31,25 +33,30 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false);
+        var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
+          typeof(AssemblyInformationalVersionAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
-        return ((AssemblyInformationalVersionAttribute)attributes[0]).InformationalVersion;
+        var infoVersionAttr =
+          (AssemblyInformationalVersionAttribute)attributes[0];
+        return infoVersionAttr.InformationalVersion;
       }
     }
     public static string Title
     {
       get
       {
-        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+        var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(
+          typeof(AssemblyTitleAttribute), false);
         if (attributes.Length > 0) {
           var titleAttribute = (AssemblyTitleAttribute)attributes[0];
           if (!string.IsNullOrWhiteSpace(titleAttribute.Title)) {
             return titleAttribute.Title;
           }
         }
-        return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
+        return System.IO.Path.GetFileNameWithoutExtension(
+          Assembly.GetExecutingAssembly().CodeBase);
       }
     }
   }

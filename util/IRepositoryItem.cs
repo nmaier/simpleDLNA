@@ -5,6 +5,6 @@ namespace NMaier.SimpleDlna.Utilities
     string Description { get; }
     string Name { get; }
 
-    void SetParameters(AttributeCollection parameters) ;
+    void SetParameters(AttributeCollection parameters);
   }
 }

@@ -13,6 +13,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
+    private readonly static StringComparer icomparer = StringComparer.CurrentCultureIgnoreCase;
+
     private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
 
     private readonly Guid uuid = Guid.NewGuid();
@@ -42,17 +44,29 @@ namespace NMaier.SimpleDlna.FileMediaServer
       this.ids = ids;
       this.directories = directories.Distinct().ToArray();
       if (this.directories.Length == 0) {
-        throw new ArgumentException("Provide one or more directories", "directories");
+        throw new ArgumentException(
+          "Provide one or more directories",
+          "directories"
+          );
       }
       var parent = this.directories[0].Parent;
       if (parent == null) {
         parent = this.directories[0];
       }
       if (this.directories.Length == 1) {
-        FriendlyName = string.Format("{0} ({1})", this.directories[0].Name, parent.FullName);
+        FriendlyName = string.Format(
+          "{0} ({1})",
+          this.directories[0].Name,
+          parent.FullName
+          );
       }
       else {
-        FriendlyName = string.Format("{0} ({1}) + {2}", this.directories[0].Name, parent.FullName, this.directories.Length - 1);
+        FriendlyName = string.Format(
+          "{0} ({1}) + {2}",
+          this.directories[0].Name,
+          parent.FullName,
+          this.directories.Length - 1
+          );
       }
       watchers = (from d in directories
                   select new FileSystemWatcher(d.FullName)).ToArray();
@@ -94,20 +108,51 @@ namespace NMaier.SimpleDlna.FileMediaServer
       lock (this) {
         IMediaFolder newMaster;
         if (directories.Length == 1) {
-          newMaster = new PlainRootFolder(this, types, directories[0]);
+          newMaster = new PlainRootFolder(
+            this,
+            types,
+            directories[0]
+            );
         }
         else {
-          var virtualMaster = new VirtualFolder(null, FriendlyName, Identifiers.ROOT);
+          var virtualMaster = new VirtualFolder(
+            null,
+            FriendlyName,
+            Identifiers.GeneralRoot
+            );
           foreach (var d in directories) {
-            virtualMaster.Merge(new PlainRootFolder(this, types, d));
+            virtualMaster.Merge(
+              new PlainRootFolder(this, types, d)
+              );
           }
           newMaster = virtualMaster;
         }
         lock (ids) {
-          ids.RegisterFolder(Identifiers.ROOT, newMaster);
-          ids.RegisterFolder(Identifiers.IMAGES, new VirtualClonedFolder(newMaster, Identifiers.IMAGES, types & DlnaMediaTypes.Image));
-          ids.RegisterFolder(Identifiers.AUDIO, new VirtualClonedFolder(newMaster, Identifiers.AUDIO, types & DlnaMediaTypes.Audio));
-          ids.RegisterFolder(Identifiers.VIDEO, new VirtualClonedFolder(newMaster, Identifiers.VIDEO, types & DlnaMediaTypes.Video));
+          ids.RegisterFolder(Identifiers.GeneralRoot, newMaster);
+          ids.RegisterFolder(
+            Identifiers.SamsungImages,
+            new VirtualClonedFolder(
+              newMaster,
+              Identifiers.SamsungImages,
+              types & DlnaMediaTypes.Image
+              )
+            );
+          ids.RegisterFolder(
+            Identifiers.SamsungAudio,
+            new VirtualClonedFolder(
+              newMaster,
+              Identifiers.SamsungAudio,
+              types & DlnaMediaTypes.Audio
+              )
+            );
+          ids.RegisterFolder(
+            Identifiers.SamsungVideo,
+            new VirtualClonedFolder(
+              newMaster,
+              Identifiers.SamsungVideo,
+              types & DlnaMediaTypes.Video
+              )
+            );
         }
       }
 
@@ -116,7 +161,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void OnChanged(Object source, FileSystemEventArgs e)
     {
-      if (store != null && e.FullPath.ToLower() == store.StoreFile.FullName.ToLower()) {
+      if (store != null && icomparer.Equals(e.FullPath, store.StoreFile.FullName)) {
         return;
       }
       DebugFormat("File System changed: {0}", e.FullPath);
@@ -138,9 +183,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
 
         try {
-          Notice("Rescanning...");
+          NoticeFormat("Rescanning {0}...", FriendlyName);
           DoRoot();
-          Notice("Done rescanning...");
+          NoticeFormat("Done rescanning {0}...", FriendlyName);
         }
         catch (Exception ex) {
           Error(ex);
@@ -150,7 +195,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
         if (Changed != null) {
           Changed.Invoke(this, EventArgs.Empty);
         }
-      }, TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
+      },
+      TaskCreationOptions.AttachedToParent | TaskCreationOptions.LongRunning);
     }
 
     private void RescanTimer(object sender, ElapsedEventArgs e)
@@ -178,13 +224,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       switch (changeType) {
         case WatcherChangeTypes.Deleted:
-          changeTimer.Interval = TimeSpan.FromSeconds(2).TotalMilliseconds;
+          changeTimer.Interval =
+            TimeSpan.FromSeconds(2).TotalMilliseconds;
           break;
         case WatcherChangeTypes.Renamed:
-          changeTimer.Interval = TimeSpan.FromSeconds(10).TotalMilliseconds;
+          changeTimer.Interval =
+            TimeSpan.FromSeconds(10).TotalMilliseconds;
           break;
         default:
-          changeTimer.Interval = TimeSpan.FromSeconds(30).TotalMilliseconds;
+          changeTimer.Interval =
+            TimeSpan.FromSeconds(30).TotalMilliseconds;
           break;
       }
       var diff = DateTime.Now - lastChanged;
@@ -219,11 +268,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
       lock (ids) {
         item = ids.GetItemByPath(info.FullName) as BaseFile;
       }
-      if (item != null && item.InfoDate == info.LastAccessTimeUtc && item.InfoSize == info.Length) {
+      if (item != null &&
+        item.InfoDate == info.LastAccessTimeUtc &&
+        item.InfoSize == info.Length) {
         return item;
       }
 
-      var ext = re_sansitizeExt.Replace(info.Extension.ToLower().Substring(1), string.Empty);
+      var ext = re_sansitizeExt.Replace(
+        info.Extension.ToLower().Substring(1),
+        string.Empty
+        );
       var type = DlnaMaps.Ext2Dlna[ext];
       var mediaType = DlnaMaps.Ext2Media[ext];
 

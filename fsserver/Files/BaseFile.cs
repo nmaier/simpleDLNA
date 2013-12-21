@@ -8,9 +8,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo, ITitleComparable
   {
-    private WeakReference _cover = new WeakReference(null);
+    private WeakReference weakCover = new WeakReference(null);
 
-    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache = new LeastRecentlyUsedDictionary<string, Cover>(500);
+    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache =
+      new LeastRecentlyUsedDictionary<string, Cover>(500);
 
     private DateTime? lastModified = null;
 
@@ -45,6 +46,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           title = Uri.UnescapeDataString(title);
         }
         catch (UriFormatException) {
+          // no op
         }
       }
       title = title.StemNameBase();
@@ -55,14 +57,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        return _cover.Target as Cover;
+        return weakCover.Target as Cover;
       }
       set
       {
         if (value != null) {
           coverCache[Item.FullName] = value;
         }
-        _cover = new WeakReference(value);
+        weakCover = new WeakReference(value);
       }
     }
     protected FileServer Server
@@ -221,7 +223,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
         case DlnaMediaTypes.Image:
           return new ImageFile(aParentFolder.Server, aFile, aType);
         default:
-          return new BaseFile(aParentFolder.Server, aFile, aType, aMediaType);
+          return new BaseFile(
+            aParentFolder.Server,
+            aFile,
+            aType,
+            aMediaType
+            );
       }
     }
 

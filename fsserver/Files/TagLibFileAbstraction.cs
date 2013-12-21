@@ -25,7 +25,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        return info.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        return info.Open(
+          FileMode.Open,
+          FileAccess.Read,
+          FileShare.ReadWrite
+          );
       }
     }
     public Stream WriteStream

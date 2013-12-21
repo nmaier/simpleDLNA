@@ -37,7 +37,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       var files = new List<BaseFile>();
       foreach (var f in rawfiles) {
         var ext = f.Extension;
-        if (string.IsNullOrEmpty(ext) || !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
+        if (string.IsNullOrEmpty(ext) ||
+          !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
           continue;
         }
         try {
