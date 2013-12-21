@@ -25,6 +25,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private readonly Identifiers ids;
 
+    private DateTime lastChanged = DateTime.Now;
+
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private FileStore store = null;
 
@@ -185,7 +187,22 @@ namespace NMaier.SimpleDlna.FileMediaServer
           changeTimer.Interval = TimeSpan.FromSeconds(30).TotalMilliseconds;
           break;
       }
+      var diff = DateTime.Now - lastChanged;
+      if (diff.TotalSeconds <= 30) {
+        // Avoid thrashing
+        changeTimer.Interval = Math.Max(
+          TimeSpan.FromSeconds(20).TotalMilliseconds,
+          changeTimer.Interval
+          );
+        InfoFormat("Avoid thrashing {0}", changeTimer.Interval);
+      }
+      DebugFormat(
+        "Change in {0} on {1}",
+        changeTimer.Interval,
+        FriendlyName
+        );
       changeTimer.Enabled = true;
+      lastChanged = DateTime.Now;
     }
 
     internal Cover GetCover(BaseFile file)

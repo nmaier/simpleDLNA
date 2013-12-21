@@ -35,7 +35,8 @@ namespace NMaier.SimpleDlna.GUI
     private readonly FileInfo logFile = new FileInfo(Path.Combine(cacheDir, "sdlna.log"));
 #endif
     private bool canClose = false;
-    private readonly System.Timers.Timer logAppendTimer = new System.Timers.Timer(500);
+    private readonly object appenderLock = new object();
+    private readonly System.Timers.Timer appenderTimer = new System.Timers.Timer(2000);
     private readonly ConcurrentQueue<LogEntry> pendingLogEntries = new ConcurrentQueue<LogEntry>();
 
     private static string cacheDir
@@ -70,7 +71,7 @@ namespace NMaier.SimpleDlna.GUI
       listImages.Images.Add("warn", Properties.Resources.warn);
       listImages.Images.Add("error", Properties.Resources.error);
 
-      logAppendTimer.Elapsed += (s, e) =>
+      appenderTimer.Elapsed += (s, e) =>
       {
         BeginInvoke((Action)(() =>
         {
@@ -256,6 +257,9 @@ namespace NMaier.SimpleDlna.GUI
       if (!logging) {
         return;
       }
+      if (loggingEvent == null) {
+        return;
+      }
       if (loggingEvent.Level < Level.Notice) {
         return;
       }
@@ -276,15 +280,15 @@ namespace NMaier.SimpleDlna.GUI
         Message = loggingEvent.RenderedMessage,
         Time = loggingEvent.TimeStamp.ToString("T")
       });
-      lock (logAppendTimer) {
-        logAppendTimer.Enabled = true;
+      lock (appenderLock) {
+        appenderTimer.Enabled = true;
       }
     }
 
     public void DoAppendInternal(object sender, System.Timers.ElapsedEventArgs e)
     {
-      lock (logAppendTimer) {
-        logAppendTimer.Enabled = false;
+      lock (appenderLock) {
+        appenderTimer.Enabled = false;
       }
       if (!logging) {
         return;
