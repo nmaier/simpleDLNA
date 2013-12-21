@@ -1,25 +1,13 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
+﻿using System;
 using System.Linq;
-using System;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal class NewView : BaseView
   {
     private DateTime minDate = DateTime.Now.AddDays(-7.0);
-
-    public override void SetParameters(AttributeCollection parameters)
-    {
-      base.SetParameters(parameters);
-
-      foreach (var v in parameters.GetValuesForKey("date")) {
-        DateTime min;
-        if (DateTime.TryParse(v, out min)) {
-          minDate = min;
-        }
-      }
-    }
 
 
     public override string Description
@@ -55,6 +43,21 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
+
+    public override void SetParameters(AttributeCollection parameters)
+    {
+      if (parameters == null) {
+        throw new ArgumentNullException("parameters");
+      }
+      base.SetParameters(parameters);
+
+      foreach (var v in parameters.GetValuesForKey("date")) {
+        DateTime min;
+        if (DateTime.TryParse(v, out min)) {
+          minDate = min;
+        }
+      }
+    }
 
     public override IMediaFolder Transform(IMediaFolder root)
     {

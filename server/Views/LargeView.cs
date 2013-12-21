@@ -1,25 +1,13 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
+﻿using System;
 using System.Linq;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal class LargeView : BaseView
   {
     private long minSize = 300 * 1024 * 1024;
-
-    public override void SetParameters(AttributeCollection parameters)
-    {
-      base.SetParameters(parameters);
-
-      foreach (var v in parameters.GetValuesForKey("size")) {
-        var min = 0L;
-        if (long.TryParse(v, out min) && min > 0) {
-          minSize = min * 1024 * 1024;
-          break;
-        }
-      }
-    }
 
 
     public override string Description
@@ -55,6 +43,22 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
+
+    public override void SetParameters(AttributeCollection parameters)
+    {
+      if (parameters == null) {
+        throw new ArgumentNullException("parameters");
+      }
+      base.SetParameters(parameters);
+
+      foreach (var v in parameters.GetValuesForKey("size")) {
+        var min = 0L;
+        if (long.TryParse(v, out min) && min > 0) {
+          minSize = min * 1024 * 1024;
+          break;
+        }
+      }
+    }
 
     public override IMediaFolder Transform(IMediaFolder root)
     {
