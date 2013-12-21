@@ -14,6 +14,8 @@ namespace NMaier.SimpleDlna.Server
 
     private const int BUFFER_SIZE = 1 << 16;
 
+    private const string CRLF = "\r\n";
+
 
     private string body;
 
@@ -173,6 +175,49 @@ namespace NMaier.SimpleDlna.Server
       return contentLength;
     }
 
+    private Stream ProcessRanges(IResponse response)
+    {
+      var responseBody = response.Body;
+      var st = response.Status;
+      var contentLength = GetContentLengthFromStream(responseBody);
+      string ar;
+      if (st != HttpCodes.OK && contentLength > 0 || !headers.TryGetValue("Range", out ar)) {
+        return responseBody;
+      }
+      try {
+        var m = bytes.Match(ar);
+        if (!m.Success) {
+          throw new InvalidDataException("Not parsed!");
+        }
+        var totalLength = contentLength;
+        var start = 0L;
+        var end = totalLength - 1;
+        if (!long.TryParse(m.Groups[1].Value, out start) || start < 0) {
+          throw new InvalidDataException("Not parsed");
+        }
+        if (m.Groups.Count != 3 || !long.TryParse(m.Groups[2].Value, out end) || end <= start || end >= totalLength) {
+          end = totalLength - 1;
+        }
+        if (start >= end) {
+          responseBody.Close();
+          response = Error416.HandleRequest(this);
+          return response.Body;
+        }
+
+        if (start > 0) {
+          responseBody.Seek(start, SeekOrigin.Current);
+        }
+        contentLength = end - start + 1;
+        response.Headers["Content-Length"] = contentLength.ToString();
+        response.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, totalLength));
+        st = HttpCodes.PARTIAL;
+      }
+      catch (Exception ex) {
+        Warn(String.Format("{0} - Failed to process range request!", this), ex);
+      }
+      return responseBody;
+    }
+
     private void Read()
     {
       try {
@@ -282,62 +327,24 @@ namespace NMaier.SimpleDlna.Server
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void SendResponse()
     {
-      var responseBody = response.Body;
-      var st = response.Status;
+      var responseBody = ProcessRanges(response);
+      var statusCode = response.Status;
 
-      var contentLength = GetContentLengthFromStream(responseBody);
+      var headerBlock = new StringBuilder();
+      headerBlock.AppendFormat("HTTP/1.1 {0} {1}\r\n", (uint)statusCode, HttpPhrases.Phrases[statusCode]);
+      headerBlock.Append(response.Headers.HeaderBlock);
+      headerBlock.Append(CRLF);
 
-      string ar;
-      if (st == HttpCodes.OK && contentLength > 0 && headers.TryGetValue("Range", out ar)) {
-        try {
-          var m = bytes.Match(ar);
-          if (!m.Success) {
-            throw new InvalidDataException("Not parsed!");
-          }
-          var totalLength = contentLength;
-          var start = 0L;
-          var end = totalLength - 1;
-          if (!long.TryParse(m.Groups[1].Value, out start) || start < 0) {
-            throw new InvalidDataException("Not parsed");
-          }
-          if (m.Groups.Count != 3 || !long.TryParse(m.Groups[2].Value, out end) || end <= start || end >= totalLength) {
-            end = totalLength - 1;
-          }
-          if (start >= end) {
-            responseBody.Close();
-            response = Error416.HandleRequest(this);
-            SendResponse();
-            return;
-          }
-
-          if (start > 0) {
-            responseBody.Seek(start, SeekOrigin.Current);
-          }
-          contentLength = end - start + 1;
-          response.Headers["Content-Length"] = contentLength.ToString();
-          response.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, totalLength));
-          st = HttpCodes.PARTIAL;
-        }
-        catch (Exception ex) {
-          Warn(String.Format("{0} - Failed to process range request!", this), ex);
-        }
-      }
-
-      var hb = new StringBuilder();
-      hb.AppendFormat("HTTP/1.1 {0} {1}\r\n", (uint)st, HttpPhrases.Phrases[st]);
-      hb.Append(response.Headers.HeaderBlock);
-      hb.Append("\r\n");
-
-      var rs = new ConcatenatedStream();
+      var responseStream = new ConcatenatedStream();
       try {
-        var headerStream = new MemoryStream(Encoding.ASCII.GetBytes(hb.ToString()));
-        rs.AddStream(headerStream);
+        var headerStream = new MemoryStream(Encoding.ASCII.GetBytes(headerBlock.ToString()));
+        responseStream.AddStream(headerStream);
         if (method != "HEAD" && responseBody != null) {
-          rs.AddStream(responseBody);
+          responseStream.AddStream(responseBody);
         }
-        InfoFormat("{0} - {1} response for {2}", this, (uint)st, path);
+        InfoFormat("{0} - {1} response for {2}", this, (uint)statusCode, path);
         state = HttpStates.WRITING;
-        new StreamPump(rs, stream, (pump, result) =>
+        new StreamPump(responseStream, stream, (pump, result) =>
         {
           pump.Input.Close();
           pump.Input.Dispose();
@@ -354,7 +361,7 @@ namespace NMaier.SimpleDlna.Server
         }, BUFFER_SIZE);
       }
       catch (Exception) {
-        rs.Dispose();
+        responseStream.Dispose();
         throw;
       }
     }
