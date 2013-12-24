@@ -2,7 +2,7 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal abstract class BaseView : IView
+  internal abstract class BaseView : Logging, IView
   {
     public abstract string Description { get; }
     public abstract string Name { get; }

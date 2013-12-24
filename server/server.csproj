@@ -134,6 +134,7 @@
     <Compile Include="Types\VirtualFolder.cs" />
     <Compile Include="Views\BaseView.cs" />
     <Compile Include="Views\ByTitleView.cs" />
+    <Compile Include="Views\FilterView.cs" />
     <Compile Include="Views\NewView.cs" />
     <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Views\IView.cs" />
