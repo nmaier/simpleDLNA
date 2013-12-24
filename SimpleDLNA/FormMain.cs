@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Collections.Concurrent;
+using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
@@ -269,9 +270,10 @@ namespace NMaier.SimpleDlna.GUI
       if (loggingEvent.Level >= Level.Error) {
         key = "error";
       }
-      else if (loggingEvent.Level >= Level.Warn) {
-        key = "warn";
-      }
+      else
+        if (loggingEvent.Level >= Level.Warn) {
+          key = "warn";
+        }
       pendingLogEntries.Enqueue(new LogEntry()
       {
         Class = cls,
@@ -415,6 +417,36 @@ namespace NMaier.SimpleDlna.GUI
       }
       catch (Exception ex) {
         MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
+    }
+
+    private void dropCacheToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      var res = MessageBox.Show(
+        this,
+        "Are you sure you want to drop the cache?",
+        "Drop cache",
+        MessageBoxButtons.YesNo,
+        MessageBoxIcon.Warning);
+      if (res != DialogResult.Yes) {
+        return;
+      }
+      var running = (from ServerListViewItem item in listDescriptions.Items
+                     where item.Description.Active
+                     select item).ToList();
+      foreach (var item in running) {
+        item.Toggle();
+      }
+      try {
+        if (cacheFile.Exists) {
+          cacheFile.Delete();
+        }
+      }
+      catch (Exception ex) {
+        LogManager.GetLogger(GetType()).ErrorFormat("Failed to remove cache file {0}", cacheFile.FullName);
+      }
+      foreach (var item in running) {
+        item.Toggle();
       }
     }
   }

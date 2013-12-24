@@ -148,6 +148,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       if (connection != null) {
         vacuumer.Remove(connection);
+        Sqlite.ClearPool(connection);
         connection.Dispose();
       }
     }

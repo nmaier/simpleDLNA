@@ -60,10 +60,12 @@
       this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.logger = new System.Windows.Forms.ListView();
+      this.colLogTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.buttonRescan = new System.Windows.Forms.Button();
-      this.colLogTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
+      this.dropCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -206,6 +208,8 @@
             this.toolStripMenuItem2,
             this.openInBrowserToolStripMenuItem,
             this.toolStripMenuItem3,
+            this.dropCacheToolStripMenuItem,
+            this.toolStripMenuItem4,
             this.hideToolStripMenuItem,
             this.exitToolStripMenuItem});
       this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -261,7 +265,7 @@
       // aboutToolStripMenuItem
       // 
       this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
       this.aboutToolStripMenuItem.Text = "About";
       this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
       // 
@@ -284,6 +288,11 @@
       this.logger.UseCompatibleStateImageBehavior = false;
       this.logger.View = System.Windows.Forms.View.Details;
       // 
+      // colLogTime
+      // 
+      this.colLogTime.Text = "Time";
+      this.colLogTime.Width = 80;
+      // 
       // colLogLogger
       // 
       this.colLogLogger.Text = "Logger";
@@ -305,10 +314,17 @@
       this.buttonRescan.UseVisualStyleBackColor = true;
       this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
       // 
-      // colLogTime
+      // toolStripMenuItem4
       // 
-      this.colLogTime.Text = "Time";
-      this.colLogTime.Width = 80;
+      this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+      this.toolStripMenuItem4.Size = new System.Drawing.Size(158, 6);
+      // 
+      // dropCacheToolStripMenuItem
+      // 
+      this.dropCacheToolStripMenuItem.Name = "dropCacheToolStripMenuItem";
+      this.dropCacheToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+      this.dropCacheToolStripMenuItem.Text = "Drop cache";
+      this.dropCacheToolStripMenuItem.Click += new System.EventHandler(this.dropCacheToolStripMenuItem_Click);
       // 
       // FormMain
       // 
@@ -371,6 +387,8 @@
     private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
     private System.Windows.Forms.Button buttonRescan;
     private System.Windows.Forms.ColumnHeader colLogTime;
+    private System.Windows.Forms.ToolStripMenuItem dropCacheToolStripMenuItem;
+    private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
   }
 }
 

@@ -351,6 +351,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public void SetCacheFile(FileInfo info)
     {
+      if (store != null) {
+        store.Dispose();
+        store = null;
+      }
       try {
         store = new FileStore(info);
       }
