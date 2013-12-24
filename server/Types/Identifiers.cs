@@ -90,7 +90,13 @@ namespace NMaier.SimpleDlna.Server
 
     public void AddView(string name)
     {
-      views.Add(ViewRepository.Lookup(name));
+      try {
+        views.Add(ViewRepository.Lookup(name));
+      }
+      catch (Exception ex) {
+        Error("Failed to add view", ex);
+        throw;
+      }
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.GC.Collect")]
