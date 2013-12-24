@@ -39,7 +39,7 @@ namespace NMaier.SimpleDlna.GUI
         if (!string.IsNullOrWhiteSpace(path)) {
           newpath = string.Format("{0};{1}", path, newpath);
         }
-        registry.SetValue(REG_PATH, newpath, registry.GetValueKind(REG_PATH));
+        registry.SetValue(REG_PATH, newpath, RegistryValueKind.ExpandString);
       }
     }
     public override void Uninstall(IDictionary savedState)
@@ -51,7 +51,7 @@ namespace NMaier.SimpleDlna.GUI
 
       using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
         var path = registry.GetValue(REG_PATH, string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
-        if (path == null) {
+        if (string.IsNullOrEmpty(path)) {
           return;
         }
         var cleaned = string.Join(";", from p in path.Split(';')
