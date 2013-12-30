@@ -46,6 +46,7 @@ namespace NMaier.SimpleDlna.Utilities
           try {
             var read = Input.EndRead(readResult);
             if (read <= 0) {
+              DebugFormat("Done pumping {0}", read);
               Finish(StreamPumpResult.Delivered);
               return;
             }

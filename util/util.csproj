@@ -70,6 +70,8 @@
     <Compile Include="FFmpeg.cs" />
     <Compile Include="Formatting.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HttpMethod.cs" />
+    <Compile Include="HttpStream.cs" />
     <Compile Include="ProductInformation.cs" />
     <Compile Include="IP.cs" />
     <Compile Include="IRepositoryItem.cs" />

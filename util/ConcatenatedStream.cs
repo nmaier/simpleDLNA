@@ -67,7 +67,7 @@ namespace NMaier.SimpleDlna.Utilities
       }
 
       var read = streams.Peek().Read(buffer, offset, count);
-      if (read < count) {
+      if (read <= 0) {
         streams.Dequeue().Dispose();
         return read + Read(buffer, offset + read, count - read);
       }
