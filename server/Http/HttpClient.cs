@@ -175,13 +175,12 @@ namespace NMaier.SimpleDlna.Server
       return contentLength;
     }
 
-    private Stream ProcessRanges(IResponse response)
+    private Stream ProcessRanges(IResponse response, ref HttpCodes status)
     {
       var responseBody = response.Body;
-      var st = response.Status;
       var contentLength = GetContentLengthFromStream(responseBody);
       string ar;
-      if (st != HttpCodes.OK && contentLength > 0 || !headers.TryGetValue("Range", out ar)) {
+      if (status != HttpCodes.OK && contentLength > 0 || !headers.TryGetValue("Range", out ar)) {
         return responseBody;
       }
       try {
@@ -210,7 +209,7 @@ namespace NMaier.SimpleDlna.Server
         contentLength = end - start + 1;
         response.Headers["Content-Length"] = contentLength.ToString();
         response.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, totalLength));
-        st = HttpCodes.PARTIAL;
+        status = HttpCodes.PARTIAL;
       }
       catch (Exception ex) {
         Warn(String.Format("{0} - Failed to process range request!", this), ex);
@@ -327,8 +326,8 @@ namespace NMaier.SimpleDlna.Server
     System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void SendResponse()
     {
-      var responseBody = ProcessRanges(response);
       var statusCode = response.Status;
+      var responseBody = ProcessRanges(response, ref statusCode);
 
       var headerBlock = new StringBuilder();
       headerBlock.AppendFormat("HTTP/1.1 {0} {1}\r\n", (uint)statusCode, HttpPhrases.Phrases[statusCode]);
