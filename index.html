@@ -30,175 +30,147 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h2>
-<a name="motivation" class="anchor" href="#motivation"><span class="octicon octicon-link"></span></a>Motivation</h2>
+          <h2 id="motivation"><a class="anchor" href="#motivation"><span class="octicon octicon-link"></span></a>Motivation</h2>
 
-<p>Looking for a simple DLNA server that I could just fire up on some directory, watch some files on my TV and then be done with it, I came up empty. There are some decent servers out there, like Serviio and friends, but none that fits my requirements. Also there wasn't really a decent enough and uncomplicated enough open source implementation that I could borrow. The Coherence python project seemed to be a good starting point, but was already to complex for what I was trying to achieve. Also, python dealing with Unicode paths on Windows pretty much sucks. Then there is Mono.UPnP, which didn't really work, and the Intel(?) Developer Tools for UPnP, which seemed kinda nice at first, but turned out to be coming straight out of over-engineering hell, in my humble opinion.</p>
+          <p>Looking for a simple DLNA server that I could just fire up in some directory, watch some files on my TV and then be done with it, I came up empty. There are some decent servers out there, like Serviio and friends, but none that fit my requirements. Also there wasn't really a decent enough and uncomplicated enough open source implementation that I could borrow. The Coherence python project seemed to be a good starting point, but was already to complex for what I was trying to achieve. Also, python dealing with Unicode paths on Windows pretty much sucks. Then there is Mono.UPnP, which didn't really work, and the Intel(?) Developer Tools for UPnP, which seemed kinda nice at first, but turned out to be coming straight out of over-engineering hell, in my humble opinion.</p>
 
-<p>And so I decided to write my own server, borrowing some ideas from Coherence, reading some of the UPnP specs and reverse engineering the various protocols involved (yuck, SOAP :p) by watching my TV interact with Coherence and Serviio under Wireshark.</p>
+          <p>And so I decided to write my own server, borrowing some ideas from Coherence, reading some of the UPnP specs and reverse engineering the various protocols involved (yuck, SOAP :p) by watching my TV interact with Coherence and Serviio under Wireshark.</p>
+          <p>And since I was at it and this is supposed to be an educational and "fun" project, I decided to do what you shouldn't normally do: Re-invent the wheel by writing my own small http server implementation insead of using the framework one.</p>
 
-<h2>
-<a name="basic-use" class="anchor" href="#basic-use"><span class="octicon octicon-link"></span></a>Basic use</h2>
+          <h2 id="basic-use"><a class="anchor" href="#basic-use"><span class="octicon octicon-link"></span></a>Basic use</h2>
 
-<ul>
-<li>
-<code>sdlna.exe</code> / <code>mono sdna.exe</code>
-Serve videos from current directory and subdirectories</li>
-<li>
-<code>sdlna.exe -t image -t audio -v bytitle</code>
-Serve images and audio files from the current directory and subdirectories, organizing files by title.</li>
-<li>
-<code>sdlna.exe -c cache.sqlite dir1 dir2</code>
-Serve videos from dir1 and dir2 (and subdirectories), storing meta data and thumbnails in the persistent cache store <code>cache.sqlite</code>.</li>
-<li>
-<code>sdlna.exe --help</code>
-Display usage help</li>
-<li>
-<code>SimpleDLNA.exe</code>
-Or just use the WinForms GUI. (This probably won't work too well on non-Windows platforms)</li>
-</ul><p>Also, you'll want to have a working ffmpeg binary somewhere within your <code>$PATH</code>, so that video thumbnailing works.</p>
+          <ul>
+            <li>
+              <code>sdlna.exe</code> / <code>mono sdlna.exe</code><br/>
+              Serve videos from current directory and subdirectories</li>
+            <li>
+              <code>sdlna.exe -t image -t audio -v bytitle</code><br/>
+              Serve images and audio files from the current directory and subdirectories, organizing files by title.</li>
+            <li>
+              <code>sdlna.exe -c cache.sqlite dir1 dir2</code><br/>
+              Serve videos from dir1 and dir2 (and subdirectories), storing meta data and thumbnails in the persistent cache store <code>cache.sqlite</code>.</li>
+            <li>
+              <code>sdlna.exe --help</code><br/>
+              Display usage help.</li>
+            <li>
+              <code>SimpleDLNA.exe</code><br/>
+              Or just use the WinForms GUI. (This probably won't work too well on non-Windows platforms ;)</li>
+            <li>
+              <code>Your front-end here</code>
+              Feel free to contribute something that works better for your preferred platform.</li>
+          </ul>
 
-<h2>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+          <p>Also, you'll want to have a working <code>ffmpeg</code> binary somewhere within your <code>$PATH</code>, so that video thumbnailing and information gathering works.</p>
 
-<ul>
-<li>Zero-config DLNA Server without persistent state (optional cache)</li>
-<li>Written in C# (See FAQ)</li>
-<li>Thumbnailing support for images and videos - if ffmpeg is found in the search path -, using any stream as input.</li>
-<li>Meta data as provided by TagLib#</li>
-<li>Serving of any and all file-system addressable  files, incl. some views (transformations)</li>
-<li>Should be relatively easy to code up additional media sources, like podcasts</li>
-</ul><h2>
-<a name="non-features-maybe-todo" class="anchor" href="#non-features-maybe-todo"><span class="octicon octicon-link"></span></a>Non-Features, maybe TODO</h2>
+          <h2 id="features"><a class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
 
-<ul>
-<li>Media transcoding
+          <ul>
+            <li>Zero-config DLNA Server without persistent state (optional cache)</li>
+            <li>Written in C# (See FAQ)</li>
+            <li>Thumbnailing support for images and videos - if ffmpeg is found in the search path -, using any stream as input.</li>
+            <li>Meta data as provided by TagLib#</li>
+            <li>Serving of any and all file-system addressable  files, incl. some views (transformations)</li>
+            <li>Should be relatively easy to code up additional media sources, like podcasts</li>
+          </ul>
 
-<ul>
-<li>Although it should be easy enough to come up with something based on ffmpeg and the various freely available image libraries</li>
-</ul>
-</li>
-<li>Full DLNA support - only browsing/playing supported at the moment</li>
-<li>Complete SSDP support. Because SSDP makes me cringe, I stopped after getting the basics working</li>
-<li>No Unit testing or test suite... Yeah, laziness is your enemy</li>
-<li>Microsoft WMP, while based on DLNA, won't accept media due to unimplemented MS specific commands. Same likely goes for an XBOX (which I don't own, so cannot test)</li>
-<li>...</li>
-</ul><h2>
-<a name="run-requirements" class="anchor" href="#run-requirements"><span class="octicon octicon-link"></span></a>Run requirements</h2>
+          <h2 id="non-features"><a name="non-features" class="anchor" href="#non-features"><span class="octicon octicon-link"></span></a>Non-Features, maybe TODO</h2>
 
-<ul>
-<li>Some .Net 4 Client Profile compatible implementation to run the app
+          <ul>
+            <li>Media transcoding<ul>
+              <li>Although it should be easy enough to come up with something based on ffmpeg and the various freely available image libraries</li>
+            </ul></li>
+            <li>Full DLNA support - only browsing/playing supported at the moment</li>
+            <li>Complete SSDP support. Because SSDP makes me cringe, I stopped after getting the basics working</li>
+            <li>No Unit testing or test suite... Yeah, laziness is your enemy</li>
+            <li>Microsoft WMP, while based on DLNA, won't accept media due to unimplemented MS specific commands. Same likely goes for an XBOX (which I don't own, so cannot test)</li>
+            <li>...</li>
+          </ul>
 
-<ul>
-<li>Tested on .Net 4 and Fedora17 + mono, OSX Lion + mono</li>
-</ul>
-</li>
-<li>File system and networking :p</li>
-<li>Some DLNA renderer (e.g. TV) to actually display the served media.
+          <h2 id="run-requirements"><a class="anchor" href="#run-requirements"><span class="octicon octicon-link"></span></a>Run requirements</h2>
 
-<ul>
-<li>Tested with: Samsung C-Series TV, Kinsky</li>
-</ul>
-</li>
-</ul><h2>
-<a name="external-dependencies" class="anchor" href="#external-dependencies"><span class="octicon octicon-link"></span></a>External dependencies</h2>
+          <ul>
+            <li>Some .Net 4 Client Profile compatible implementation to run the app <ul>
+              <li>Tested on .Net 4 and Fedora17 + mono, OSX Lion + mono</li>
+            </ul></li>
+            <li>File system and networking :p</li>
+            <li>Some DLNA renderer (e.g. TV) to actually display the served media. <ul>
+              <li>Tested with: Samsung C-Series TV, Kinsky</li>
+            </ul></li>
+          </ul>
 
-<ul>
-<li><a href="http://logging.apache.org/log4net/">log4net</a></li>
-<li><a href="https://github.com/nmaier/getoptnet">GetOptNet</a></li>
-<li><a href="https://github.com/mono/taglib-sharp/">TagLib#</a></li>
-<li><a href="http://system.data.sqlite.org/">System.Data.Sqlite</a></li>
-</ul><p>The external dependencies are <a href="http://nuget.org/">nuget</a> managed and can be auto-restored (except for Sqlite maybe... Just reinstall it using nuget into the fsserver project).</p>
+          <h2 id="external-dependencies"><a class="anchor" href="#external-dependencies"><span class="octicon octicon-link"></span></a>External dependencies</h2>
 
-<h2>
-<a name="design" class="anchor" href="#design"><span class="octicon octicon-link"></span></a>Design</h2>
+          <ul>
+            <li><a href="http://logging.apache.org/log4net/">log4net</a></li>
+            <li><a href="https://github.com/nmaier/getoptnet">GetOptNet</a></li>
+            <li><a href="https://github.com/mono/taglib-sharp/">TagLib#</a></li>
+            <li><a href="http://system.data.sqlite.org/">System.Data.Sqlite</a></li>
+          </ul>
+          <p>The external dependencies are <a href="http://nuget.org/">nuget</a> managed and can be auto-restored (except for Sqlite maybe... Just reinstall it using nuget into the fsserver project).</p>
 
-<p>The thing wasn't formally designed, but more written as I went along. However, the individual components are only loosely coupled and interact through some real, generic interfaces that allow for extensibility.</p>
+          <h2 id="design"><a class="anchor" href="#design"><span class="octicon octicon-link"></span></a>Design</h2>
 
-<p>Most of the IO is asynchronous, as per .Net <code>Stream.BeginRead/.BeginWrite</code>. No forking (D'OH), no explicit thread management.</p>
+          <p>The thing wasn't formally designed, but more written as I went along. However, the individual components are only loosely coupled and interact through some real, generic interfaces that allow for extensibility.</p>
 
-<p>The structure is as follows:</p>
+          <p>Most of the IO is asynchronous, as per .Net <code>Stream.BeginRead/.BeginWrite</code>. No forking (D'OH), no explicit thread management.</p>
 
-<ul>
-<li>
-<code>server</code> class library - The actual core that implements an SSDP and HTTP server
+          <p>The structure is as follows:</p>
 
-<ul>
-<li>
-<code>SSDPServer</code> implementing the important bits of the SSDP-based multicast protocol as used by UPnP/DLNA</li>
-<li>
-<code>HttpServer</code> and <code>HttpClient</code> - Custom, stripped down HTTP/1.0 implementation</li>
-<li>
-<code>Handlers</code> - Request processing and response composition</li>
-<li>
-<code>Responses</code> - Implementing an interface the HttpClient knows how to ship over the net.</li>
-<li>
-<code>Views</code> - Transformations of media trees</li>
-<li>Some interfaces, types, enums, etc. to bring things together</li>
-</ul>
-</li>
-<li>
-<code>fsserver</code> class library - Serving stuff from a file sytem. To be "mounted" by the <code>server</code>
+          <ul>
+            <li><code>server</code> class library - The actual core that implements an SSDP and HTTP server<ul>
+              <li><code>SSDPServer</code> implementing the important bits of the SSDP-based multicast protocol as used by UPnP/DLNA</li>
+              <li><code>HttpServer</code> and <code>HttpClient</code> - Custom, stripped down HTTP/1.0 implementation</li>
+              <li><code>Handlers</code> - Request processing and response composition</li>
+              <li><code>Responses</code> - Implementing an interface the HttpClient knows how to ship over the net.</li>
+              <li><code>Views</code> - Transformations of media trees</li>
+              <li>Some interfaces, types, enums, etc. to bring things together</li>
+            </ul></li>
+            <li><code>fsserver</code> class library - Serving stuff from a file sytem. To be "mounted" by the <code>server</code><ul>
+              <li>Virtual folder/file trees the HTTPServer MediaMount will understand</li>
+            </ul></li>
+            <li><code>thumbs</code> class library - Generating thumbnail pictures from arbriary stream sources<ul>
+              <li>Image thumbnailer, using .Net System.Drawing</li>
+              <li>Video thumbnailer, using ffmpeg via async pipes and the .Net Process API</li>
+            </ul></li>
+            <li><code>sdlna</code> CLI application - Bringing the various pieces together</li>
+            <li><code>SimpleDLNA</code> GUI application - Alternative to the CLI and with persistent configuration. This thing is especially rough, as im not an UX guy.</li>
+            <li><code>util</code> Various low-level utility stuff</li>
+          </ul>
 
-<ul>
-<li>Virtual folder/file trees the HTTPServer MediaMount will understand</li>
-</ul>
-</li>
-<li>
-<code>thumbs</code> class library - Generating thumbnail pictures from arbriary stream sources
+          <h2 id="contributing"><a class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
-<ul>
-<li>Image thumbnailer, using .Net System.Drawing</li>
-<li>Video thumbnailer, using ffmpeg via async pipes and the .Net Process API</li>
-</ul>
-</li>
-<li>
-<code>sdlna</code> CLI application - Bringing the various pieces together</li>
-<li>
-<code>SimpleDLNA</code> GUI application - Alternative to the CLI and with persistent configuration. This thing is especially rough, as im not an UX guy.</li>
-<li>
-<code>util</code> Various low-level utility stuff</li>
-</ul><h2>
-<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+          <p>Feel free to drop me pull requests. If you plan to implement something more than a few lines, then open the pull request early so that there aren't any nasty surprises later.
+          Please try not to introduce too many new FXCop warnings. ;)</p>
 
-<p>Feel free to drop me pull requests. If you plan to implement something more than a few lines, then open the pull request early so that there aren't any nasty surprises later.
-Please try not to introduce too many new FXCop warnings. ;)</p>
+          <p>If you want to add something that will require some for of persistence incl. persistent configuration or API keys, etc., then open a pull request/issue especially early!</p>
 
-<p>If you want to add something that will require some for of persistence incl. persistent configuration or API keys, etc., then open a pull request/issue especially early!</p>
+          <h2 id="faq"><a class="anchor" href="#faq"><span class="octicon octicon-link"></span></a>Mini FAQ</h2>
 
-<h2>
-<a name="mini-faq" class="anchor" href="#mini-faq"><span class="octicon octicon-link"></span></a>Mini FAQ</h2>
+          <ul>
+            <li><strong>Q</strong>: Does it work in my network/with my TV?</li>
+            <li><strong>A</strong>: At the moment, if you got a somewhat recent Samsung TV, then probably yes. Otherwise probably not. Why don't you just try?</li>
+            <li><strong>Q</strong>: This thing does not work with my setup?!</li>
+            <li><strong>A</strong>: Either provide me with the setup (i.e. buy me that TV) or whip out your debugger and Wireshark and read Contributing ;)</li>
+            <li><strong>Q</strong>: Are you planning to support Podcasts, RTMP streaming, <em>insert name here</em>?</li>
+            <li><strong>A</strong>: Maybe, but probably not. See Contributing</li>
+            <li><strong>Q</strong>: Why .Net and C#? I'm on Linux and/or Mac!</li>
+            <li><strong>A</strong>: Yeah, well... Other languages have their own set of problems. C# is reasonably portable, managed and garbage collected, statically typed and comes with a huge stdlib. And actually quite nice to use. If only it wasn't for Microsoft having invented this stuff and holding various patents...<br/>
+              Maybe I'll get bored and rewrite this stuff in C++11 or as a Firefox add-on in JavaScript :p</li>
+          </ul>
 
-<ul>
-<li>
-<strong>Q</strong>: Does it work in my network/with my TV?</li>
-<li>
-<strong>A</strong>: At the moment, if you got a somewhat recent Samsung TV, then probably yes. Otherwise probably not. Why don't you just try?</li>
-<li>
-<strong>Q</strong>: This thing does not work with my setup?!</li>
-<li>
-<strong>A</strong>: Either provide me with the setup (i.e. buy me that TV) or whip out your debugger and Wireshark and read Contributing ;)</li>
-<li>
-<strong>Q</strong>: Are you planning to support Podcasts, RTMP streaming, <em>insert name here</em>?</li>
-<li>
-<strong>A</strong>: Maybe, but probably not. See Contributing</li>
-<li>
-<strong>Q</strong>: Why .Net and C#? I'm on Linux and/or Mac!</li>
-<li>
-<strong>A</strong>: Yeah, well... Other languages have their own set of problems. C# is reasonably portable, managed and garbage collected, statically typed and comes with a huge stdlib.</li>
-</ul><h2>
-<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h2>
+          <h2 id="thanks"><a class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h2>
 
-<p>To Microsoft, the UPnP(-AV) folks and Samsung and DLNA gurus for designing such a set of specs and protocols, that includes HTTP-alike over multicast UDP sockets, SOAP and XML, dozens of poorly documented namespaces used in SOAP responses, the contentFeatures.dlna.org HTTP header and other fancy tech.
-Also a big Kudos to software engineers for messing up even the most basic things like http header field names are usually case insensitive or the Reason-Phrase of http status lines is purely informal.</p>
+          <p>To Microsoft, the UPnP(-AV) folks and Samsung and DLNA gurus for designing such a set of specs and protocols, that includes HTTP-alike over multicast UDP sockets, SOAP and XML, dozens of poorly documented namespaces used in SOAP responses, the contentFeatures.dlna.org HTTP header and other fancy tech.
+          Also a big kudos to software engineers for messing up even the most basic things like http header field names are usually case insensitive or the Reason-Phrase of http status lines is purely informal.</p>
 
-<h2><a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h2>
-<ul>
-  <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.12...v0.13">Version 0.13 - Kafkaesque</a></li>
-  <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.11...v0.12">Version 0.12</a></li>
-  <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.10...v0.11">Version 0.11</a></li>
-  <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.9...v0.10">Version 0.10</a></li>
-</ul>
+          <h2 id="changelog"><a class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h2>
+          <ul>
+            <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.12...v0.13">Version 0.13 - Kafkaesque</a></li>
+            <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.11...v0.12">Version 0.12</a></li>
+            <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.10...v0.11">Version 0.11</a></li>
+            <li><a href="https://github.com/nmaier/simpleDLNA/compare/v0.9...v0.10">Version 0.10</a></li>
+          </ul>
+
         </section>
 
         <aside id="sidebar">
@@ -231,9 +203,9 @@ Also a big Kudos to software engineers for messing up even the most basic things
 
           <p>This page is using large portions of the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
+
       </div>
     </div>
 
-  
   </body>
 </html>
