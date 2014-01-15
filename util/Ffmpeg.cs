@@ -103,7 +103,7 @@ namespace NMaier.SimpleDlna.Utilities
             for (line = p.StandardOutput.ReadLine(); line != null; line = p.StandardOutput.ReadLine()) {
               var m = RegLine.Match(line.Trim());
               if (m.Success) {
-                rv.Add(m.Groups[1].Value, m.Groups[2].Value);
+                rv[m.Groups[1].Value] = m.Groups[2].Value;
               }
             }
             line = p.StandardOutput.ReadToEnd();
