@@ -9,14 +9,16 @@ namespace NMaier.SimpleDlna.Server.Ssdp
   internal sealed class Datagram : Logging
   {
     public readonly IPEndPoint EndPoint;
+    public readonly IPAddress LocalAddress;
     public readonly string Message;
     public readonly bool Sticky;
 
 
-    public Datagram(IPEndPoint aEndPoint, string aMessage, bool sticky)
+    public Datagram(IPEndPoint endPoint, IPAddress localAddresss, string message, bool sticky)
     {
-      EndPoint = aEndPoint;
-      Message = aMessage;
+      EndPoint = endPoint;
+      LocalAddress = localAddresss;
+      Message = message;
       Sticky = sticky;
       SendCount = 0;
     }
@@ -32,29 +34,28 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     public void Send()
     {
       var msg = Encoding.ASCII.GetBytes(Message);
-      foreach (var external in IP.ExternalIPAddresses) {
-        try {
-          var client = new UdpClient(new IPEndPoint(external, 0));
-          client.BeginSend(msg, msg.Length, EndPoint, result =>
-          {
+      try {
+        var client = new UdpClient();
+        client.Client.Bind(new IPEndPoint(LocalAddress, 0));
+        client.BeginSend(msg, msg.Length, EndPoint, result =>
+        {
+          try {
+            client.EndSend(result);
+          }
+          catch (Exception ex) {
+            Debug(ex);
+          }
+          finally {
             try {
-              client.EndSend(result);
+              client.Close();
             }
-            catch (Exception ex) {
-              Debug(ex);
+            catch (Exception) {
             }
-            finally {
-              try {
-                client.Close();
-              }
-              catch (Exception) {
-              }
-            }
-          }, null);
-        }
-        catch (Exception ex) {
-          Error(ex);
-        }
+          }
+        }, null);
+      }
+      catch (Exception ex) {
+        Error(ex);
       }
       ++SendCount;
     }

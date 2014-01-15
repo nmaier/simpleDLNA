@@ -135,12 +135,12 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       Receive();
     }
 
-    private void SendDatagram(IPEndPoint endpoint, string msg, bool sticky)
+    private void SendDatagram(IPEndPoint endpoint, IPAddress address, string message, bool sticky)
     {
       if (!running) {
         return;
       }
-      var dgram = new Datagram(endpoint, msg, sticky);
+      var dgram = new Datagram(endpoint, address, message, sticky);
       if (messageQueue.Count == 0) {
         dgram.Send();
       }
@@ -159,8 +159,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       headers.Add("ST", dev.Type);
       headers.Add("USN", dev.USN);
 
-      SendDatagram(endpoint, String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock), false);
-      InfoFormat("{1} - Responded to a {0} request", dev.Type, endpoint);
+      SendDatagram(endpoint, dev.Address, String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock), false);
+      InfoFormat("{2}, {1} - Responded to a {0} request", dev.Type, endpoint, dev.Address);
     }
 
     private void Tick(object sender, Timers.ElapsedEventArgs e)
@@ -205,11 +205,11 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       headers.Add("NT", dev.Type);
       headers.Add("USN", dev.USN);
 
-      SendDatagram(SSDP_ENDP, String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock), sticky);
+      SendDatagram(SSDP_ENDP, dev.Address, String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock), sticky);
       DebugFormat("{0} said {1}", dev.USN, type);
     }
 
-    internal void RegisterNotification(Guid UUID, Uri Descriptor)
+    internal void RegisterNotification(Guid UUID, Uri Descriptor, IPAddress address)
     {
       List<UpnpDevice> list;
       lock (devices) {
@@ -218,7 +218,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         }
       }
       foreach (var t in new string[] { "upnp:rootdevice", "urn:schemas-upnp-org:device:MediaServer:1", "urn:schemas-upnp-org:service:ContentDirectory:1", "uuid:" + UUID }) {
-        list.Add(new UpnpDevice(UUID, t, Descriptor));
+        list.Add(new UpnpDevice(UUID, t, Descriptor, address));
       }
 
       NotifyAll();
@@ -231,7 +231,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         req = null;
       }
 
-      Debug("RespondToSearch");
+      DebugFormat("RespondToSearch {0} {1}", endpoint, req);
       foreach (var d in Devices) {
         if (!string.IsNullOrEmpty(req) && req != d.Type) {
           continue;

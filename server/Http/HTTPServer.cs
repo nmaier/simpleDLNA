@@ -235,7 +235,7 @@ namespace NMaier.SimpleDlna.Server
 
       foreach (var address in IP.ExternalIPAddresses) {
         var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
-        ssdpServer.RegisterNotification(guid, uri);
+        ssdpServer.RegisterNotification(guid, uri, address);
         NoticeFormat("New mount at: {0}", uri);
       }
     }
