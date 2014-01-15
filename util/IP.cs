@@ -44,7 +44,14 @@ namespace NMaier.SimpleDlna.Utilities
     private static IEnumerable<IPAddress> GetIPsDefault()
     {
       foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces()) {
-        foreach (var uni in adapter.GetIPProperties().UnicastAddresses) {
+        var props = adapter.GetIPProperties();
+        var gateways = from ga in props.GatewayAddresses
+                       where !ga.Address.Equals(IPAddress.Any)
+                       select true;
+        if (gateways.Count() == 0) {
+          continue;
+        }
+        foreach (var uni in props.UnicastAddresses) {
           var address = uni.Address;
           if (address.AddressFamily != AddressFamily.InterNetwork) {
             continue;
