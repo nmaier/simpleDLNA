@@ -17,6 +17,8 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly ConcurrentDictionary<string, IPrefixHandler> prefixes = new ConcurrentDictionary<string, IPrefixHandler>();
 
+    private readonly ConcurrentDictionary<Guid, List<Guid>> devicesForServers = new ConcurrentDictionary<Guid, List<Guid>>();
+
     private readonly ConcurrentDictionary<Guid, MediaMount> servers = new ConcurrentDictionary<Guid, MediaMount>();
 
     public static readonly string Signature = GenerateServerSignature();
@@ -234,8 +236,14 @@ namespace NMaier.SimpleDlna.Server
       RegisterHandler(mount);
 
       foreach (var address in IP.ExternalIPAddresses) {
+        var deviceGuid = Guid.NewGuid();
+        var list = devicesForServers.GetOrAdd(guid, new List<Guid>());
+        lock (list) {
+          list.Add(deviceGuid);
+        }
+        mount.AddDeviceGuid(deviceGuid, address);
         var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
-        ssdpServer.RegisterNotification(guid, uri, address);
+        ssdpServer.RegisterNotification(deviceGuid, uri, address);
         NoticeFormat("New mount at: {0}", uri);
       }
     }
@@ -250,7 +258,16 @@ namespace NMaier.SimpleDlna.Server
         return;
       }
 
-      ssdpServer.UnregisterNotification(server.Uuid);
+      List<Guid> list;
+      if (devicesForServers.TryGetValue(server.Uuid, out list)) {
+        lock (list) {
+          foreach (var deviceGuid in list) {
+            ssdpServer.UnregisterNotification(deviceGuid);
+          }
+        }
+        devicesForServers.TryRemove(server.Uuid, out list);
+      }
+
       UnregisterHandler(mount);
 
       MediaMount ignored;

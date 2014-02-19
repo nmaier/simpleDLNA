@@ -222,7 +222,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
 
       NotifyAll();
-      DebugFormat("Registered mount {0}", UUID);
+      DebugFormat("Registered mount {0}, {1}", UUID, address);
     }
 
     internal void RespondToSearch(IPEndPoint endpoint, string req)

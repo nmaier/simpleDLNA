@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Reflection;
 using System.Xml;
 using NMaier.SimpleDlna.Utilities;
@@ -7,7 +9,7 @@ namespace NMaier.SimpleDlna.Server
 {
   internal sealed partial class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
-    private readonly string descriptor;
+    private readonly Dictionary<IPAddress, Guid> guidsForAddresses = new Dictionary<IPAddress, Guid>();
 
     private static uint mount = 0;
 
@@ -22,7 +24,6 @@ namespace NMaier.SimpleDlna.Server
     {
       server = aServer;
       prefix = String.Format("/mm-{0}/", ++mount);
-      descriptor = GenerateDescriptor();
       if (server is IVolatileMediaServer) {
         (server as IVolatileMediaServer).Changed += ChangedServer;
       }
@@ -66,11 +67,13 @@ namespace NMaier.SimpleDlna.Server
       systemID++;
     }
 
-    private string GenerateDescriptor()
+    private string GenerateDescriptor(IPAddress source)
     {
       var doc = new XmlDocument();
       doc.LoadXml(Properties.Resources.description);
-      doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", Uuid);
+      var guid = Uuid;
+      guidsForAddresses.TryGetValue(source, out guid);
+      doc.GetElementsByTagName("UDN").Item(0).InnerText = String.Format("uuid:{0}", guid);
       doc.GetElementsByTagName("modelNumber").Item(0).InnerText = Assembly.GetExecutingAssembly().GetName().Version.ToString();
       doc.GetElementsByTagName("friendlyName").Item(0).InnerText = FriendlyName + " — sdlna";
       doc.GetElementsByTagName("SCPDURL").Item(0).InnerText = String.Format("{0}contentDirectory.xml", prefix);
@@ -80,6 +83,11 @@ namespace NMaier.SimpleDlna.Server
       return doc.OuterXml;
     }
 
+
+    public void AddDeviceGuid(Guid guid, IPAddress address)
+    {
+      guidsForAddresses.Add(address, guid);
+    }
 
     public IMediaItem GetItem(string id)
     {
@@ -91,7 +99,7 @@ namespace NMaier.SimpleDlna.Server
       var path = request.Path.Substring(prefix.Length);
       Debug(path);
       if (path == "description.xml") {
-        return new StringResponse(HttpCodes.OK, "text/xml", descriptor);
+        return new StringResponse(HttpCodes.OK, "text/xml", GenerateDescriptor(request.LocalEndPoint.Address));
       }
       if (path == "contentDirectory.xml") {
         return new ResourceResponse(HttpCodes.OK, "text/xml", "contentdirectory");
