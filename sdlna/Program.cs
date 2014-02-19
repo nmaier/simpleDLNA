@@ -95,43 +95,45 @@ namespace NMaier.SimpleDlna
 
         options.SetupLogging();
 
-        var server = new HttpServer(options.Port);
-        try {
-          server.Info("CTRL-C to terminate");
+        using (var icon = new ProgramIcon()) {
+          var server = new HttpServer(options.Port);
+          try {
+            server.Info("CTRL-C to terminate");
 
-          Console.Title = "SimpleDLNA - starting ...";
+            Console.Title = "SimpleDLNA - starting ...";
 
-          var types = options.Types[0];
-          foreach (var t in options.Types) {
-            types = types | t;
-            server.InfoFormat("Enabled type {0}", t);
-          }
+            var types = options.Types[0];
+            foreach (var t in options.Types) {
+              types = types | t;
+              server.InfoFormat("Enabled type {0}", t);
+            }
 
-          var friendlyName = "sdlna";
+            var friendlyName = "sdlna";
 
-          if (options.Seperate) {
-            foreach (var d in options.Directories) {
-              server.InfoFormat("Mounting FileServer for {0}", d.FullName);
-              var fs = SetupFileServer(options, types, new DirectoryInfo[] { d });
+            if (options.Seperate) {
+              foreach (var d in options.Directories) {
+                server.InfoFormat("Mounting FileServer for {0}", d.FullName);
+                var fs = SetupFileServer(options, types, new DirectoryInfo[] { d });
+                friendlyName = fs.FriendlyName;
+                server.RegisterMediaServer(fs);
+                server.NoticeFormat("{0} mounted", d.FullName);
+              }
+            }
+            else {
+              server.InfoFormat("Mounting FileServer for {0} ({1})", options.Directories[0], options.Directories.Length);
+              var fs = SetupFileServer(options, types, options.Directories);
               friendlyName = fs.FriendlyName;
               server.RegisterMediaServer(fs);
-              server.NoticeFormat("{0} mounted", d.FullName);
+              server.NoticeFormat("{0} ({1}) mounted", options.Directories[0], options.Directories.Length);
             }
-          }
-          else {
-            server.InfoFormat("Mounting FileServer for {0} ({1})", options.Directories[0], options.Directories.Length);
-            var fs = SetupFileServer(options, types, options.Directories);
-            friendlyName = fs.FriendlyName;
-            server.RegisterMediaServer(fs);
-            server.NoticeFormat("{0} ({1}) mounted", options.Directories[0], options.Directories.Length);
-          }
 
-          Console.Title = String.Format("{0} - running ...", friendlyName);
+            Console.Title = String.Format("{0} - running ...", friendlyName);
 
-          Run(server);
-        }
-        finally {
-          server.Dispose();
+            Run(server);
+          }
+          finally {
+            server.Dispose();
+          }
         }
       }
       catch (GetOptException ex) {
