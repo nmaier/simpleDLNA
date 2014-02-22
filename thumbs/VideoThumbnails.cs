@@ -72,6 +72,9 @@ namespace NMaier.SimpleDlna.Thumbnails
         if (!pump.Wait(2000)) {
           throw new ArgumentException("stream reading timed out");
         }
+        if (thumb.Length == 0) {
+          throw new ArgumentException("ffmpeg did not produce a result");
+        }
 
         using (var img = Image.FromStream(thumb)) {
           using (var scaled = ThumbnailMaker.ResizeImage(img, ref width, ref height)) {
@@ -156,6 +159,7 @@ namespace NMaier.SimpleDlna.Thumbnails
             sti.RedirectStandardOutput = true;
             p.Start();
 
+            DebugFormat("Running: {0} {1}", sti.FileName, sti.Arguments);
             return GetThumbnailFromProcess(p, ref width, ref height);
           }
         }
