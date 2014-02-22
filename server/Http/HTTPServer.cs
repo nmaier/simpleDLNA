@@ -236,6 +236,7 @@ namespace NMaier.SimpleDlna.Server
       RegisterHandler(mount);
 
       foreach (var address in IP.ExternalIPAddresses) {
+        DebugFormat("Registering device for {0}", address);
         var deviceGuid = Guid.NewGuid();
         var list = devicesForServers.GetOrAdd(guid, new List<Guid>());
         lock (list) {
