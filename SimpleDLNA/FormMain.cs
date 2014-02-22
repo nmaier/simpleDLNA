@@ -154,6 +154,10 @@ namespace NMaier.SimpleDlna.GUI
 #if DEBUG
       log4net.LogManager.GetLogger(this.GetType()).Info("Debug mode / Skipping one-instance-only stuff");
 #else
+      if (Type.GetType("Mono.Runtime") != null) {
+        // XXX Mono sometimes stack overflows for whatever reason.
+        return;
+      }
       new Thread(() =>
       {
         for (; ; ) {
