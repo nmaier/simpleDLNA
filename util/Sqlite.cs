@@ -30,23 +30,16 @@ namespace NMaier.SimpleDlna.Utilities
           "database"
           );
       }
-      var cs = string.Format("Uri=file:{0}", database.FullName);
-      if (Type.GetType("Mono.Runtime") == null) {
-        var rv = new System.Data.SQLite.SQLiteConnection(cs);
-        if (rv == null) {
-          throw new ArgumentException("no connection");
-        }
-        rv.Open();
-        if (clearPool == null) {
-          clearPool = conn =>
-          {
-            System.Data.SQLite.SQLiteConnection.ClearPool(
-              conn as System.Data.SQLite.SQLiteConnection);
-          };
-        }
-        return rv;
-      }
+      var cs = string.Format("Uri=file:{0},Pooling=true", database.FullName);
 
+      if (Type.GetType("Mono.Runtime") == null) {
+        return GetDatabaseConnectionSDS(cs);
+      }
+      return GetDatabaseConnectionMono(cs);
+    }
+
+    private static IDbConnection GetDatabaseConnectionMono(string cs)
+    {
       Assembly monoSqlite;
       try {
         monoSqlite = Assembly.Load(
@@ -59,11 +52,11 @@ namespace NMaier.SimpleDlna.Utilities
       var dbconn = monoSqlite.GetType(
         "Mono.Data.Sqlite.SqliteConnection");
       var ctor = dbconn.GetConstructor(new[] { typeof(string) });
-      var mrv = ctor.Invoke(new[] { cs }) as IDbConnection;
-      if (mrv == null) {
+      var rv = ctor.Invoke(new[] { cs }) as IDbConnection;
+      if (rv == null) {
         throw new ArgumentException("no connection");
       }
-      mrv.Open();
+      rv.Open();
       if (clearPool == null) {
         var cp = dbconn.GetMethod("ClearPool");
         clearPool = conn =>
@@ -73,7 +66,24 @@ namespace NMaier.SimpleDlna.Utilities
           }
         };
       }
-      return mrv;
+      return rv;
+    }
+
+    private static IDbConnection GetDatabaseConnectionSDS(string cs)
+    {
+      var rv = new System.Data.SQLite.SQLiteConnection(cs);
+      if (rv == null) {
+        throw new ArgumentException("no connection");
+      }
+      rv.Open();
+      if (clearPool == null) {
+        clearPool = conn =>
+        {
+          System.Data.SQLite.SQLiteConnection.ClearPool(
+            conn as System.Data.SQLite.SQLiteConnection);
+        };
+      }
+      return rv;
     }
   }
 }
