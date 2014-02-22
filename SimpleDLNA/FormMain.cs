@@ -48,7 +48,28 @@ namespace NMaier.SimpleDlna.GUI
         if (!string.IsNullOrWhiteSpace(rv) && Directory.Exists(rv)) {
           return rv;
         }
-        return Path.GetTempPath();
+        try {
+          try {
+            rv = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (string.IsNullOrEmpty(rv)) {
+              throw new IOException("Cannot get localappdata");
+            }
+          }
+          catch (Exception) {
+            rv = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (string.IsNullOrEmpty(rv)) {
+              throw new IOException("Cannot get localappdata");
+            }
+          }
+          rv = Path.Combine(rv, "SimpleDLNA");
+          if (!Directory.Exists(rv)) {
+            Directory.CreateDirectory(rv);
+          }
+          return rv;
+        }
+        catch (Exception) {
+          return Path.GetTempPath();
+        }
       }
     }
 
