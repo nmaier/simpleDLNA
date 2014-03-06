@@ -468,7 +468,7 @@ namespace NMaier.SimpleDlna.GUI
         }
       }
       catch (Exception ex) {
-        LogManager.GetLogger(GetType()).ErrorFormat("Failed to remove cache file {0}", cacheFile.FullName);
+        LogManager.GetLogger(GetType()).Error(string.Format("Failed to remove cache file {0}", cacheFile.FullName), ex);
       }
       foreach (var item in running) {
         item.Toggle();
