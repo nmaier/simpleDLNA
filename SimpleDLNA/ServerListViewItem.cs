@@ -111,6 +111,17 @@ namespace NMaier.SimpleDlna.GUI
           state = Description.Active ? State.Running : State.Stopped;
         };
         fileServer.Load();
+        var authorizer = new HttpAuthorizer();
+        if (Description.Ips.Length != 0) {
+          authorizer.AddMethod(new IpAuthorizer(Description.Ips));
+        }
+        if (Description.Macs.Length != 0) {
+          authorizer.AddMethod(new MacAuthorizer(Description.Macs));
+        }
+        if (Description.UserAgents.Length != 0) {
+          authorizer.AddMethod(new UserAgentAuthorizer(Description.UserAgents));
+        }
+        fileServer.Authorizer = authorizer;
         server.RegisterMediaServer(fileServer);
         state = State.Running;
       }

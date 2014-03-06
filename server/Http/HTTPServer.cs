@@ -29,6 +29,8 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly SsdpHandler ssdpServer;
 
+    public event EventHandler<HttpAuthorizationEventArgs> OnAuthorizeClient;
+
 
     public HttpServer()
       : this(port: 0)
@@ -187,6 +189,19 @@ namespace NMaier.SimpleDlna.Server
         throw new ArgumentException("Invalid preifx; already taken");
       }
       DebugFormat("Registered Handler for {0}", prefix);
+    }
+
+    internal bool AuthorizeClient(HttpClient client)
+    {
+      if (OnAuthorizeClient == null) {
+        return true;
+      }
+      if (IPAddress.IsLoopback(client.RemoteEndpoint.Address)) {
+        return true;
+      }
+      var e = new HttpAuthorizationEventArgs(client.Headers, client.RemoteEndpoint);
+      OnAuthorizeClient(this, e);
+      return !e.Cancel;
     }
 
     internal void RemoveClient(HttpClient client)

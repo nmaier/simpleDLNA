@@ -25,6 +25,8 @@ namespace NMaier.SimpleDlna.Server
 
     private static readonly Regex bytes = new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
 
+    private readonly static IHandler Error403 = new StaticHandler(new StringResponse(HttpCodes.DENIED, "<!doctype html><title>Access denied!</title><h1>Access denied!</h1><p>You're not allowed to access the requested resource.</p>"));
+
     private readonly static IHandler Error404 = new StaticHandler(new StringResponse(HttpCodes.NOT_FOUND, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
 
     private readonly static IHandler Error416 = new StaticHandler(new StringResponse(HttpCodes.RANGE_NOT_SATISFIABLE, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
@@ -356,6 +358,9 @@ namespace NMaier.SimpleDlna.Server
               return;
             }
           }
+          else {
+            DebugFormat("{0} - Client aborted connection", this);
+          }
           Close();
         }, BUFFER_SIZE);
       }
@@ -369,18 +374,41 @@ namespace NMaier.SimpleDlna.Server
     {
       State = HttpStates.WRITEBEGIN;
       try {
+        if (!owner.AuthorizeClient(this)) {
+          throw new HttpStatusException(HttpCodes.DENIED);
+        }
+        if (string.IsNullOrEmpty(path)) {
+          throw new HttpStatusException(HttpCodes.NOT_FOUND);
+        }
         var handler = owner.FindHandler(path);
         if (handler == null) {
-          throw new Http404Exception();
+          throw new HttpStatusException(HttpCodes.NOT_FOUND);
         }
         response = handler.HandleRequest(this);
         if (response == null) {
           throw new ArgumentException("Handler did not return a response");
         }
       }
-      catch (Http404Exception ex) {
-        Warn(String.Format("{0} - Got a 404: {1}", this, path), ex);
-        response = Error404.HandleRequest(this);
+      catch (HttpStatusException ex) {
+#if DEBUG
+         Warn(String.Format("{0} - Got a {2}: {1}", this, path, ex.Code), ex);
+#else
+        InfoFormat("{0} - Got a {2}: {1}", this, path, ex.Code);
+#endif
+        switch (ex.Code) {
+          case HttpCodes.NOT_FOUND:
+            response = Error404.HandleRequest(this);
+            break;
+          case HttpCodes.DENIED:
+            response = Error403.HandleRequest(this);
+            break;
+          case HttpCodes.INTERNAL_ERROR:
+            response = Error500.HandleRequest(this);
+            break;
+          default:
+            response = new StaticHandler(new StringResponse(ex.Code, "text/plain", ex.Message)).HandleRequest(this);
+            break;
+        }
       }
       catch (Exception ex) {
         Warn(String.Format("{0} - Failed to process response", this), ex);

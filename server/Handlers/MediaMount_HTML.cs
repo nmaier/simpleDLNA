@@ -24,7 +24,7 @@ namespace NMaier.SimpleDlna.Server
     {
       var item = aItem as IMediaFolder;
       if (item == null) {
-        throw new Http404Exception();
+        throw new HttpStatusException(HttpCodes.NOT_FOUND);
       }
 
       var article = HtmlTools.CreateHtmlArticle(string.Format("Folder: {0}", item.Title));

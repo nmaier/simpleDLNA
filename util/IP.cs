@@ -11,7 +11,7 @@ namespace NMaier.SimpleDlna.Utilities
   public static class IP
   {
     private static bool warned = false;
-
+    private static AddressToMacResolver macResolver = new AddressToMacResolver();
 
     public static IEnumerable<IPAddress> AllIPAddresses
     {
@@ -83,6 +83,15 @@ namespace NMaier.SimpleDlna.Utilities
       if (!returned) {
         throw new ApplicationException("No IP");
       }
+    }
+
+    public static string GetMAC(IPAddress ip)
+    {
+      return macResolver.Resolve(ip);
+    }
+    public static bool IsAcceptedMAC(string mac)
+    {
+      return AddressToMacResolver.IsAcceptedMac(mac);
     }
   }
 }

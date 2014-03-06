@@ -65,6 +65,7 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="AddressToMacResolver.cs" />
     <Compile Include="BaseSortPart.cs" />
     <Compile Include="ConcatenatedStream.cs" />
     <Compile Include="FFmpeg.cs" />

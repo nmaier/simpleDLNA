@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Windows.Forms;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Comparers;
 using NMaier.SimpleDlna.Server.Views;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -16,7 +18,8 @@ namespace NMaier.SimpleDlna.GUI
       Text = "New Server";
       checkVideo.Checked = true;
       SizeDirectoryColumn();
-      SizeViewsColumns();
+      SizeColumns(listViews);
+      SizeColumns(listRestrictions);
     }
     public FormServer(ServerDescription description)
     {
@@ -44,9 +47,27 @@ namespace NMaier.SimpleDlna.GUI
         var i = new ListViewItem(d);
         listDirectories.Items.Add(i);
       }
+      var t = comboNewRestriction.Items[0].ToString();
+      foreach (var r in description.Macs) {
+        var i = listRestrictions.Items.Add(r);
+        i.Tag = 0;
+        i.SubItems.Add(t);
+      }
+      t = comboNewRestriction.Items[1].ToString();
+      foreach (var r in description.Ips) {
+        var i = listRestrictions.Items.Add(r);
+        i.Tag = 1;
+        i.SubItems.Add(t);
+      }
+      t = comboNewRestriction.Items[2].ToString();
+      foreach (var r in description.UserAgents) {
+        var i = listRestrictions.Items.Add(r);
+        i.Tag = 2;
+        i.SubItems.Add(t);
+      }
 
       SizeDirectoryColumn();
-      SizeViewsColumns();
+      SizeColumns(listViews);
     }
 
 
@@ -65,16 +86,30 @@ namespace NMaier.SimpleDlna.GUI
           types |= DlnaMediaTypes.Image;
         }
         var views = (from ListViewItem i in listViews.Items
-                     select i.Text).ToList();
+                     select i.Text).ToArray();
         var dirs = (from ListViewItem i in listDirectories.Items
-                    select i.Text).ToList();
-        var rv = new ServerDescription(
-          textName.Text,
-          ((IItemComparer)comboOrder.SelectedItem).Name,
-          checkOrderDescending.Checked,
-          types,
-          views,
-          dirs);
+                    select i.Text).ToArray();
+        var macs = (from ListViewItem i in listRestrictions.Items
+                    where (int)i.Tag == 0
+                    select i.Text).ToArray();
+        var ips = (from ListViewItem i in listRestrictions.Items
+                   where (int)i.Tag == 1
+                   select i.Text).ToArray();
+        var uas = (from ListViewItem i in listRestrictions.Items
+                   where (int)i.Tag == 2
+                   select i.Text).ToArray();
+        var rv = new ServerDescription()
+        {
+          Name = textName.Text,
+          Order = ((IItemComparer)comboOrder.SelectedItem).Name,
+          OrderDescending = checkOrderDescending.Checked,
+          Types = types,
+          Views = views,
+          Ips = ips,
+          Macs = macs,
+          UserAgents = uas,
+          Directories = dirs.ToArray()
+        };
         return rv;
       }
     }
@@ -117,6 +152,34 @@ namespace NMaier.SimpleDlna.GUI
       SizeDirectoryColumn();
     }
 
+    private void buttonAddRestriction_Click(object sender, EventArgs e)
+    {
+      var valid = false;
+      var re = textRestriction.Text;
+      switch (comboNewRestriction.SelectedIndex) {
+        case 0:
+          valid = IP.IsAcceptedMAC(re);
+          break;
+        case 1:
+          IPAddress o;
+          valid = IPAddress.TryParse(re, out o);
+          break;
+        case 2:
+          valid = !string.IsNullOrWhiteSpace(re);
+          break;
+        default:
+          break;
+      }
+      if (!valid) {
+        errorProvider.SetError(textRestriction, "You must provide a valid value");
+        return;
+      }
+      var item = listRestrictions.Items.Add(re);
+      item.SubItems.Add(comboNewRestriction.SelectedItem.ToString());
+      item.Tag = comboNewRestriction.SelectedIndex;
+      SizeColumns(listRestrictions);
+    }
+
     private void buttonAddView_Click(object sender, EventArgs e)
     {
       var i = comboNewView.SelectedItem as IView;
@@ -124,7 +187,7 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
       listViews.Items.Add(new ListViewItem(new string[] { i.Name, i.Description }));
-      SizeViewsColumns();
+      SizeColumns(listViews);
     }
 
     private void buttonRemoveDirectory_Click(object sender, EventArgs e)
@@ -135,12 +198,24 @@ namespace NMaier.SimpleDlna.GUI
       SizeDirectoryColumn();
     }
 
+    private void buttonRemoveRestriction_Click(object sender, EventArgs e)
+    {
+      foreach (var i in listRestrictions.SelectedItems) {
+        var item = i as ListViewItem;
+        var index = (int)item.Tag;
+        textRestriction.Text = item.Text;
+        comboNewRestriction.SelectedIndex = index;
+        listRestrictions.Items.Remove(item);
+      }
+      SizeColumns(listRestrictions);
+    }
+
     private void buttonRemoveView_Click(object sender, EventArgs e)
     {
       foreach (var i in listViews.SelectedItems) {
         listViews.Items.Remove(i as ListViewItem);
       }
-      SizeViewsColumns();
+      SizeColumns(listViews);
     }
 
     private void checkTypes_Validating(object sender, CancelEventArgs e)
@@ -165,6 +240,7 @@ namespace NMaier.SimpleDlna.GUI
       Icon = Properties.Resources.server;
       AddOrderItems();
       AddViewItems();
+      comboNewRestriction.SelectedIndex = 0;
     }
 
     private void listDirectories_Validating(object sender, CancelEventArgs e)
@@ -178,6 +254,17 @@ namespace NMaier.SimpleDlna.GUI
       }
     }
 
+    private void SizeColumns(ListView lv)
+    {
+      var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
+      if (lv.Items.Count == 0) {
+        mode = ColumnHeaderAutoResizeStyle.HeaderSize;
+      }
+      for (var c = 0; c < lv.Columns.Count; ++c) {
+        lv.Columns[c].AutoResize(mode);
+      }
+    }
+
     private void SizeDirectoryColumn()
     {
       var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
@@ -185,16 +272,6 @@ namespace NMaier.SimpleDlna.GUI
         mode = ColumnHeaderAutoResizeStyle.HeaderSize;
       }
       colDirectory.AutoResize(mode);
-    }
-
-    private void SizeViewsColumns()
-    {
-      var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
-      if (listViews.Items.Count == 0) {
-        mode = ColumnHeaderAutoResizeStyle.HeaderSize;
-      }
-      colViewName.AutoResize(mode);
-      colViewDesc.AutoResize(mode);
     }
 
     private void textName_Validating(object sender, CancelEventArgs e)

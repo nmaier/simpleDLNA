@@ -98,38 +98,48 @@ namespace NMaier.SimpleDlna
         using (var icon = new ProgramIcon()) {
           var server = new HttpServer(options.Port);
           try {
-            server.Info("CTRL-C to terminate");
+            using (var authorizer = new HttpAuthorizer(server)) {
+              if (options.Ips.Length != 0) {
+              authorizer.AddMethod(new IpAuthorizer(options.Ips));
+              }
+              if (options.Macs.Length != 0) {
+                authorizer.AddMethod(new MacAuthorizer(options.Macs));
+              }
+              if (options.UserAgents.Length != 0) {
+                authorizer.AddMethod(new UserAgentAuthorizer(options.UserAgents));
+              }
 
-            Console.Title = "SimpleDLNA - starting ...";
+              Console.Title = "SimpleDLNA - starting ...";
 
-            var types = options.Types[0];
-            foreach (var t in options.Types) {
-              types = types | t;
-              server.InfoFormat("Enabled type {0}", t);
-            }
+              var types = options.Types[0];
+              foreach (var t in options.Types) {
+                types = types | t;
+                server.InfoFormat("Enabled type {0}", t);
+              }
 
-            var friendlyName = "sdlna";
+              var friendlyName = "sdlna";
 
-            if (options.Seperate) {
-              foreach (var d in options.Directories) {
-                server.InfoFormat("Mounting FileServer for {0}", d.FullName);
-                var fs = SetupFileServer(options, types, new DirectoryInfo[] { d });
+              if (options.Seperate) {
+                foreach (var d in options.Directories) {
+                  server.InfoFormat("Mounting FileServer for {0}", d.FullName);
+                  var fs = SetupFileServer(options, types, new DirectoryInfo[] { d });
+                  friendlyName = fs.FriendlyName;
+                  server.RegisterMediaServer(fs);
+                  server.NoticeFormat("{0} mounted", d.FullName);
+                }
+              }
+              else {
+                server.InfoFormat("Mounting FileServer for {0} ({1})", options.Directories[0], options.Directories.Length);
+                var fs = SetupFileServer(options, types, options.Directories);
                 friendlyName = fs.FriendlyName;
                 server.RegisterMediaServer(fs);
-                server.NoticeFormat("{0} mounted", d.FullName);
+                server.NoticeFormat("{0} ({1}) mounted", options.Directories[0], options.Directories.Length);
               }
-            }
-            else {
-              server.InfoFormat("Mounting FileServer for {0} ({1})", options.Directories[0], options.Directories.Length);
-              var fs = SetupFileServer(options, types, options.Directories);
-              friendlyName = fs.FriendlyName;
-              server.RegisterMediaServer(fs);
-              server.NoticeFormat("{0} ({1}) mounted", options.Directories[0], options.Directories.Length);
-            }
 
-            Console.Title = String.Format("{0} - running ...", friendlyName);
+              Console.Title = String.Format("{0} - running ...", friendlyName);
 
-            Run(server);
+              Run(server);
+            }
           }
           finally {
             server.Dispose();
@@ -140,7 +150,7 @@ namespace NMaier.SimpleDlna
         Console.Error.WriteLine("Error: {0}\n\n", ex.Message);
         options.PrintUsage();
       }
-#if DEBUG
+#if !DEBUG
       catch (Exception ex) {
         LogManager.GetLogger(typeof(Program)).Fatal("Failed to run", ex);
       }
@@ -149,6 +159,7 @@ namespace NMaier.SimpleDlna
 
     private static void Run(HttpServer server)
     {
+      server.Info("CTRL-C to terminate");
       BlockEvent.WaitOne();
 
       server.Info("Going down!");

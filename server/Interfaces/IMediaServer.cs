@@ -8,5 +8,7 @@ namespace NMaier.SimpleDlna.Server
     Guid Uuid { get; }
 
     IMediaItem GetItem(string id);
+
+    IHttpAuthorizationMethod Authorizer { get; }
   }
 }

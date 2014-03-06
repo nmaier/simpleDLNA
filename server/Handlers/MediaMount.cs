@@ -30,6 +30,13 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
+    public IHttpAuthorizationMethod Authorizer
+    {
+      get
+      {
+        return server.Authorizer;
+      }
+    }
     public string DescriptorURI
     {
       get
@@ -96,6 +103,10 @@ namespace NMaier.SimpleDlna.Server
 
     public IResponse HandleRequest(IRequest request)
     {
+      if (Authorizer != null && !IPAddress.IsLoopback(request.RemoteEndpoint.Address) && !Authorizer.Authorize(request.Headers, request.RemoteEndpoint, IP.GetMAC(request.RemoteEndpoint.Address))) {
+          throw new HttpStatusException(HttpCodes.DENIED);
+      }
+
       var path = request.Path.Substring(prefix.Length);
       Debug(path);
       if (path == "description.xml") {
@@ -126,7 +137,7 @@ namespace NMaier.SimpleDlna.Server
         return ProcessHtmlRequest(item);
       }
       WarnFormat("Did not understand {0} {1}", request.Method, path);
-      throw new Http404Exception();
+      throw new HttpStatusException(HttpCodes.NOT_FOUND);
     }
   }
 }

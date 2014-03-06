@@ -37,6 +37,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private readonly FileSystemWatcher[] watchers;
 
+    public IHttpAuthorizationMethod Authorizer
+    {
+      get;
+      set;
+    }
+
 
     public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
     {

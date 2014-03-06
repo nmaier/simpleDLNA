@@ -1,6 +1,6 @@
 namespace NMaier.SimpleDlna.Server
 {
-  internal enum HttpCodes : uint
+  public enum HttpCodes : int
   {
     DENIED = 403,
     INTERNAL_ERROR = 500,

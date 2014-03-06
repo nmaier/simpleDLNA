@@ -69,6 +69,7 @@
     <Compile Include="Comparers\TitleComparer.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Handlers\IndexHandler.cs" />
+    <Compile Include="Http\HttpAuthorizationEventArgs.cs" />
     <Compile Include="Http\HttpPhrases.cs" />
     <Compile Include="Interfaces\IBookmarkable.cs" />
     <Compile Include="Interfaces\IMediaAudioResource.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Interfaces\Metadata\IMetaResolution.cs" />
     <Compile Include="Interfaces\Metadata\IMetaVideoItem.cs" />
     <Compile Include="Types\AudioResourceDecorator.cs" />
+    <Compile Include="Http\HttpAuthorizer.cs" />
     <Compile Include="Types\DlnaFlags.cs" />
     <Compile Include="Types\DlnaMaps.cs" />
     <Compile Include="Types\DlnaMime.cs" />
@@ -98,7 +100,7 @@
     <Compile Include="Http\HttpClient.cs" />
     <Compile Include="Http\HttpCodes.cs" />
     <Compile Include="Types\HtmlTools.cs" />
-    <Compile Include="Types\Http404Exception.cs" />
+    <Compile Include="Types\HttpStatusException.cs" />
     <Compile Include="Types\HttpException.cs" />
     <Compile Include="Http\HttpServer.cs" />
     <Compile Include="Handlers\IconHandler.cs" />
@@ -125,11 +127,15 @@
     <Compile Include="Ssdp\SsdpHandler.cs" />
     <Compile Include="Handlers\StaticHandler.cs" />
     <Compile Include="Responses\StringResponse.cs" />
+    <Compile Include="Http\IHttpAuthorizationMethod.cs" />
+    <Compile Include="Http\IpAuthorizer.cs" />
+    <Compile Include="Http\MacAuthorizer.cs" />
     <Compile Include="Types\MediaResourceDecorator.cs" />
     <Compile Include="Types\RawHeaders.cs" />
     <Compile Include="Http\ResponseHeaders.cs" />
     <Compile Include="Types\Identifiers.cs" />
     <Compile Include="Types\UpnpDevice.cs" />
+    <Compile Include="Http\UserAgentAuthorizer.cs" />
     <Compile Include="Types\VirtualClonedFolder.cs" />
     <Compile Include="Types\VirtualFolder.cs" />
     <Compile Include="Views\BaseView.cs" />

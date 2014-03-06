@@ -431,7 +431,7 @@ namespace NMaier.SimpleDlna.Server
             result = HandleXSetBookmark(sparams);
             break;
           default:
-            throw new Http404Exception();
+            throw new HttpStatusException(HttpCodes.NOT_FOUND);
         }
         var response = env.CreateElement(String.Format("u:{0}Response", method.LocalName), method.NamespaceURI);
         rbody.AppendChild(response);

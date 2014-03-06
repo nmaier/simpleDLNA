@@ -7,21 +7,10 @@ namespace NMaier.SimpleDlna.GUI
   [Serializable]
   public class ServerDescription
   {
-    protected ServerDescription()
+    public ServerDescription()
     {
+      UserAgents = Ips = Macs = Views = Directories = new string[0];
     }
-
-
-    public ServerDescription(string name, string order, bool orderDescending, DlnaMediaTypes types, List<string> views, List<string> directories)
-    {
-      Name = name;
-      Order = order;
-      OrderDescending = orderDescending;
-      Types = types;
-      Views = views.ToArray();
-      Directories = directories.ToArray();
-    }
-
 
     public bool Active { get; set; }
     public string[] Directories { get; set; }
@@ -30,6 +19,9 @@ namespace NMaier.SimpleDlna.GUI
     public bool OrderDescending { get; set; }
     public DlnaMediaTypes Types { get; set; }
     public string[] Views { get; set; }
+    public string[] Macs { get; set; }
+    public string[] Ips { get; set; }
+    public string[] UserAgents { get; set; }
 
 
     public void AdoptInfo(ServerDescription other)
@@ -43,6 +35,9 @@ namespace NMaier.SimpleDlna.GUI
       OrderDescending = other.OrderDescending;
       Types = other.Types;
       Views = other.Views;
+      Macs = other.Macs;
+      Ips = other.Ips;
+      UserAgents = other.UserAgents;
     }
 
     public void ToggleActive()

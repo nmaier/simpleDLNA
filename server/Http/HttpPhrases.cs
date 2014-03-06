@@ -10,7 +10,7 @@ namespace NMaier.SimpleDlna.Server
         { HttpCodes.MOVED_PERMANENTLY, "Moved Permanently" },
         { HttpCodes.NOT_MODIFIED, "Not Modified" },
         { HttpCodes.TEMPORARY_REDIRECT, "Temprary Redirect" },
-        { HttpCodes.DENIED, "Access Denied" },
+        { HttpCodes.DENIED, "Forbidden" },
         { HttpCodes.NOT_FOUND, "Not Found" },
         { HttpCodes.RANGE_NOT_SATISFIABLE, "Requested Range not satisfiable" },
         { HttpCodes.INTERNAL_ERROR, "Internal Server Error" } };
