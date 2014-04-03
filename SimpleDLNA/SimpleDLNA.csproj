@@ -97,6 +97,10 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\NgenInstaller.cs">
+      <Link>NgenInstaller.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="FormAbout.cs">
       <SubType>Form</SubType>
     </Compile>

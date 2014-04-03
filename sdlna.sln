@@ -25,6 +25,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Global", "Global", "{4710D7C1-4ADC-4D3E-BD48-3295B7573B2A}"
 	ProjectSection(SolutionItems) = preProject
 		GlobalAssemblyInfo.cs = GlobalAssemblyInfo.cs
+		NgenInstaller.cs = NgenInstaller.cs
 	EndProjectSection
 EndProject
 Global
