@@ -6,6 +6,6 @@ namespace NMaier.SimpleDlna.Server
   {
     Stream Body { get; }
     IHeaders Headers { get; }
-    HttpCodes Status { get; }
+    HttpCode Status { get; }
   }
 }

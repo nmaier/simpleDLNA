@@ -24,7 +24,7 @@ namespace NMaier.SimpleDlna.Server
     {
       var item = aItem as IMediaFolder;
       if (item == null) {
-        throw new HttpStatusException(HttpCodes.NOT_FOUND);
+        throw new HttpStatusException(HttpCode.NotFound);
       }
 
       var article = HtmlTools.CreateHtmlArticle(string.Format("Folder: {0}", item.Title));
@@ -91,7 +91,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
 
-      return new StringResponse(HttpCodes.OK, document.OuterXml);
+      return new StringResponse(HttpCode.Ok, document.OuterXml);
     }
   }
 }

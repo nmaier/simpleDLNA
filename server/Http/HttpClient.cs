@@ -25,13 +25,13 @@ namespace NMaier.SimpleDlna.Server
 
     private static readonly Regex bytes = new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
 
-    private readonly static IHandler Error403 = new StaticHandler(new StringResponse(HttpCodes.DENIED, "<!doctype html><title>Access denied!</title><h1>Access denied!</h1><p>You're not allowed to access the requested resource.</p>"));
+    private readonly static IHandler Error403 = new StaticHandler(new StringResponse(HttpCode.Denied, "<!doctype html><title>Access denied!</title><h1>Access denied!</h1><p>You're not allowed to access the requested resource.</p>"));
 
-    private readonly static IHandler Error404 = new StaticHandler(new StringResponse(HttpCodes.NOT_FOUND, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
+    private readonly static IHandler Error404 = new StaticHandler(new StringResponse(HttpCode.NotFound, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
 
-    private readonly static IHandler Error416 = new StaticHandler(new StringResponse(HttpCodes.RANGE_NOT_SATISFIABLE, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
+    private readonly static IHandler Error416 = new StaticHandler(new StringResponse(HttpCode.RangeNotSatisfiable, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
 
-    private readonly static IHandler Error500 = new StaticHandler(new StringResponse(HttpCodes.INTERNAL_ERROR, "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"));
+    private readonly static IHandler Error500 = new StaticHandler(new StringResponse(HttpCode.InternalError, "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"));
 
     private readonly IHeaders headers = new Headers();
 
@@ -177,12 +177,12 @@ namespace NMaier.SimpleDlna.Server
       return contentLength;
     }
 
-    private Stream ProcessRanges(IResponse response, ref HttpCodes status)
+    private Stream ProcessRanges(IResponse rangedResponse, ref HttpCode status)
     {
-      var responseBody = response.Body;
+      var responseBody = rangedResponse.Body;
       var contentLength = GetContentLengthFromStream(responseBody);
       string ar;
-      if (status != HttpCodes.OK && contentLength > 0 || !headers.TryGetValue("Range", out ar)) {
+      if (status != HttpCode.Ok && contentLength > 0 || !headers.TryGetValue("Range", out ar)) {
         return responseBody;
       }
       try {
@@ -201,17 +201,17 @@ namespace NMaier.SimpleDlna.Server
         }
         if (start >= end) {
           responseBody.Close();
-          response = Error416.HandleRequest(this);
-          return response.Body;
+          rangedResponse = Error416.HandleRequest(this);
+          return rangedResponse.Body;
         }
 
         if (start > 0) {
           responseBody.Seek(start, SeekOrigin.Current);
         }
         contentLength = end - start + 1;
-        response.Headers["Content-Length"] = contentLength.ToString();
-        response.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, totalLength));
-        status = HttpCodes.PARTIAL;
+        rangedResponse.Headers["Content-Length"] = contentLength.ToString();
+        rangedResponse.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, totalLength));
+        status = HttpCode.Partial;
       }
       catch (Exception ex) {
         Warn(String.Format("{0} - Failed to process range request!", this), ex);
@@ -375,14 +375,14 @@ namespace NMaier.SimpleDlna.Server
       State = HttpStates.WRITEBEGIN;
       try {
         if (!owner.AuthorizeClient(this)) {
-          throw new HttpStatusException(HttpCodes.DENIED);
+          throw new HttpStatusException(HttpCode.Denied);
         }
         if (string.IsNullOrEmpty(path)) {
-          throw new HttpStatusException(HttpCodes.NOT_FOUND);
+          throw new HttpStatusException(HttpCode.NotFound);
         }
         var handler = owner.FindHandler(path);
         if (handler == null) {
-          throw new HttpStatusException(HttpCodes.NOT_FOUND);
+          throw new HttpStatusException(HttpCode.NotFound);
         }
         response = handler.HandleRequest(this);
         if (response == null) {
@@ -396,13 +396,13 @@ namespace NMaier.SimpleDlna.Server
         InfoFormat("{0} - Got a {2}: {1}", this, path, ex.Code);
 #endif
         switch (ex.Code) {
-          case HttpCodes.NOT_FOUND:
+          case HttpCode.NotFound:
             response = Error404.HandleRequest(this);
             break;
-          case HttpCodes.DENIED:
+          case HttpCode.Denied:
             response = Error403.HandleRequest(this);
             break;
-          case HttpCodes.INTERNAL_ERROR:
+          case HttpCode.InternalError:
             response = Error500.HandleRequest(this);
             break;
           default:

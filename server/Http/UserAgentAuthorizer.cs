@@ -7,7 +7,7 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class UserAgentAuthorizer : Logging, IHttpAuthorizationMethod
   {
-    private readonly Dictionary<string, object> uas = new Dictionary<string, object>();
+    private readonly Dictionary<string, object> userAgents = new Dictionary<string, object>();
 
 
     private UserAgentAuthorizer()
@@ -15,19 +15,25 @@ namespace NMaier.SimpleDlna.Server
     }
 
 
-    public UserAgentAuthorizer(IEnumerable<string> uas)
+    public UserAgentAuthorizer(IEnumerable<string> userAgents)
     {
-      foreach (var u in uas) {
+      if (userAgents == null) {
+        throw new ArgumentNullException("userAgents");
+      }
+      foreach (var u in userAgents) {
         if (string.IsNullOrEmpty(u)) {
           throw new FormatException("Invalid User-Agent supplied");
         }
-        this.uas.Add(u, null);
+        this.userAgents.Add(u, null);
       }
     }
 
 
     public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
     {
+      if (headers == null) {
+        throw new ArgumentNullException("headers");
+      }
       string ua;
       if (!headers.TryGetValue("User-Agent", out ua)) {
         return false;
@@ -35,7 +41,7 @@ namespace NMaier.SimpleDlna.Server
       if (string.IsNullOrEmpty(ua)) {
         return false;
       }
-      var rv = uas.ContainsKey(ua);
+      var rv = userAgents.ContainsKey(ua);
       if (!rv) {
         DebugFormat("Rejecting {0}. Not in User-Agent whitelist", ua);
       }

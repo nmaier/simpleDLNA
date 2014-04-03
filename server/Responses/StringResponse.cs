@@ -9,14 +9,14 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly IHeaders headers = new ResponseHeaders();
 
-    private readonly HttpCodes status;
+    private readonly HttpCode status;
 
 
-    public StringResponse(HttpCodes aStatus, string aBody)
+    public StringResponse(HttpCode aStatus, string aBody)
       : this(aStatus, "text/html; charset=utf-8", aBody)
     {
     }
-    public StringResponse(HttpCodes aStatus, string aMime, string aBody)
+    public StringResponse(HttpCode aStatus, string aMime, string aBody)
     {
       status = aStatus;
       body = aBody;
@@ -40,7 +40,7 @@ namespace NMaier.SimpleDlna.Server
         return headers;
       }
     }
-    public HttpCodes Status
+    public HttpCode Status
     {
       get
       {

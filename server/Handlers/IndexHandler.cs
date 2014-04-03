@@ -38,7 +38,7 @@ namespace NMaier.SimpleDlna.Server
 
       article.AppendChild(list);
 
-      return new StringResponse(HttpCodes.OK, document.OuterXml);
+      return new StringResponse(HttpCode.Ok, document.OuterXml);
     }
   }
 }

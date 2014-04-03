@@ -38,8 +38,8 @@ namespace NMaier.SimpleDlna.Server
     }
     public HttpServer(int port)
     {
-      prefixes.TryAdd("/favicon.ico", new StaticHandler(new ResourceResponse(HttpCodes.OK, "image/icon", "favicon")));
-      prefixes.TryAdd("/static/browse.css", new StaticHandler(new ResourceResponse(HttpCodes.OK, "text/css", "browse_css")));
+      prefixes.TryAdd("/favicon.ico", new StaticHandler(new ResourceResponse(HttpCode.Ok, "image/icon", "favicon")));
+      prefixes.TryAdd("/static/browse.css", new StaticHandler(new ResourceResponse(HttpCode.Ok, "text/css", "browse_css")));
       RegisterHandler(new IconHandler());
 
       listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));

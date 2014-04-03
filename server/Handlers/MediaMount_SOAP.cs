@@ -408,7 +408,7 @@ namespace NMaier.SimpleDlna.Server
       var rbody = env.CreateElement("SOAP-ENV:Body", NS_SOAPENV);
       env.DocumentElement.AppendChild(rbody);
 
-      var code = HttpCodes.OK;
+      var code = HttpCode.Ok;
       try {
         IEnumerable<KeyValuePair<string, string>> result;
         switch (method.LocalName) {
@@ -431,7 +431,7 @@ namespace NMaier.SimpleDlna.Server
             result = HandleXSetBookmark(sparams);
             break;
           default:
-            throw new HttpStatusException(HttpCodes.NOT_FOUND);
+            throw new HttpStatusException(HttpCode.NotFound);
         }
         var response = env.CreateElement(String.Format("u:{0}Response", method.LocalName), method.NamespaceURI);
         rbody.AppendChild(response);
@@ -443,7 +443,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       catch (Exception ex) {
-        code = HttpCodes.INTERNAL_ERROR;
+        code = HttpCode.InternalError;
         var fault = env.CreateElement("SOAP-ENV", "Fault", NS_SOAPENV);
         var faultCode = env.CreateElement("faultcode");
         faultCode.InnerText = "500";

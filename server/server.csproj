@@ -98,7 +98,7 @@
     <Compile Include="Types\DlnaMediaTypes.cs" />
     <Compile Include="Types\Headers.cs" />
     <Compile Include="Http\HttpClient.cs" />
-    <Compile Include="Http\HttpCodes.cs" />
+    <Compile Include="Http\HttpCode.cs" />
     <Compile Include="Types\HtmlTools.cs" />
     <Compile Include="Types\HttpStatusException.cs" />
     <Compile Include="Types\HttpException.cs" />
@@ -128,7 +128,7 @@
     <Compile Include="Handlers\StaticHandler.cs" />
     <Compile Include="Responses\StringResponse.cs" />
     <Compile Include="Http\IHttpAuthorizationMethod.cs" />
-    <Compile Include="Http\IpAuthorizer.cs" />
+    <Compile Include="Http\IPAddressAuthorizer.cs" />
     <Compile Include="Http\MacAuthorizer.cs" />
     <Compile Include="Types\MediaResourceDecorator.cs" />
     <Compile Include="Types\RawHeaders.cs" />

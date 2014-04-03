@@ -1,8 +1,8 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -11,10 +11,13 @@ namespace NMaier.SimpleDlna.Utilities
     private const int BUFFER_SIZE = 1 << 16;
 
     private const long SMALL_SEEK = BUFFER_SIZE << 15;
+
     private const int TIMEOUT = 30000;
 
 
     private Stream bufferedStream;
+
+    private long? length;
 
     private readonly static ILog logger = LogManager.GetLogger(typeof(HttpStream));
 
@@ -23,7 +26,6 @@ namespace NMaier.SimpleDlna.Utilities
     private readonly HttpMethod method;
 
     private long position = 0;
-    private long? length;
 
     private readonly Uri referrer;
 
@@ -36,16 +38,8 @@ namespace NMaier.SimpleDlna.Utilities
     private readonly Uri uri;
 
 
-    public HttpStream(HttpMethod method, string uri)
-      : this(method, uri, null)
-    {
-    }
     public HttpStream(HttpMethod method, Uri uri)
       : this(method, uri, null)
-    {
-    }
-    public HttpStream(HttpMethod method, string uri, string referrer)
-      : this(method, new Uri(uri), new Uri(referrer))
     {
     }
     public HttpStream(HttpMethod method, Uri uri, Uri referrer)
@@ -61,15 +55,13 @@ namespace NMaier.SimpleDlna.Utilities
 
     public override bool CanRead
     {
-      get
-      {
+      get {
         return true;
       }
     }
     public override bool CanSeek
     {
-      get
-      {
+      get {
         if (response == null) {
           OpenAt(0, HttpMethod.HEAD);
         }
@@ -85,22 +77,19 @@ namespace NMaier.SimpleDlna.Utilities
     }
     public override bool CanTimeout
     {
-      get
-      {
+      get {
         return true;
       }
     }
     public override bool CanWrite
     {
-      get
-      {
+      get {
         return false;
       }
     }
     public string ContentType
     {
-      get
-      {
+      get {
         if (response == null) {
           OpenAt(0, HttpMethod.HEAD);
         }
@@ -109,8 +98,7 @@ namespace NMaier.SimpleDlna.Utilities
     }
     public DateTime LastModified
     {
-      get
-      {
+      get {
         if (response == null) {
           OpenAt(0, HttpMethod.HEAD);
         }
@@ -119,8 +107,7 @@ namespace NMaier.SimpleDlna.Utilities
     }
     public override long Length
     {
-      get
-      {
+      get {
         if (!length.HasValue) {
           OpenAt(0, HttpMethod.HEAD);
           length = response.ContentLength;
@@ -133,19 +120,16 @@ namespace NMaier.SimpleDlna.Utilities
     }
     public override long Position
     {
-      get
-      {
+      get {
         return position;
       }
-      set
-      {
+      set {
         Seek(Position, SeekOrigin.Begin);
       }
     }
     public Uri Uri
     {
-      get
-      {
+      get {
         return new Uri(uri.ToString());
       }
     }
@@ -212,8 +196,10 @@ namespace NMaier.SimpleDlna.Utilities
       if (pos > 0 && response.StatusCode != HttpStatusCode.PartialContent) {
         throw new IOException("Failed to open the http stream at a specific position");
       }
-      else if (pos == 0 && response.StatusCode != HttpStatusCode.OK) {
-        throw new IOException("Failed to open the http stream");
+      else {
+        if (pos == 0 && response.StatusCode != HttpStatusCode.OK) {
+          throw new IOException("Failed to open the http stream");
+        }
       }
       logger.InfoFormat("Opened {0} {1} at {2}", method, uri, pos);
     }
@@ -248,7 +234,6 @@ namespace NMaier.SimpleDlna.Utilities
 
     public override void Flush()
     {
-      return;
     }
 
     public override int Read(byte[] buffer, int offset, int count)

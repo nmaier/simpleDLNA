@@ -104,16 +104,16 @@ namespace NMaier.SimpleDlna.Server
     public IResponse HandleRequest(IRequest request)
     {
       if (Authorizer != null && !IPAddress.IsLoopback(request.RemoteEndpoint.Address) && !Authorizer.Authorize(request.Headers, request.RemoteEndpoint, IP.GetMAC(request.RemoteEndpoint.Address))) {
-          throw new HttpStatusException(HttpCodes.DENIED);
+          throw new HttpStatusException(HttpCode.Denied);
       }
 
       var path = request.Path.Substring(prefix.Length);
       Debug(path);
       if (path == "description.xml") {
-        return new StringResponse(HttpCodes.OK, "text/xml", GenerateDescriptor(request.LocalEndPoint.Address));
+        return new StringResponse(HttpCode.Ok, "text/xml", GenerateDescriptor(request.LocalEndPoint.Address));
       }
       if (path == "contentDirectory.xml") {
-        return new ResourceResponse(HttpCodes.OK, "text/xml", "contentdirectory");
+        return new ResourceResponse(HttpCode.Ok, "text/xml", "contentdirectory");
       }
       if (path == "control") {
         return ProcessSoapRequest(request);
@@ -137,7 +137,7 @@ namespace NMaier.SimpleDlna.Server
         return ProcessHtmlRequest(item);
       }
       WarnFormat("Did not understand {0} {1}", request.Method, path);
-      throw new HttpStatusException(HttpCodes.NOT_FOUND);
+      throw new HttpStatusException(HttpCode.NotFound);
     }
   }
 }

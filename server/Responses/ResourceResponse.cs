@@ -11,14 +11,14 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly byte[] resource;
 
-    private readonly HttpCodes status;
+    private readonly HttpCode status;
 
 
-    public ResourceResponse(HttpCodes aStatus, string type, string aResource)
+    public ResourceResponse(HttpCode aStatus, string type, string aResource)
       : this(aStatus, type, Properties.Resources.ResourceManager, aResource)
     {
     }
-    public ResourceResponse(HttpCodes aStatus, string type, ResourceManager aResourceManager, string aResource)
+    public ResourceResponse(HttpCode aStatus, string type, ResourceManager aResourceManager, string aResource)
     {
       status = aStatus;
       try {
@@ -48,7 +48,7 @@ namespace NMaier.SimpleDlna.Server
         return headers;
       }
     }
-    public HttpCodes Status
+    public HttpCode Status
     {
       get
       {

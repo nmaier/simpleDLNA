@@ -9,7 +9,7 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly Headers headers;
 
-    private readonly HttpCodes status = HttpCodes.OK;
+    private readonly HttpCode status = HttpCode.Ok;
 
     private readonly IMediaResource item;
 
@@ -53,7 +53,7 @@ namespace NMaier.SimpleDlna.Server
         return headers;
       }
     }
-    public HttpCodes Status
+    public HttpCode Status
     {
       get
       {

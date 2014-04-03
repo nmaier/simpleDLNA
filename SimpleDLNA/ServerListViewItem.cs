@@ -113,7 +113,7 @@ namespace NMaier.SimpleDlna.GUI
         fileServer.Load();
         var authorizer = new HttpAuthorizer();
         if (Description.Ips.Length != 0) {
-          authorizer.AddMethod(new IpAuthorizer(Description.Ips));
+          authorizer.AddMethod(new IPAddressAuthorizer(Description.Ips));
         }
         if (Description.Macs.Length != 0) {
           authorizer.AddMethod(new MacAuthorizer(Description.Macs));

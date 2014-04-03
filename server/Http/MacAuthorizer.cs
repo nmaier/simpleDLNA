@@ -17,6 +17,9 @@ namespace NMaier.SimpleDlna.Server
 
     public MacAuthorizer(IEnumerable<string> macs)
     {
+      if (macs == null) {
+        throw new ArgumentNullException("macs");
+      }
       foreach (var m in macs) {
         var mac = m.ToUpperInvariant().Trim();
         if (!IP.IsAcceptedMAC(mac)) {

@@ -100,7 +100,7 @@ namespace NMaier.SimpleDlna
           try {
             using (var authorizer = new HttpAuthorizer(server)) {
               if (options.Ips.Length != 0) {
-              authorizer.AddMethod(new IpAuthorizer(options.Ips));
+              authorizer.AddMethod(new IPAddressAuthorizer(options.Ips));
               }
               if (options.Macs.Length != 0) {
                 authorizer.AddMethod(new MacAuthorizer(options.Macs));

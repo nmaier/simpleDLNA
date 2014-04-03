@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -5,23 +6,26 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
-  public sealed class IpAuthorizer : Logging, IHttpAuthorizationMethod
+  public sealed class IPAddressAuthorizer : Logging, IHttpAuthorizationMethod
   {
     private readonly Dictionary<IPAddress, object> ips = new Dictionary<IPAddress, object>();
 
 
-    private IpAuthorizer()
+    private IPAddressAuthorizer()
     {
     }
 
 
-    public IpAuthorizer(IEnumerable<IPAddress> addresses)
+    public IPAddressAuthorizer(IEnumerable<IPAddress> addresses)
     {
+      if (addresses == null) {
+        throw new ArgumentNullException("addresses");
+      }
       foreach (var ip in addresses) {
         ips.Add(ip, null);
       }
     }
-    public IpAuthorizer(IEnumerable<string> addresses)
+    public IPAddressAuthorizer(IEnumerable<string> addresses)
       : this((from a in addresses
               select IPAddress.Parse(a)))
     {

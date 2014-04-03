@@ -1,23 +1,20 @@
-using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
-  public class HttpAuthorizer : Logging, IHttpAuthorizationMethod, IDisposable
+  public sealed class HttpAuthorizer : Logging, IHttpAuthorizationMethod, IDisposable
   {
     private readonly List<IHttpAuthorizationMethod> methods = new List<IHttpAuthorizationMethod>();
 
-
-    protected readonly HttpServer server = null;
+    private readonly HttpServer server = null;
 
 
     public HttpAuthorizer()
     {
     }
-
-
     public HttpAuthorizer(HttpServer server)
     {
       if (server == null) {
@@ -42,7 +39,7 @@ namespace NMaier.SimpleDlna.Server
       methods.Add(method);
     }
 
-    public virtual bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
+    public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
     {
       if (methods.Count == 0) {
         return true;

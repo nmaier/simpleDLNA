@@ -15,7 +15,7 @@ namespace NMaier.SimpleDlna.Server
     {
       var resource = req.Path.Substring(Prefix.Length);
       var isPng = resource.EndsWith(".png");
-      return new ResourceResponse(HttpCodes.OK, isPng ? "image/png" : "image/jpeg", resource);
+      return new ResourceResponse(HttpCode.Ok, isPng ? "image/png" : "image/jpeg", resource);
     }
   }
 }
