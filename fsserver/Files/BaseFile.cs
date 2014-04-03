@@ -88,14 +88,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       get
       {
         try {
-          return new FileStream(
-            Item.FullName,
-            FileMode.Open,
-            FileAccess.Read,
-            FileShare.ReadWrite | FileShare.Delete,
-            1 << 17,
-            FileOptions.Asynchronous | FileOptions.SequentialScan
-            );
+          return new FileReadStream(Item);
         }
         catch (FileNotFoundException ex) {
           Error("Failed to access: " + Item.FullName, ex);
