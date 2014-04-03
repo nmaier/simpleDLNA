@@ -55,9 +55,17 @@ namespace NMaier.SimpleDlna.Utilities
       streams.Enqueue(stream);
     }
 
+    public override void Close()
+    {
+      foreach (var stream in streams) {
+        stream.Close();
+        stream.Dispose();
+      }
+      streams.Clear();
+    }
+
     public override void Flush()
     {
-      return;
     }
 
     public override int Read(byte[] buffer, int offset, int count)
@@ -67,9 +75,13 @@ namespace NMaier.SimpleDlna.Utilities
       }
 
       var read = streams.Peek().Read(buffer, offset, count);
-      if (read <= 0) {
-        streams.Dequeue().Dispose();
-        return read + Read(buffer, offset + read, count - read);
+      if (read < count) {
+        var sndRead = streams.Peek().Read(buffer, offset + read, count - read);
+        if (sndRead <= 0) {
+          streams.Dequeue().Dispose();
+          return read + Read(buffer, offset + read, count - read);
+        }
+        read += sndRead;
       }
       return read;
     }
