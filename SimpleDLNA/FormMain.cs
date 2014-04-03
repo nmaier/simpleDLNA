@@ -246,7 +246,10 @@ namespace NMaier.SimpleDlna.GUI
           Task.Factory.StartNew(() =>
           {
             item.UpdateInfo(desc);
-            SaveConfig();
+            BeginInvoke((Action)(() =>
+            {
+              SaveConfig();
+            }));
           });
         }
       }
