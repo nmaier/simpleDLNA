@@ -58,7 +58,6 @@ namespace NMaier.SimpleDlna.Thumbnails
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
     {
-      Debug("Starting ffmpeg");
       using (var thumb = new MemoryStream()) {
         var pump = new StreamPump(p.StandardOutput.BaseStream, thumb, null, 4096);
         if (!p.WaitForExit(20000)) {
@@ -68,7 +67,6 @@ namespace NMaier.SimpleDlna.Thumbnails
         if (p.ExitCode != 0) {
           throw new ArgumentException("ffmpeg does not understand the stream");
         }
-        Debug("Done ffmpeg");
         if (!pump.Wait(2000)) {
           throw new ArgumentException("stream reading timed out");
         }

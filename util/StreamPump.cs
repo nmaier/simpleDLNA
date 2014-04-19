@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  public sealed class StreamPump : Logging, IDisposable
+  public sealed class StreamPump : IDisposable
   {
     private readonly byte[] buffer;
 
@@ -46,7 +46,6 @@ namespace NMaier.SimpleDlna.Utilities
           try {
             var read = Input.EndRead(readResult);
             if (read <= 0) {
-              DebugFormat("Done pumping {0}", read);
               Finish(StreamPumpResult.Delivered);
               return;
             }
@@ -59,24 +58,20 @@ namespace NMaier.SimpleDlna.Utilities
                   Pump();
                 }
                 catch (Exception ex) {
-                  Debug(ex);
                   Finish(StreamPumpResult.Aborted);
                 }
               }, null);
             }
             catch (Exception ex) {
-              Debug(ex);
               Finish(StreamPumpResult.Aborted);
             }
           }
           catch (Exception ex) {
-            Error(ex);
             Finish(StreamPumpResult.Aborted);
           }
         }, null);
       }
       catch (Exception ex) {
-        Error(ex);
         Finish(StreamPumpResult.Aborted);
       }
     }

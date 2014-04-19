@@ -43,7 +43,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
             if (store.HasCover(file)) {
               continue;
             }
-            logger.DebugFormat("Trying {0}", file.Item.FullName);
             file.LoadCover();
             using (var k = file.Cover.Content) {
               k.ReadByte();

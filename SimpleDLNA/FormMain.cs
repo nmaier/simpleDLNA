@@ -133,14 +133,14 @@ namespace NMaier.SimpleDlna.GUI
 
       var layout = new PatternLayout()
       {
-        ConversionPattern = "%date %6level [%3thread] %-14.14logger{1} - %message%newline%exception"
+        ConversionPattern = "%date %6level [%3thread] %-30.30logger{1} - %message%newline%exception"
       };
       layout.ActivateOptions();
       var fileAppender = new RollingFileAppender()
       {
         File = logFile.FullName,
         Layout = layout,
-        MaximumFileSize = "5MB",
+        MaximumFileSize = "10MB",
         MaxSizeRollBackups = 3,
         RollingStyle = RollingFileAppender.RollingMode.Size
       };
