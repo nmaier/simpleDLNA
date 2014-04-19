@@ -135,6 +135,7 @@
     <Compile Include="Types\RawHeaders.cs" />
     <Compile Include="Http\ResponseHeaders.cs" />
     <Compile Include="Types\Identifiers.cs" />
+    <Compile Include="Types\SubTitle.cs" />
     <Compile Include="Types\UpnpDevice.cs" />
     <Compile Include="Http\UserAgentAuthorizer.cs" />
     <Compile Include="Types\VirtualClonedFolder.cs" />

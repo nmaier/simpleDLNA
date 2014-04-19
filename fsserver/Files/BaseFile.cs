@@ -170,8 +170,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
         rv.Add("Title", Title);
         rv.Add("MediaType", MediaType.ToString());
         rv.Add("Type", Type.ToString());
-        rv.Add("SizeRaw", InfoSize.ToString());
-        rv.Add("Size", InfoSize.Value.FormatFileSize());
+        if (InfoSize.HasValue) {
+          rv.Add("SizeRaw", InfoSize.ToString());
+          rv.Add("Size", InfoSize.Value.FormatFileSize());
+        }
         rv.Add("Date", InfoDate.ToString());
         rv.Add("DateO", InfoDate.ToString("o"));
         try {

@@ -9,14 +9,17 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly Headers headers;
 
-    private readonly HttpCode status = HttpCode.Ok;
-
     private readonly IMediaResource item;
 
+    private readonly string prefix;
 
-    public ItemResponse(IRequest request, IMediaResource aItem, string transferMode = "Streaming")
+    private readonly HttpCode status = HttpCode.Ok;
+
+
+    public ItemResponse(string prefix, IRequest request, IMediaResource item, string transferMode = "Streaming")
     {
-      item = aItem;
+      this.prefix = prefix;
+      this.item = item;
       headers = new ResponseHeaders(noCache: !(item is IMediaCoverResource));
       var meta = item as IMetaInfo;
       if (meta != null) {
@@ -26,14 +29,34 @@ namespace NMaier.SimpleDlna.Server
       headers.Add("Accept-Ranges", "bytes");
       headers.Add("Content-Type", DlnaMaps.Mime[item.Type]);
       if (request.Headers.ContainsKey("getcontentFeatures.dlna.org")) {
-        if (item.MediaType == DlnaMediaTypes.Image) {
-          headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultInteractive));
+        try {
+          if (item.MediaType == DlnaMediaTypes.Image) {
+            headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultInteractive));
+          }
+          else {
+            headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultStreaming));
+          }
         }
-        else {
-          headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultStreaming));
+        catch (NotSupportedException) {
+        }
+        catch (NotImplementedException) {
         }
       }
-      Headers.Add("transferMode.dlna.org", transferMode);
+      if (request.Headers.ContainsKey("getCaptionInfo.sec")) {
+        var mvi = item as IMetaVideoItem;
+        if (mvi != null && mvi.SubTitle.HasSubtitle) {
+          var surl = String.Format(
+            "http://{0}:{1}{2}subtitle/{3}/st.srt",
+            request.LocalEndPoint.Address,
+            request.LocalEndPoint.Port,
+            prefix,
+            item.Id
+            );
+          DebugFormat("Sending subtitles {0}", surl);
+          headers.Add("CaptionInfo.sec", surl);
+        }
+      }
+      headers.Add("transferMode.dlna.org", transferMode);
 
       Debug(headers);
     }

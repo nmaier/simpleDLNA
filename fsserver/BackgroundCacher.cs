@@ -2,24 +2,14 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
-  internal sealed class Thumbnailer
+  internal sealed class BackgroundCacher
   {
-    private struct Item
-    {
-      public readonly WeakReference Store;
-      public readonly WeakReference File;
-
-      public Item(WeakReference store, WeakReference file)
-      {
-        Store = store;
-        File = file;
-      }
-    }
-
     private static readonly BlockingCollection<Item> queue = CreateQueue();
+
 
     private static BlockingCollection<Item> CreateQueue()
     {
@@ -34,8 +24,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private static void Run()
     {
-      var logger = log4net.LogManager.GetLogger(typeof(Thumbnailer));
-      logger.Debug("Thumber started");
+      var logger = log4net.LogManager.GetLogger(typeof(BackgroundCacher));
+      logger.Debug("started");
+      var loadedSubTitles = 0ul;
       try {
         for (; ; ) {
           var item = queue.Take();
@@ -45,6 +36,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
             continue;
           }
           try {
+            var mvi = file as IMetaVideoItem;
+            if (mvi != null && mvi.SubTitle.HasSubtitle) {
+              loadedSubTitles++;
+            }
             if (store.HasCover(file)) {
               continue;
             }
@@ -55,20 +50,33 @@ namespace NMaier.SimpleDlna.FileMediaServer
             }
           }
           catch (Exception) {
-            // Already logged and don't care.
           }
         }
       }
       finally {
-        logger.Debug("Thumber stopped");
+        logger.DebugFormat("stopped subtitles: {0}", loadedSubTitles);
       }
     }
+
 
     public static void AddFiles(FileStore store, IEnumerable<WeakReference> items)
     {
       var storeRef = new WeakReference(store);
       foreach (var i in items) {
         queue.Add(new Item(storeRef, i));
+      }
+    }
+
+
+    private struct Item
+    {
+      public readonly WeakReference File;
+      public readonly WeakReference Store;
+
+      public Item(WeakReference store, WeakReference file)
+      {
+        Store = store;
+        File = file;
       }
     }
   }

@@ -69,6 +69,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return bytes;
       }
     }
+    IMediaCoverResource IMediaCover.Cover
+    {
+      get
+      {
+        return this;
+      }
+    }
 
 
     public Stream Content
@@ -212,11 +219,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       info.AddValue("b", bytes);
       info.AddValue("w", width);
       info.AddValue("h", height);
-    }
-
-    IMediaCoverResource IMediaCover.Cover
-    {
-      get { return this; }
     }
   }
 }

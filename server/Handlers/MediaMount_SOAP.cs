@@ -27,27 +27,6 @@ namespace NMaier.SimpleDlna.Server
     private readonly static IDictionary<string, AttributeCollection> soapCache = new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
 
 
-    private static void AddActors(IMediaResource resource, XmlElement item)
-    {
-      var mvi = resource as IMetaVideoItem;
-      if (mvi == null) {
-        return;
-      }
-      try {
-        var actors = mvi.MetaActors;
-        if (actors != null) {
-          foreach (var actor in actors) {
-            var e = item.OwnerDocument.CreateElement("upnp", "actor", NS_UPNP);
-            e.InnerText = actor;
-            item.AppendChild(e);
-          }
-        }
-      }
-      catch (Exception) {
-        return;
-      }
-    }
-
     private static void AddBookmarkInfo(IMediaResource resource, XmlElement item)
     {
       var bookmarkable = resource as IBookmarkable;
@@ -72,7 +51,7 @@ namespace NMaier.SimpleDlna.Server
       try {
         var c = cover.Cover;
         var curl = String.Format(
-          "http://{0}:{1}{2}cover/{3}",
+          "http://{0}:{1}{2}cover/{3}/i.jpg",
           request.LocalEndPoint.Address,
           request.LocalEndPoint.Port,
           prefix,
@@ -173,6 +152,47 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
+    private void AddVideoProperties(IRequest request, IMediaResource resource, XmlElement item)
+    {
+      var mvi = resource as IMetaVideoItem;
+      if (mvi == null) {
+        return;
+      }
+      try {
+        var actors = mvi.MetaActors;
+        if (actors != null) {
+          foreach (var actor in actors) {
+            var e = item.OwnerDocument.CreateElement("upnp", "actor", NS_UPNP);
+            e.InnerText = actor;
+            item.AppendChild(e);
+          }
+        }
+      }
+      catch (Exception) {
+      }
+#if ANNOUNCE_SUBTITLE_IN_SOAP
+      // This is a kind of costly operation, as getting subtitles in general for the
+      // first time is costly. Most Samsung TVs seem to query the subtitle when actually
+      // playing a file anyway (see ItemResponse), and that should be enough.
+      if (mvi.SubTitle.HasSubtitle) {
+        var surl = String.Format(
+          "http://{0}:{1}{2}subtitle/{3}/st.srt",
+          request.LocalEndPoint.Address,
+          request.LocalEndPoint.Port,
+          prefix,
+          resource.Id
+          );
+        var result = item.OwnerDocument;
+        var srt = result.CreateElement("sec", "CaptionInfoEx", NS_SEC);
+        var srttype = result.CreateAttribute("sec", "type", NS_SEC);
+        srttype.InnerText = "srt";
+        srt.SetAttributeNode(srttype);
+        srt.InnerText = surl;
+        item.AppendChild(srt);
+      }
+#endif
+    }
+
     private static void Browse_AddFolder(XmlDocument result, IMediaFolder f)
     {
       var meta = f as IMetaInfo;
@@ -218,7 +238,7 @@ namespace NMaier.SimpleDlna.Server
 
       AddGeneralProperties(props, item);
 
-      AddActors(resource, item);
+      AddVideoProperties(request, resource, item);
 
       var title = result.CreateElement("dc", "title", NS_DC);
       title.InnerText = resource.Title;
@@ -226,7 +246,7 @@ namespace NMaier.SimpleDlna.Server
 
       var res = result.CreateElement(string.Empty, "res", NS_DIDL);
       res.InnerText = String.Format(
-        "http://{0}:{1}{2}file/{3}",
+        "http://{0}:{1}{2}file/{3}/res",
         request.LocalEndPoint.Address,
         request.LocalEndPoint.Port,
         prefix,

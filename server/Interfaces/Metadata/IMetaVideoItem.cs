@@ -6,5 +6,6 @@ namespace NMaier.SimpleDlna.Server.Metadata
   {
     IEnumerable<string> MetaActors { get; }
     string MetaDirector { get; }
+    SubTitle SubTitle { get; }
   }
 }

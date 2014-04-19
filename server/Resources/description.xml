@@ -18,8 +18,8 @@
 <modelNumber></modelNumber> 
 <modelURL>https://tn123.org/</modelURL> 
 <serialNumber></serialNumber>
-<sec:ProductCap>DCM10,getMediaInfo.sec</sec:ProductCap>
-<sec:X_ProductCap>DCM10,getMediaInfo.sec</sec:X_ProductCap>
+<sec:ProductCap>smi,DCM10,getMediaInfo.sec,getCaptionInfo.sec</sec:ProductCap>
+<sec:X_ProductCap>smi,DCM10,getMediaInfo.sec,getCaptionInfo.sec</sec:X_ProductCap>
 
 
 <iconList>

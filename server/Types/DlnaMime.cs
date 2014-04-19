@@ -10,6 +10,7 @@ namespace NMaier.SimpleDlna.Server
     MP3,
     MPEG,
     VORBIS,
-    WMV
+    WMV,
+    SRT
   }
 }

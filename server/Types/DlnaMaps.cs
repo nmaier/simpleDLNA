@@ -34,7 +34,9 @@ namespace NMaier.SimpleDlna.Server
         { DlnaMime.MP3, "audio/mpeg" },
         { DlnaMime.AAC, "audio/aac" },
         { DlnaMime.VORBIS, "audio/ogg" },
-        { DlnaMime.WMV, "video/x-ms-wmv" } };
+        { DlnaMime.WMV, "video/x-ms-wmv" },
+        { DlnaMime.SRT, "smi/caption" }
+    };
     private static readonly string[] mkvs = new string[] { "mkv", "matroska", "mk3d", "webm" };
     private static readonly string[] mp3s = new string[] { "mp3", "mp3p", "mp3x", "mp3a", "mpa" };
     private static readonly string[] mpgs = new string[] { "mpg", "mpe", "mpeg", "mpg2", "mpeg2", "ts", "vob", "m2v" };
@@ -48,7 +50,9 @@ namespace NMaier.SimpleDlna.Server
         { DlnaMime.MP3, "DLNA.ORG_PN=MP3" },
         { DlnaMime.AAC, "DLNA.ORG_PN=AAC" },
         { DlnaMime.VORBIS, "DLNA.ORG_PN=OGG" },
-        { DlnaMime.WMV, "DLNA.ORG_PN=WMVHIGH_FULL" } };
+        { DlnaMime.WMV, "DLNA.ORG_PN=WMVHIGH_FULL" },
+        { DlnaMime.SRT, "DLNA.ORG_PN=SRT" }
+    };
     private static readonly string[] wmvs = new string[] { "wmv", "asf", "wma", "wmf" };
 
 

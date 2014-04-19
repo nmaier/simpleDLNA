@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Xml;
+using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
@@ -104,7 +105,7 @@ namespace NMaier.SimpleDlna.Server
     public IResponse HandleRequest(IRequest request)
     {
       if (Authorizer != null && !IPAddress.IsLoopback(request.RemoteEndpoint.Address) && !Authorizer.Authorize(request.Headers, request.RemoteEndpoint, IP.GetMAC(request.RemoteEndpoint.Address))) {
-          throw new HttpStatusException(HttpCode.Denied);
+        throw new HttpStatusException(HttpCode.Denied);
       }
 
       var path = request.Path.Substring(prefix.Length);
@@ -120,14 +121,23 @@ namespace NMaier.SimpleDlna.Server
       }
       if (path.StartsWith("file/")) {
         var id = path.Split('/')[1];
+        InfoFormat("Serving file {0}", id);
         var item = GetItem(id) as IMediaResource;
-        return new ItemResponse(request, item);
+        return new ItemResponse(prefix, request, item);
       }
       if (path.StartsWith("cover/")) {
-        var id = path.Substring("cover/".Length);
+        var id = path.Split('/')[1];
+        InfoFormat("Serving cover {0}", id);
         var item = GetItem(id) as IMediaCover;
-        return new ItemResponse(request, item.Cover, "Interactive");
+        return new ItemResponse(prefix, request, item.Cover, "Interactive");
       }
+      if (path.StartsWith("subtitle/")) {
+        var id = path.Split('/')[1];
+        InfoFormat("Serving subtitle {0}", id);
+        var item = GetItem(id) as IMetaVideoItem;
+        return new ItemResponse(prefix, request, item.SubTitle, "Background");
+      }
+
       if (string.IsNullOrEmpty(path) || path == "index.html") {
         return new Redirect(request, prefix + "index/0");
       }

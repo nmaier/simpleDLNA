@@ -245,7 +245,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       lock (ids) {
         items = ids.Resources.ToList();
       }
-      Thumbnailer.AddFiles(store, items);
+      BackgroundCacher.AddFiles(store, items);
     }
 
 
