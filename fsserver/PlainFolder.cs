@@ -11,15 +11,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private readonly DirectoryInfo dir;
 
-    private static IEnumerable<string> GetExtensions(DlnaMediaTypes types)
-    {
-      return (from i in DlnaMaps.Media2Ext
-              where types.HasFlag(i.Key)
-              select i.Value).SelectMany(i => { return i; });
-    }
-
     protected PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir)
-      : this(server, types, parent, dir, GetExtensions(types))
+      : this(server, types, parent, dir, types.GetExtensions())
     { }
 
     private PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir, IEnumerable<string> exts)

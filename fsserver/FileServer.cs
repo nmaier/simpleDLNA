@@ -13,6 +13,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
+    private readonly DirectoryInfo[] directories;
+
     private readonly static StringComparer icomparer = StringComparer.CurrentCultureIgnoreCase;
 
     private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
@@ -23,25 +25,21 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
 
-    private readonly DirectoryInfo[] directories;
+    private DateTime lastChanged = DateTime.Now;
+
+    private static readonly double ChangeDefaultTime = TimeSpan.FromSeconds(30).TotalMilliseconds;
+
+    private static readonly double ChangeRenamedTime = TimeSpan.FromSeconds(10).TotalMilliseconds;
+
+    private static readonly double ChangeDeleteTime = TimeSpan.FromSeconds(2).TotalMilliseconds;
 
     private readonly Identifiers ids;
 
-    private DateTime lastChanged = DateTime.Now;
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private FileStore store = null;
 
     private readonly DlnaMediaTypes types;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
     private readonly FileSystemWatcher[] watchers;
-
-    public IHttpAuthorizationMethod Authorizer
-    {
-      get;
-      set;
-    }
 
 
     public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
@@ -84,6 +82,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public event EventHandler Changing;
 
 
+    public IHttpAuthorizationMethod Authorizer
+    {
+      get;
+      set;
+    }
     public string FriendlyName { get; set; }
     public Guid Uuid
     {
@@ -129,7 +132,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           foreach (var d in directories) {
             virtualMaster.Merge(
               new PlainRootFolder(this, types, d)
-              );
+            );
           }
           newMaster = virtualMaster;
         }
@@ -142,7 +145,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
               Identifiers.SamsungImages,
               types & DlnaMediaTypes.Image
               )
-            );
+          );
           ids.RegisterFolder(
             Identifiers.SamsungAudio,
             new VirtualClonedFolder(
@@ -150,7 +153,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
               Identifiers.SamsungAudio,
               types & DlnaMediaTypes.Audio
               )
-            );
+          );
           ids.RegisterFolder(
             Identifiers.SamsungVideo,
             new VirtualClonedFolder(
@@ -158,7 +161,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
               Identifiers.SamsungVideo,
               types & DlnaMediaTypes.Video
               )
-            );
+          );
         }
       }
 
@@ -167,17 +170,40 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private void OnChanged(Object source, FileSystemEventArgs e)
     {
-      if (store != null && icomparer.Equals(e.FullPath, store.StoreFile.FullName)) {
-        return;
+      try {
+        if (store != null && icomparer.Equals(e.FullPath, store.StoreFile.FullName)) {
+          return;
+        }
+        var ext = string.IsNullOrEmpty(e.FullPath) ? Path.GetExtension(e.FullPath) : string.Empty;
+        if (!string.IsNullOrEmpty(ext) && !types.GetExtensions().Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
+          DebugFormat("Skipping name {0} {1} {2}", e.Name, Path.GetExtension(e.FullPath), string.Join(", ", types.GetExtensions()));
+          return;
+        }
+        DebugFormat("File System changed ({1}): {0}", e.FullPath, e.ChangeType);
+        DelayedRescan(e.ChangeType);
       }
-      DebugFormat("File System changed: {0}", e.FullPath);
-      DelayedRescan(e.ChangeType);
+      catch (Exception ex) {
+        Error("OnChanged failed", ex);
+      }
     }
 
     private void OnRenamed(Object source, RenamedEventArgs e)
     {
-      DebugFormat("File System changed (rename): {0}", e.FullPath);
-      DelayedRescan(e.ChangeType);
+      try {
+        var exts = types.GetExtensions();
+        var ext = string.IsNullOrEmpty(e.FullPath) ? Path.GetExtension(e.FullPath) : string.Empty;
+        if (!string.IsNullOrEmpty(ext) &&
+          !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase) &&
+          !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
+          DebugFormat("Skipping name {0} {1} {2}", e.Name, Path.GetExtension(e.FullPath), string.Join(", ", exts));
+          return;
+        }
+        DebugFormat("File System changed ({1}): {0}", e.FullPath, e.ChangeType);
+        DelayedRescan(e.ChangeType);
+      }
+      catch (Exception ex) {
+        Error("OnRenamed failed", ex);
+      }
     }
 
     private void RescanInternal()
@@ -230,21 +256,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       switch (changeType) {
         case WatcherChangeTypes.Deleted:
-          changeTimer.Interval =
-            TimeSpan.FromSeconds(2).TotalMilliseconds;
+          changeTimer.Interval = ChangeDeleteTime;
           break;
         case WatcherChangeTypes.Renamed:
-          changeTimer.Interval =
-            TimeSpan.FromSeconds(10).TotalMilliseconds;
+          changeTimer.Interval = ChangeRenamedTime;
           break;
         default:
-          changeTimer.Interval =
-            TimeSpan.FromSeconds(30).TotalMilliseconds;
+          changeTimer.Interval = ChangeDefaultTime;
           break;
       }
       var diff = DateTime.Now - lastChanged;
       if (diff.TotalSeconds <= 30) {
-        // Avoid thrashing
         changeTimer.Interval = Math.Max(
           TimeSpan.FromSeconds(20).TotalMilliseconds,
           changeTimer.Interval
@@ -255,7 +277,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         "Change in {0} on {1}",
         changeTimer.Interval,
         FriendlyName
-        );
+      );
       changeTimer.Enabled = true;
       lastChanged = DateTime.Now;
     }

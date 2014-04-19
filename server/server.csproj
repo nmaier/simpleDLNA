@@ -96,6 +96,7 @@
     <Compile Include="Types\DlnaMaps.cs" />
     <Compile Include="Types\DlnaMime.cs" />
     <Compile Include="Types\DlnaMediaTypes.cs" />
+    <Compile Include="Types\Extensions.cs" />
     <Compile Include="Types\Headers.cs" />
     <Compile Include="Http\HttpClient.cs" />
     <Compile Include="Http\HttpCode.cs" />
