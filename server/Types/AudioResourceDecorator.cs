@@ -9,7 +9,6 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-
     public virtual string MetaAlbum
     {
       get
@@ -17,6 +16,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.MetaAlbum;
       }
     }
+
     public virtual string MetaArtist
     {
       get
@@ -24,6 +24,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.MetaArtist;
       }
     }
+
     public virtual string MetaDescription
     {
       get
@@ -31,6 +32,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.MetaDescription;
       }
     }
+
     public virtual TimeSpan? MetaDuration
     {
       get
@@ -38,6 +40,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.MetaDuration;
       }
     }
+
     public virtual string MetaGenre
     {
       get
@@ -45,6 +48,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.MetaGenre;
       }
     }
+
     public virtual string MetaPerformer
     {
       get
@@ -52,6 +56,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.MetaPerformer;
       }
     }
+
     public virtual int? MetaTrack
     {
       get

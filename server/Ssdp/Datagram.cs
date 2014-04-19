@@ -9,10 +9,12 @@ namespace NMaier.SimpleDlna.Server.Ssdp
   internal sealed class Datagram : Logging
   {
     public readonly IPEndPoint EndPoint;
-    public readonly IPAddress LocalAddress;
-    public readonly string Message;
-    public readonly bool Sticky;
 
+    public readonly IPAddress LocalAddress;
+
+    public readonly string Message;
+
+    public readonly bool Sticky;
 
     public Datagram(IPEndPoint endPoint, IPAddress localAddresss, string message, bool sticky)
     {
@@ -23,13 +25,11 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       SendCount = 0;
     }
 
-
     public uint SendCount
     {
       get;
       private set;
     }
-
 
     public void Send()
     {

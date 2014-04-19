@@ -9,8 +9,8 @@ namespace NMaier.SimpleDlna.Server
     MATROSKA,
     MP3,
     MPEG,
+    SRT,
     VORBIS,
-    WMV,
-    SRT
+    WMV
   }
 }

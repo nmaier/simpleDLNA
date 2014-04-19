@@ -3,25 +3,22 @@ using System.Collections.Generic;
 
 namespace NMaier.SimpleDlna.Utilities
 {
+  using PartsCache = LeastRecentlyUsedDictionary<string, BaseSortPart[]>;
   public class NaturalStringComparer : StringComparer
   {
     private static readonly StringComparer comparer =
       StringComparer.CurrentCultureIgnoreCase;
 
-    private static readonly bool platformSupport =
-      HasPlatformSupport();
+    private static readonly bool platformSupport = HasPlatformSupport();
 
-    private readonly LeastRecentlyUsedDictionary<string, BaseSortPart[]> partsCache =
-      new LeastRecentlyUsedDictionary<string, BaseSortPart[]>(5000);
+    private readonly PartsCache partsCache = new PartsCache(5000);
 
     private readonly bool stemBase;
-
 
     public NaturalStringComparer(bool stemBase)
     {
       this.stemBase = stemBase;
     }
-
 
     private static bool HasPlatformSupport()
     {
@@ -43,7 +40,7 @@ namespace NMaier.SimpleDlna.Utilities
       var parts = new List<BaseSortPart>();
       var num = false;
       var start = 0;
-      for (int i = 0, end = str.Length; i < end; ++i) {
+      for (var i = 0; i < str.Length; ++i) {
         var c = str[i];
         var cnum = c >= '0' && c <= '9';
         if (cnum == num) {
@@ -80,7 +77,6 @@ namespace NMaier.SimpleDlna.Utilities
       return rv;
     }
 
-
     public override int Compare(string x, string y)
     {
       if (stemBase) {
@@ -97,7 +93,8 @@ namespace NMaier.SimpleDlna.Utilities
       var p2 = Split(y);
 
       int rv;
-      for (int i = 0, e = Math.Min(p1.Length, p2.Length); i < e; ++i) {
+      var e = Math.Min(p1.Length, p2.Length);
+      for (var i = 0; i < e; ++i) {
         rv = p1[i].CompareTo(p2[i]);
         if (rv != 0) {
           return rv;

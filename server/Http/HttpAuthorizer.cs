@@ -11,10 +11,10 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly HttpServer server = null;
 
-
     public HttpAuthorizer()
     {
     }
+
     public HttpAuthorizer(HttpServer server)
     {
       if (server == null) {
@@ -24,12 +24,10 @@ namespace NMaier.SimpleDlna.Server
       server.OnAuthorizeClient += OnAuthorize;
     }
 
-
     private void OnAuthorize(object sender, HttpAuthorizationEventArgs e)
     {
       e.Cancel = !Authorize(e.Headers, e.RemoteEndpoint, IP.GetMAC(e.RemoteEndpoint.Address));
     }
-
 
     public void AddMethod(IHttpAuthorizationMethod method)
     {

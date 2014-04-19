@@ -37,7 +37,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
           try {
             var mvi = file as IMetaVideoItem;
-            if (mvi != null && mvi.SubTitle.HasSubtitle) {
+            if (mvi != null && mvi.Subtitle.HasSubtitle) {
               loadedSubTitles++;
             }
             if (store.HasCover(file)) {

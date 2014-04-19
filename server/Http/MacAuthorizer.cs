@@ -9,11 +9,9 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly Dictionary<string, object> macs = new Dictionary<string, object>();
 
-
     private MacAuthorizer()
     {
     }
-
 
     public MacAuthorizer(IEnumerable<string> macs)
     {
@@ -28,7 +26,6 @@ namespace NMaier.SimpleDlna.Server
         this.macs.Add(mac, null);
       }
     }
-
 
     public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
     {

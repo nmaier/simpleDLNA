@@ -17,7 +17,6 @@ namespace NMaier.SimpleDlna.Server
 
     public const string SamsungVideo = "V";
 
-
     private readonly IItemComparer comparer;
 
     private static readonly Random idGen = new Random();
@@ -32,13 +31,11 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly bool order;
 
-
     public Identifiers(IItemComparer comparer, bool order)
     {
       this.comparer = comparer;
       this.order = order;
     }
-
 
     public bool HasViews
     {
@@ -47,6 +44,7 @@ namespace NMaier.SimpleDlna.Server
         return views.Count != 0;
       }
     }
+
     public IEnumerable<WeakReference> Resources
     {
       get
@@ -56,7 +54,6 @@ namespace NMaier.SimpleDlna.Server
                 select i).ToList();
       }
     }
-
 
     private void RegisterFolderTree(IMediaFolder folder)
     {
@@ -87,7 +84,6 @@ namespace NMaier.SimpleDlna.Server
       item.Id = id;
     }
 
-
     public void AddView(string name)
     {
       try {
@@ -99,7 +95,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2001:AvoidCallingProblematicMethods", MessageId = "System.GC.Collect")]
     public void Cleanup()
     {
       GC.Collect();

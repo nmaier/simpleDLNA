@@ -10,11 +10,11 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly HttpCode status;
 
-
     public FileResponse(HttpCode aStatus, FileInfo aBody)
       : this(aStatus, "text/html; charset=utf-8", aBody)
     {
     }
+
     public FileResponse(HttpCode aStatus, string aMime, FileInfo aBody)
     {
       status = aStatus;
@@ -24,7 +24,6 @@ namespace NMaier.SimpleDlna.Server
       headers["Content-Length"] = body.Length.ToString();
     }
 
-
     public Stream Body
     {
       get
@@ -32,6 +31,7 @@ namespace NMaier.SimpleDlna.Server
         return body.OpenRead();
       }
     }
+
     public IHeaders Headers
     {
       get
@@ -39,6 +39,7 @@ namespace NMaier.SimpleDlna.Server
         return headers;
       }
     }
+
     public HttpCode Status
     {
       get

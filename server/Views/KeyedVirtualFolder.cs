@@ -7,16 +7,15 @@ namespace NMaier.SimpleDlna.Server.Views
   {
     private readonly Dictionary<string, T> keys = new Dictionary<string, T>();
 
-
     protected KeyedVirtualFolder()
       : this(null, null)
     {
     }
+
     protected KeyedVirtualFolder(IMediaFolder aParent, string aName)
       : base(aParent, aName)
     {
     }
-
 
     public T GetFolder(string key)
     {

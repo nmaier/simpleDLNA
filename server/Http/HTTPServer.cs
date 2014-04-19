@@ -13,13 +13,17 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpServer : Logging, IDisposable
   {
-    private readonly ConcurrentDictionary<HttpClient, DateTime> clients = new ConcurrentDictionary<HttpClient, DateTime>();
+    private readonly ConcurrentDictionary<HttpClient, DateTime> clients =
+      new ConcurrentDictionary<HttpClient, DateTime>();
 
-    private readonly ConcurrentDictionary<string, IPrefixHandler> prefixes = new ConcurrentDictionary<string, IPrefixHandler>();
+    private readonly ConcurrentDictionary<string, IPrefixHandler> prefixes =
+      new ConcurrentDictionary<string, IPrefixHandler>();
 
-    private readonly ConcurrentDictionary<Guid, List<Guid>> devicesForServers = new ConcurrentDictionary<Guid, List<Guid>>();
+    private readonly ConcurrentDictionary<Guid, List<Guid>> devicesForServers =
+      new ConcurrentDictionary<Guid, List<Guid>>();
 
-    private readonly ConcurrentDictionary<Guid, MediaMount> servers = new ConcurrentDictionary<Guid, MediaMount>();
+    private readonly ConcurrentDictionary<Guid, MediaMount> servers =
+      new ConcurrentDictionary<Guid, MediaMount>();
 
     public static readonly string Signature = GenerateServerSignature();
 
@@ -29,17 +33,19 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly SsdpHandler ssdpServer;
 
-    public event EventHandler<HttpAuthorizationEventArgs> OnAuthorizeClient;
-
-
     public HttpServer()
       : this(port: 0)
     {
     }
+
     public HttpServer(int port)
     {
-      prefixes.TryAdd("/favicon.ico", new StaticHandler(new ResourceResponse(HttpCode.Ok, "image/icon", "favicon")));
-      prefixes.TryAdd("/static/browse.css", new StaticHandler(new ResourceResponse(HttpCode.Ok, "text/css", "browse_css")));
+      prefixes.TryAdd(
+        "/favicon.ico",
+        new StaticHandler(new ResourceResponse(HttpCode.Ok, "image/icon", "favicon")));
+      prefixes.TryAdd(
+        "/static/browse.css",
+        new StaticHandler(new ResourceResponse(HttpCode.Ok, "text/css", "browse_css")));
       RegisterHandler(new IconHandler());
 
       listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
@@ -58,6 +64,7 @@ namespace NMaier.SimpleDlna.Server
       Accept();
     }
 
+    public event EventHandler<HttpAuthorizationEventArgs> OnAuthorizeClient;
 
     public Dictionary<string, string> MediaMounts
     {
@@ -70,8 +77,8 @@ namespace NMaier.SimpleDlna.Server
         return rv;
       }
     }
-    public int RealPort { get; private set; }
 
+    public int RealPort { get; private set; }
 
     private void Accept()
     {
@@ -88,7 +95,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void AcceptCallback(IAsyncResult result)
     {
       try {
@@ -151,6 +157,18 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
+    internal bool AuthorizeClient(HttpClient client)
+    {
+      if (OnAuthorizeClient == null) {
+        return true;
+      }
+      if (IPAddress.IsLoopback(client.RemoteEndpoint.Address)) {
+        return true;
+      }
+      var e = new HttpAuthorizationEventArgs(client.Headers, client.RemoteEndpoint);
+      OnAuthorizeClient(this, e);
+      return !e.Cancel;
+    }
 
     internal IPrefixHandler FindHandler(string prefix)
     {
@@ -191,19 +209,6 @@ namespace NMaier.SimpleDlna.Server
       DebugFormat("Registered Handler for {0}", prefix);
     }
 
-    internal bool AuthorizeClient(HttpClient client)
-    {
-      if (OnAuthorizeClient == null) {
-        return true;
-      }
-      if (IPAddress.IsLoopback(client.RemoteEndpoint.Address)) {
-        return true;
-      }
-      var e = new HttpAuthorizationEventArgs(client.Headers, client.RemoteEndpoint);
-      OnAuthorizeClient(this, e);
-      return !e.Cancel;
-    }
-
     internal void RemoveClient(HttpClient client)
     {
       DateTime ignored;
@@ -217,7 +222,6 @@ namespace NMaier.SimpleDlna.Server
         DebugFormat("Unregistered Handler for {0}", handler.Prefix);
       }
     }
-
 
     public void Dispose()
     {

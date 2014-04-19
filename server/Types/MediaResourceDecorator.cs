@@ -9,12 +9,10 @@ namespace NMaier.SimpleDlna.Server
   {
     protected T resource;
 
-
     public MediaResourceDecorator(T resource)
     {
       this.resource = resource;
     }
-
 
     public virtual Stream Content
     {
@@ -23,6 +21,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.Content;
       }
     }
+
     public virtual IMediaCoverResource Cover
     {
       get
@@ -30,6 +29,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.Cover;
       }
     }
+
     public string Id
     {
       get
@@ -41,6 +41,7 @@ namespace NMaier.SimpleDlna.Server
         resource.Id = value;
       }
     }
+
     public DateTime InfoDate
     {
       get
@@ -48,6 +49,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.InfoDate;
       }
     }
+
     public long? InfoSize
     {
       get
@@ -55,6 +57,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.InfoSize;
       }
     }
+
     public virtual DlnaMediaTypes MediaType
     {
       get
@@ -62,6 +65,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.MediaType;
       }
     }
+
     public string Path
     {
       get
@@ -69,6 +73,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.Path;
       }
     }
+
     public virtual string PN
     {
       get
@@ -76,6 +81,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.PN;
       }
     }
+
     public virtual IHeaders Properties
     {
       get
@@ -83,6 +89,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.Properties;
       }
     }
+
     public virtual string Title
     {
       get
@@ -90,6 +97,7 @@ namespace NMaier.SimpleDlna.Server
         return resource.Title;
       }
     }
+
     public DlnaMime Type
     {
       get
@@ -98,10 +106,14 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-
-    virtual public int CompareTo(IMediaItem other)
+    public virtual int CompareTo(IMediaItem other)
     {
       return resource.CompareTo(other);
+    }
+
+    public bool Equals(IMediaItem other)
+    {
+      return resource.Equals(other);
     }
   }
 }

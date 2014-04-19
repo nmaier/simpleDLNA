@@ -7,6 +7,8 @@ namespace NMaier.SimpleDlna.Server
 {
   public class VirtualFolder : IMediaFolder, ITitleComparable
   {
+    private string comparableTitle;
+
     private readonly List<IMediaFolder> merged = new List<IMediaFolder>();
 
     protected List<IMediaFolder> folders = new List<IMediaFolder>();
@@ -14,23 +16,22 @@ namespace NMaier.SimpleDlna.Server
     protected List<IMediaResource> resources = new List<IMediaResource>();
 
     private string path;
-    private string comparableTitle;
-
 
     public VirtualFolder()
     {
     }
+
     public VirtualFolder(IMediaFolder parent, string name)
       : this(parent, name, name)
     {
     }
+
     public VirtualFolder(IMediaFolder parent, string name, string id)
     {
       Parent = parent;
       Id = id;
       Name = name;
     }
-
 
     public IEnumerable<IMediaResource> AllItems
     {
@@ -39,6 +40,7 @@ namespace NMaier.SimpleDlna.Server
         return folders.SelectMany(f => (f as VirtualFolder).AllItems).Concat(resources);
       }
     }
+
     public int ChildCount
     {
       get
@@ -46,6 +48,7 @@ namespace NMaier.SimpleDlna.Server
         return folders.Count + resources.Count;
       }
     }
+
     public IEnumerable<IMediaFolder> ChildFolders
     {
       get
@@ -53,6 +56,7 @@ namespace NMaier.SimpleDlna.Server
         return folders;
       }
     }
+
     public IEnumerable<IMediaResource> ChildItems
     {
       get
@@ -60,13 +64,17 @@ namespace NMaier.SimpleDlna.Server
         return resources;
       }
     }
+
     public string Id { get; set; }
+
     public string Name { get; set; }
+
     public IMediaFolder Parent
     {
       get;
       set;
     }
+
     public virtual string Path
     {
       get
@@ -89,6 +97,7 @@ namespace NMaier.SimpleDlna.Server
         return path;
       }
     }
+
     public IHeaders Properties
     {
       get
@@ -98,6 +107,7 @@ namespace NMaier.SimpleDlna.Server
         return rv;
       }
     }
+
     public virtual string Title
     {
       get
@@ -105,7 +115,6 @@ namespace NMaier.SimpleDlna.Server
         return Name;
       }
     }
-
 
     public void AddResource(IMediaResource res)
     {
@@ -150,6 +159,14 @@ namespace NMaier.SimpleDlna.Server
         throw new ArgumentNullException("other");
       }
       return Title.CompareTo(other.Title);
+    }
+
+    public bool Equals(IMediaItem other)
+    {
+      if (other == null) {
+        throw new ArgumentNullException("other");
+      }
+      return Title.Equals(other.Title);
     }
 
     public void Merge(IMediaFolder folder)

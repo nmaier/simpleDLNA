@@ -16,7 +16,6 @@ namespace NMaier.SimpleDlna.Server
 
     private const string CRLF = "\r\n";
 
-
     private string body;
 
     private uint bodyBytes = 0;
@@ -61,7 +60,6 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly NetworkStream stream;
 
-
     public HttpClient(HttpServer aOwner, TcpClient aClient)
     {
       State = HttpStates.ACCEPTED;
@@ -76,7 +74,6 @@ namespace NMaier.SimpleDlna.Server
       LocalEndPoint = client.Client.LocalEndPoint as IPEndPoint;
     }
 
-
     internal enum HttpStates
     {
       ACCEPTED,
@@ -87,7 +84,6 @@ namespace NMaier.SimpleDlna.Server
       WRITING
     }
 
-
     private HttpStates State
     {
       set
@@ -97,7 +93,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-
     public string Body
     {
       get
@@ -105,6 +100,7 @@ namespace NMaier.SimpleDlna.Server
         return body;
       }
     }
+
     public IHeaders Headers
     {
       get
@@ -112,6 +108,7 @@ namespace NMaier.SimpleDlna.Server
         return headers;
       }
     }
+
     public bool IsATimeout
     {
       get
@@ -133,11 +130,13 @@ namespace NMaier.SimpleDlna.Server
         }
       }
     }
+
     public IPEndPoint LocalEndPoint
     {
       get;
       private set;
     }
+
     public string Method
     {
       get
@@ -145,6 +144,7 @@ namespace NMaier.SimpleDlna.Server
         return method;
       }
     }
+
     public string Path
     {
       get
@@ -152,12 +152,12 @@ namespace NMaier.SimpleDlna.Server
         return path;
       }
     }
+
     public IPEndPoint RemoteEndpoint
     {
       get;
       private set;
     }
-
 
     private long GetContentLengthFromStream(Stream responseBody)
     {
@@ -324,8 +324,6 @@ namespace NMaier.SimpleDlna.Server
       Read();
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "NMaier.SimpleDlna.Utilities.StreamPump"),
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void SendResponse()
     {
       var statusCode = response.Status;
@@ -345,7 +343,8 @@ namespace NMaier.SimpleDlna.Server
         }
         InfoFormat("{0} - {1} response for {2}", this, (uint)statusCode, path);
         state = HttpStates.WRITING;
-        new StreamPump(responseStream, stream, (pump, result) =>
+        var sp = new StreamPump(responseStream, stream, BUFFER_SIZE);
+        sp.Pump((pump, result) =>
         {
           pump.Input.Close();
           pump.Input.Dispose();
@@ -362,7 +361,7 @@ namespace NMaier.SimpleDlna.Server
             DebugFormat("{0} - Client aborted connection", this);
           }
           Close();
-        }, BUFFER_SIZE);
+        });
       }
       catch (Exception) {
         responseStream.Dispose();
@@ -417,7 +416,6 @@ namespace NMaier.SimpleDlna.Server
       SendResponse();
     }
 
-
     internal void Close()
     {
       State = HttpStates.CLOSED;
@@ -437,7 +435,6 @@ namespace NMaier.SimpleDlna.Server
         }
       }
     }
-
 
     public void Dispose()
     {

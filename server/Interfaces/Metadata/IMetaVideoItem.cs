@@ -5,7 +5,9 @@ namespace NMaier.SimpleDlna.Server.Metadata
   public interface IMetaVideoItem : IMetaInfo, IMetaDescription, IMetaGenre, IMetaDuration, IMetaResolution
   {
     IEnumerable<string> MetaActors { get; }
+
     string MetaDirector { get; }
-    SubTitle SubTitle { get; }
+
+    Subtitle Subtitle { get; }
   }
 }

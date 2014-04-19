@@ -10,8 +10,10 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public static class IP
   {
+    private readonly static AddressToMacResolver macResolver =
+      new AddressToMacResolver();
+
     private static bool warned = false;
-    private static AddressToMacResolver macResolver = new AddressToMacResolver();
 
     public static IEnumerable<IPAddress> AllIPAddresses
     {
@@ -30,6 +32,7 @@ namespace NMaier.SimpleDlna.Utilities
         }
       }
     }
+
     public static IEnumerable<IPAddress> ExternalIPAddresses
     {
       get
@@ -39,7 +42,6 @@ namespace NMaier.SimpleDlna.Utilities
                select i;
       }
     }
-
 
     private static IEnumerable<IPAddress> GetIPsDefault()
     {
@@ -89,6 +91,7 @@ namespace NMaier.SimpleDlna.Utilities
     {
       return macResolver.Resolve(ip);
     }
+
     public static bool IsAcceptedMAC(string mac)
     {
       return AddressToMacResolver.IsAcceptedMac(mac);

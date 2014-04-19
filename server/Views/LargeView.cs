@@ -9,7 +9,6 @@ namespace NMaier.SimpleDlna.Server.Views
   {
     private long minSize = 300 * 1024 * 1024;
 
-
     public override string Description
     {
       get
@@ -17,6 +16,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Show only large files";
       }
     }
+
     public override string Name
     {
       get
@@ -24,7 +24,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "large";
       }
     }
-
 
     private void ProcessFolder(IMediaFolder root)
     {
@@ -42,7 +41,6 @@ namespace NMaier.SimpleDlna.Server.Views
         root.RemoveResource(f);
       }
     }
-
 
     public override void SetParameters(AttributeCollection parameters)
     {

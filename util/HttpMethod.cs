@@ -1,4 +1,4 @@
-namespace NMaier.SimpleDlna.Utilities
+﻿namespace NMaier.SimpleDlna.Utilities
 {
   public enum HttpMethod
   {

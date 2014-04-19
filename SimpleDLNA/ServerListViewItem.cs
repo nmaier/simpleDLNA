@@ -18,9 +18,7 @@ namespace NMaier.SimpleDlna.GUI
 
     private readonly HttpServer server;
 
-
     public readonly ServerDescription Description;
-
 
     public ServerListViewItem(HttpServer server, FileInfo cacheFile, ServerDescription description)
     {
@@ -33,15 +31,13 @@ namespace NMaier.SimpleDlna.GUI
       ImageIndex = 0;
     }
 
-
     private enum State : int
     {
       Loading = 0,
-      Refreshing = 3,
       Running = 1,
-      Stopped = 2
+      Stopped = 2,
+      Refreshing = 3
     }
-
 
     private State state
     {
@@ -55,7 +51,6 @@ namespace NMaier.SimpleDlna.GUI
         UpdateInfo();
       }
     }
-
 
     private void BeginInvoke(Action func)
     {
@@ -96,7 +91,9 @@ namespace NMaier.SimpleDlna.GUI
         if (dirs.Length == 0) {
           throw new InvalidOperationException("No remaining directories");
         }
-        fileServer = new FileServer(Description.Types, ids, dirs) { FriendlyName = Description.Name };
+        fileServer = new FileServer(Description.Types, ids, dirs) {
+          FriendlyName = Description.Name
+        };
 #if !DEBUG
         if (cacheFile != null) {
           fileServer.SetCacheFile(cacheFile);
@@ -156,7 +153,6 @@ namespace NMaier.SimpleDlna.GUI
         ImageIndex = (int)state;
       });
     }
-
 
     public void Dispose()
     {

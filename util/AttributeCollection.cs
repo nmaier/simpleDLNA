@@ -11,7 +11,6 @@ namespace NMaier.SimpleDlna.Utilities
   {
     private readonly IList<Attribute> list = new List<Attribute>();
 
-
     public int Count
     {
       get
@@ -19,6 +18,7 @@ namespace NMaier.SimpleDlna.Utilities
         return list.Count;
       }
     }
+
     public ICollection<string> Keys
     {
       get
@@ -27,6 +27,7 @@ namespace NMaier.SimpleDlna.Utilities
                 select i.Key).ToList();
       }
     }
+
     public ICollection<string> Values
     {
       get
@@ -36,12 +37,10 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
-
     IEnumerator IEnumerable.GetEnumerator()
     {
       return list.GetEnumerator();
     }
-
 
     public void Add(Attribute item)
     {

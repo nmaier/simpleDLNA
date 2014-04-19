@@ -11,6 +11,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Removes empty intermediate folders and flattens folders with only few files";
       }
     }
+
     public override string Name
     {
       get
@@ -18,7 +19,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "flatten";
       }
     }
-
 
     private static void MergeFolders(VirtualFolder aFrom, VirtualFolder aTo)
     {
@@ -69,7 +69,6 @@ namespace NMaier.SimpleDlna.Server.Views
       }
       return true;
     }
-
 
     public override IMediaFolder Transform(IMediaFolder Root)
     {

@@ -9,11 +9,11 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  internal sealed class VideoThumbnails : Logging, IThumbnails, IDisposable
+  internal sealed class VideoThumbnailLoader : Logging, IThumbnailLoader, IDisposable
   {
     private Semaphore semaphore = new Semaphore(2, 2);
 
-    public VideoThumbnails()
+    public VideoThumbnailLoader()
     {
       if (FFmpeg.FFmpegExecutable == null) {
         throw new NotSupportedException("No ffmpeg available");
@@ -28,87 +28,61 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
-    public void Dispose()
-    {
-      if (semaphore != null) {
-        semaphore.Dispose();
-        semaphore = null;
-      }
-    }
-
-    public MemoryStream GetThumbnail(object item, ref int width, ref int height)
-    {
-      semaphore.WaitOne();
-      try {
-        var stream = item as Stream;
-        if (stream != null) {
-          return GetThumbnailInternal(stream, ref width, ref height);
-        }
-        var fi = item as FileInfo;
-        if (fi != null) {
-          return GetThumbnailInternal(fi, ref width, ref height);
-        }
-        throw new NotSupportedException();
-      }
-      finally {
-        semaphore.Release();
-      }
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-    private MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
+    private static MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
     {
       using (var thumb = new MemoryStream()) {
-        var pump = new StreamPump(p.StandardOutput.BaseStream, thumb, null, 4096);
-        if (!p.WaitForExit(20000)) {
-          p.Kill();
-          throw new ArgumentException("ffmpeg timed out");
-        }
-        if (p.ExitCode != 0) {
-          throw new ArgumentException("ffmpeg does not understand the stream");
-        }
-        if (!pump.Wait(2000)) {
-          throw new ArgumentException("stream reading timed out");
-        }
-        if (thumb.Length == 0) {
-          throw new ArgumentException("ffmpeg did not produce a result");
-        }
+        using (var pump = new StreamPump(p.StandardOutput.BaseStream, thumb, 4096)) {
+          pump.Pump(null);
+          if (!p.WaitForExit(20000)) {
+            p.Kill();
+            throw new ArgumentException("ffmpeg timed out");
+          }
+          if (p.ExitCode != 0) {
+            throw new ArgumentException("ffmpeg does not understand the stream");
+          }
+          if (!pump.Wait(2000)) {
+            throw new ArgumentException("stream reading timed out");
+          }
+          if (thumb.Length == 0) {
+            throw new ArgumentException("ffmpeg did not produce a result");
+          }
 
-        using (var img = Image.FromStream(thumb)) {
-          using (var scaled = ThumbnailMaker.ResizeImage(img, ref width, ref height)) {
-            var rv = new MemoryStream();
-            try {
-              scaled.Save(rv, ImageFormat.Jpeg);
-              return rv;
-            }
-            catch (Exception) {
-              rv.Dispose();
-              throw;
+          using (var img = Image.FromStream(thumb)) {
+            using (var scaled = ThumbnailMaker.ResizeImage(img, ref width, ref height)) {
+              var rv = new MemoryStream();
+              try {
+                scaled.Save(rv, ImageFormat.Jpeg);
+                return rv;
+              }
+              catch (Exception) {
+                rv.Dispose();
+                throw;
+              }
             }
           }
         }
       }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA1806:DoNotIgnoreMethodResults", MessageId = "NMaier.SimpleDlna.Utilities.StreamPump"),
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
-    private MemoryStream GetThumbnailInternal(Stream stream, ref int width, ref int height)
+    private static MemoryStream GetThumbnailInternal(Stream stream, ref int width, ref int height)
     {
       using (var p = new Process()) {
-        long pos = 20;
+        var pos = 20L;
         try {
           var length = stream.Length;
           if (length < 10 * (1 << 20)) {
             pos = 5;
           }
-          else
+          else {
             if (length > 100 * (1 << 20)) {
               pos = 60;
             }
-            else
+            else {
               if (length > 50 * (1 << 20)) {
                 pos = 60;
               }
+            }
+          }
         }
         catch (Exception) {
         }
@@ -128,10 +102,11 @@ namespace NMaier.SimpleDlna.Thumbnails
         sti.RedirectStandardOutput = true;
         p.Start();
 
-        new StreamPump(stream, p.StandardInput.BaseStream, (pump, result) =>
+        var sp = new StreamPump(stream, p.StandardInput.BaseStream, 4096);
+        sp.Pump((pump, result) =>
         {
           stream.Dispose();
-        }, 4096);
+        });
         return GetThumbnailFromProcess(p, ref width, ref height);
       }
     }
@@ -139,7 +114,7 @@ namespace NMaier.SimpleDlna.Thumbnails
     private MemoryStream GetThumbnailInternal(FileInfo file, ref int width, ref int height)
     {
       Exception last = null;
-      for (long best = IdentifyBestCapturePosition(file); best >= 0; best -= Math.Max(best / 2, 5)) {
+      for (var best = IdentifyBestCapturePosition(file); best >= 0; best -= Math.Max(best / 2, 5)) {
         try {
           using (var p = new Process()) {
             var sti = p.StartInfo;
@@ -197,6 +172,33 @@ namespace NMaier.SimpleDlna.Thumbnails
         return 600;
       }
       return 20;
+    }
+
+    public void Dispose()
+    {
+      if (semaphore != null) {
+        semaphore.Dispose();
+        semaphore = null;
+      }
+    }
+
+    public MemoryStream GetThumbnail(object item, ref int width, ref int height)
+    {
+      semaphore.WaitOne();
+      try {
+        var stream = item as Stream;
+        if (stream != null) {
+          return GetThumbnailInternal(stream, ref width, ref height);
+        }
+        var fi = item as FileInfo;
+        if (fi != null) {
+          return GetThumbnailInternal(fi, ref width, ref height);
+        }
+        throw new NotSupportedException();
+      }
+      finally {
+        semaphore.Release();
+      }
     }
   }
 }

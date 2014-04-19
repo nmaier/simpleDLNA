@@ -11,31 +11,33 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-
     public HttpStatusException()
     {
     }
+
     public HttpStatusException(HttpCode code)
       : base(HttpPhrases.Phrases[code])
     {
       Code = code;
     }
+
     public HttpStatusException(string msg)
       : base(msg)
     {
       Code = HttpCode.None;
     }
+
     public HttpStatusException(HttpCode code, Exception innerException)
       : base(HttpPhrases.Phrases[code], innerException)
     {
       Code = code;
     }
+
     public HttpStatusException(string message, Exception innerException)
       : base(message, innerException)
     {
       Code = HttpCode.None;
     }
-
 
     public HttpCode Code
     {

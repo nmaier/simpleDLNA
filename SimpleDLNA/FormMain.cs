@@ -18,60 +18,27 @@ namespace NMaier.SimpleDlna.GUI
 {
   public partial class FormMain : Form, IAppender, IDisposable
   {
-    private struct LogEntry
-    {
-      public string Key;
-      public string Message;
-      public string Class;
-      public string Exception;
-      public string Time;
-    }
-    private bool logging = false;
+    private bool canClose = false;
+
     private static readonly Properties.Settings Config = Properties.Settings.Default;
-    private HttpServer httpServer;
+
     private readonly FileInfo cacheFile = new FileInfo(Path.Combine(cacheDir, "sdlna.cache"));
+
 #if DEBUG
     private readonly FileInfo logFile = new FileInfo(Path.Combine(cacheDir, "sdlna.dbg.log"));
 #else
     private readonly FileInfo logFile = new FileInfo(Path.Combine(cacheDir, "sdlna.log"));
+
 #endif
-    private bool canClose = false;
     private readonly object appenderLock = new object();
+
     private readonly System.Timers.Timer appenderTimer = new System.Timers.Timer(2000);
+
     private readonly ConcurrentQueue<LogEntry> pendingLogEntries = new ConcurrentQueue<LogEntry>();
 
-    private static string cacheDir
-    {
-      get
-      {
-        var rv = Config.cache;
-        if (!string.IsNullOrWhiteSpace(rv) && Directory.Exists(rv)) {
-          return rv;
-        }
-        try {
-          try {
-            rv = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            if (string.IsNullOrEmpty(rv)) {
-              throw new IOException("Cannot get localappdata");
-            }
-          }
-          catch (Exception) {
-            rv = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            if (string.IsNullOrEmpty(rv)) {
-              throw new IOException("Cannot get localappdata");
-            }
-          }
-          rv = Path.Combine(rv, "SimpleDLNA");
-          if (!Directory.Exists(rv)) {
-            Directory.CreateDirectory(rv);
-          }
-          return rv;
-        }
-        catch (Exception) {
-          return Path.GetTempPath();
-        }
-      }
-    }
+    private HttpServer httpServer;
+
+    private bool logging = false;
 
     public FormMain()
     {
@@ -111,6 +78,41 @@ namespace NMaier.SimpleDlna.GUI
       }
     }
 
+    private delegate void logDelegate(string level, string logger, string msg, string ex);
+
+    private static string cacheDir
+    {
+      get
+      {
+        var rv = Config.cache;
+        if (!string.IsNullOrWhiteSpace(rv) && Directory.Exists(rv)) {
+          return rv;
+        }
+        try {
+          try {
+            rv = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            if (string.IsNullOrEmpty(rv)) {
+              throw new IOException("Cannot get LocalAppData");
+            }
+          }
+          catch (Exception) {
+            rv = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (string.IsNullOrEmpty(rv)) {
+              throw new IOException("Cannot get LocalAppData");
+            }
+          }
+          rv = Path.Combine(rv, "SimpleDLNA");
+          if (!Directory.Exists(rv)) {
+            Directory.CreateDirectory(rv);
+          }
+          return rv;
+        }
+        catch (Exception) {
+          return Path.GetTempPath();
+        }
+      }
+    }
+
     public override string Text
     {
       get
@@ -121,6 +123,233 @@ namespace NMaier.SimpleDlna.GUI
       {
         base.Text = value;
         notifyIcon.Text = value;
+      }
+    }
+
+    private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      using (var about = new FormAbout()) {
+        about.ShowDialog();
+      }
+    }
+
+    private void ButtonEdit_Click(object sender, EventArgs e)
+    {
+      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
+      if (item == null) {
+        return;
+      }
+      using (var ns = new FormServer(item.Description)) {
+        var rv = ns.ShowDialog();
+        if (rv == DialogResult.OK) {
+          var desc = ns.Description;
+          Task.Factory.StartNew(() =>
+          {
+            item.UpdateInfo(desc);
+            BeginInvoke((Action)(() =>
+            {
+              SaveConfig();
+            }));
+          });
+        }
+      }
+    }
+
+    private void ButtonNewServer_Click(object sender, EventArgs e)
+    {
+      using (var ns = new FormServer()) {
+        var rv = ns.ShowDialog();
+        if (rv == DialogResult.OK) {
+          var item = new ServerListViewItem(httpServer, cacheFile, ns.Description);
+          listDescriptions.Items.Add(item);
+          item.Load();
+          SaveConfig();
+        }
+      }
+    }
+
+    private void buttonRemove_Click(object sender, EventArgs e)
+    {
+      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
+      if (item == null) {
+        return;
+      }
+      if (MessageBox.Show(string.Format("Would you like to remove {0}?", item.Description.Name), "Remove Server", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) {
+        return;
+      }
+      if (item.Description.Active) {
+        item.Toggle();
+      }
+      listDescriptions.Items.Remove(item);
+      SaveConfig();
+    }
+
+    private void buttonRescan_Click(object sender, EventArgs e)
+    {
+      try {
+        var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
+        if (item == null) {
+          return;
+        }
+        item.Rescan();
+      }
+      catch (Exception ex) {
+        MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
+    }
+
+    private void ButtonStartStop_Click(object sender, EventArgs e)
+    {
+      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
+      if (item == null) {
+        return;
+      }
+      Task.Factory.StartNew(() =>
+      {
+        item.Toggle();
+        BeginInvoke((Action)(() =>
+        {
+          SaveConfig();
+          buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
+        }));
+      });
+    }
+
+    private void dropCacheToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      var res = MessageBox.Show(
+        this,
+        "Are you sure you want to drop the cache?",
+        "Drop cache",
+        MessageBoxButtons.YesNo,
+        MessageBoxIcon.Warning);
+      if (res != DialogResult.Yes) {
+        return;
+      }
+      var running = (from ServerListViewItem item in listDescriptions.Items
+                     where item.Description.Active
+                     select item).ToList();
+      foreach (var item in running) {
+        item.Toggle();
+      }
+      try {
+        if (cacheFile.Exists) {
+          cacheFile.Delete();
+        }
+      }
+      catch (Exception ex) {
+        LogManager.GetLogger(GetType()).Error(string.Format("Failed to remove cache file {0}", cacheFile.FullName), ex);
+      }
+      foreach (var item in running) {
+        item.Toggle();
+      }
+    }
+
+    private void exitContextMenuItem_Click(object sender, EventArgs e)
+    {
+      canClose = true;
+      notifyIcon_DoubleClick(sender, e);
+      Close();
+    }
+
+    private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
+    {
+      Text = "Going down...";
+      httpServer.Dispose();
+      httpServer = null;
+    }
+
+    private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      e.Cancel = !canClose;
+      if (!canClose) {
+        WindowState = FormWindowState.Minimized;
+      }
+    }
+
+    private void FormMain_Load(object sender, EventArgs e)
+    {
+      httpServer = new HttpServer((int)Config.port);
+
+      Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
+
+      LoadConfig();
+    }
+
+    private void FormMain_Resize(object sender, EventArgs e)
+    {
+      if (WindowState == FormWindowState.Minimized) {
+        notifyIcon.Visible = true;
+        ShowInTaskbar = false;
+        Hide();
+      }
+    }
+
+    private void hideToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      WindowState = FormWindowState.Minimized;
+    }
+
+    private void ListDescriptions_SelectedIndexChanged(object sender, EventArgs e)
+    {
+      var enable = listDescriptions.SelectedItems.Count != 0;
+      buttonStartStop.Enabled = buttonRemove.Enabled = buttonEdit.Enabled = enable;
+      if (enable) {
+        var item = (listDescriptions.SelectedItems[0] as ServerListViewItem);
+        buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
+        buttonRescan.Enabled = item.Description.Active;
+      }
+      else {
+        buttonRescan.Enabled = false;
+      }
+    }
+
+    private void LoadConfig()
+    {
+      var descs = (from d in Config.Descriptors
+                   let i = new ServerListViewItem(httpServer, cacheFile, d)
+                   select i).ToArray();
+      listDescriptions.Items.AddRange(descs);
+
+      Task.Factory.StartNew(() =>
+      {
+        var po = new ParallelOptions()
+        {
+          MaxDegreeOfParallelism = Math.Min(4, Environment.ProcessorCount)
+        };
+        Parallel.ForEach(descs, po, i =>
+        {
+          i.Load();
+        });
+      });
+    }
+
+    private void notifyIcon_DoubleClick(object sender, EventArgs e)
+    {
+      Show();
+      WindowState = FormWindowState.Normal;
+      ShowInTaskbar = true;
+      notifyIcon.Visible = false;
+    }
+
+    private void openInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      Process.Start(string.Format("http://localhost:{0}/", httpServer.RealPort));
+    }
+
+    private void SaveConfig()
+    {
+      Config.Descriptors = (from ServerListViewItem item in listDescriptions.Items
+                            select item.Description).ToList();
+      Config.Save();
+    }
+
+    private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      using (var settings = new FormSettings()) {
+        settings.ShowDialog();
+        Config.Save();
+        SetupLogging();
       }
     }
 
@@ -179,108 +408,6 @@ namespace NMaier.SimpleDlna.GUI
 #endif
     }
 
-    private void ButtonNewServer_Click(object sender, EventArgs e)
-    {
-      using (var ns = new FormServer()) {
-        var rv = ns.ShowDialog();
-        if (rv == DialogResult.OK) {
-          var item = new ServerListViewItem(httpServer, cacheFile, ns.Description);
-          listDescriptions.Items.Add(item);
-          item.Load();
-          SaveConfig();
-        }
-      }
-    }
-
-    private void ListDescriptions_SelectedIndexChanged(object sender, EventArgs e)
-    {
-      var enable = listDescriptions.SelectedItems.Count != 0;
-      buttonStartStop.Enabled = buttonRemove.Enabled = buttonEdit.Enabled = enable;
-      if (enable) {
-        var item = (listDescriptions.SelectedItems[0] as ServerListViewItem);
-        buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
-        buttonRescan.Enabled = item.Description.Active;
-      }
-      else {
-        buttonRescan.Enabled = false;
-      }
-    }
-
-    private void SaveConfig()
-    {
-      Config.Descriptors = (from ServerListViewItem item in listDescriptions.Items
-                            select item.Description).ToList();
-      Config.Save();
-    }
-
-    private void LoadConfig()
-    {
-      var descs = (from d in Config.Descriptors
-                   let i = new ServerListViewItem(httpServer, cacheFile, d)
-                   select i).ToArray();
-      listDescriptions.Items.AddRange(descs);
-
-      Task.Factory.StartNew(() =>
-      {
-        var po = new ParallelOptions()
-        {
-          MaxDegreeOfParallelism = Math.Min(4, Environment.ProcessorCount)
-        };
-        Parallel.ForEach(descs, po, i =>
-        {
-          i.Load();
-        });
-      });
-    }
-
-    private void ButtonEdit_Click(object sender, EventArgs e)
-    {
-      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
-      if (item == null) {
-        return;
-      }
-      using (var ns = new FormServer(item.Description)) {
-        var rv = ns.ShowDialog();
-        if (rv == DialogResult.OK) {
-          var desc = ns.Description;
-          Task.Factory.StartNew(() =>
-          {
-            item.UpdateInfo(desc);
-            BeginInvoke((Action)(() =>
-            {
-              SaveConfig();
-            }));
-          });
-        }
-      }
-    }
-
-    private void ButtonStartStop_Click(object sender, EventArgs e)
-    {
-      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
-      if (item == null) {
-        return;
-      }
-      Task.Factory.StartNew(() =>
-      {
-        item.Toggle();
-        BeginInvoke((Action)(() =>
-        {
-          SaveConfig();
-          buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
-        }));
-      });
-    }
-
-    private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
-    {
-      Text = "Going down...";
-      httpServer.Dispose();
-      httpServer = null;
-    }
-
-    private delegate void logDelegate(string level, string logger, string msg, string ex);
-
     public void DoAppend(LoggingEvent loggingEvent)
     {
       if (!logging) {
@@ -298,10 +425,11 @@ namespace NMaier.SimpleDlna.GUI
       if (loggingEvent.Level >= Level.Error) {
         key = "error";
       }
-      else
+      else {
         if (loggingEvent.Level >= Level.Warn) {
           key = "warn";
         }
+      }
       pendingLogEntries.Enqueue(new LogEntry()
       {
         Class = cls,
@@ -334,7 +462,7 @@ namespace NMaier.SimpleDlna.GUI
           last = logger.Items.Add(new ListViewItem(new string[] { entry.Time, entry.Class, entry.Message }));
           last.ImageKey = entry.Key;
           if (!string.IsNullOrWhiteSpace(entry.Exception)) {
-            last = logger.Items.Add(new ListViewItem(new string[] { "", entry.Class, entry.Exception }));
+            last = logger.Items.Add(new ListViewItem(new string[] { string.Empty, entry.Class, entry.Exception }));
             last.ImageKey = entry.Key;
             last.IndentCount = 1;
           }
@@ -351,131 +479,17 @@ namespace NMaier.SimpleDlna.GUI
       }
     }
 
-    private void notifyIcon_DoubleClick(object sender, EventArgs e)
+    private struct LogEntry
     {
-      Show();
-      WindowState = FormWindowState.Normal;
-      ShowInTaskbar = true;
-      notifyIcon.Visible = false;
-    }
+      public string Class;
 
-    private void FormMain_Resize(object sender, EventArgs e)
-    {
-      if (WindowState == FormWindowState.Minimized) {
-        notifyIcon.Visible = true;
-        ShowInTaskbar = false;
-        Hide();
-      }
-    }
+      public string Exception;
 
-    private void exitContextMenuItem_Click(object sender, EventArgs e)
-    {
-      canClose = true;
-      notifyIcon_DoubleClick(sender, e);
-      Close();
-    }
+      public string Key;
 
-    private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
-    {
-      e.Cancel = !canClose;
-      if (!canClose) {
-        WindowState = FormWindowState.Minimized;
-      }
-    }
+      public string Message;
 
-    private void hideToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      WindowState = FormWindowState.Minimized;
-    }
-
-    private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      using (var about = new FormAbout()) {
-        about.ShowDialog();
-      }
-    }
-
-    private void openInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      Process.Start(string.Format("http://localhost:{0}/", httpServer.RealPort));
-    }
-
-    private void FormMain_Load(object sender, EventArgs e)
-    {
-      httpServer = new HttpServer((int)Config.port);
-
-      Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
-
-      LoadConfig();
-    }
-
-    private void buttonRemove_Click(object sender, EventArgs e)
-    {
-      var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
-      if (item == null) {
-        return;
-      }
-      if (MessageBox.Show(string.Format("Would you like to remove {0}?", item.Description.Name), "Remove Server", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) {
-        return;
-      }
-      if (item.Description.Active) {
-        item.Toggle();
-      }
-      listDescriptions.Items.Remove(item);
-      SaveConfig();
-    }
-
-    private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      using (var settings = new FormSettings()) {
-        settings.ShowDialog();
-        Config.Save();
-        SetupLogging();
-      }
-    }
-
-    private void buttonRescan_Click(object sender, EventArgs e)
-    {
-      try {
-        var item = listDescriptions.SelectedItems[0] as ServerListViewItem;
-        if (item == null) {
-          return;
-        }
-        item.Rescan();
-      }
-      catch (Exception ex) {
-        MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-      }
-    }
-
-    private void dropCacheToolStripMenuItem_Click(object sender, EventArgs e)
-    {
-      var res = MessageBox.Show(
-        this,
-        "Are you sure you want to drop the cache?",
-        "Drop cache",
-        MessageBoxButtons.YesNo,
-        MessageBoxIcon.Warning);
-      if (res != DialogResult.Yes) {
-        return;
-      }
-      var running = (from ServerListViewItem item in listDescriptions.Items
-                     where item.Description.Active
-                     select item).ToList();
-      foreach (var item in running) {
-        item.Toggle();
-      }
-      try {
-        if (cacheFile.Exists) {
-          cacheFile.Delete();
-        }
-      }
-      catch (Exception ex) {
-        LogManager.GetLogger(GetType()).Error(string.Format("Failed to remove cache file {0}", cacheFile.FullName), ex);
-      }
-      foreach (var item in running) {
-        item.Toggle();
-      }
+      public string Time;
     }
   }
 }

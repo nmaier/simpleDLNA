@@ -21,11 +21,9 @@ namespace NMaier.SimpleDlna.Server
 
     private const string NS_UPNP = "urn:schemas-upnp-org:metadata-1-0/upnp/";
 
-
     private static readonly string featureList = Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
 
     private readonly static IDictionary<string, AttributeCollection> soapCache = new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
-
 
     private static void AddBookmarkInfo(IMediaResource resource, XmlElement item)
     {
@@ -152,7 +150,7 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    private void AddVideoProperties(IRequest request, IMediaResource resource, XmlElement item)
+    private static void AddVideoProperties(IRequest request, IMediaResource resource, XmlElement item)
     {
       var mvi = resource as IMetaVideoItem;
       if (mvi == null) {

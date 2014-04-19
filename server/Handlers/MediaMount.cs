@@ -10,7 +10,8 @@ namespace NMaier.SimpleDlna.Server
 {
   internal sealed partial class MediaMount : Logging, IMediaServer, IPrefixHandler
   {
-    private readonly Dictionary<IPAddress, Guid> guidsForAddresses = new Dictionary<IPAddress, Guid>();
+    private readonly Dictionary<IPAddress, Guid> guidsForAddresses =
+      new Dictionary<IPAddress, Guid>();
 
     private static uint mount = 0;
 
@@ -19,7 +20,6 @@ namespace NMaier.SimpleDlna.Server
     private readonly IMediaServer server;
 
     private uint systemID = 1;
-
 
     public MediaMount(IMediaServer aServer)
     {
@@ -30,7 +30,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-
     public IHttpAuthorizationMethod Authorizer
     {
       get
@@ -38,6 +37,7 @@ namespace NMaier.SimpleDlna.Server
         return server.Authorizer;
       }
     }
+
     public string DescriptorURI
     {
       get
@@ -45,6 +45,7 @@ namespace NMaier.SimpleDlna.Server
         return String.Format("{0}description.xml", prefix);
       }
     }
+
     public string FriendlyName
     {
       get
@@ -52,6 +53,7 @@ namespace NMaier.SimpleDlna.Server
         return server.FriendlyName;
       }
     }
+
     public string Prefix
     {
       get
@@ -59,6 +61,7 @@ namespace NMaier.SimpleDlna.Server
         return prefix;
       }
     }
+
     public Guid Uuid
     {
       get
@@ -66,7 +69,6 @@ namespace NMaier.SimpleDlna.Server
         return server.Uuid;
       }
     }
-
 
     private void ChangedServer(object sender, EventArgs e)
     {
@@ -90,7 +92,6 @@ namespace NMaier.SimpleDlna.Server
 
       return doc.OuterXml;
     }
-
 
     public void AddDeviceGuid(Guid guid, IPAddress address)
     {
@@ -135,7 +136,7 @@ namespace NMaier.SimpleDlna.Server
         var id = path.Split('/')[1];
         InfoFormat("Serving subtitle {0}", id);
         var item = GetItem(id) as IMetaVideoItem;
-        return new ItemResponse(prefix, request, item.SubTitle, "Background");
+        return new ItemResponse(prefix, request, item.Subtitle, "Background");
       }
 
       if (string.IsNullOrEmpty(path) || path == "index.html") {

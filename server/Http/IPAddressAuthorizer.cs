@@ -8,13 +8,12 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class IPAddressAuthorizer : Logging, IHttpAuthorizationMethod
   {
-    private readonly Dictionary<IPAddress, object> ips = new Dictionary<IPAddress, object>();
-
+    private readonly Dictionary<IPAddress, object> ips =
+      new Dictionary<IPAddress, object>();
 
     private IPAddressAuthorizer()
     {
     }
-
 
     public IPAddressAuthorizer(IEnumerable<IPAddress> addresses)
     {
@@ -25,12 +24,12 @@ namespace NMaier.SimpleDlna.Server
         ips.Add(ip, null);
       }
     }
+
     public IPAddressAuthorizer(IEnumerable<string> addresses)
       : this((from a in addresses
               select IPAddress.Parse(a)))
     {
     }
-
 
     public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
     {

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 
 namespace NMaier.SimpleDlna.Server.Views
@@ -11,6 +12,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Mushes all files together into the root folder";
       }
     }
+
     public override string Name
     {
       get
@@ -18,7 +20,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "plain";
       }
     }
-
 
     private static void EatAll(IMediaFolder root, IMediaFolder folder)
     {
@@ -30,9 +31,11 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-
     public override IMediaFolder Transform(IMediaFolder Root)
     {
+      if (Root == null) {
+        throw new ArgumentNullException("Root");
+      }
       var rv = new VirtualFolder(null, Root.Title, Root.Id);
       EatAll(rv, Root);
       return rv;

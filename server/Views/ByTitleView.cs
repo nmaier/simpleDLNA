@@ -12,6 +12,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Reorganizes files into folders by title";
       }
     }
+
     public override string Name
     {
       get
@@ -19,7 +20,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "bytitle";
       }
     }
-
 
     private static void SortFolder(VirtualFolder folder, TitlesFolder titles)
     {
@@ -38,7 +38,6 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-
     public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
@@ -52,7 +51,6 @@ namespace NMaier.SimpleDlna.Server.Views
       }
       return root;
     }
-
 
     private class TitlesFolder : KeyedVirtualFolder<VirtualFolder>
     {

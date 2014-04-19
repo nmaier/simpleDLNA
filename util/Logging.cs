@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using log4net;
 using log4net.Core;
 
@@ -7,7 +7,6 @@ namespace NMaier.SimpleDlna.Utilities
   public class Logging : ILog
   {
     private ILog instance;
-
 
     private ILog logger
     {
@@ -20,7 +19,6 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
-
     public bool IsDebugEnabled
     {
       get
@@ -28,6 +26,7 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.IsDebugEnabled;
       }
     }
+
     public bool IsErrorEnabled
     {
       get
@@ -35,6 +34,7 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.IsErrorEnabled;
       }
     }
+
     public bool IsFatalEnabled
     {
       get
@@ -42,6 +42,7 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.IsFatalEnabled;
       }
     }
+
     public bool IsInfoEnabled
     {
       get
@@ -49,6 +50,7 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.IsInfoEnabled;
       }
     }
+
     public bool IsNoticeEnabled
     {
       get
@@ -56,6 +58,7 @@ namespace NMaier.SimpleDlna.Utilities
         return Logger.IsEnabledFor(Level.Notice);
       }
     }
+
     public bool IsWarnEnabled
     {
       get
@@ -63,6 +66,7 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.IsWarnEnabled;
       }
     }
+
     public ILogger Logger
     {
       get
@@ -70,7 +74,6 @@ namespace NMaier.SimpleDlna.Utilities
         return logger.Logger;
       }
     }
-
 
     public void Debug(object message)
     {

@@ -4,7 +4,11 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class ResponseHeaders : RawHeaders
   {
-    public ResponseHeaders() : this(noCache: true) { }
+    public ResponseHeaders()
+      : this(noCache: true)
+    {
+    }
+
     public ResponseHeaders(bool noCache)
     {
       this["Server"] = HttpServer.Signature;

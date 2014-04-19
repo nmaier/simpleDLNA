@@ -9,11 +9,9 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly Dictionary<string, object> userAgents = new Dictionary<string, object>();
 
-
     private UserAgentAuthorizer()
     {
     }
-
 
     public UserAgentAuthorizer(IEnumerable<string> userAgents)
     {
@@ -27,7 +25,6 @@ namespace NMaier.SimpleDlna.Server
         this.userAgents.Add(u, null);
       }
     }
-
 
     public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
     {

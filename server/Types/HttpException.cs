@@ -11,14 +11,15 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-
     public HttpException()
     {
     }
+
     public HttpException(string msg)
       : base(msg)
     {
     }
+
     public HttpException(string message, Exception innerException)
       : base(message, innerException)
     {

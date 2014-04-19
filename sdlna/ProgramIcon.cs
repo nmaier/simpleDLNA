@@ -7,7 +7,7 @@ namespace NMaier.SimpleDlna
 {
   internal class ProgramIcon : Logging, IDisposable
   {
-    private readonly IntPtr window = IntPtr.Zero;
+    private IntPtr window = IntPtr.Zero;
 
     private readonly IntPtr iconLg = IntPtr.Zero;
 
@@ -16,7 +16,6 @@ namespace NMaier.SimpleDlna
     private readonly IntPtr oldLg = IntPtr.Zero;
 
     private readonly IntPtr oldSm = IntPtr.Zero;
-
 
     public ProgramIcon()
     {
@@ -43,9 +42,14 @@ namespace NMaier.SimpleDlna
       }
     }
 
+    ~ProgramIcon()
+    {
+      Dispose();
+    }
 
     public void Dispose()
     {
+      GC.SuppressFinalize(this);
       try {
         if (window == IntPtr.Zero) {
           return;
@@ -56,6 +60,7 @@ namespace NMaier.SimpleDlna
         if (oldSm != IntPtr.Zero) {
           SafeNativeMethods.SendMessage(window, SafeNativeMethods.WM_SETICON, IntPtr.Zero, oldSm);
         }
+        window = IntPtr.Zero;
       }
       catch (Exception ex) {
         Debug("Couldnd't restore icon", ex);

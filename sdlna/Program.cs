@@ -19,7 +19,6 @@ namespace NMaier.SimpleDlna
 
     private static uint CancelHitCount = 0;
 
-
     private static void CancelKeyPressed(object sender, ConsoleCancelEventArgs e)
     {
       if (CancelHitCount++ == 3) {
@@ -100,7 +99,7 @@ namespace NMaier.SimpleDlna
           try {
             using (var authorizer = new HttpAuthorizer(server)) {
               if (options.Ips.Length != 0) {
-              authorizer.AddMethod(new IPAddressAuthorizer(options.Ips));
+                authorizer.AddMethod(new IPAddressAuthorizer(options.Ips));
               }
               if (options.Macs.Length != 0) {
                 authorizer.AddMethod(new MacAuthorizer(options.Macs));

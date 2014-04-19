@@ -7,78 +7,38 @@ using NMaier.SimpleDlna.Utilities;
 namespace NMaier.SimpleDlna.Server
 {
   [Serializable]
-  public class SubTitle : IMediaResource
+  public class Subtitle : IMediaResource
   {
     [NonSerialized]
-    static private readonly ILog logger = LogManager.GetLogger(typeof(SubTitle));
+    private static readonly ILog logger = LogManager.GetLogger(typeof(Subtitle));
+
     [NonSerialized]
-    static private readonly string[] exts = new string[] {
+    private static readonly string[] exts = new string[] {
       ".srt", ".SRT",
       ".ass", ".ASS",
       ".ssa", ".SSA",
       ".sub", ".SUB",
       ".vtt", ".VTT"
     };
-    
+
     private string text = null;
 
     [NonSerialized]
-    public byte[] encodedText = null;
+    private byte[] encodedText = null;
 
-    public SubTitle(FileInfo file)
+    public Subtitle()
+    {
+    }
+
+    public Subtitle(FileInfo file)
     {
       Load(file);
     }
 
-    public SubTitle(string text)
+    public Subtitle(string text)
     {
       this.text = text;
     }
-
-    public SubTitle() { }
-
-    private void Load(FileInfo file)
-    {
-      try {
-        // Try external
-        foreach (var i in exts) {
-          var sti = new FileInfo(System.IO.Path.ChangeExtension(file.FullName, i));
-          try {
-            if (!sti.Exists) {
-              sti = new FileInfo(file.FullName + i);
-            }
-            if (!sti.Exists) {
-              continue;
-            }
-            text = FFmpeg.GetSubtitleSRT(sti);
-          }
-          catch (NotSupportedException) {
-          }
-          catch (Exception ex) {
-            logger.Debug(string.Format("Failed to get subtitle from {0}", sti.FullName), ex);
-          }
-        }
-        try {
-          text = FFmpeg.GetSubtitleSRT(file);
-        }
-        catch (NotSupportedException) {
-        }
-        catch (Exception ex) {
-          logger.Debug(string.Format("Failed to get subtitle from {0}", file.FullName), ex);
-        }
-      }
-      catch (Exception ex) {
-        logger.Error(string.Format("Failed to load subtitle for {0}", file.FullName), ex);
-      }
-    }
-
-    public bool HasSubtitle
-    {
-      get {
-        return !string.IsNullOrWhiteSpace(text);
-      }
-    }
-
 
     public Stream Content
     {
@@ -93,6 +53,7 @@ namespace NMaier.SimpleDlna.Server
         return new MemoryStream(encodedText, false);
       }
     }
+
     public IMediaCoverResource Cover
     {
       get
@@ -100,6 +61,15 @@ namespace NMaier.SimpleDlna.Server
         throw new NotImplementedException();
       }
     }
+
+    public bool HasSubtitle
+    {
+      get
+      {
+        return !string.IsNullOrWhiteSpace(text);
+      }
+    }
+
     public string Id
     {
       get
@@ -111,6 +81,7 @@ namespace NMaier.SimpleDlna.Server
         throw new NotImplementedException();
       }
     }
+
     public DateTime InfoDate
     {
       get
@@ -118,6 +89,7 @@ namespace NMaier.SimpleDlna.Server
         return DateTime.UtcNow;
       }
     }
+
     public long? InfoSize
     {
       get
@@ -132,6 +104,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
     }
+
     public DlnaMediaTypes MediaType
     {
       get
@@ -139,6 +112,7 @@ namespace NMaier.SimpleDlna.Server
         throw new NotImplementedException();
       }
     }
+
     public string Path
     {
       get
@@ -146,6 +120,7 @@ namespace NMaier.SimpleDlna.Server
         return "ad-hoc-subtitle:";
       }
     }
+
     public string PN
     {
       get
@@ -153,6 +128,7 @@ namespace NMaier.SimpleDlna.Server
         return DlnaMaps.PN[Type];
       }
     }
+
     public IHeaders Properties
     {
       get
@@ -168,6 +144,7 @@ namespace NMaier.SimpleDlna.Server
         return rv;
       }
     }
+
     public string Title
     {
       get
@@ -175,6 +152,7 @@ namespace NMaier.SimpleDlna.Server
         throw new NotImplementedException();
       }
     }
+
     public DlnaMime Type
     {
       get
@@ -183,8 +161,47 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
+    private void Load(FileInfo file)
+    {
+      try {
+        // Try external
+        foreach (var i in exts) {
+          var sti = new FileInfo(System.IO.Path.ChangeExtension(file.FullName, i));
+          try {
+            if (!sti.Exists) {
+              sti = new FileInfo(file.FullName + i);
+            }
+            if (!sti.Exists) {
+              continue;
+            }
+            text = FFmpeg.GetSubtitleSubrip(sti);
+          }
+          catch (NotSupportedException) {
+          }
+          catch (Exception ex) {
+            logger.Debug(string.Format("Failed to get subtitle from {0}", sti.FullName), ex);
+          }
+        }
+        try {
+          text = FFmpeg.GetSubtitleSubrip(file);
+        }
+        catch (NotSupportedException) {
+        }
+        catch (Exception ex) {
+          logger.Debug(string.Format("Failed to get subtitle from {0}", file.FullName), ex);
+        }
+      }
+      catch (Exception ex) {
+        logger.Error(string.Format("Failed to load subtitle for {0}", file.FullName), ex);
+      }
+    }
 
     public int CompareTo(IMediaItem other)
+    {
+      throw new NotImplementedException();
+    }
+
+    public bool Equals(IMediaItem other)
     {
       throw new NotImplementedException();
     }

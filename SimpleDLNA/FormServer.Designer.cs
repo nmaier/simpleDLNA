@@ -348,6 +348,7 @@
       this.buttonAddView.TabIndex = 8;
       this.buttonAddView.Text = "Add";
       this.buttonAddView.UseVisualStyleBackColor = true;
+      this.buttonAddView.Click += new System.EventHandler(this.buttonAddView_Click);
       // 
       // listViews
       // 
@@ -442,7 +443,7 @@
       // buttonRemoveRestriction
       // 
       this.buttonRemoveRestriction.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonRemoveRestriction.Location = new System.Drawing.Point(427, 35);
+      this.buttonRemoveRestriction.Location = new System.Drawing.Point(431, 35);
       this.buttonRemoveRestriction.Name = "buttonRemoveRestriction";
       this.buttonRemoveRestriction.Size = new System.Drawing.Size(75, 23);
       this.buttonRemoveRestriction.TabIndex = 11;
@@ -453,7 +454,7 @@
       // buttonAddRestriction
       // 
       this.buttonAddRestriction.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonAddRestriction.Location = new System.Drawing.Point(427, 6);
+      this.buttonAddRestriction.Location = new System.Drawing.Point(431, 6);
       this.buttonAddRestriction.Name = "buttonAddRestriction";
       this.buttonAddRestriction.Size = new System.Drawing.Size(75, 23);
       this.buttonAddRestriction.TabIndex = 10;

@@ -9,7 +9,6 @@ namespace NMaier.SimpleDlna.Server.Views
   {
     private Regex filter = null;
 
-
     public override string Description
     {
       get
@@ -17,6 +16,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Show only files matching a specific filter";
       }
     }
+
     public override string Name
     {
       get
@@ -24,7 +24,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "filter";
       }
     }
-
 
     private void ProcessFolder(IMediaFolder root)
     {
@@ -38,7 +37,6 @@ namespace NMaier.SimpleDlna.Server.Views
         root.RemoveResource(f);
       }
     }
-
 
     public override void SetParameters(AttributeCollection parameters)
     {

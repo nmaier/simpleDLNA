@@ -9,7 +9,10 @@ namespace NMaier.SimpleDlna.Server
     {
       return (from i in DlnaMaps.Media2Ext
               where types.HasFlag(i.Key)
-              select i.Value).SelectMany(i => { return i; });
+              select i.Value).SelectMany(i =>
+      {
+        return i;
+      });
     }
   }
 }

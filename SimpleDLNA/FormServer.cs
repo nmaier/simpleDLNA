@@ -21,6 +21,7 @@ namespace NMaier.SimpleDlna.GUI
       SizeColumns(listViews);
       SizeColumns(listRestrictions);
     }
+
     public FormServer(ServerDescription description)
     {
       Init();
@@ -70,7 +71,6 @@ namespace NMaier.SimpleDlna.GUI
       SizeColumns(listViews);
     }
 
-
     public ServerDescription Description
     {
       get
@@ -113,7 +113,6 @@ namespace NMaier.SimpleDlna.GUI
         return rv;
       }
     }
-
 
     private void AddOrderItems()
     {
@@ -254,7 +253,7 @@ namespace NMaier.SimpleDlna.GUI
       }
     }
 
-    private void SizeColumns(ListView lv)
+    private static void SizeColumns(ListView lv)
     {
       var mode = ColumnHeaderAutoResizeStyle.ColumnContent;
       if (lv.Items.Count == 0) {

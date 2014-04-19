@@ -11,6 +11,7 @@ namespace NMaier.SimpleDlna.Server.Comparers
         return "Sort by file size";
       }
     }
+
     public override string Name
     {
       get
@@ -18,7 +19,6 @@ namespace NMaier.SimpleDlna.Server.Comparers
         return "size";
       }
     }
-
 
     public override int Compare(IMediaItem x, IMediaItem y)
     {

@@ -5,12 +5,12 @@ using System.Windows.Forms;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  static class Program
+  internal static class Program
   {
     [STAThread]
-    static void Main()
+    private static void Main()
     {
-      using (Mutex mutex = new Mutex(false, @"Global\simpledlnaguilock")) {
+      using (var mutex = new Mutex(false, @"Global\simpledlnaguilock")) {
 #if !DEBUG
         if (!mutex.WaitOne(0, false)) {
           using (var pipe = new NamedPipeClientStream(".", "simpledlnagui", PipeDirection.Out)) {

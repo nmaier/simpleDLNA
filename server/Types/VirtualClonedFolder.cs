@@ -1,4 +1,5 @@
-﻿namespace NMaier.SimpleDlna.Server
+﻿
+namespace NMaier.SimpleDlna.Server
 {
   public class VirtualClonedFolder : VirtualFolder
   {
@@ -6,8 +7,6 @@
 
     private readonly DlnaMediaTypes types;
 
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
     protected VirtualClonedFolder(IMediaFolder parent, string name, string id, DlnaMediaTypes types)
       : base(parent, name, id)
     {
@@ -18,20 +17,20 @@
       Cleanup();
     }
 
-
     public VirtualClonedFolder(IMediaFolder parent)
       : this(parent, parent.Id, parent.Id, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
     {
     }
+
     public VirtualClonedFolder(IMediaFolder parent, string name)
       : this(parent, name, name, DlnaMediaTypes.Audio | DlnaMediaTypes.Image | DlnaMediaTypes.Video)
     {
     }
+
     public VirtualClonedFolder(IMediaFolder parent, string name, DlnaMediaTypes types)
       : this(parent, name, name, types)
     {
     }
-
 
     private void CloneFolder(VirtualFolder parent, IMediaFolder folder)
     {
@@ -46,7 +45,6 @@
         }
       }
     }
-
 
     public override void Cleanup()
     {

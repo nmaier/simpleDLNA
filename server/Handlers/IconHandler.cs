@@ -10,7 +10,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-
     public IResponse HandleRequest(IRequest req)
     {
       var resource = req.Path.Substring(Prefix.Length);

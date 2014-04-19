@@ -15,18 +15,15 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly static Regex validator = new Regex(@"^[a-z\d][a-z\d_.-]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-
     protected Headers(bool asIs)
     {
       this.asIs = asIs;
     }
 
-
     public Headers()
       : this(asIs: false)
     {
     }
-
 
     public int Count
     {
@@ -35,6 +32,7 @@ namespace NMaier.SimpleDlna.Server
         return dict.Count;
       }
     }
+
     public string HeaderBlock
     {
       get
@@ -46,6 +44,7 @@ namespace NMaier.SimpleDlna.Server
         return hb.ToString();
       }
     }
+
     public Stream HeaderStream
     {
       get
@@ -53,6 +52,7 @@ namespace NMaier.SimpleDlna.Server
         return new MemoryStream(Encoding.ASCII.GetBytes(HeaderBlock));
       }
     }
+
     public bool IsReadOnly
     {
       get
@@ -60,6 +60,7 @@ namespace NMaier.SimpleDlna.Server
         return false;
       }
     }
+
     public ICollection<string> Keys
     {
       get
@@ -67,6 +68,7 @@ namespace NMaier.SimpleDlna.Server
         return dict.Keys;
       }
     }
+
     public ICollection<string> Values
     {
       get
@@ -74,7 +76,6 @@ namespace NMaier.SimpleDlna.Server
         return dict.Values;
       }
     }
-
 
     public string this[string key]
     {
@@ -87,7 +88,6 @@ namespace NMaier.SimpleDlna.Server
         dict[Normalize(key)] = value;
       }
     }
-
 
     private string Normalize(string header)
     {
@@ -105,7 +105,6 @@ namespace NMaier.SimpleDlna.Server
     {
       return dict.GetEnumerator();
     }
-
 
     public void Add(KeyValuePair<string, string> item)
     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -6,12 +6,10 @@ namespace NMaier.SimpleDlna.Utilities
   {
     private readonly Type type;
 
-
     protected BaseSortPart()
     {
       type = GetType();
     }
-
 
     public int CompareTo(BaseSortPart other)
     {

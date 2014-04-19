@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Collections;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -11,25 +11,25 @@ namespace NMaier.SimpleDlna.Utilities
   {
     private readonly uint capacity;
 
-    private readonly ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items;
+    private readonly ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items =
+      new ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
 
-    private readonly LinkedList<KeyValuePair<TKey, TValue>> order = new LinkedList<KeyValuePair<TKey, TValue>>();
+    private readonly LinkedList<KeyValuePair<TKey, TValue>> order =
+      new LinkedList<KeyValuePair<TKey, TValue>>();
 
     private readonly uint toDrop;
-
 
     [CLSCompliant(false)]
     public LeastRecentlyUsedDictionary(uint capacity)
     {
-      items = new ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
       this.capacity = capacity;
       toDrop = Math.Min(10, (uint)(capacity * 0.07));
     }
+
     public LeastRecentlyUsedDictionary(int capacity)
       : this((uint)capacity)
     {
     }
-
 
     [CLSCompliant(false)]
     public uint Capacity
@@ -39,6 +39,7 @@ namespace NMaier.SimpleDlna.Utilities
         return capacity;
       }
     }
+
     public int Count
     {
       get
@@ -46,6 +47,7 @@ namespace NMaier.SimpleDlna.Utilities
         return items.Count;
       }
     }
+
     public bool IsReadOnly
     {
       get
@@ -53,6 +55,7 @@ namespace NMaier.SimpleDlna.Utilities
         return false;
       }
     }
+
     public ICollection<TKey> Keys
     {
       get
@@ -60,6 +63,7 @@ namespace NMaier.SimpleDlna.Utilities
         return items.Keys;
       }
     }
+
     public ICollection<TValue> Values
     {
       get
@@ -68,7 +72,6 @@ namespace NMaier.SimpleDlna.Utilities
                 select i.Value.Value).ToList();
       }
     }
-
 
     public TValue this[TKey key]
     {
@@ -84,6 +87,10 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      return items.GetEnumerator();
+    }
 
     private void MaybeDropSome()
     {
@@ -98,12 +105,6 @@ namespace NMaier.SimpleDlna.Utilities
         }
       }
     }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      return items.GetEnumerator();
-    }
-
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Add(KeyValuePair<TKey, TValue> item)

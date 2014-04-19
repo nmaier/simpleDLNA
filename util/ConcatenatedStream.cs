@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -8,7 +8,6 @@ namespace NMaier.SimpleDlna.Utilities
   {
     private readonly Queue<Stream> streams = new Queue<Stream>();
 
-
     public override bool CanRead
     {
       get
@@ -16,6 +15,7 @@ namespace NMaier.SimpleDlna.Utilities
         return true;
       }
     }
+
     public override bool CanSeek
     {
       get
@@ -23,6 +23,7 @@ namespace NMaier.SimpleDlna.Utilities
         return false;
       }
     }
+
     public override bool CanWrite
     {
       get
@@ -30,6 +31,7 @@ namespace NMaier.SimpleDlna.Utilities
         return false;
       }
     }
+
     public override long Length
     {
       get
@@ -37,6 +39,7 @@ namespace NMaier.SimpleDlna.Utilities
         throw new NotSupportedException();
       }
     }
+
     public override long Position
     {
       get
@@ -48,7 +51,6 @@ namespace NMaier.SimpleDlna.Utilities
         throw new NotSupportedException();
       }
     }
-
 
     public void AddStream(Stream stream)
     {

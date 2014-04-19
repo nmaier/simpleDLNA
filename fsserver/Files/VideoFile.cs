@@ -27,7 +27,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private bool initialized = false;
 
-    private SubTitle subTitle;
+    private Subtitle subTitle;
 
     private string title;
 
@@ -63,7 +63,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         bookmark = 0;
       }
       try {
-        subTitle = info.GetValue("st", typeof(SubTitle)) as SubTitle;
+        subTitle = info.GetValue("st", typeof(Subtitle)) as Subtitle;
       }
       catch (Exception) {
         subTitle = null;
@@ -179,19 +179,19 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return rv;
       }
     }
-    public SubTitle SubTitle
+    public Subtitle Subtitle
     {
       get
       {
         try {
           if (subTitle == null) {
-            subTitle = new SubTitle(Item);
+            subTitle = new Subtitle(Item);
             Server.UpdateFileCache(this);
           }
         }
         catch (Exception ex) {
           Error("Failed to look up subtitle", ex);
-          subTitle = new SubTitle();
+          subTitle = new Subtitle();
         }
         return subTitle;
       }

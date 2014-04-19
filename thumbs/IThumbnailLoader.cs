@@ -1,10 +1,9 @@
-using System;
 using System.IO;
 using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  internal interface IThumbnails
+  internal interface IThumbnailLoader
   {
     DlnaMediaTypes Handling { get; }
 

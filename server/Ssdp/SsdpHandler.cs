@@ -14,21 +14,31 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 {
   internal sealed class SsdpHandler : Logging, IDisposable
   {
-    private readonly UdpClient client = new UdpClient();
-    private readonly Threading.AutoResetEvent datagramPosted = new Threading.AutoResetEvent(false);
     private const int DATAGRAMS_PER_MESSAGE = 2;
+
+    private const string SSDP_ADDR = "239.255.255.250";
+
+    private const int SSDP_PORT = 1900;
+
+    private readonly UdpClient client = new UdpClient();
+
+    private readonly Threading.AutoResetEvent datagramPosted = new Threading.AutoResetEvent(false);
+
     private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
+
     private readonly ConcurrentQueue<Datagram> messageQueue = new ConcurrentQueue<Datagram>();
+
     private readonly Timers.Timer notificationTimer = new Timers.Timer(60000);
+
     private readonly Timers.Timer queueTimer = new Timers.Timer(1000);
+
     private static readonly Random random = new Random();
-    private bool running = true;
-    const string SSDP_ADDR = "239.255.255.250";
+
     private static readonly IPEndPoint SSDP_ENDP = new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
+
     private static readonly IPAddress SSDP_IP = IPAddress.Parse(SSDP_ADDR);
-    const int SSDP_PORT = 1900;
 
-
+    private bool running = true;
 
     public SsdpHandler()
     {
@@ -46,31 +56,25 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       Receive();
     }
 
-
-
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", MessageId = "client")]
-    public void Dispose()
+    private UpnpDevice[] Devices
     {
-      Debug("Disposing SSDP");
-      running = false;
-      while (messageQueue.Count != 0) {
-        datagramPosted.WaitOne();
+      get
+      {
+        UpnpDevice[] devs;
+        lock (devices) {
+          devs = devices.Values.SelectMany(i =>
+          {
+            return i;
+          }).ToArray();
+        }
+        return devs;
       }
-
-      client.DropMulticastGroup(SSDP_IP);
-
-      notificationTimer.Enabled = false;
-      queueTimer.Enabled = false;
-      notificationTimer.Dispose();
-      queueTimer.Dispose();
-      datagramPosted.Dispose();
     }
 
     private void ProcessQueue(object sender, Timers.ElapsedEventArgs e)
     {
       while (messageQueue.Count != 0) {
-        Datagram msg = null;
+        var msg = (Datagram)null;
         if (!messageQueue.TryPeek(out msg)) {
           continue;
         }
@@ -99,7 +103,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     private void ReceiveCallback(IAsyncResult result)
     {
       try {
@@ -153,7 +156,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       var headers = new RawHeaders();
       headers.Add("CACHE-CONTROL", "max-age = 600");
       headers.Add("DATE", DateTime.Now.ToString("R"));
-      headers.Add("EXT", "");
+      headers.Add("EXT", string.Empty);
       headers.Add("LOCATION", dev.Descriptor.ToString());
       headers.Add("SERVER", HttpServer.Signature);
       headers.Add("ST", dev.Type);
@@ -168,21 +171,6 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       Debug("Sending SSDP notifications!");
       notificationTimer.Interval = random.Next(60000, 120000);
       NotifyAll();
-    }
-
-    private UpnpDevice[] Devices
-    {
-      get
-      {
-        UpnpDevice[] devs;
-        lock (devices) {
-          devs = devices.Values.SelectMany(i =>
-          {
-            return i;
-          }).ToArray();
-        }
-        return devs;
-      }
     }
 
     internal void NotifyAll()
@@ -253,6 +241,23 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         NotifyDevice(d, "byebye", true);
       }
       DebugFormat("Unregistered mount {0}", UUID);
+    }
+
+    public void Dispose()
+    {
+      Debug("Disposing SSDP");
+      running = false;
+      while (messageQueue.Count != 0) {
+        datagramPosted.WaitOne();
+      }
+
+      client.DropMulticastGroup(SSDP_IP);
+
+      notificationTimer.Enabled = false;
+      queueTimer.Enabled = false;
+      notificationTimer.Dispose();
+      queueTimer.Dispose();
+      datagramPosted.Dispose();
     }
   }
 }

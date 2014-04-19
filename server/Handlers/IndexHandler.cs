@@ -1,5 +1,5 @@
-using NMaier.SimpleDlna.Utilities;
 using System.Linq;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -7,12 +7,10 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly HttpServer owner;
 
-
     public IndexHandler(HttpServer owner)
     {
       this.owner = owner;
     }
-
 
     public string Prefix
     {
@@ -22,14 +20,16 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-
     public IResponse HandleRequest(IRequest req)
     {
       var article = HtmlTools.CreateHtmlArticle("Index");
       var document = article.OwnerDocument;
 
       var list = document.EL("ul");
-      var mounts = owner.MediaMounts.OrderBy(m => { return m.Value; }, NaturalStringComparer.CurrentCultureIgnoreCase);
+      var mounts = owner.MediaMounts.OrderBy(m =>
+      {
+        return m.Value;
+      }, NaturalStringComparer.CurrentCultureIgnoreCase);
       foreach (var m in mounts) {
         var li = document.EL("li");
         li.AppendChild(document.EL("a", new AttributeCollection() { { "href", m.Key } }, m.Value));

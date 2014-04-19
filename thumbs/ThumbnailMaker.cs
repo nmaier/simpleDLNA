@@ -9,28 +9,33 @@ using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
+  using Drawing2D = System.Drawing.Drawing2D;
+
   public sealed class ThumbnailMaker : Logging
   {
-    private static readonly LeastRecentlyUsedDictionary<string, CacheItem> cache = new LeastRecentlyUsedDictionary<string, CacheItem>(1 << 11);
-    private static readonly Dictionary<DlnaMediaTypes, List<IThumbnails>> thumbers = BuildThumbnailers();
+    private static readonly LeastRecentlyUsedDictionary<string, CacheItem> cache =
+      new LeastRecentlyUsedDictionary<string, CacheItem>(1 << 11);
 
-    private static Dictionary<DlnaMediaTypes, List<IThumbnails>> BuildThumbnailers()
+    private static readonly Dictionary<DlnaMediaTypes, List<IThumbnailLoader>> thumbers =
+      BuildThumbnailers();
+
+    private static Dictionary<DlnaMediaTypes, List<IThumbnailLoader>> BuildThumbnailers()
     {
-      var thumbers = new Dictionary<DlnaMediaTypes, List<IThumbnails>>();
+      var thumbers = new Dictionary<DlnaMediaTypes, List<IThumbnailLoader>>();
       var types = Enum.GetValues(typeof(DlnaMediaTypes));
       foreach (DlnaMediaTypes i in types) {
-        thumbers.Add(i, new List<IThumbnails>());
+        thumbers.Add(i, new List<IThumbnailLoader>());
       }
       var a = Assembly.GetExecutingAssembly();
       foreach (Type t in a.GetTypes()) {
-        if (t.GetInterface("IThumbnails") == null) {
+        if (t.GetInterface("IThumbnailLoader") == null) {
           continue;
         }
-        ConstructorInfo ctor = t.GetConstructor(new Type[] { });
+        var ctor = t.GetConstructor(new Type[] { });
         if (ctor == null) {
           continue;
         }
-        var thumber = ctor.Invoke(new object[] { }) as IThumbnails;
+        var thumber = ctor.Invoke(new object[] { }) as IThumbnailLoader;
         if (thumber == null) {
           continue;
         }
@@ -41,37 +46,6 @@ namespace NMaier.SimpleDlna.Thumbnails
         }
       }
       return thumbers;
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "2#"),
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "1#")]
-    public byte[] GetThumbnail(FileSystemInfo file, ref int width, ref int height)
-    {
-      if (file == null) {
-        throw new ArgumentNullException("file");
-      }
-      var ext = file.Extension.ToLower().Substring(1);
-      var mediaType = DlnaMaps.Ext2Media[ext];
-
-      var key = file.FullName;
-      byte[] rv;
-      if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
-        return rv;
-      }
-
-      return GetThumbnailInternal(key, file, mediaType, ref width, ref height);
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "4#"),
-    System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "3#"),
-    CLSCompliant(false)]
-    public byte[] GetThumbnail(string key, DlnaMediaTypes type, Stream stream, ref int width, ref int height)
-    {
-      byte[] rv;
-      if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
-        return rv;
-      }
-      return GetThumbnailInternal(key, stream, type, ref width, ref height);
     }
 
     private static bool GetThumbnailFromCache(ref string key, ref int width, ref int height, out byte[] rv)
@@ -141,16 +115,16 @@ namespace NMaier.SimpleDlna.Thumbnails
         catch (Exception ex) {
           LogManager.GetLogger(typeof(ThumbnailMaker)).Debug("Failed to set resolution", ex);
         }
-        using (Graphics graphics = Graphics.FromImage(result)) {
+        using (var graphics = Graphics.FromImage(result)) {
           if (result.Width > image.Width && result.Height > image.Height) {
-            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+            graphics.CompositingQuality = Drawing2D.CompositingQuality.HighQuality;
+            graphics.InterpolationMode = Drawing2D.InterpolationMode.High;
           }
           else {
-            graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
+            graphics.CompositingQuality = Drawing2D.CompositingQuality.HighSpeed;
+            graphics.InterpolationMode = Drawing2D.InterpolationMode.Bicubic;
           }
-          graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
+          graphics.SmoothingMode = Drawing2D.SmoothingMode.HighSpeed;
           graphics.DrawImage(image, 0, 0, result.Width, result.Height);
           width = result.Width;
           height = result.Height;
@@ -163,13 +137,41 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
+    public IThumbnail GetThumbnail(FileSystemInfo file, int width, int height)
+    {
+      if (file == null) {
+        throw new ArgumentNullException("file");
+      }
+      var ext = file.Extension.ToLower().Substring(1);
+      var mediaType = DlnaMaps.Ext2Media[ext];
 
+      var key = file.FullName;
+      byte[] rv;
+      if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
+        return new Thumbnail(width, height, rv);
+        ;
+      }
 
+      rv = GetThumbnailInternal(key, file, mediaType, ref width, ref height);
+      return new Thumbnail(width, height, rv);
+    }
+
+    public IThumbnail GetThumbnail(string key, DlnaMediaTypes type, Stream stream, int width, int height)
+    {
+      byte[] rv;
+      if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
+        return new Thumbnail(width, height, rv);
+      }
+      rv = GetThumbnailInternal(key, stream, type, ref width, ref height);
+      return new Thumbnail(width, height, rv);
+    }
 
     private class CacheItem
     {
       public readonly byte[] Data;
+
       public readonly int Height;
+
       public readonly int Width;
 
       public CacheItem(byte[] aData, int aWidth, int aHeight)

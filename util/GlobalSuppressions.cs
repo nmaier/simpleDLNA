@@ -1,13 +1,25 @@
-﻿// This file is used by Code Analysis to maintain SuppressMessage 
-// attributes that are applied to this project.
-// Project-level suppressions either have no target or are given 
-// a specific target and scoped to a namespace, type, member, etc.
-//
-// To add a suppression to this file, right-click the message in the 
-// Error List, point to "Suppress Message(s)", and click 
-// "In Project Suppression File".
-// You do not need to add suppressions to this file manually.
-
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dlna", Scope = "namespace", Target = "NMaier.SimpleDlna.Utilities")]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dlna")]
+﻿[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dlna", Scope = "namespace", Target = "NMaier.SimpleDlna.Utilities")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2243:AttributeStringLiteralsShouldParseCorrectly")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Dlna")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.ConcatenatedStream.#Close()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fmpeg", Scope = "type", Target = "NMaier.SimpleDlna.Utilities.FFmpeg")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fmpeg", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#FFmpegExecutable")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#GetSubtitleSRT(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#GetSubtitleSRT(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ffmpeg", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#GetSubtitleSRT(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#IdentifyFileInternalFFmpeg(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ffmpeg", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#IdentifyFileInternalFFmpeg(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "GET", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.HttpMethod.#GET")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "HEAD", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.HttpMethod.#HEAD")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#GetSubtitleSubrip(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#GetSubtitleSubrip(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Subrip", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#GetSubtitleSubrip(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ffmpeg", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#GetSubtitleSubrip(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.HttpStream.#Length")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.HttpStream.#OpenAt(System.Int64,NMaier.SimpleDlna.Utilities.HttpMethod)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "MAC", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.IP.#GetMAC(System.Net.IPAddress)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "MAC", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.IP.#IsAcceptedMAC(System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.Repository`1.#ListItems()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1000:DoNotDeclareStaticMembersOnGenericTypes", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.Repository`1.#Lookup(System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Sqlite", Scope = "type", Target = "NMaier.SimpleDlna.Utilities.Sqlite")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.Sqlite.#GetDatabaseConnectionSDS(System.String)")]

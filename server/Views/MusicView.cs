@@ -12,6 +12,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Reorganizes files into a proper music collection";
       }
     }
+
     public override string Name
     {
       get
@@ -19,7 +20,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "music";
       }
     }
-
 
     private static void LinkTriple(TripleKeyedVirtualFolder folder, IMediaAudioResource r, string key1, string key2)
     {
@@ -65,7 +65,6 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-
     public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
@@ -86,14 +85,12 @@ namespace NMaier.SimpleDlna.Server.Views
       return root;
     }
 
-
     private class AlbumInTitleAudioResource : AudioResourceDecorator
     {
       public AlbumInTitleAudioResource(IMediaAudioResource resource)
         : base(resource)
       {
       }
-
 
       public override string Title
       {
@@ -113,6 +110,7 @@ namespace NMaier.SimpleDlna.Server.Views
       public DoubleKeyedVirtualFolder()
       {
       }
+
       public DoubleKeyedVirtualFolder(IMediaFolder aParent, string aName)
         : base(aParent, aName)
       {
@@ -124,6 +122,7 @@ namespace NMaier.SimpleDlna.Server.Views
       public SimpleKeyedVirtualFolder()
       {
       }
+
       public SimpleKeyedVirtualFolder(IMediaFolder aParent, string aName)
         : base(aParent, aName)
       {
@@ -135,6 +134,7 @@ namespace NMaier.SimpleDlna.Server.Views
       public TripleKeyedVirtualFolder()
       {
       }
+
       public TripleKeyedVirtualFolder(IMediaFolder aParent, string aName)
         : base(aParent, aName)
       {

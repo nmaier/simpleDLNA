@@ -13,11 +13,11 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly HttpCode status;
 
-
     public ResourceResponse(HttpCode aStatus, string type, string aResource)
       : this(aStatus, type, Properties.Resources.ResourceManager, aResource)
     {
     }
+
     public ResourceResponse(HttpCode aStatus, string type, ResourceManager aResourceManager, string aResource)
     {
       status = aStatus;
@@ -33,7 +33,6 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-
     public Stream Body
     {
       get
@@ -41,6 +40,7 @@ namespace NMaier.SimpleDlna.Server
         return new MemoryStream(resource);
       }
     }
+
     public IHeaders Headers
     {
       get
@@ -48,6 +48,7 @@ namespace NMaier.SimpleDlna.Server
         return headers;
       }
     }
+
     public HttpCode Status
     {
       get

@@ -11,20 +11,30 @@ namespace NMaier.SimpleDlna.Server
                     DlnaFlags.ConnectionStall |
                     DlnaFlags.ByteBasedSeek |
                     DlnaFlags.DlnaV15);
+
     internal static readonly string DefaultInteractive =
       FlagsToString(DlnaFlags.InteractiveTransferMode |
                     DlnaFlags.BackgroundTransferMode |
                     DlnaFlags.ConnectionStall |
                     DlnaFlags.ByteBasedSeek |
                     DlnaFlags.DlnaV15);
+
     private static readonly string[] aacs = new string[] { "aac", "mp4a", "m4a" };
+
     private static readonly string[] avcs = new string[] { "avc", "mp4", "m4v", "mov", "3gp", "3gpp", "flv" };
+
     private static readonly string[] avis = new string[] { "avi", "divx", "xvid" };
+
     public static readonly Dictionary<DlnaMime, List<string>> Dlna2Ext = new Dictionary<DlnaMime, List<string>>();
+
     public static readonly Dictionary<string, DlnaMime> Ext2Dlna = new Dictionary<string, DlnaMime>();
+
     public static readonly Dictionary<string, DlnaMediaTypes> Ext2Media = new Dictionary<string, DlnaMediaTypes>();
+
     private static readonly string[] jpgs = new string[] { "jpg", "jpe", "jpeg", "jif", "jfif" };
+
     public static readonly Dictionary<DlnaMediaTypes, List<string>> Media2Ext = new Dictionary<DlnaMediaTypes, List<string>>();
+
     public static readonly Dictionary<DlnaMime, string> Mime = new Dictionary<DlnaMime, string>() {
         { DlnaMime.MATROSKA, "video/x-mkv" },
         { DlnaMime.AVI, "video/avi" },
@@ -37,10 +47,15 @@ namespace NMaier.SimpleDlna.Server
         { DlnaMime.WMV, "video/x-ms-wmv" },
         { DlnaMime.SRT, "smi/caption" }
     };
+
     private static readonly string[] mkvs = new string[] { "mkv", "matroska", "mk3d", "webm" };
+
     private static readonly string[] mp3s = new string[] { "mp3", "mp3p", "mp3x", "mp3a", "mpa" };
+
     private static readonly string[] mpgs = new string[] { "mpg", "mpe", "mpeg", "mpg2", "mpeg2", "ts", "vob", "m2v" };
+
     private static readonly string[] ogas = new string[] { "ogg", "oga" };
+
     public static readonly Dictionary<DlnaMime, string> PN = new Dictionary<DlnaMime, string>() {
         { DlnaMime.MATROSKA, "DLNA.ORG_PN=MATROSKA" },
         { DlnaMime.AVI, "DLNA.ORG_PN=AVI" },
@@ -53,13 +68,12 @@ namespace NMaier.SimpleDlna.Server
         { DlnaMime.WMV, "DLNA.ORG_PN=WMVHIGH_FULL" },
         { DlnaMime.SRT, "DLNA.ORG_PN=SRT" }
     };
+
     private static readonly string[] wmvs = new string[] { "wmv", "asf", "wma", "wmf" };
 
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline")]
     static DlnaMaps()
     {
-      var e2d = new [] {
+      var e2d = new[] {
           new
       { t = DlnaMime.MATROSKA, e = mkvs },
           new
@@ -92,7 +106,6 @@ namespace NMaier.SimpleDlna.Server
       InitMedia(new string[][] { mp3s, aacs, ogas }, DlnaMediaTypes.Audio);
     }
 
-
     private static void InitMedia(string[][] k, DlnaMediaTypes t)
     {
       foreach (var i in k) {
@@ -108,7 +121,6 @@ namespace NMaier.SimpleDlna.Server
         }
       }
     }
-
 
     internal static string FlagsToString(DlnaFlags flags)
     {

@@ -13,9 +13,13 @@ namespace NMaier.SimpleDlna.GUI
   public class PathEnvironmentInstaller : Installer
   {
     private const string ENV_PATH = "EnvironmentPath";
-    private const string REG_PATH = "PATH";
+
     private const string REG_ENV = "Environment";
+
+    private const string REG_PATH = "PATH";
+
     private readonly DirectoryInfo directory = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+
     public override void Install(IDictionary stateSaver)
     {
       base.Install(stateSaver);
@@ -42,6 +46,18 @@ namespace NMaier.SimpleDlna.GUI
         registry.SetValue(REG_PATH, newpath, RegistryValueKind.ExpandString);
       }
     }
+
+    public override void Rollback(IDictionary savedState)
+    {
+      base.Rollback(savedState);
+      if (!savedState.Contains(ENV_PATH)) {
+        return;
+      }
+      using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
+        registry.SetValue(REG_PATH, savedState[ENV_PATH], registry.GetValueKind(REG_PATH));
+      }
+    }
+
     public override void Uninstall(IDictionary savedState)
     {
       base.Uninstall(savedState);
@@ -61,17 +77,6 @@ namespace NMaier.SimpleDlna.GUI
           return;
         }
         registry.SetValue(REG_PATH, cleaned, registry.GetValueKind(REG_PATH));
-      }
-    }
-
-    public override void Rollback(IDictionary savedState)
-    {
-      base.Rollback(savedState);
-      if (!savedState.Contains(ENV_PATH)) {
-        return;
-      }
-      using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
-        registry.SetValue(REG_PATH, savedState[ENV_PATH], registry.GetValueKind(REG_PATH));
       }
     }
   }

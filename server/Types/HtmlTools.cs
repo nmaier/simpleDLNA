@@ -1,6 +1,6 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Xml;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {

@@ -19,7 +19,6 @@ namespace NMaier.SimpleDlna.Server
       "Date",
       "Size" };
 
-
     private IResponse ProcessHtmlRequest(IMediaItem aItem)
     {
       var item = aItem as IMediaFolder;

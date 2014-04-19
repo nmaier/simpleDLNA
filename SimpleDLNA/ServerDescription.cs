@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.GUI
@@ -13,16 +12,24 @@ namespace NMaier.SimpleDlna.GUI
     }
 
     public bool Active { get; set; }
+
     public string[] Directories { get; set; }
-    public string Name { get; set; }
-    public string Order { get; set; }
-    public bool OrderDescending { get; set; }
-    public DlnaMediaTypes Types { get; set; }
-    public string[] Views { get; set; }
-    public string[] Macs { get; set; }
+
     public string[] Ips { get; set; }
+
+    public string[] Macs { get; set; }
+
+    public string Name { get; set; }
+
+    public string Order { get; set; }
+
+    public bool OrderDescending { get; set; }
+
+    public DlnaMediaTypes Types { get; set; }
+
     public string[] UserAgents { get; set; }
 
+    public string[] Views { get; set; }
 
     public void AdoptInfo(ServerDescription other)
     {

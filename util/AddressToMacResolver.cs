@@ -7,14 +7,11 @@ namespace NMaier.SimpleDlna.Utilities
 {
   internal class AddressToMacResolver : Logging
   {
-    private struct MACInfo {
-      public string MAC;
-      public DateTime Fresh;
-    }
+    private static readonly Regex regMac =
+      new Regex(@"(?:[0-9A-F]{2}:){5}[0-9A-F]{2}", RegexOptions.Compiled);
 
-    private static readonly Regex regMac = new Regex(@"(?:[0-9A-F]{2}:){5}[0-9A-F]{2}", RegexOptions.Compiled);
-
-    private readonly ConcurrentDictionary<IPAddress, MACInfo> cache = new ConcurrentDictionary<IPAddress,MACInfo>();
+    private readonly ConcurrentDictionary<IPAddress, MACInfo> cache =
+      new ConcurrentDictionary<IPAddress, MACInfo>();
 
     public static bool IsAcceptedMac(string mac)
     {
@@ -29,7 +26,8 @@ namespace NMaier.SimpleDlna.Utilities
     {
       try {
         if (ip.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork) {
-          throw new NotSupportedException("Addresses other than IPV4 are not supported");
+          throw new NotSupportedException(
+            "Addresses other than IPV4 are not supported");
         }
         MACInfo info;
         if (cache.TryGetValue(ip, out info) && info.Fresh > DateTime.Now) {
@@ -37,14 +35,17 @@ namespace NMaier.SimpleDlna.Utilities
           return info.MAC;
         }
         var raw = new byte[6];
-        UInt32 length = 6;
-        UInt32 addr = (UInt32)ip.Address;
+        var length = 6u;
+#pragma warning disable 612,618
+        var addr = (UInt32)ip.Address;
+#pragma warning restore 612,618
         string mac = null;
 
         try {
-        if (SafeNativeMethods.SendARP(addr, 0, raw, ref length) == 0) {
-          mac = string.Format("{0:X}:{1:X}:{2:X}:{3:X}:{4:X}:{5:X}", raw[0], raw[1], raw[2], raw[3], raw[4], raw[5]);
-        }
+          if (SafeNativeMethods.SendARP(addr, 0, raw, ref length) == 0) {
+            mac = string.Format("{0:X}:{1:X}:{2:X}:{3:X}:{4:X}:{5:X}",
+              raw[0], raw[1], raw[2], raw[3], raw[4], raw[5]);
+          }
         }
         catch (DllNotFoundException) {
           // ignore
@@ -61,6 +62,13 @@ namespace NMaier.SimpleDlna.Utilities
         Warn(string.Format("Failed to resolve {0} to MAC", ip), ex);
         return null;
       }
+    }
+
+    private struct MACInfo
+    {
+      public DateTime Fresh;
+
+      public string MAC;
     }
   }
 }

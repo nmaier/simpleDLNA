@@ -12,21 +12,13 @@ using NMaier.SimpleDlna.Utilities;
 namespace NMaier.SimpleDlna
 {
   [GetOptOptions(AcceptPrefixType = ArgumentPrefixTypes.Dashes)]
-  class Options : GetOpt
+  internal class Options : GetOpt
   {
-    private int port = 0;
     private string[] macs = new string[0];
+
     private string[] ips = new string[0];
+
     private string[] uas = new string[0];
-
-    [Argument("cache", HelpVar = "file", HelpText = "Cache file to use for storing meta data (default: none)")]
-    [ShortArgument('c')]
-    public FileInfo CacheFile = null;
-
-    [Argument("sort-descending", HelpText = "Sort order; see --list-sort-orders")]
-    [ShortArgument('d')]
-    [FlagArgument(true)]
-    public bool DescendingOrder = false;
 
     [Parameters(HelpVar = "Directory")]
     public DirectoryInfo[] Directories = new DirectoryInfo[] { new DirectoryInfo(".") };
@@ -39,6 +31,17 @@ namespace NMaier.SimpleDlna
     [Argument("view", HelpText = "Apply a view (default: no views applied)", HelpVar = "view")]
     [ShortArgument('v')]
     public string[] Views = new string[0];
+
+    private int port = 0;
+
+    [Argument("cache", HelpVar = "file", HelpText = "Cache file to use for storing meta data (default: none)")]
+    [ShortArgument('c')]
+    public FileInfo CacheFile = null;
+
+    [Argument("sort-descending", HelpText = "Sort order; see --list-sort-orders")]
+    [ShortArgument('d')]
+    [FlagArgument(true)]
+    public bool DescendingOrder = false;
 
     [Argument("list-sort-orders", HelpText = "List all available sort orders")]
     [FlagArgument(true)]
@@ -79,44 +82,6 @@ namespace NMaier.SimpleDlna
     [FlagArgument(true)]
     public bool ShowVersion = false;
 
-    [Argument("mac", HelpText = "Allow only specified MACs", HelpVar = "MAC")]
-    [ShortArgument('m')]
-    public string[] Macs
-    {
-      get
-      {
-        return macs;
-      }
-      set
-      {
-        foreach (var mac in value) {
-          if (!IP.IsAcceptedMAC(mac)) {
-            throw new GetOptException(string.Format("Not a valid mac address: {0}. Must have a form of 01:AF:BC:00:0A:FF!", mac));
-          }
-        }
-        macs = value;
-      }
-    }
-
-    [Argument("ua", HelpText = "Allow only specified user-agents", HelpVar = "User-Agent")]
-    [ShortArgument('u')]
-    public string[] UserAgents
-    {
-      get
-      {
-        return uas;
-      }
-      set
-      {
-        foreach (var ua in value) {
-          if (string.IsNullOrWhiteSpace(ua)) {
-            throw new GetOptException(string.Format("Not a valid User-Agent: {0}.", ua));
-          }
-        }
-        uas = value;
-      }
-    }
-
     [Argument("ip", HelpText = "Allow only specified IPs", HelpVar = "IP")]
     [ShortArgument('i')]
     public string[] Ips
@@ -139,6 +104,25 @@ namespace NMaier.SimpleDlna
       }
     }
 
+    [Argument("mac", HelpText = "Allow only specified MACs", HelpVar = "MAC")]
+    [ShortArgument('m')]
+    public string[] Macs
+    {
+      get
+      {
+        return macs;
+      }
+      set
+      {
+        foreach (var mac in value) {
+          if (!IP.IsAcceptedMAC(mac)) {
+            throw new GetOptException(string.Format("Not a valid mac address: {0}. Must have a form of 01:AF:BC:00:0A:FF!", mac));
+          }
+        }
+        macs = value;
+      }
+    }
+
     [Argument("port", HelpVar = "port", HelpText = "Webserver listen port (default: 0, bind an available port)")]
     [ShortArgument('p')]
     public int Port
@@ -156,6 +140,24 @@ namespace NMaier.SimpleDlna
       }
     }
 
+    [Argument("ua", HelpText = "Allow only specified user-agents", HelpVar = "User-Agent")]
+    [ShortArgument('u')]
+    public string[] UserAgents
+    {
+      get
+      {
+        return uas;
+      }
+      set
+      {
+        foreach (var ua in value) {
+          if (string.IsNullOrWhiteSpace(ua)) {
+            throw new GetOptException(string.Format("Not a valid User-Agent: {0}.", ua));
+          }
+        }
+        uas = value;
+      }
+    }
 
     public void SetupLogging()
     {

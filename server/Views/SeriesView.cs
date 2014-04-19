@@ -15,7 +15,6 @@ namespace NMaier.SimpleDlna.Server.Views
       @"\b[1-9](?:0[1-9]|[1-3]\d)\b)", // 101
       RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-
     public override string Description
     {
       get
@@ -23,6 +22,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Try to determine (TV) series from title and categorize accordingly";
       }
     }
+
     public override string Name
     {
       get
@@ -30,7 +30,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "series";
       }
     }
-
 
     private static void SortFolder(IMediaFolder folder, SimpleKeyedVirtualFolder series)
     {
@@ -55,7 +54,6 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-
     public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
@@ -74,12 +72,12 @@ namespace NMaier.SimpleDlna.Server.Views
       return root;
     }
 
-
     private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
     {
       public SimpleKeyedVirtualFolder()
       {
       }
+
       public SimpleKeyedVirtualFolder(IMediaFolder aParent, string aName)
         : base(aParent, aName)
       {

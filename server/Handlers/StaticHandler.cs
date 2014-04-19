@@ -6,17 +6,16 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly IResponse response;
 
-
     public StaticHandler(IResponse aResponse)
       : this("#", aResponse)
     {
     }
+
     public StaticHandler(string aPrefix, IResponse aResponse)
     {
       prefix = aPrefix;
       response = aResponse;
     }
-
 
     public string Prefix
     {
@@ -25,7 +24,6 @@ namespace NMaier.SimpleDlna.Server
         return prefix;
       }
     }
-
 
     public IResponse HandleRequest(IRequest req)
     {

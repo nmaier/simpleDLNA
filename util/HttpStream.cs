@@ -1,8 +1,8 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -14,7 +14,6 @@ namespace NMaier.SimpleDlna.Utilities
 
     private const int TIMEOUT = 30000;
 
-
     private Stream bufferedStream;
 
     private long? length;
@@ -22,8 +21,6 @@ namespace NMaier.SimpleDlna.Utilities
     private readonly static ILog logger = LogManager.GetLogger(typeof(HttpStream));
 
     public static readonly string UserAgent = GenerateUserAgent();
-
-    private readonly HttpMethod method;
 
     private long position = 0;
 
@@ -37,31 +34,32 @@ namespace NMaier.SimpleDlna.Utilities
 
     private readonly Uri uri;
 
-
-    public HttpStream(HttpMethod method, Uri uri)
-      : this(method, uri, null)
+    public HttpStream(Uri uri)
+      : this(uri, null)
     {
     }
-    public HttpStream(HttpMethod method, Uri uri, Uri referrer)
+
+    public HttpStream(Uri uri, Uri referrer)
     {
       if (uri == null) {
         throw new ArgumentNullException("uri");
       }
       this.uri = uri;
       this.referrer = referrer;
-      this.method = method;
     }
-
 
     public override bool CanRead
     {
-      get {
+      get
+      {
         return true;
       }
     }
+
     public override bool CanSeek
     {
-      get {
+      get
+      {
         if (response == null) {
           OpenAt(0, HttpMethod.HEAD);
         }
@@ -75,39 +73,49 @@ namespace NMaier.SimpleDlna.Utilities
         return true;
       }
     }
+
     public override bool CanTimeout
     {
-      get {
+      get
+      {
         return true;
       }
     }
+
     public override bool CanWrite
     {
-      get {
+      get
+      {
         return false;
       }
     }
+
     public string ContentType
     {
-      get {
+      get
+      {
         if (response == null) {
           OpenAt(0, HttpMethod.HEAD);
         }
         return response.ContentType;
       }
     }
+
     public DateTime LastModified
     {
-      get {
+      get
+      {
         if (response == null) {
           OpenAt(0, HttpMethod.HEAD);
         }
         return response.LastModified;
       }
     }
+
     public override long Length
     {
-      get {
+      get
+      {
         if (!length.HasValue) {
           OpenAt(0, HttpMethod.HEAD);
           length = response.ContentLength;
@@ -118,22 +126,26 @@ namespace NMaier.SimpleDlna.Utilities
         return length.Value;
       }
     }
+
     public override long Position
     {
-      get {
+      get
+      {
         return position;
       }
-      set {
+      set
+      {
         Seek(Position, SeekOrigin.Begin);
       }
     }
+
     public Uri Uri
     {
-      get {
+      get
+      {
         return new Uri(uri.ToString());
       }
     }
-
 
     private static string GenerateUserAgent()
     {
@@ -160,10 +172,21 @@ namespace NMaier.SimpleDlna.Utilities
         );
     }
 
-
     protected override void Dispose(bool disposing)
     {
-      Dispose();
+      if (disposing) {
+        if (bufferedStream != null) {
+          bufferedStream.Dispose();
+          bufferedStream = null;
+        }
+        if (responseStream != null) {
+          responseStream.Dispose();
+          responseStream = null;
+        }
+        response = null;
+        request = null;
+      }
+
       base.Dispose(disposing);
     }
 
@@ -177,6 +200,7 @@ namespace NMaier.SimpleDlna.Utilities
       }
       Close();
       Dispose();
+
       request = (HttpWebRequest)WebRequest.Create(uri);
       request.Method = method.ToString();
       if (referrer != null) {
@@ -204,7 +228,6 @@ namespace NMaier.SimpleDlna.Utilities
       logger.InfoFormat("Opened {0} {1} at {2}", method, uri, pos);
     }
 
-
     public override void Close()
     {
       if (bufferedStream != null) {
@@ -220,16 +243,8 @@ namespace NMaier.SimpleDlna.Utilities
 
     public new void Dispose()
     {
-      if (bufferedStream != null) {
-        bufferedStream.Dispose();
-        bufferedStream = null;
-      }
-      if (responseStream != null) {
-        responseStream.Dispose();
-        responseStream = null;
-      }
-      response = null;
-      request = null;
+      Dispose(true);
+      GC.SuppressFinalize(this);
     }
 
     public override void Flush()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,11 +7,11 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fmpeg")]
+  using InfoCache = LeastRecentlyUsedDictionary<FileInfo, IDictionary<string, string>>;
+
   public static class FFmpeg
   {
     private static readonly DirectoryInfo[] specialLocations = new DirectoryInfo[] {
@@ -22,8 +23,7 @@ namespace NMaier.SimpleDlna.Utilities
         new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
     };
 
-    private readonly static LeastRecentlyUsedDictionary<FileInfo, IDictionary<string, string>> infoCache =
-      new LeastRecentlyUsedDictionary<FileInfo, IDictionary<string, string>>(500);
+    private readonly static InfoCache infoCache = new InfoCache(500);
 
     private static readonly Regex regAssStrip = new Regex(@"^,+", RegexOptions.Compiled);
 
@@ -33,20 +33,11 @@ namespace NMaier.SimpleDlna.Utilities
     private static readonly Regex regDimensions =
       new Regex(@"Video: .+ ([0-9]{2,})x([0-9]{2,}) ", RegexOptions.Compiled);
 
-    private static readonly Regex regLine =
-      new Regex(@"^(?:ID|META)_([\w\d_]+)=(.+)$", RegexOptions.Compiled);
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fidentify")]
-    public static readonly string FFidentifyExecutable = FindExecutable("ffidentify");
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Fmpeg")]
     public static readonly string FFmpegExecutable = FindExecutable("ffmpeg");
-
 
     private static string FindExecutable(string executable)
     {
-      var isWin = Environment.OSVersion.Platform.ToString()
-        .ToLower().Contains("win");
+      var isWin = Environment.OSVersion.Platform.ToString().ToLower().Contains("win");
       if (isWin) {
         executable += ".exe";
       }
@@ -80,7 +71,7 @@ namespace NMaier.SimpleDlna.Utilities
         if (!i.Exists) {
           continue;
         }
-        foreach (var di in new[] { i, new DirectoryInfo(Path.Combine(i.FullName, "bin")) }) {
+        foreach (var di in new [] { i, new DirectoryInfo(Path.Combine(i.FullName, "bin")) }) {
           try {
             var r = di.GetFiles(executable, SearchOption.TopDirectoryOnly);
             if (r.Length != 0) {
@@ -103,60 +94,6 @@ namespace NMaier.SimpleDlna.Utilities
       return null;
     }
 
-    private static IDictionary<string, string> IdentifyFileInternalFFidentify(FileInfo file)
-    {
-      if (FFmpeg.FFidentifyExecutable == null) {
-        throw new NotSupportedException();
-      }
-      if (file == null) {
-        throw new ArgumentNullException("file");
-      }
-      IDictionary<string, string> rv;
-      if (infoCache.TryGetValue(file, out rv)) {
-        return rv;
-      }
-      try {
-        using (var p = new Process()) {
-          var sti = p.StartInfo;
-#if !DEBUG
-          sti.CreateNoWindow = true;
-#endif
-          sti.UseShellExecute = false;
-          sti.FileName = FFmpeg.FFidentifyExecutable;
-          sti.Arguments = String.Format("\"{0}\"", file.FullName);
-          sti.LoadUserProfile = false;
-          sti.RedirectStandardOutput = true;
-          p.Start();
-          if (p.WaitForExit(2000) && p.ExitCode == 0) {
-            rv = new Dictionary<string, string>();
-            string line;
-            for (line = p.StandardOutput.ReadLine(); line != null; line = p.StandardOutput.ReadLine()) {
-              var m = regLine.Match(line.Trim());
-              if (m.Success) {
-                rv[m.Groups[1].Value] = m.Groups[2].Value;
-              }
-            }
-            line = p.StandardOutput.ReadToEnd();
-            if (line != null) {
-              var m = regLine.Match(line.Trim());
-              if (m.Success) {
-                rv.Add(m.Groups[1].Value, m.Groups[2].Value);
-              }
-            }
-            lock (infoCache) {
-              infoCache.Add(file, rv);
-            }
-            return rv;
-          }
-        }
-      }
-      catch (Exception ex) {
-        throw new NotSupportedException(ex.Message, ex);
-      }
-      throw new NotSupportedException();
-    }
-
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ffmpeg")]
     private static IDictionary<string, string> IdentifyFileInternalFFmpeg(FileInfo file)
     {
       if (FFmpeg.FFmpegExecutable == null) {
@@ -184,8 +121,9 @@ namespace NMaier.SimpleDlna.Utilities
           rv = new Dictionary<string, string>();
 
           using (var reader = new StreamReader(new MemoryStream())) {
-            using (var pump = new StreamPump(p.StandardError.BaseStream, reader.BaseStream, null, 4096)) {
-              if (!p.WaitForExit(2000)) {
+            using (var pump = new StreamPump(p.StandardError.BaseStream, reader.BaseStream, 4096)) {
+              pump.Pump(null);
+              if (!p.WaitForExit(3000)) {
                 throw new NotSupportedException("ffmpeg timed out");
               }
               if (!pump.Wait(1000)) {
@@ -231,7 +169,6 @@ namespace NMaier.SimpleDlna.Utilities
       throw new NotSupportedException();
     }
 
-
     public static Size GetFileDimensions(FileInfo file)
     {
       string sw, sh;
@@ -258,8 +195,7 @@ namespace NMaier.SimpleDlna.Utilities
       throw new NotSupportedException();
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ffmpeg")]
-    public static string GetSubtitleSRT(FileInfo file)
+    public static string GetSubtitleSubrip(FileInfo file)
     {
       if (FFmpeg.FFmpegExecutable == null) {
         throw new NotSupportedException();
@@ -281,7 +217,8 @@ namespace NMaier.SimpleDlna.Utilities
           p.Start();
 
           using (var reader = new StreamReader(new MemoryStream())) {
-            using (var pump = new StreamPump(p.StandardOutput.BaseStream, reader.BaseStream, null, 40960)) {
+            using (var pump = new StreamPump(p.StandardOutput.BaseStream, reader.BaseStream, 40960)) {
+              pump.Pump(null);
               if (!p.WaitForExit(10000)) {
                 throw new NotSupportedException("ffmpeg timed out");
               }
@@ -310,9 +247,6 @@ namespace NMaier.SimpleDlna.Utilities
 
     public static IDictionary<string, string> IdentifyFile(FileInfo file)
     {
-      if (FFmpeg.FFidentifyExecutable != null) {
-        return IdentifyFileInternalFFidentify(file);
-      }
       if (FFmpeg.FFmpegExecutable != null) {
         return IdentifyFileInternalFFmpeg(file);
       }

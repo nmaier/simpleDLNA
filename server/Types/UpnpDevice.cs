@@ -6,11 +6,14 @@ namespace NMaier.SimpleDlna.Server
   internal sealed class UpnpDevice
   {
     public readonly IPAddress Address;
-    public readonly Uri Descriptor;
-    public readonly string Type;
-    public readonly string USN;
-    public readonly Guid Uuid;
 
+    public readonly Uri Descriptor;
+
+    public readonly string Type;
+
+    public readonly string USN;
+
+    public readonly Guid Uuid;
 
     public UpnpDevice(Guid uuid, string type, Uri descriptor, IPAddress address)
     {

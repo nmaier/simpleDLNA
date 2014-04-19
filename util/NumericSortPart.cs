@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -8,13 +8,11 @@ namespace NMaier.SimpleDlna.Utilities
 
     private readonly ulong val;
 
-
     public NumericSortPart(string s)
     {
       val = ulong.Parse(s);
       len = s.Length;
     }
-
 
     public int CompareTo(NumericSortPart other)
     {

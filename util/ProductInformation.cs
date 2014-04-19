@@ -1,5 +1,4 @@
-using System;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -17,6 +16,7 @@ namespace NMaier.SimpleDlna.Utilities
         return ((AssemblyCompanyAttribute)attributes[0]).Company;
       }
     }
+
     public static string Copyright
     {
       get
@@ -29,6 +29,7 @@ namespace NMaier.SimpleDlna.Utilities
         return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
       }
     }
+
     public static string ProductVersion
     {
       get
@@ -43,6 +44,7 @@ namespace NMaier.SimpleDlna.Utilities
         return infoVersionAttr.InformationalVersion;
       }
     }
+
     public static string Title
     {
       get

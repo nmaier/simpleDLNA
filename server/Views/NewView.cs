@@ -9,7 +9,6 @@ namespace NMaier.SimpleDlna.Server.Views
   {
     private DateTime minDate = DateTime.Now.AddDays(-7.0);
 
-
     public override string Description
     {
       get
@@ -17,6 +16,7 @@ namespace NMaier.SimpleDlna.Server.Views
         return "Show only new files";
       }
     }
+
     public override string Name
     {
       get
@@ -24,7 +24,6 @@ namespace NMaier.SimpleDlna.Server.Views
         return "new";
       }
     }
-
 
     private void ProcessFolder(IMediaFolder root)
     {
@@ -42,7 +41,6 @@ namespace NMaier.SimpleDlna.Server.Views
         root.RemoveResource(f);
       }
     }
-
 
     public override void SetParameters(AttributeCollection parameters)
     {

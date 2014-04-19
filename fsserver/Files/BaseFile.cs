@@ -8,10 +8,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo, ITitleComparable
   {
-    private WeakReference weakCover = new WeakReference(null);
-
-    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache =
-      new LeastRecentlyUsedDictionary<string, Cover>(500);
+    private string comparableTitle;
 
     private DateTime? lastModified = null;
 
@@ -20,8 +17,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly FileServer server;
 
     private readonly string title;
-    private string comparableTitle;
 
+    private WeakReference weakCover = new WeakReference(null);
+
+    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache =
+      new LeastRecentlyUsedDictionary<string, Cover>(500);
 
     protected BaseFile(FileServer server, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
     {
@@ -52,7 +52,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       title = title.StemNameBase();
     }
 
-
     protected Cover cover
     {
       get
@@ -67,6 +66,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         weakCover = new WeakReference(value);
       }
     }
+
     protected FileServer Server
     {
       get
@@ -75,13 +75,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-
     internal FileInfo Item
     {
       get;
       set;
     }
-
 
     public Stream Content
     {
@@ -107,6 +105,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
       }
     }
+
     public virtual IMediaCoverResource Cover
     {
       get
@@ -118,11 +117,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return cover;
       }
     }
+
     public string Id
     {
       get;
       set;
     }
+
     public DateTime InfoDate
     {
       get
@@ -133,6 +134,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return lastModified.Value;
       }
     }
+
     public long? InfoSize
     {
       get
@@ -143,11 +145,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return length;
       }
     }
+
     public DlnaMediaTypes MediaType
     {
       get;
       protected set;
     }
+
     public string Path
     {
       get
@@ -155,6 +159,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return Item.FullName;
       }
     }
+
     public string PN
     {
       get
@@ -162,6 +167,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return DlnaMaps.PN[Type];
       }
     }
+
     public virtual IHeaders Properties
     {
       get
@@ -187,6 +193,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return rv;
       }
     }
+
     public virtual string Title
     {
       get
@@ -194,19 +201,18 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return title;
       }
     }
+
     public DlnaMime Type
     {
       get;
       protected set;
     }
 
-
     protected bool LoadCoverFromCache()
     {
       cover = Server.GetCover(this);
       return cover != null;
     }
-
 
     internal static BaseFile GetFile(PlainFolder aParentFolder, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
     {
@@ -232,13 +238,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
       return cover;
     }
 
-
     public virtual int CompareTo(IMediaItem other)
     {
       if (other == null) {
         throw new ArgumentNullException("other");
       }
       return Title.ToLower().CompareTo(other.Title.ToLower());
+    }
+
+    public bool Equals(IMediaItem other)
+    {
+      if (other == null) {
+        throw new ArgumentNullException("other");
+      }
+      return Title.ToLower().Equals(other.Title.ToLower());
     }
 
     public void LazyLoadedCover(object sender, EventArgs e)

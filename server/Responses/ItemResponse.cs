@@ -11,14 +11,10 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly IMediaResource item;
 
-    private readonly string prefix;
-
     private readonly HttpCode status = HttpCode.Ok;
-
 
     public ItemResponse(string prefix, IRequest request, IMediaResource item, string transferMode = "Streaming")
     {
-      this.prefix = prefix;
       this.item = item;
       headers = new ResponseHeaders(noCache: !(item is IMediaCoverResource));
       var meta = item as IMetaInfo;
@@ -44,7 +40,7 @@ namespace NMaier.SimpleDlna.Server
       }
       if (request.Headers.ContainsKey("getCaptionInfo.sec")) {
         var mvi = item as IMetaVideoItem;
-        if (mvi != null && mvi.SubTitle.HasSubtitle) {
+        if (mvi != null && mvi.Subtitle.HasSubtitle) {
           var surl = String.Format(
             "http://{0}:{1}{2}subtitle/{3}/st.srt",
             request.LocalEndPoint.Address,
@@ -61,7 +57,6 @@ namespace NMaier.SimpleDlna.Server
       Debug(headers);
     }
 
-
     public Stream Body
     {
       get
@@ -69,6 +64,7 @@ namespace NMaier.SimpleDlna.Server
         return item.Content;
       }
     }
+
     public IHeaders Headers
     {
       get
@@ -76,6 +72,7 @@ namespace NMaier.SimpleDlna.Server
         return headers;
       }
     }
+
     public HttpCode Status
     {
       get

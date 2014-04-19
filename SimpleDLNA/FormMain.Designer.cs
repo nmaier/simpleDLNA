@@ -21,6 +21,8 @@
           httpServer.Dispose();
           httpServer = null;
         }
+        if (appenderTimer != null)
+          appenderTimer.Dispose();
       }
       base.Dispose(disposing);
     }
