@@ -14,7 +14,6 @@ namespace NMaier.SimpleDlna.GUI
       Product.Text = ProductInformation.Title;
       Version.Text = String.Format("Version {0}", ProductInformation.ProductVersion);
       Copyright.Text = ProductInformation.Copyright;
-      Company.Text = ProductInformation.Company;
       License.Text = Encoding.UTF8.GetString(Properties.Resources.LICENSE);
     }
   }

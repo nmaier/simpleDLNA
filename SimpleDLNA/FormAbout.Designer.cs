@@ -31,7 +31,6 @@
       this.Product = new System.Windows.Forms.Label();
       this.Version = new System.Windows.Forms.Label();
       this.Copyright = new System.Windows.Forms.Label();
-      this.Company = new System.Windows.Forms.Label();
       this.License = new System.Windows.Forms.TextBox();
       this.okButton = new System.Windows.Forms.Button();
       this.tableLayoutPanel.SuspendLayout();
@@ -47,7 +46,6 @@
       this.tableLayoutPanel.Controls.Add(this.Product, 1, 0);
       this.tableLayoutPanel.Controls.Add(this.Version, 1, 1);
       this.tableLayoutPanel.Controls.Add(this.Copyright, 1, 2);
-      this.tableLayoutPanel.Controls.Add(this.Company, 1, 3);
       this.tableLayoutPanel.Controls.Add(this.License, 1, 4);
       this.tableLayoutPanel.Controls.Add(this.okButton, 1, 5);
       this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -74,55 +72,43 @@
       this.logoPictureBox.TabIndex = 12;
       this.logoPictureBox.TabStop = false;
       // 
-      // labelProductName
+      // Product
       // 
       this.Product.Dock = System.Windows.Forms.DockStyle.Fill;
       this.Product.Location = new System.Drawing.Point(143, 0);
       this.Product.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
       this.Product.MaximumSize = new System.Drawing.Size(0, 17);
-      this.Product.Name = "labelProductName";
+      this.Product.Name = "Product";
       this.Product.Size = new System.Drawing.Size(271, 17);
       this.Product.TabIndex = 19;
       this.Product.Text = "Product Name";
       this.Product.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
-      // labelVersion
+      // Version
       // 
       this.Version.Dock = System.Windows.Forms.DockStyle.Fill;
       this.Version.Location = new System.Drawing.Point(143, 26);
       this.Version.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
       this.Version.MaximumSize = new System.Drawing.Size(0, 17);
-      this.Version.Name = "labelVersion";
+      this.Version.Name = "Version";
       this.Version.Size = new System.Drawing.Size(271, 17);
       this.Version.TabIndex = 0;
       this.Version.Text = "Version";
       this.Version.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
-      // labelCopyright
+      // Copyright
       // 
       this.Copyright.Dock = System.Windows.Forms.DockStyle.Fill;
       this.Copyright.Location = new System.Drawing.Point(143, 52);
       this.Copyright.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
       this.Copyright.MaximumSize = new System.Drawing.Size(0, 17);
-      this.Copyright.Name = "labelCopyright";
+      this.Copyright.Name = "Copyright";
       this.Copyright.Size = new System.Drawing.Size(271, 17);
       this.Copyright.TabIndex = 21;
       this.Copyright.Text = "Copyright";
       this.Copyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
       // 
-      // labelCompanyName
-      // 
-      this.Company.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.Company.Location = new System.Drawing.Point(143, 78);
-      this.Company.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
-      this.Company.MaximumSize = new System.Drawing.Size(0, 17);
-      this.Company.Name = "labelCompanyName";
-      this.Company.Size = new System.Drawing.Size(271, 17);
-      this.Company.TabIndex = 22;
-      this.Company.Text = "Company Name";
-      this.Company.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-      // 
-      // textBoxLicense
+      // License
       // 
       this.License.AcceptsReturn = true;
       this.License.AcceptsTab = true;
@@ -130,7 +116,7 @@
       this.License.Location = new System.Drawing.Point(143, 107);
       this.License.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
       this.License.Multiline = true;
-      this.License.Name = "textBoxLicense";
+      this.License.Name = "License";
       this.License.ReadOnly = true;
       this.License.ScrollBars = System.Windows.Forms.ScrollBars.Both;
       this.License.Size = new System.Drawing.Size(271, 126);
@@ -178,7 +164,6 @@
     private System.Windows.Forms.Label Product;
     private System.Windows.Forms.Label Version;
     private System.Windows.Forms.Label Copyright;
-    private System.Windows.Forms.Label Company;
     private System.Windows.Forms.TextBox License;
     private System.Windows.Forms.Button okButton;
   }
