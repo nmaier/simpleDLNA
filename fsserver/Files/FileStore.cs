@@ -14,7 +14,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStore : Logging, IDisposable
   {
-    private const uint SCHEMA = 0x20131101;
+    private const uint SCHEMA = 0x20140420;
 
     private static readonly FileStoreVacuumer vacuumer =
       new FileStoreVacuumer();
@@ -62,17 +62,24 @@ namespace NMaier.SimpleDlna.FileMediaServer
       selectCoverTime.DbType = DbType.Int64;
 
       insert = connection.CreateCommand();
-      insert.CommandText = "INSERT OR REPLACE INTO store VALUES(?,?,?,?,?)";
+      insert.CommandText =
+        "INSERT OR REPLACE INTO store " +
+        "VALUES(@key, @size, @time, @data, COALESCE(@cover, (SELECT cover FROM store WHERE key = @key)))";
       insert.Parameters.Add(insertKey = select.CreateParameter());
       insertKey.DbType = DbType.String;
+      insertKey.ParameterName = "@key";
       insert.Parameters.Add(insertSize = select.CreateParameter());
       insertSize.DbType = DbType.Int64;
+      insertSize.ParameterName = "@size";
       insert.Parameters.Add(insertTime = select.CreateParameter());
       insertTime.DbType = DbType.Int64;
+      insertTime.ParameterName = "@time";
       insert.Parameters.Add(insertData = select.CreateParameter());
       insertData.DbType = DbType.Binary;
+      insertData.ParameterName = "@data";
       insert.Parameters.Add(insertCover = select.CreateParameter());
       insertCover.DbType = DbType.Binary;
+      insertCover.ParameterName = "@cover";
 
       InfoFormat("FileStore at {0} is ready", storeFile.FullName);
 
@@ -84,12 +91,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       using (var transaction = connection.BeginTransaction()) {
         using (var pragma = connection.CreateCommand()) {
           pragma.CommandText = string.Format("PRAGMA user_version = {0}", SCHEMA);
-          pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA journal_mode = MEMORY";
-          pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA temp_store = MEMORY";
-          pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA synchonous = OFF";
           pragma.ExecuteNonQuery();
         }
         using (var create = connection.CreateCommand()) {

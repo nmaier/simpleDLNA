@@ -75,7 +75,7 @@ namespace NMaier.SimpleDlna.Utilities
           "database"
           );
       }
-      var cs = string.Format("Uri=file:{0};Pooling=true", database.FullName);
+      var cs = string.Format("Uri=file:{0};Pooling=true;Synchronous=Off;journal mode=WAL", database.FullName);
 
       if (Type.GetType("Mono.Runtime") == null) {
         return GetDatabaseConnectionSDS(cs);
