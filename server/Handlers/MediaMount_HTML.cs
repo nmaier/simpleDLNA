@@ -67,7 +67,7 @@ namespace NMaier.SimpleDlna.Server
         if (props.ContainsKey("HasCover")) {
           details.AppendChild(document.EL(
             "img",
-            new AttributeCollection { { "title", "Cover image" }, { "alt", "Cover image" }, { "src", String.Format("{0}cover/{1}", prefix, i.Id) } }
+            new AttributeCollection { { "title", "Cover image" }, { "alt", "Cover image" }, { "src", String.Format("{0}cover/{1}/{2}.{3}", prefix, i.Id, i.Title, DlnaMaps.Dlna2Ext[i.Type][0]) } }
             ));
         }
 
