@@ -34,6 +34,12 @@ namespace NMaier.SimpleDlna.GUI
           }
           catch (Exception ex) {
             log4net.LogManager.GetLogger(typeof(Program)).Fatal("Encountered fatal unhandled exception", ex);
+            MessageBox.Show(
+              string.Format("Encountered an unhandled error. Will exit now.\n\n{0}\n{1}", ex.Message, ex.StackTrace),
+              "Error",
+              MessageBoxButtons.OK,
+              MessageBoxIcon.Error
+              );
             throw;
           }
         }
