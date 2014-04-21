@@ -74,7 +74,12 @@ namespace NMaier.SimpleDlna.Utilities
         }
         name = respace.Replace(name, " ");
       }
-      var ws = trim.Replace(name, " ").Trim();
+      var ws = name;
+      var wsprev = name;
+      do {
+        wsprev = ws;
+        ws = trim.Replace(wsprev.Trim(), " ").Trim();
+      } while (wsprev != ws);
       if (string.IsNullOrWhiteSpace(ws)) {
         return name;
       }
