@@ -290,6 +290,11 @@ namespace NMaier.SimpleDlna.GUI
       WindowState = FormWindowState.Minimized;
     }
 
+    private void homepageToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+      Process.Start("http://nmaier.github.io/simpleDLNA/");
+    }
+
     private void ListDescriptions_SelectedIndexChanged(object sender, EventArgs e)
     {
       var enable = listDescriptions.SelectedItems.Count != 0;

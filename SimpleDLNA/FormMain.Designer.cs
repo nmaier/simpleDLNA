@@ -57,6 +57,8 @@
       this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
       this.openInBrowserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+      this.dropCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
       this.hideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -66,8 +68,7 @@
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.buttonRescan = new System.Windows.Forms.Button();
-      this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
-      this.dropCacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.homepageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -242,6 +243,18 @@
       this.toolStripMenuItem3.Name = "toolStripMenuItem3";
       this.toolStripMenuItem3.Size = new System.Drawing.Size(158, 6);
       // 
+      // dropCacheToolStripMenuItem
+      // 
+      this.dropCacheToolStripMenuItem.Name = "dropCacheToolStripMenuItem";
+      this.dropCacheToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+      this.dropCacheToolStripMenuItem.Text = "Drop cache";
+      this.dropCacheToolStripMenuItem.Click += new System.EventHandler(this.dropCacheToolStripMenuItem_Click);
+      // 
+      // toolStripMenuItem4
+      // 
+      this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+      this.toolStripMenuItem4.Size = new System.Drawing.Size(158, 6);
+      // 
       // hideToolStripMenuItem
       // 
       this.hideToolStripMenuItem.Name = "hideToolStripMenuItem";
@@ -259,6 +272,7 @@
       // helpToolStripMenuItem
       // 
       this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.homepageToolStripMenuItem,
             this.aboutToolStripMenuItem});
       this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
       this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
@@ -316,17 +330,12 @@
       this.buttonRescan.UseVisualStyleBackColor = true;
       this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
       // 
-      // toolStripMenuItem4
+      // homepageToolStripMenuItem
       // 
-      this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-      this.toolStripMenuItem4.Size = new System.Drawing.Size(158, 6);
-      // 
-      // dropCacheToolStripMenuItem
-      // 
-      this.dropCacheToolStripMenuItem.Name = "dropCacheToolStripMenuItem";
-      this.dropCacheToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
-      this.dropCacheToolStripMenuItem.Text = "Drop cache";
-      this.dropCacheToolStripMenuItem.Click += new System.EventHandler(this.dropCacheToolStripMenuItem_Click);
+      this.homepageToolStripMenuItem.Name = "homepageToolStripMenuItem";
+      this.homepageToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.homepageToolStripMenuItem.Text = "Homepage";
+      this.homepageToolStripMenuItem.Click += new System.EventHandler(this.homepageToolStripMenuItem_Click);
       // 
       // FormMain
       // 
@@ -391,6 +400,7 @@
     private System.Windows.Forms.ColumnHeader colLogTime;
     private System.Windows.Forms.ToolStripMenuItem dropCacheToolStripMenuItem;
     private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
+    private System.Windows.Forms.ToolStripMenuItem homepageToolStripMenuItem;
   }
 }
 
