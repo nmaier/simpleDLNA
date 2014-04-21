@@ -52,6 +52,14 @@ namespace NMaier.SimpleDlna.Server
           headers.Add("CaptionInfo.sec", surl);
         }
       }
+      if (request.Headers.ContainsKey("getMediaInfo.sec")) {
+        var md = item as IMetaDuration;
+        if (md != null && md.MetaDuration.HasValue) {
+          headers.Add(
+            "MediaInfo.sec",
+            string.Format("SEC_Duration={0};", md.MetaDuration.Value.TotalMilliseconds));
+        }
+      }
       headers.Add("transferMode.dlna.org", transferMode);
 
       Debug(headers);
