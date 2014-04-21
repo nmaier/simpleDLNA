@@ -8,6 +8,7 @@ using log4net.Layout;
 using NMaier.GetOptNet;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
+using log4net.Core;
 
 namespace NMaier.SimpleDlna
 {
@@ -176,7 +177,9 @@ namespace NMaier.SimpleDlna
           Layout = layout,
           MaximumFileSize = "1MB",
           MaxSizeRollBackups = 10,
-          RollingStyle = RollingFileAppender.RollingMode.Size
+          RollingStyle = RollingFileAppender.RollingMode.Size,
+          ImmediateFlush = false,
+          Threshold = Level.Debug
         };
         fileAppender.ActivateOptions();
         BasicConfigurator.Configure(appender, fileAppender);

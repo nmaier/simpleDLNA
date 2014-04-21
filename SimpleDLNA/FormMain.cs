@@ -376,7 +376,9 @@ namespace NMaier.SimpleDlna.GUI
         Layout = layout,
         MaximumFileSize = "10MB",
         MaxSizeRollBackups = 3,
-        RollingStyle = RollingFileAppender.RollingMode.Size
+        RollingStyle = RollingFileAppender.RollingMode.Size,
+        ImmediateFlush = false,
+        Threshold = Level.Info
       };
       fileAppender.ActivateOptions();
 
