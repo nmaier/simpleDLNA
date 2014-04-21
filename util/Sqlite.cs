@@ -2,11 +2,14 @@
 using System.Data;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace NMaier.SimpleDlna.Utilities
 {
   public static class Sqlite
   {
+    private const int GROW_SIZE = 1 << 24;
+
     private static Action<IDbConnection> clearPool = null;
 
     private static IDbConnection GetDatabaseConnectionMono(string cs)
@@ -47,6 +50,32 @@ namespace NMaier.SimpleDlna.Utilities
         throw new ArgumentException("no connection");
       }
       rv.Open();
+
+      try {
+        // XXX Try to set SQLITE_FCNTL_CHUNK_SIZE by messy reflection trick, pending
+        // ticket http://system.data.sqlite.org/index.html/tktview?name=d1c008fa0a
+        var field = typeof(System.Data.SQLite.SQLiteConnection).GetField("_sql", BindingFlags.NonPublic | BindingFlags.Instance);
+        var sql = field.GetValue(rv);
+        if (sql == null) {
+          throw new Exception("Failed to get field");
+        }
+        var func = sql.GetType().GetMethod("FileControl", BindingFlags.NonPublic | BindingFlags.Instance);
+        if (func == null) {
+          throw new Exception("Failed to get func");
+        }
+        var arg = Marshal.AllocHGlobal(sizeof(Int32));
+        try {
+          Marshal.WriteInt32(arg, GROW_SIZE);
+          func.Invoke(sql, new object[] { null, (int)0x6, arg });
+        }
+        finally {
+          Marshal.FreeHGlobal(arg);
+        }
+      }
+      catch (Exception ex) {
+        log4net.LogManager.GetLogger(typeof(Sqlite)).Error("Failed to sqlite control", ex);
+      }
+
       if (clearPool == null) {
         clearPool = conn =>
         {
