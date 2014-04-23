@@ -16,8 +16,14 @@ namespace NMaier.SimpleDlna
     {
       base.Install(stateSaver);
       using (var proc = new Process()) {
-        proc.StartInfo.FileName = Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), "ngen.exe");
-        proc.StartInfo.Arguments = string.Format("install /nologo \"{0}\"", Assembly.GetExecutingAssembly().Location);
+        proc.StartInfo.FileName = Path.Combine(
+          RuntimeEnvironment.GetRuntimeDirectory(),
+          "ngen.exe"
+          );
+        proc.StartInfo.Arguments = string.Format(
+          "install /nologo \"{0}\"",
+          Assembly.GetExecutingAssembly().Location
+          );
         proc.StartInfo.UseShellExecute = false;
         proc.StartInfo.CreateNoWindow = true;
         proc.Start();

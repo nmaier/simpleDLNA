@@ -1,9 +1,9 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -49,12 +49,12 @@ namespace NMaier.SimpleDlna.Server
       try {
         var c = cover.Cover;
         var curl = String.Format(
-          "http://{0}:{1}{2}cover/{3}/i.jpg",
-          request.LocalEndPoint.Address,
-          request.LocalEndPoint.Port,
-          prefix,
-          resource.Id
-          );
+        "http://{0}:{1}{2}cover/{3}/i.jpg",
+        request.LocalEndPoint.Address,
+        request.LocalEndPoint.Port,
+        prefix,
+        resource.Id
+        );
         var icon = result.CreateElement("upnp", "albumArtURI", NS_UPNP);
         var profile = result.CreateAttribute("dlna", "profileID", NS_DLNA);
         profile.InnerText = "JPEG_TN";
@@ -72,9 +72,9 @@ namespace NMaier.SimpleDlna.Server
         res.InnerText = curl;
 
         res.SetAttribute("protocolInfo", string.Format(
-            "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
-            c.PN, DlnaMaps.Mime[c.Type], DlnaMaps.DefaultStreaming
-            ));
+        "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
+        c.PN, DlnaMaps.Mime[c.Type], DlnaMaps.DefaultStreaming
+        ));
         var width = c.MetaWidth;
         var height = c.MetaHeight;
         if (width.HasValue && height.HasValue) {
@@ -84,9 +84,9 @@ namespace NMaier.SimpleDlna.Server
           res.SetAttribute("resolution", "200x200");
         }
         res.SetAttribute("protocolInfo", string.Format(
-          "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_CI=1;DLNA.ORG_FLAGS={0}",
-          DlnaMaps.DefaultInteractive
-          ));
+        "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_CI=1;DLNA.ORG_FLAGS={0}",
+        DlnaMaps.DefaultInteractive
+        ));
         item.AppendChild(res);
       }
       catch (Exception) {
@@ -244,12 +244,12 @@ namespace NMaier.SimpleDlna.Server
 
       var res = result.CreateElement(string.Empty, "res", NS_DIDL);
       res.InnerText = String.Format(
-        "http://{0}:{1}{2}file/{3}/res",
-        request.LocalEndPoint.Address,
-        request.LocalEndPoint.Port,
-        prefix,
-        resource.Id
-        );
+      "http://{0}:{1}{2}file/{3}/res",
+      request.LocalEndPoint.Address,
+      request.LocalEndPoint.Port,
+      prefix,
+      resource.Id
+      );
 
       var prop = string.Empty;
       if (props.TryGetValue("SizeRaw", out prop)) {
@@ -263,13 +263,41 @@ namespace NMaier.SimpleDlna.Server
       }
 
       res.SetAttribute("protocolInfo", String.Format(
-          "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
-          resource.PN, DlnaMaps.Mime[resource.Type], DlnaMaps.DefaultStreaming
-          ));
+      "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
+      resource.PN, DlnaMaps.Mime[resource.Type], DlnaMaps.DefaultStreaming
+      ));
       item.AppendChild(res);
 
       AddCover(request, resource, item);
       result.DocumentElement.AppendChild(item);
+    }
+
+    private int BrowseFolder_AddItems(IRequest request, XmlDocument result, IMediaFolder root, int start, int requested)
+    {
+      var provided = 0;
+      foreach (var i in root.ChildFolders) {
+        if (start > 0) {
+          start--;
+          continue;
+        }
+        Browse_AddFolder(result, i);
+        if (++provided == requested) {
+          break;
+        }
+      }
+      if (provided != requested) {
+        foreach (var i in root.ChildItems) {
+          if (start > 0) {
+            start--;
+            continue;
+          }
+          Browse_AddItem(request, result, i);
+          if (++provided == requested) {
+            break;
+          }
+        }
+      }
+      return provided;
     }
 
     private static XmlElement CreateObjectClass(XmlDocument result, IMediaResource resource)
@@ -332,36 +360,15 @@ namespace NMaier.SimpleDlna.Server
         provided++;
       }
       else {
-        foreach (var i in root.ChildFolders) {
-          if (start > 0) {
-            start--;
-            continue;
-          }
-          Browse_AddFolder(result, i);
-          if (++provided == requested) {
-            break;
-          }
-        }
-        if (provided != requested) {
-          foreach (var i in root.ChildItems) {
-            if (start > 0) {
-              start--;
-              continue;
-            }
-            Browse_AddItem(request, result, i);
-            if (++provided == requested) {
-              break;
-            }
-          }
-        }
+        provided = BrowseFolder_AddItems(request, result, root, start, requested);
       }
       var resXML = result.OuterXml;
       rv = new AttributeCollection() {
-        { "Result", resXML },
-        { "NumberReturned", provided.ToString() },
-        { "TotalMatches", root.ChildCount.ToString() },
-        { "UpdateID", systemID.ToString() }
-      };
+            { "Result", resXML },
+            { "NumberReturned", provided.ToString() },
+            { "TotalMatches", root.ChildCount.ToString() },
+            { "UpdateID", systemID.ToString() }
+            };
       soapCache[key] = rv;
       return rv;
     }

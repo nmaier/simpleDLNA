@@ -1,8 +1,8 @@
+﻿using log4net;
+using NMaier.SimpleDlna.Utilities;
 using System;
 using System.IO;
 using System.Text;
-using log4net;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -10,7 +10,11 @@ namespace NMaier.SimpleDlna.Server
   public class Subtitle : IMediaResource
   {
     [NonSerialized]
-    private static readonly ILog logger = LogManager.GetLogger(typeof(Subtitle));
+    private byte[] encodedText = null;
+
+    [NonSerialized]
+    private static readonly ILog logger =
+      LogManager.GetLogger(typeof(Subtitle));
 
     [NonSerialized]
     private static readonly string[] exts = new string[] {
@@ -19,12 +23,9 @@ namespace NMaier.SimpleDlna.Server
       ".ssa", ".SSA",
       ".sub", ".SUB",
       ".vtt", ".VTT"
-    };
+      };
 
     private string text = null;
-
-    [NonSerialized]
-    private byte[] encodedText = null;
 
     public Subtitle()
     {
@@ -38,20 +39,6 @@ namespace NMaier.SimpleDlna.Server
     public Subtitle(string text)
     {
       this.text = text;
-    }
-
-    public Stream Content
-    {
-      get
-      {
-        if (!HasSubtitle) {
-          throw new NotSupportedException();
-        }
-        if (encodedText == null) {
-          encodedText = Encoding.UTF8.GetBytes(text);
-        }
-        return new MemoryStream(encodedText, false);
-      }
     }
 
     public IMediaCoverResource Cover
@@ -95,7 +82,7 @@ namespace NMaier.SimpleDlna.Server
       get
       {
         try {
-          using (var s = Content) {
+          using (var s = CreateContentStream()) {
             return s.Length;
           }
         }
@@ -204,6 +191,17 @@ namespace NMaier.SimpleDlna.Server
     public bool Equals(IMediaItem other)
     {
       throw new NotImplementedException();
+    }
+
+    public Stream CreateContentStream()
+    {
+      if (!HasSubtitle) {
+        throw new NotSupportedException();
+      }
+      if (encodedText == null) {
+        encodedText = Encoding.UTF8.GetBytes(text);
+      }
+      return new MemoryStream(encodedText, false);
     }
   }
 }

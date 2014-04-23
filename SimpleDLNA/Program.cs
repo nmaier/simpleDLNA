@@ -39,7 +39,7 @@ namespace NMaier.SimpleDlna.GUI
               "Error",
               MessageBoxButtons.OK,
               MessageBoxIcon.Error
-              );
+            );
             throw;
           }
         }

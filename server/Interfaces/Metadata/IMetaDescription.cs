@@ -1,4 +1,4 @@
-namespace NMaier.SimpleDlna.Server.Metadata
+﻿namespace NMaier.SimpleDlna.Server.Metadata
 {
   public interface IMetaDescription
   {

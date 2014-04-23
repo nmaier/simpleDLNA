@@ -1,25 +1,17 @@
+﻿using NMaier.SimpleDlna.Server.Metadata;
 using System;
 using System.IO;
-using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.Server
 {
   internal class MediaResourceDecorator<T> : IMediaResource, IMetaInfo
-    where T : IMediaResource, IMetaInfo
+      where T : IMediaResource, IMetaInfo
   {
     protected T resource;
 
     public MediaResourceDecorator(T resource)
     {
       this.resource = resource;
-    }
-
-    public virtual Stream Content
-    {
-      get
-      {
-        return resource.Content;
-      }
     }
 
     public virtual IMediaCoverResource Cover
@@ -114,6 +106,11 @@ namespace NMaier.SimpleDlna.Server
     public bool Equals(IMediaItem other)
     {
       return resource.Equals(other);
+    }
+
+    public virtual Stream CreateContentStream()
+    {
+      return resource.CreateContentStream();
     }
   }
 }

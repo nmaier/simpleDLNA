@@ -1,56 +1,31 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStoreVacuumer : Logging, IDisposable
   {
-    private const int MIN_TIME = 30 * 60 * 1000;
     private const int MAX_TIME = 240 * 60 * 1000;
+
+    private const int MIN_TIME = 30 * 60 * 1000;
 
     private readonly Dictionary<string, WeakReference> connections =
       new Dictionary<string, WeakReference>();
+
     private readonly Timer timer = new Timer();
+
     private readonly Random rnd = new Random();
 
     public FileStoreVacuumer()
     {
       timer.Elapsed += Run;
       Schedule();
-    }
-
-    private void Schedule()
-    {
-      timer.Interval = rnd.Next(MIN_TIME, MAX_TIME);
-      timer.Enabled = true;
-      DebugFormat("Scheduling next vaccuum in {0}", timer.Interval);
-    }
-
-    public void Add(IDbConnection connection)
-    {
-      lock (connections) {
-        connections[connection.ConnectionString] =
-          new WeakReference(connection);
-      }
-    }
-    public void Remove(IDbConnection connection)
-    {
-      lock (connections) {
-        connections.Remove(connection.ConnectionString);
-      }
-    }
-
-    public void Dispose()
-    {
-      if (timer != null) {
-        timer.Dispose();
-      }
     }
 
     private void Run(object sender, ElapsedEventArgs e)
@@ -79,6 +54,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }, TaskCreationOptions.LongRunning | TaskCreationOptions.AttachedToParent);
 
       Schedule();
+    }
+
+    private void Schedule()
+    {
+      timer.Interval = rnd.Next(MIN_TIME, MAX_TIME);
+      timer.Enabled = true;
+      DebugFormat("Scheduling next vaccuum in {0}", timer.Interval);
     }
 
     private void Vacuum(IDbConnection connection)
@@ -124,6 +106,28 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
       }
       Debug("Vacuum done!");
+    }
+
+    public void Add(IDbConnection connection)
+    {
+      lock (connections) {
+        connections[connection.ConnectionString] =
+          new WeakReference(connection);
+      }
+    }
+
+    public void Dispose()
+    {
+      if (timer != null) {
+        timer.Dispose();
+      }
+    }
+
+    public void Remove(IDbConnection connection)
+    {
+      lock (connections) {
+        connections.Remove(connection.ConnectionString);
+      }
     }
   }
 }

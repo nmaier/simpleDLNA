@@ -45,6 +45,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
+        "OwnerKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
         "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
         "MsmSig" = "8:_UNDEFINED"
@@ -76,7 +82,7 @@
         "Entry"
         {
         "MsmKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
-        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -88,7 +94,7 @@
         "Entry"
         {
         "MsmKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -118,13 +124,7 @@
         "Entry"
         {
         "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
-        "OwnerKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
-        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -136,7 +136,13 @@
         "Entry"
         {
         "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
+        "OwnerKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -196,13 +202,13 @@
         "Entry"
         {
         "MsmKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
-        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -461,7 +467,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.FileMediaServer, Version=0.14.5206.30790, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.FileMediaServer, Version=0.14.5226.13303, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_16DF506659DEFD7B608074EFC39D915D"
@@ -532,7 +538,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.Server, Version=0.14.5206.30789, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.Server, Version=0.14.5226.13303, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_8B027FF01F1C9D3A2EB9B544E468D6BF"
@@ -614,7 +620,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.Utilities, Version=0.14.5206.30789, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.Utilities, Version=0.14.5226.13302, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_D4AC720A49A3302B93FE5716E205514D"
@@ -727,7 +733,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.Thumbnails, Version=0.14.5206.30790, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.Thumbnails, Version=0.14.5226.13303, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_FF60C74C923980A10AE5C7BBA9493FB1"
@@ -844,7 +850,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SimpleDLNA"
         "ProductCode" = "8:{3691AAA4-FD06-45A5-962D-AA39CCD6C3F3}"
-        "PackageCode" = "8:{49B71BAB-1B11-4A46-9665-5619051F629D}"
+        "PackageCode" = "8:{7CD41D99-3292-41D0-B30C-FF77CC0049B7}"
         "UpgradeCode" = "8:{9BB9834F-0082-46E1-A93B-5411738F6C5C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

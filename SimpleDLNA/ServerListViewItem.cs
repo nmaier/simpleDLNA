@@ -1,10 +1,10 @@
+using NMaier.SimpleDlna.FileMediaServer;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Comparers;
 using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using NMaier.SimpleDlna.FileMediaServer;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Comparers;
 
 namespace NMaier.SimpleDlna.GUI
 {

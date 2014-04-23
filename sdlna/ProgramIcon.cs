@@ -1,7 +1,7 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna
 {

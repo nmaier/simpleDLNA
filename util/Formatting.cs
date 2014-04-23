@@ -79,7 +79,8 @@ namespace NMaier.SimpleDlna.Utilities
       do {
         wsprev = ws;
         ws = trim.Replace(wsprev.Trim(), " ").Trim();
-      } while (wsprev != ws);
+      }
+      while (wsprev != ws);
       if (string.IsNullOrWhiteSpace(ws)) {
         return name;
       }

@@ -1,5 +1,5 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Comparers
 {
@@ -34,9 +34,9 @@ namespace NMaier.SimpleDlna.Server.Comparers
       var tx = x as ITitleComparable;
       var ty = y as ITitleComparable;
       return comp.Compare(
-        tx != null ? tx.ToComparableTitle() : x.Title.StemCompareBase(),
-        ty != null ? ty.ToComparableTitle() : y.Title.StemCompareBase()
-        );
+      tx != null ? tx.ToComparableTitle() : x.Title.StemCompareBase(),
+      ty != null ? ty.ToComparableTitle() : y.Title.StemCompareBase()
+      );
     }
   }
 }

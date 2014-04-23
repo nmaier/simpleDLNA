@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,8 +8,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Timers;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -40,7 +40,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly DlnaMediaTypes types;
 
     private readonly FileSystemWatcher[] watchers;
-
 
     public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
     {
@@ -77,17 +76,18 @@ namespace NMaier.SimpleDlna.FileMediaServer
       uuid = DeriveUUID();
     }
 
-
     public event EventHandler Changed;
-    public event EventHandler Changing;
 
+    public event EventHandler Changing;
 
     public IHttpAuthorizationMethod Authorizer
     {
       get;
       set;
     }
+
     public string FriendlyName { get; set; }
+
     public Guid Uuid
     {
       get
@@ -95,7 +95,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return uuid;
       }
     }
-
 
     private Guid DeriveUUID()
     {
@@ -175,7 +174,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
           return;
         }
         var ext = string.IsNullOrEmpty(e.FullPath) ? Path.GetExtension(e.FullPath) : string.Empty;
-        if (!string.IsNullOrEmpty(ext) && !types.GetExtensions().Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
+        if (!string.IsNullOrEmpty(ext) &&
+          !types.GetExtensions().Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase)) {
           DebugFormat("Skipping name {0} {1} {2}", e.Name, Path.GetExtension(e.FullPath), string.Join(", ", types.GetExtensions()));
           return;
         }
@@ -193,8 +193,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
         var exts = types.GetExtensions();
         var ext = string.IsNullOrEmpty(e.FullPath) ? Path.GetExtension(e.FullPath) : string.Empty;
         if (!string.IsNullOrEmpty(ext) &&
-          !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase) &&
-          !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
+          !exts.Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase) &&
+          !exts.Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase)) {
           DebugFormat("Skipping name {0} {1} {2}", e.Name, Path.GetExtension(e.FullPath), string.Join(", ", exts));
           return;
         }
@@ -247,7 +247,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       BackgroundCacher.AddFiles(store, items);
     }
-
 
     internal void DelayedRescan(WatcherChangeTypes changeType)
     {
@@ -303,7 +302,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
 
       var ext = re_sansitizeExt.Replace(
-        info.Extension.ToLower().Substring(1),
+        info.Extension.ToUpperInvariant().Substring(1),
         string.Empty
         );
       var type = DlnaMaps.Ext2Dlna[ext];
@@ -325,7 +324,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         store.MaybeStoreFile(aFile);
       }
     }
-
 
     public void Dispose()
     {

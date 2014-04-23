@@ -1,11 +1,11 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {

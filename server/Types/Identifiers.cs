@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NMaier.SimpleDlna.Server.Comparers;
+﻿using NMaier.SimpleDlna.Server.Comparers;
 using NMaier.SimpleDlna.Server.Views;
 using NMaier.SimpleDlna.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -21,11 +21,14 @@ namespace NMaier.SimpleDlna.Server
 
     private static readonly Random idGen = new Random();
 
-    private readonly Dictionary<string, WeakReference> ids = new Dictionary<string, WeakReference>();
+    private readonly Dictionary<string, WeakReference> ids =
+      new Dictionary<string, WeakReference>();
 
-    private readonly Dictionary<string, IMediaItem> hardRefs = new Dictionary<string, IMediaItem>();
+    private readonly Dictionary<string, IMediaItem> hardRefs =
+      new Dictionary<string, IMediaItem>();
 
-    private Dictionary<string, string> paths = new Dictionary<string, string>();
+    private Dictionary<string, string> paths =
+      new Dictionary<string, string>();
 
     private readonly List<IView> views = new List<IView>();
 
@@ -72,7 +75,6 @@ namespace NMaier.SimpleDlna.Server
       string id;
       if (!paths.ContainsKey(path)) {
         while (ids.ContainsKey(id = idGen.Next(1000, int.MaxValue).ToString("X8"))) {
-          ;
         }
         paths[path] = id;
       }

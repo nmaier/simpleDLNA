@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
@@ -19,12 +19,14 @@ namespace NMaier.SimpleDlna.Thumbnails
     public MemoryStream GetThumbnail(object item, ref int width, ref int height)
     {
       Image img = null;
-      if (item is Stream) {
-        img = Image.FromStream(item as Stream);
+      var stream = item as Stream;
+      if (stream != null) {
+        img = Image.FromStream(stream);
       }
       else {
-        if (item is FileInfo) {
-          img = Image.FromFile((item as FileInfo).FullName);
+        var fi = item as FileInfo;
+        if (fi != null) {
+          img = Image.FromFile(fi.FullName);
         }
         else {
           throw new NotSupportedException();

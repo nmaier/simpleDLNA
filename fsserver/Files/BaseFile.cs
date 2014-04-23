@@ -1,11 +1,13 @@
-﻿using System;
-using System.IO;
-using NMaier.SimpleDlna.Server;
+﻿using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
+using System;
+using System.IO;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
+  using CoverCache = LeastRecentlyUsedDictionary<string, Cover>;
+
   internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo, ITitleComparable
   {
     private string comparableTitle;
@@ -20,8 +22,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private WeakReference weakCover = new WeakReference(null);
 
-    private static readonly LeastRecentlyUsedDictionary<string, Cover> coverCache =
-      new LeastRecentlyUsedDictionary<string, Cover>(500);
+    private static readonly CoverCache coverCache = new CoverCache(500);
 
     protected BaseFile(FileServer server, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
     {
@@ -79,31 +80,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get;
       set;
-    }
-
-    public Stream Content
-    {
-      get
-      {
-        try {
-          return new FileReadStream(Item);
-        }
-        catch (FileNotFoundException ex) {
-          Error("Failed to access: " + Item.FullName, ex);
-          server.DelayedRescan(WatcherChangeTypes.Deleted);
-          throw;
-        }
-        catch (UnauthorizedAccessException ex) {
-          Error("Failed to access: " + Item.FullName, ex);
-          server.DelayedRescan(WatcherChangeTypes.Changed);
-          throw;
-        }
-        catch (IOException ex) {
-          Error("Failed to access: " + Item.FullName, ex);
-          server.DelayedRescan(WatcherChangeTypes.Changed);
-          throw;
-        }
-      }
     }
 
     public virtual IMediaCoverResource Cover
@@ -225,11 +201,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
           return new ImageFile(aParentFolder.Server, aFile, aType);
         default:
           return new BaseFile(
-            aParentFolder.Server,
-            aFile,
-            aType,
-            aMediaType
-            );
+          aParentFolder.Server,
+          aFile,
+          aType,
+          aMediaType
+          );
       }
     }
 
@@ -243,7 +219,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (other == null) {
         throw new ArgumentNullException("other");
       }
-      return Title.ToLower().CompareTo(other.Title.ToLower());
+      return StringComparer.CurrentCulture.Compare(title, other.Title);
     }
 
     public bool Equals(IMediaItem other)
@@ -251,7 +227,29 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (other == null) {
         throw new ArgumentNullException("other");
       }
-      return Title.ToLower().Equals(other.Title.ToLower());
+      return StringComparer.CurrentCulture.Equals(title, other.Title);
+    }
+
+    public Stream CreateContentStream()
+    {
+      try {
+        return new FileReadStream(Item);
+      }
+      catch (FileNotFoundException ex) {
+        Error("Failed to access: " + Item.FullName, ex);
+        server.DelayedRescan(WatcherChangeTypes.Deleted);
+        throw;
+      }
+      catch (UnauthorizedAccessException ex) {
+        Error("Failed to access: " + Item.FullName, ex);
+        server.DelayedRescan(WatcherChangeTypes.Changed);
+        throw;
+      }
+      catch (IOException ex) {
+        Error("Failed to access: " + Item.FullName, ex);
+        server.DelayedRescan(WatcherChangeTypes.Changed);
+        throw;
+      }
     }
 
     public void LazyLoadedCover(object sender, EventArgs e)

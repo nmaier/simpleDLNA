@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
 {

@@ -1,9 +1,9 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal class KeyedVirtualFolder<T> : VirtualFolder
-    where T : VirtualFolder, new()
+      where T : VirtualFolder, new()
   {
     private readonly Dictionary<string, T> keys = new Dictionary<string, T>();
 
@@ -20,13 +20,13 @@ namespace NMaier.SimpleDlna.Server.Views
     public T GetFolder(string key)
     {
       T rv;
-      var lkey = key.ToUpper();
-      if (!keys.TryGetValue(lkey, out rv)) {
+      var compareKey = key.ToUpperInvariant();
+      if (!keys.TryGetValue(compareKey, out rv)) {
         rv = new T();
         rv.Name = key;
         rv.Parent = this;
         folders.Add(rv);
-        keys.Add(lkey, rv);
+        keys.Add(compareKey, rv);
       }
       return rv;
     }

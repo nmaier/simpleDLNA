@@ -1,8 +1,8 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -18,7 +18,8 @@ namespace NMaier.SimpleDlna.Utilities
 
     private long? length;
 
-    private readonly static ILog logger = LogManager.GetLogger(typeof(HttpStream));
+    private readonly static ILog logger =
+      LogManager.GetLogger(typeof(HttpStream));
 
     public static readonly string UserAgent = GenerateUserAgent();
 
@@ -67,7 +68,8 @@ namespace NMaier.SimpleDlna.Utilities
           return false;
         }
         var ranges = response.Headers.Get("Accept-Ranges");
-        if (!string.IsNullOrEmpty(ranges) && ranges.ToUpper() == "none") {
+        if (!string.IsNullOrEmpty(ranges) &&
+          ranges.ToUpperInvariant() == "none") {
           return false;
         }
         return true;
@@ -190,12 +192,12 @@ namespace NMaier.SimpleDlna.Utilities
       base.Dispose(disposing);
     }
 
-    protected void OpenAt(long pos, HttpMethod method)
+    protected void OpenAt(long offset, HttpMethod method)
     {
-      if (pos < 0) {
+      if (offset < 0) {
         throw new IOException("Position cannot be negative");
       }
-      if (pos > 0 && method == HttpMethod.HEAD) {
+      if (offset > 0 && method == HttpMethod.HEAD) {
         throw new ArgumentException("Cannot use a position (seek) with HEAD request");
       }
       Close();
@@ -209,23 +211,23 @@ namespace NMaier.SimpleDlna.Utilities
       request.AllowAutoRedirect = true;
       request.Timeout = TIMEOUT * 1000;
       request.UserAgent = UserAgent;
-      if (pos > 0) {
-        request.AddRange(pos);
+      if (offset > 0) {
+        request.AddRange(offset);
       }
       response = (HttpWebResponse)request.GetResponse();
       if (method != HttpMethod.HEAD) {
         responseStream = response.GetResponseStream();
         bufferedStream = new BufferedStream(responseStream, BUFFER_SIZE);
       }
-      if (pos > 0 && response.StatusCode != HttpStatusCode.PartialContent) {
+      if (offset > 0 && response.StatusCode != HttpStatusCode.PartialContent) {
         throw new IOException("Failed to open the http stream at a specific position");
       }
       else {
-        if (pos == 0 && response.StatusCode != HttpStatusCode.OK) {
+        if (offset == 0 && response.StatusCode != HttpStatusCode.OK) {
           throw new IOException("Failed to open the http stream");
         }
       }
-      logger.InfoFormat("Opened {0} {1} at {2}", method, uri, pos);
+      logger.InfoFormat("Opened {0} {1} at {2}", method, uri, offset);
     }
 
     public override void Close()

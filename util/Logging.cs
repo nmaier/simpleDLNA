@@ -1,6 +1,6 @@
-﻿using System;
-using log4net;
+﻿using log4net;
 using log4net.Core;
+using System;
 
 namespace NMaier.SimpleDlna.Utilities
 {

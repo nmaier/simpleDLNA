@@ -1,7 +1,7 @@
+﻿using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 using System;
 using System.IO;
-using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -27,10 +27,24 @@ namespace NMaier.SimpleDlna.Server
       if (request.Headers.ContainsKey("getcontentFeatures.dlna.org")) {
         try {
           if (item.MediaType == DlnaMediaTypes.Image) {
-            headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultInteractive));
+            headers.Add(
+              "contentFeatures.dlna.org",
+              String.Format(
+                "{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
+                item.PN,
+                DlnaMaps.DefaultInteractive
+                )
+              );
           }
           else {
-            headers.Add("contentFeatures.dlna.org", String.Format("{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}", item.PN, DlnaMaps.DefaultStreaming));
+            headers.Add(
+              "contentFeatures.dlna.org",
+              String.Format(
+                "{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
+                item.PN,
+                DlnaMaps.DefaultStreaming
+                )
+              );
           }
         }
         catch (NotSupportedException) {
@@ -42,12 +56,12 @@ namespace NMaier.SimpleDlna.Server
         var mvi = item as IMetaVideoItem;
         if (mvi != null && mvi.Subtitle.HasSubtitle) {
           var surl = String.Format(
-            "http://{0}:{1}{2}subtitle/{3}/st.srt",
-            request.LocalEndPoint.Address,
-            request.LocalEndPoint.Port,
-            prefix,
-            item.Id
-            );
+          "http://{0}:{1}{2}subtitle/{3}/st.srt",
+          request.LocalEndPoint.Address,
+          request.LocalEndPoint.Port,
+          prefix,
+          item.Id
+          );
           DebugFormat("Sending subtitles {0}", surl);
           headers.Add("CaptionInfo.sec", surl);
         }
@@ -57,7 +71,11 @@ namespace NMaier.SimpleDlna.Server
         if (md != null && md.MetaDuration.HasValue) {
           headers.Add(
             "MediaInfo.sec",
-            string.Format("SEC_Duration={0};", md.MetaDuration.Value.TotalMilliseconds));
+            string.Format(
+              "SEC_Duration={0};",
+              md.MetaDuration.Value.TotalMilliseconds
+              )
+            );
         }
       }
       headers.Add("transferMode.dlna.org", transferMode);
@@ -69,7 +87,7 @@ namespace NMaier.SimpleDlna.Server
     {
       get
       {
-        return item.Content;
+        return item.CreateContentStream();
       }
     }
 

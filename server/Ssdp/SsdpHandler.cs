@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using NMaier.SimpleDlna.Utilities;
+
 using Threading = System.Threading;
 using Timers = System.Timers;
 
@@ -22,21 +23,28 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     private readonly UdpClient client = new UdpClient();
 
-    private readonly Threading.AutoResetEvent datagramPosted = new Threading.AutoResetEvent(false);
+    private readonly Threading.AutoResetEvent datagramPosted =
+      new Threading.AutoResetEvent(false);
 
-    private readonly Dictionary<Guid, List<UpnpDevice>> devices = new Dictionary<Guid, List<UpnpDevice>>();
+    private readonly Dictionary<Guid, List<UpnpDevice>> devices =
+      new Dictionary<Guid, List<UpnpDevice>>();
 
-    private readonly ConcurrentQueue<Datagram> messageQueue = new ConcurrentQueue<Datagram>();
+    private readonly ConcurrentQueue<Datagram> messageQueue =
+      new ConcurrentQueue<Datagram>();
 
-    private readonly Timers.Timer notificationTimer = new Timers.Timer(60000);
+    private readonly Timers.Timer notificationTimer =
+      new Timers.Timer(60000);
 
-    private readonly Timers.Timer queueTimer = new Timers.Timer(1000);
+    private readonly Timers.Timer queueTimer =
+      new Timers.Timer(1000);
 
     private static readonly Random random = new Random();
 
-    private static readonly IPEndPoint SSDP_ENDP = new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
+    private static readonly IPEndPoint SSDP_ENDP =
+      new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
 
-    private static readonly IPAddress SSDP_IP = IPAddress.Parse(SSDP_ADDR);
+    private static readonly IPAddress SSDP_IP =
+      IPAddress.Parse(SSDP_ADDR);
 
     private bool running = true;
 
@@ -48,7 +56,11 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       queueTimer.Elapsed += ProcessQueue;
 
       client.Client.UseOnlyOverlappedIO = true;
-      client.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+      client.Client.SetSocketOption(
+        SocketOptionLevel.Socket,
+        SocketOptionName.ReuseAddress,
+        true
+        );
       client.ExclusiveAddressUse = false;
       client.Client.Bind(new IPEndPoint(IPAddress.Any, SSDP_PORT));
       client.JoinMulticastGroup(SSDP_IP, 2);
@@ -115,7 +127,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
           var proto = reader.ReadLine().Trim();
           var method = proto.Split(new char[] { ' ' }, 2)[0];
           var headers = new Headers();
-          for (var line = reader.ReadLine(); line != null; line = reader.ReadLine()) {
+          for (var line = reader.ReadLine(); line != null;
+            line = reader.ReadLine()) {
             line = line.Trim();
             if (string.IsNullOrEmpty(line)) {
               break;
@@ -162,7 +175,12 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       headers.Add("ST", dev.Type);
       headers.Add("USN", dev.USN);
 
-      SendDatagram(endpoint, dev.Address, String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock), false);
+      SendDatagram(
+        endpoint,
+        dev.Address,
+        String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock),
+        false
+        );
       InfoFormat("{2}, {1} - Responded to a {0} request", dev.Type, endpoint, dev.Address);
     }
 
@@ -193,7 +211,12 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       headers.Add("NT", dev.Type);
       headers.Add("USN", dev.USN);
 
-      SendDatagram(SSDP_ENDP, dev.Address, String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock), sticky);
+      SendDatagram(
+        SSDP_ENDP,
+        dev.Address,
+        String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock),
+        sticky
+        );
       DebugFormat("{0} said {1}", dev.USN, type);
     }
 
@@ -205,7 +228,12 @@ namespace NMaier.SimpleDlna.Server.Ssdp
           devices.Add(UUID, list = new List<UpnpDevice>());
         }
       }
-      foreach (var t in new string[] { "upnp:rootdevice", "urn:schemas-upnp-org:device:MediaServer:1", "urn:schemas-upnp-org:service:ContentDirectory:1", "uuid:" + UUID }) {
+      foreach (var t in new string[] {
+        "upnp:rootdevice",
+        "urn:schemas-upnp-org:device:MediaServer:1",
+        "urn:schemas-upnp-org:service:ContentDirectory:1",
+        "uuid:" + UUID
+      }) {
         list.Add(new UpnpDevice(UUID, t, Descriptor, address));
       }
 

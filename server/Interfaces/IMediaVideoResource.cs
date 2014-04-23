@@ -1,4 +1,4 @@
-using NMaier.SimpleDlna.Server.Metadata;
+﻿using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.Server
 {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 
 namespace NMaier.SimpleDlna.Server
@@ -22,7 +22,7 @@ namespace NMaier.SimpleDlna.Server
       Descriptor = descriptor;
       Address = address;
 
-      if (Type.StartsWith("uuid:")) {
+      if (Type.StartsWith("uuid:", StringComparison.Ordinal)) {
         USN = Type;
       }
       else {

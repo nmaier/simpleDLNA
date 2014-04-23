@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using NMaier.SimpleDlna.Utilities;
+using System.Linq;
 using System.Text.RegularExpressions;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
@@ -13,7 +13,8 @@ namespace NMaier.SimpleDlna.Server.Views
       @"\b[\s-_]*(?:0[1-9]|[12][0-9]|3[01])[\s._-](?:0[1-9]|1[012])[\s._-](?:19|20|21)[0-9]{2}|" + // 20.02.2014 (sane)
       @"\b[\s-_]*(?:0[1-9]|1[012])[\s._-](?:0[1-9]|[12][0-9]|3[01])[\s._-](?:19|20|21)[0-9]{2}|" + // 02.20.2014 (US)
       @"\b[1-9](?:0[1-9]|[1-3]\d)\b)", // 101
-      RegexOptions.Compiled | RegexOptions.IgnoreCase);
+      RegexOptions.Compiled | RegexOptions.IgnoreCase
+      );
 
     public override string Description
     {

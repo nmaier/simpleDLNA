@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace NMaier.SimpleDlna.Utilities
 {
   using PartsCache = LeastRecentlyUsedDictionary<string, BaseSortPart[]>;
+
   public class NaturalStringComparer : StringComparer
   {
     private static readonly StringComparer comparer =
@@ -86,7 +87,7 @@ namespace NMaier.SimpleDlna.Utilities
       if (platformSupport) {
         return SafeNativeMethods.StrCmpLogicalW(x, y);
       }
-      if (x == y || x.CompareTo(y) == 0) {
+      if (x == y || StringComparer.InvariantCulture.Compare(x, y) == 0) {
         return 0;
       }
       var p1 = Split(x);

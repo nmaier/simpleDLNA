@@ -19,7 +19,6 @@ namespace NMaier.SimpleDlna.GUI.Properties
       }
     }
 
-
     [UserScopedSetting]
     [DefaultSettingValue("")]
     public List<ServerDescription> Descriptors

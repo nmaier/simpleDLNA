@@ -1,5 +1,5 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System.Linq;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -32,7 +32,11 @@ namespace NMaier.SimpleDlna.Server
       }, NaturalStringComparer.CurrentCultureIgnoreCase);
       foreach (var m in mounts) {
         var li = document.EL("li");
-        li.AppendChild(document.EL("a", new AttributeCollection() { { "href", m.Key } }, m.Value));
+        li.AppendChild(document.EL(
+          "a",
+          new AttributeCollection() { { "href", m.Key } },
+          m.Value
+          ));
         list.AppendChild(li);
       }
 

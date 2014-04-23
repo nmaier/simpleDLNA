@@ -11,9 +11,11 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly bool asIs = false;
 
-    private readonly Dictionary<string, string> dict = new Dictionary<string, string>();
+    private readonly Dictionary<string, string> dict =
+      new Dictionary<string, string>();
 
-    private readonly static Regex validator = new Regex(@"^[a-z\d][a-z\d_.-]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private readonly static Regex validator =
+      new Regex(@"^[a-z\d][a-z\d_.-]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     protected Headers(bool asIs)
     {
@@ -92,7 +94,7 @@ namespace NMaier.SimpleDlna.Server
     private string Normalize(string header)
     {
       if (!asIs) {
-        header = header.ToLower();
+        header = header.ToUpperInvariant();
       }
       header = header.Trim();
       if (!validator.IsMatch(header)) {
@@ -154,8 +156,13 @@ namespace NMaier.SimpleDlna.Server
 
     public override string ToString()
     {
-      return string.Format("({0})", string.Join(", ", (from x in dict
-                                                       select string.Format("{0}={1}", x.Key, x.Value))));
+      return string.Format(
+        "({0})",
+        string.Join(
+          ", ",
+          (from x in dict select string.Format("{0}={1}", x.Key, x.Value))
+          )
+        );
     }
 
     public bool TryGetValue(string key, out string value)

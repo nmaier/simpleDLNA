@@ -1,19 +1,15 @@
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal class PlainFolder : VirtualFolder, IMetaInfo
   {
     private readonly DirectoryInfo dir;
-
-    protected PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir)
-      : this(server, types, parent, dir, types.GetExtensions())
-    { }
 
     private PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir, IEnumerable<string> exts)
       : base(parent, dir.Name)
@@ -31,7 +27,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       foreach (var f in rawfiles) {
         var ext = f.Extension;
         if (string.IsNullOrEmpty(ext) ||
-          !exts.Contains(ext.Substring(1), StringComparer.InvariantCultureIgnoreCase)) {
+          !exts.Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase)) {
           continue;
         }
         try {
@@ -44,15 +40,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
       resources.AddRange(files);
     }
 
-    private PlainFolder TryGetFolder(FileServer server, DlnaMediaTypes types, DirectoryInfo d)
+    protected PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir)
+      : this(server, types, parent, dir, types.GetExtensions())
     {
-      try {
-        return new PlainFolder(server, types, this, d);
-      }
-      catch (Exception ex) {
-        server.Warn("Failed to access folder", ex);
-        return null;
-      }
     }
 
     public DateTime InfoDate
@@ -62,6 +52,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return dir.LastWriteTimeUtc;
       }
     }
+
     public long? InfoSize
     {
       get
@@ -69,6 +60,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return null;
       }
     }
+
     public override string Path
     {
       get
@@ -76,16 +68,29 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return dir.FullName;
       }
     }
+
     public FileServer Server
     {
       get;
       protected set;
     }
+
     public override string Title
     {
       get
       {
         return dir.Name;
+      }
+    }
+
+    private PlainFolder TryGetFolder(FileServer server, DlnaMediaTypes types, DirectoryInfo d)
+    {
+      try {
+        return new PlainFolder(server, types, this, d);
+      }
+      catch (Exception ex) {
+        server.Warn("Failed to access folder", ex);
+        return null;
       }
     }
   }

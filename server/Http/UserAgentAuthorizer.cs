@@ -1,13 +1,14 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class UserAgentAuthorizer : Logging, IHttpAuthorizationMethod
   {
-    private readonly Dictionary<string, object> userAgents = new Dictionary<string, object>();
+    private readonly Dictionary<string, object> userAgents =
+      new Dictionary<string, object>();
 
     private UserAgentAuthorizer()
     {
@@ -26,7 +27,7 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
+    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
     {
       if (headers == null) {
         throw new ArgumentNullException("headers");

@@ -1,4 +1,4 @@
-using NMaier.SimpleDlna.Utilities;
+﻿using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {

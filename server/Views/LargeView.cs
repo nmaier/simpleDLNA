@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using NMaier.SimpleDlna.Server.Metadata;
+﻿using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
+using System;
+using System.Linq;
 
 namespace NMaier.SimpleDlna.Server.Views
 {

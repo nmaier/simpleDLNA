@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using System;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -9,22 +9,24 @@ namespace NMaier.SimpleDlna.FileMediaServer
   internal sealed class AudioFile : BaseFile, IMediaAudioResource, ISerializable
   {
     private string album;
+
     private string artist;
+
     private string description;
+
     private TimeSpan? duration;
+
     private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
+
     private string genre;
+
     private bool initialized = false;
+
     private string performer;
+
     private string title;
+
     private int? track;
-
-
-
-    internal AudioFile(FileServer server, FileInfo aFile, DlnaMime aType)
-      : base(server, aFile, aType, DlnaMediaTypes.Audio)
-    {
-    }
 
     private AudioFile(SerializationInfo info, DeserializeInfo di)
       : this(di.Server, di.Info, di.Type)
@@ -53,7 +55,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
     }
 
-
+    internal AudioFile(FileServer server, FileInfo aFile, DlnaMime aType)
+      : base(server, aFile, aType, DlnaMediaTypes.Audio)
+    {
+    }
 
     public override IMediaCoverResource Cover
     {
@@ -179,36 +184,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    public override int CompareTo(IMediaItem other)
-    {
-      if (track.HasValue && other is AudioFile) {
-        var oa = other as AudioFile;
-        int rv;
-        if (oa.track.HasValue &&
-          (rv = track.Value.CompareTo(oa.track.Value)) != 0) {
-          return rv;
-        }
-      }
-      return base.CompareTo(other);
-    }
-
-    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
-    {
-      if (info == null) {
-        throw new ArgumentNullException("info");
-      }
-      info.AddValue("al", album);
-      info.AddValue("ar", artist);
-      info.AddValue("g", genre);
-      info.AddValue("p", performer);
-      info.AddValue("ti", title);
-      info.AddValue("tr", track);
-      info.AddValue(
-        "d",
-        duration.GetValueOrDefault(EmptyDuration).Ticks
-        );
-    }
-
     private void InitCover(TagLib.Tag tag)
     {
       TagLib.IPicture pic = null;
@@ -260,52 +235,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
           try {
             var t = tl.Tag;
-            genre = t.FirstGenre;
-            if (string.IsNullOrWhiteSpace(genre)) {
-              genre = null;
-            }
-
-            if (t.Track != 0 && t.Track < (1 << 10)) {
-              track = (int)t.Track;
-            }
-
-
-            title = t.Title;
-            if (string.IsNullOrWhiteSpace(title)) {
-              title = null;
-            }
-
-            description = t.Comment;
-            if (string.IsNullOrWhiteSpace(description)) {
-              description = null;
-            }
-
-            if (string.IsNullOrWhiteSpace(artist)) {
-              performer = t.JoinedPerformers;
-            }
-            else {
-              performer = t.JoinedPerformersSort;
-            }
-            if (string.IsNullOrWhiteSpace(performer)) {
-              performer = null;
-            }
-
-            artist = t.JoinedAlbumArtists;
-            if (string.IsNullOrWhiteSpace(artist)) {
-              artist = t.JoinedComposers;
-            }
-            if (string.IsNullOrWhiteSpace(artist)) {
-              artist = null;
-            }
-
-            album = t.AlbumSort;
-            if (string.IsNullOrWhiteSpace(album)) {
-              album = t.Album;
-            }
-            if (string.IsNullOrWhiteSpace(album)) {
-              album = null;
-            }
-
+            SetProperties(t);
             InitCover(t);
           }
           catch (Exception ex) {
@@ -328,6 +258,85 @@ namespace NMaier.SimpleDlna.FileMediaServer
       catch (Exception ex) {
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
+    }
+
+    private void SetProperties(TagLib.Tag tag)
+    {
+      genre = tag.FirstGenre;
+      if (string.IsNullOrWhiteSpace(genre)) {
+        genre = null;
+      }
+
+      if (tag.Track != 0 && tag.Track < (1 << 10)) {
+        track = (int)tag.Track;
+      }
+
+
+      title = tag.Title;
+      if (string.IsNullOrWhiteSpace(title)) {
+        title = null;
+      }
+
+      description = tag.Comment;
+      if (string.IsNullOrWhiteSpace(description)) {
+        description = null;
+      }
+
+      if (string.IsNullOrWhiteSpace(artist)) {
+        performer = tag.JoinedPerformers;
+      }
+      else {
+        performer = tag.JoinedPerformersSort;
+      }
+      if (string.IsNullOrWhiteSpace(performer)) {
+        performer = null;
+      }
+
+      artist = tag.JoinedAlbumArtists;
+      if (string.IsNullOrWhiteSpace(artist)) {
+        artist = tag.JoinedComposers;
+      }
+      if (string.IsNullOrWhiteSpace(artist)) {
+        artist = null;
+      }
+
+      album = tag.AlbumSort;
+      if (string.IsNullOrWhiteSpace(album)) {
+        album = tag.Album;
+      }
+      if (string.IsNullOrWhiteSpace(album)) {
+        album = null;
+      }
+    }
+
+    public override int CompareTo(IMediaItem other)
+    {
+      if (track.HasValue) {
+        var oa = other as AudioFile;
+        int rv;
+        if (oa != null && oa.track.HasValue &&
+          (rv = track.Value.CompareTo(oa.track.Value)) != 0) {
+          return rv;
+        }
+      }
+      return base.CompareTo(other);
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      if (info == null) {
+        throw new ArgumentNullException("info");
+      }
+      info.AddValue("al", album);
+      info.AddValue("ar", artist);
+      info.AddValue("g", genre);
+      info.AddValue("p", performer);
+      info.AddValue("ti", title);
+      info.AddValue("tr", track);
+      info.AddValue(
+        "d",
+        duration.GetValueOrDefault(EmptyDuration).Ticks
+      );
     }
 
     public override void LoadCover()

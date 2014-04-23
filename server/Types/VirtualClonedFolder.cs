@@ -1,5 +1,4 @@
-﻿
-namespace NMaier.SimpleDlna.Server
+﻿namespace NMaier.SimpleDlna.Server
 {
   public class VirtualClonedFolder : VirtualFolder
   {

@@ -25,7 +25,8 @@ namespace NMaier.SimpleDlna.Utilities
 
     private readonly static InfoCache infoCache = new InfoCache(500);
 
-    private static readonly Regex regAssStrip = new Regex(@"^,+", RegexOptions.Compiled);
+    private static readonly Regex regAssStrip =
+      new Regex(@"^,+", RegexOptions.Compiled);
 
     private static readonly Regex regDuration =
       new Regex(@"Duration: ([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.([0-9]+))?", RegexOptions.Compiled);
@@ -37,7 +38,8 @@ namespace NMaier.SimpleDlna.Utilities
 
     private static string FindExecutable(string executable)
     {
-      var isWin = Environment.OSVersion.Platform.ToString().ToLower().Contains("win");
+      var isWin = Environment.OSVersion.Platform.ToString().ToUpperInvariant().
+        Contains("WIN");
       if (isWin) {
         executable += ".exe";
       }
@@ -58,7 +60,8 @@ namespace NMaier.SimpleDlna.Utilities
           continue;
         }
       }
-      foreach (var p in Environment.GetEnvironmentVariable("PATH").Split(isWin ? ';' : ':')) {
+      foreach (var p in Environment.GetEnvironmentVariable("PATH").
+        Split(isWin ? ';' : ':')) {
         try {
           places.Add(new DirectoryInfo(p.Trim()));
         }
@@ -71,7 +74,7 @@ namespace NMaier.SimpleDlna.Utilities
         if (!i.Exists) {
           continue;
         }
-        foreach (var di in new [] { i, new DirectoryInfo(Path.Combine(i.FullName, "bin")) }) {
+        foreach (var di in new[] { i, new DirectoryInfo(Path.Combine(i.FullName, "bin")) }) {
           try {
             var r = di.GetFiles(executable, SearchOption.TopDirectoryOnly);
             if (r.Length != 0) {
@@ -94,7 +97,7 @@ namespace NMaier.SimpleDlna.Utilities
       return null;
     }
 
-    private static IDictionary<string, string> IdentifyFileInternalFFmpeg(FileInfo file)
+    private static IDictionary<string, string> IdentifyFileInternal(FileInfo file)
     {
       if (FFmpeg.FFmpegExecutable == null) {
         throw new NotSupportedException();
@@ -107,66 +110,72 @@ namespace NMaier.SimpleDlna.Utilities
         return rv;
       }
       try {
-        using (var p = new Process()) {
-          var sti = p.StartInfo;
-#if !DEBUG
-          sti.CreateNoWindow = true;
-#endif
-          sti.UseShellExecute = false;
-          sti.FileName = FFmpeg.FFmpegExecutable;
-          sti.Arguments = String.Format("-i \"{0}\"", file.FullName);
-          sti.LoadUserProfile = false;
-          sti.RedirectStandardError = true;
-          p.Start();
-          rv = new Dictionary<string, string>();
-
-          using (var reader = new StreamReader(new MemoryStream())) {
-            using (var pump = new StreamPump(p.StandardError.BaseStream, reader.BaseStream, 4096)) {
-              pump.Pump(null);
-              if (!p.WaitForExit(3000)) {
-                throw new NotSupportedException("ffmpeg timed out");
-              }
-              if (!pump.Wait(1000)) {
-                throw new NotSupportedException("ffmpeg pump timed out");
-              }
-              reader.BaseStream.Seek(0, SeekOrigin.Begin);
-
-              var output = reader.ReadToEnd();
-              var match = regDuration.Match(output);
-              if (match != null && match.Success) {
-                int h, m, s, ms;
-                if (int.TryParse(match.Groups[1].Value, out h) &&
-                  int.TryParse(match.Groups[2].Value, out m) &&
-                  int.TryParse(match.Groups[3].Value, out s)) {
-                  if (match.Groups.Count < 5 || !int.TryParse(match.Groups[4].Value, out ms)) {
-                    ms = 0;
-                  }
-                  var ts = new TimeSpan(0, h, m, s, ms * 10);
-                  var tss = ts.TotalSeconds.ToString(CultureInfo.InvariantCulture);
-                  rv.Add("LENGTH", tss);
-                }
-              }
-              match = regDimensions.Match(output);
-              if (match != null && match.Success) {
-                int w, h;
-                if (int.TryParse(match.Groups[1].Value, out w) &&
-                  int.TryParse(match.Groups[2].Value, out h)) {
-                  rv.Add("VIDEO_WIDTH", w.ToString());
-                  rv.Add("VIDEO_HEIGHT", h.ToString());
-                }
-              }
-            }
-          }
-          if (rv.Count == 0) {
-            throw new NotSupportedException("File not supported");
-          }
-          return rv;
-        }
+        return IdentifyInternalFromProcess(file);
       }
       catch (Exception ex) {
         throw new NotSupportedException(ex.Message, ex);
       }
-      throw new NotSupportedException();
+    }
+
+    private static IDictionary<string, string> IdentifyInternalFromProcess(FileInfo file)
+    {
+      IDictionary<string, string> rv;
+
+      using (var p = new Process()) {
+        var sti = p.StartInfo;
+#if !DEBUG
+        sti.CreateNoWindow = true;
+#endif
+        sti.UseShellExecute = false;
+        sti.FileName = FFmpeg.FFmpegExecutable;
+        sti.Arguments = String.Format("-i \"{0}\"", file.FullName);
+        sti.LoadUserProfile = false;
+        sti.RedirectStandardError = true;
+        p.Start();
+        rv = new Dictionary<string, string>();
+
+        using (var reader = new StreamReader(new MemoryStream())) {
+          using (var pump = new StreamPump(p.StandardError.BaseStream, reader.BaseStream, 4096)) {
+            pump.Pump(null);
+            if (!p.WaitForExit(3000)) {
+              throw new NotSupportedException("ffmpeg timed out");
+            }
+            if (!pump.Wait(1000)) {
+              throw new NotSupportedException("ffmpeg pump timed out");
+            }
+            reader.BaseStream.Seek(0, SeekOrigin.Begin);
+
+            var output = reader.ReadToEnd();
+            var match = regDuration.Match(output);
+            if (match != null && match.Success) {
+              int h, m, s, ms;
+              if (int.TryParse(match.Groups[1].Value, out h) &&
+                int.TryParse(match.Groups[2].Value, out m) &&
+                int.TryParse(match.Groups[3].Value, out s)) {
+                if (match.Groups.Count < 5 || !int.TryParse(match.Groups[4].Value, out ms)) {
+                  ms = 0;
+                }
+                var ts = new TimeSpan(0, h, m, s, ms * 10);
+                var tss = ts.TotalSeconds.ToString(CultureInfo.InvariantCulture);
+                rv.Add("LENGTH", tss);
+              }
+            }
+            match = regDimensions.Match(output);
+            if (match != null && match.Success) {
+              int w, h;
+              if (int.TryParse(match.Groups[1].Value, out w) &&
+                int.TryParse(match.Groups[2].Value, out h)) {
+                rv.Add("VIDEO_WIDTH", w.ToString());
+                rv.Add("VIDEO_HEIGHT", h.ToString());
+              }
+            }
+          }
+        }
+        if (rv.Count == 0) {
+          throw new NotSupportedException("File not supported");
+        }
+        return rv;
+      }
     }
 
     public static Size GetFileDimensions(FileInfo file)
@@ -248,7 +257,7 @@ namespace NMaier.SimpleDlna.Utilities
     public static IDictionary<string, string> IdentifyFile(FileInfo file)
     {
       if (FFmpeg.FFmpegExecutable != null) {
-        return IdentifyFileInternalFFmpeg(file);
+        return IdentifyFileInternal(file);
       }
       throw new NotSupportedException();
     }

@@ -1,13 +1,14 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpAuthorizer : Logging, IHttpAuthorizationMethod, IDisposable
   {
-    private readonly List<IHttpAuthorizationMethod> methods = new List<IHttpAuthorizationMethod>();
+    private readonly List<IHttpAuthorizationMethod> methods =
+      new List<IHttpAuthorizationMethod>();
 
     private readonly HttpServer server = null;
 
@@ -26,7 +27,11 @@ namespace NMaier.SimpleDlna.Server
 
     private void OnAuthorize(object sender, HttpAuthorizationEventArgs e)
     {
-      e.Cancel = !Authorize(e.Headers, e.RemoteEndpoint, IP.GetMAC(e.RemoteEndpoint.Address));
+      e.Cancel = !Authorize(
+        e.Headers,
+        e.RemoteEndpoint,
+        IP.GetMAC(e.RemoteEndpoint.Address)
+        );
     }
 
     public void AddMethod(IHttpAuthorizationMethod method)
@@ -37,14 +42,14 @@ namespace NMaier.SimpleDlna.Server
       methods.Add(method);
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
+    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
     {
       if (methods.Count == 0) {
         return true;
       }
       try {
         foreach (var m in methods) {
-          if (m.Authorize(headers, ep, mac)) {
+          if (m.Authorize(headers, endPoint, mac)) {
             return true;
           }
         }

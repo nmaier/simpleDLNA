@@ -1,4 +1,4 @@
-namespace NMaier.SimpleDlna.Server
+﻿namespace NMaier.SimpleDlna.Server
 {
   internal sealed class IconHandler : IPrefixHandler
   {
@@ -13,8 +13,12 @@ namespace NMaier.SimpleDlna.Server
     public IResponse HandleRequest(IRequest req)
     {
       var resource = req.Path.Substring(Prefix.Length);
-      var isPng = resource.EndsWith(".png");
-      return new ResourceResponse(HttpCode.Ok, isPng ? "image/png" : "image/jpeg", resource);
+      var isPng = resource.EndsWith(".png", System.StringComparison.OrdinalIgnoreCase);
+      return new ResourceResponse(
+        HttpCode.Ok,
+        isPng ? "image/png" : "image/jpeg",
+        resource
+        );
     }
   }
 }

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -33,11 +33,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private int? width;
 
-
     private VideoFile(SerializationInfo info, StreamingContext ctx)
       : this(info, ctx.Context as DeserializeInfo)
     {
     }
+
     private VideoFile(SerializationInfo info, DeserializeInfo di)
       : this(di.Server, di.Info, di.Type)
     {
@@ -71,12 +71,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       initialized = true;
     }
 
-
     internal VideoFile(FileServer server, FileInfo aFile, DlnaMime aType)
       : base(server, aFile, aType, DlnaMediaTypes.Video)
     {
     }
-
 
     public long? Bookmark
     {
@@ -90,6 +88,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Server.UpdateFileCache(this);
       }
     }
+
     public IEnumerable<string> MetaActors
     {
       get
@@ -98,6 +97,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return actors;
       }
     }
+
     public string MetaDescription
     {
       get
@@ -106,6 +106,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return description;
       }
     }
+
     public string MetaDirector
     {
       get
@@ -114,6 +115,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return director;
       }
     }
+
     public TimeSpan? MetaDuration
     {
       get
@@ -122,6 +124,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return duration;
       }
     }
+
     public string MetaGenre
     {
       get
@@ -133,6 +136,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return genre;
       }
     }
+
     public int? MetaHeight
     {
       get
@@ -141,6 +145,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return height;
       }
     }
+
     public int? MetaWidth
     {
       get
@@ -149,6 +154,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return width;
       }
     }
+
     public override IHeaders Properties
     {
       get
@@ -179,6 +185,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return rv;
       }
     }
+
     public Subtitle Subtitle
     {
       get
@@ -196,6 +203,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return subTitle;
       }
     }
+
     public override string Title
     {
       get
@@ -206,7 +214,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return base.Title;
       }
     }
-
 
     private void MaybeInit()
     {
@@ -269,7 +276,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
     }
-
 
     public void GetObjectData(SerializationInfo info, StreamingContext context)
     {

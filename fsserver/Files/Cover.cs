@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Serialization;
-using NMaier.SimpleDlna.Server;
+﻿using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Thumbnails;
 using NMaier.SimpleDlna.Utilities;
+using System;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -35,13 +35,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     internal Cover(FileInfo aFile, Stream aStream)
     {
-      bytes = thumber.GetThumbnail(
+      var thumb = thumber.GetThumbnail(
         aFile.FullName,
         DlnaMediaTypes.Image,
         aStream,
         width,
         height
-        ).GetData();
+        );
+      bytes = thumb.GetData();
+      height = thumb.Height;
+      width = thumb.Width;
     }
 
     public Cover(FileInfo aFile)
@@ -70,14 +73,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       get
       {
         return this;
-      }
-    }
-
-    public Stream Content
-    {
-      get
-      {
-        return new MemoryStream(Bytes);
       }
     }
 
@@ -189,11 +184,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       try {
         if (bytes == null) {
-          bytes = thumber.GetThumbnail(
+          var thumb = thumber.GetThumbnail(
             file,
             width,
             height
-            ).GetData();
+            );
+          bytes = thumb.GetData();
+          height = thumb.Height;
+          width = thumb.Width;
         }
       }
       catch (NotSupportedException ex) {
@@ -218,6 +216,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public bool Equals(IMediaItem other)
     {
       throw new NotImplementedException();
+    }
+
+    public Stream CreateContentStream()
+    {
+      return new MemoryStream(Bytes);
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)

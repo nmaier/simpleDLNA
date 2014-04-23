@@ -1,10 +1,10 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Utilities;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -24,19 +24,41 @@ namespace NMaier.SimpleDlna.Server
 
     private static readonly Regex bytes = new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
 
-    private readonly static IHandler Error403 = new StaticHandler(new StringResponse(HttpCode.Denied, "<!doctype html><title>Access denied!</title><h1>Access denied!</h1><p>You're not allowed to access the requested resource.</p>"));
+    private readonly static IHandler Error403 =
+      new StaticHandler(new StringResponse(
+        HttpCode.Denied,
+        "<!doctype html><title>Access denied!</title><h1>Access denied!</h1><p>You're not allowed to access the requested resource.</p>"
+        )
+      );
 
-    private readonly static IHandler Error404 = new StaticHandler(new StringResponse(HttpCode.NotFound, "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"));
+    private readonly static IHandler Error404 =
+      new StaticHandler(new StringResponse(
+        HttpCode.NotFound,
+        "<!doctype html><title>Not found!</title><h1>Not found!</h1><p>The requested resource was not found!</p>"
+        )
+      );
 
-    private readonly static IHandler Error416 = new StaticHandler(new StringResponse(HttpCode.RangeNotSatisfiable, "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"));
+    private readonly static IHandler Error416 =
+      new StaticHandler(new StringResponse(
+        HttpCode.RangeNotSatisfiable,
+        "<!doctype html><title>Requested Range not satisfiable!</title><h1>Requested Range not satisfiable!</h1><p>Nice try, but do not try again :p</p>"
+        )
+      );
 
-    private readonly static IHandler Error500 = new StaticHandler(new StringResponse(HttpCode.InternalError, "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"));
+    private readonly static IHandler Error500 =
+      new StaticHandler(new StringResponse(
+        HttpCode.InternalError,
+        "<!doctype html><title>Internal Server Error</title><h1>Internal Server Error</h1><p>Something is very rotten in the State of Denmark!</p>"
+        )
+      );
 
     private readonly IHeaders headers = new Headers();
 
-    private readonly uint READ_TIMEOUT = (uint)TimeSpan.FromMinutes(1).TotalSeconds;
+    private readonly uint READ_TIMEOUT =
+      (uint)TimeSpan.FromMinutes(1).TotalSeconds;
 
-    private readonly uint WRITE_TIMEOUT = (uint)TimeSpan.FromMinutes(180).TotalSeconds;
+    private readonly uint WRITE_TIMEOUT =
+      (uint)TimeSpan.FromMinutes(180).TotalSeconds;
 
     private readonly TcpClient client;
 
@@ -163,7 +185,8 @@ namespace NMaier.SimpleDlna.Server
     {
       long contentLength = -1;
       string clf;
-      if (!response.Headers.TryGetValue("Content-Length", out clf) || !long.TryParse(clf, out contentLength)) {
+      if (!response.Headers.TryGetValue("Content-Length", out clf) ||
+        !long.TryParse(clf, out contentLength)) {
         try {
           contentLength = responseBody.Length - responseBody.Position;
           if (contentLength < 0) {
@@ -182,7 +205,8 @@ namespace NMaier.SimpleDlna.Server
       var responseBody = rangedResponse.Body;
       var contentLength = GetContentLengthFromStream(responseBody);
       string ar;
-      if (status != HttpCode.Ok && contentLength > 0 || !headers.TryGetValue("Range", out ar)) {
+      if (status != HttpCode.Ok && contentLength > 0 ||
+        !headers.TryGetValue("Range", out ar)) {
         return responseBody;
       }
       try {
@@ -196,7 +220,8 @@ namespace NMaier.SimpleDlna.Server
         if (!long.TryParse(m.Groups[1].Value, out start) || start < 0) {
           throw new InvalidDataException("Not parsed");
         }
-        if (m.Groups.Count != 3 || !long.TryParse(m.Groups[2].Value, out end) || end <= start || end >= totalLength) {
+        if (m.Groups.Count != 3 || !long.TryParse(m.Groups[2].Value, out end) ||
+          end <= start || end >= totalLength) {
           end = totalLength - 1;
         }
         if (start >= end) {
@@ -210,7 +235,10 @@ namespace NMaier.SimpleDlna.Server
         }
         contentLength = end - start + 1;
         rangedResponse.Headers["Content-Length"] = contentLength.ToString();
-        rangedResponse.Headers.Add("Content-Range", String.Format("bytes {0}-{1}/{2}", start, end, totalLength));
+        rangedResponse.Headers.Add(
+          "Content-Range",
+          String.Format("bytes {0}-{1}/{2}", start, end, totalLength)
+          );
         status = HttpCode.Partial;
       }
       catch (Exception ex) {
@@ -260,12 +288,14 @@ namespace NMaier.SimpleDlna.Server
         if (!hasHeaders) {
           readStream.Seek(0, SeekOrigin.Begin);
           var reader = new StreamReader(readStream);
-          for (var line = reader.ReadLine(); line != null; line = reader.ReadLine()) {
+          for (var line = reader.ReadLine(); line != null;
+            line = reader.ReadLine()) {
             line = line.Trim();
             if (string.IsNullOrEmpty(line)) {
               hasHeaders = true;
               readStream = new MemoryStream();
-              if (headers.ContainsKey("content-length") && uint.TryParse(headers["content-length"], out bodyBytes)) {
+              if (headers.ContainsKey("content-length") &&
+                uint.TryParse(headers["content-length"], out bodyBytes)) {
                 if (bodyBytes > (1 << 20)) {
                   throw new IOException("Body too long");
                 }
@@ -280,7 +310,7 @@ namespace NMaier.SimpleDlna.Server
             }
             if (method == null) {
               var parts = line.Split(new char[] { ' ' }, 3);
-              method = parts[0].Trim().ToUpper();
+              method = parts[0].Trim().ToUpperInvariant();
               path = parts[1].Trim();
               DebugFormat("{0} - {1} request for {2}", this, method, path);
             }
@@ -330,13 +360,18 @@ namespace NMaier.SimpleDlna.Server
       var responseBody = ProcessRanges(response, ref statusCode);
 
       var headerBlock = new StringBuilder();
-      headerBlock.AppendFormat("HTTP/1.1 {0} {1}\r\n", (uint)statusCode, HttpPhrases.Phrases[statusCode]);
+      headerBlock.AppendFormat(
+        "HTTP/1.1 {0} {1}\r\n",
+        (uint)statusCode,
+        HttpPhrases.Phrases[statusCode]
+        );
       headerBlock.Append(response.Headers.HeaderBlock);
       headerBlock.Append(CRLF);
 
       var responseStream = new ConcatenatedStream();
       try {
-        var headerStream = new MemoryStream(Encoding.ASCII.GetBytes(headerBlock.ToString()));
+        var headerStream = new MemoryStream(
+          Encoding.ASCII.GetBytes(headerBlock.ToString()));
         responseStream.AddStream(headerStream);
         if (method != "HEAD" && responseBody != null) {
           responseStream.AddStream(responseBody);
@@ -352,7 +387,8 @@ namespace NMaier.SimpleDlna.Server
             DebugFormat("{0} - Done writing response", this);
 
             string conn;
-            if (headers.TryGetValue("connection", out conn) && conn.ToLower() == "keep-alive") {
+            if (headers.TryGetValue("connection", out conn) &&
+              conn.ToUpperInvariant() == "KEEP-ALIVE") {
               ReadNext();
               return;
             }
@@ -390,7 +426,7 @@ namespace NMaier.SimpleDlna.Server
       }
       catch (HttpStatusException ex) {
 #if DEBUG
-         Warn(String.Format("{0} - Got a {2}: {1}", this, path, ex.Code), ex);
+        Warn(String.Format("{0} - Got a {2}: {1}", this, path, ex.Code), ex);
 #else
         InfoFormat("{0} - Got a {2}: {1}", this, path, ex.Code);
 #endif
@@ -405,7 +441,11 @@ namespace NMaier.SimpleDlna.Server
             response = Error500.HandleRequest(this);
             break;
           default:
-            response = new StaticHandler(new StringResponse(ex.Code, "text/plain", ex.Message)).HandleRequest(this);
+            response = new StaticHandler(new StringResponse(
+              ex.Code,
+              "text/plain",
+              ex.Message
+              )).HandleRequest(this);
             break;
         }
       }

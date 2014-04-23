@@ -1,11 +1,11 @@
-﻿using System;
+﻿using log4net;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using log4net;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
@@ -142,7 +142,7 @@ namespace NMaier.SimpleDlna.Thumbnails
       if (file == null) {
         throw new ArgumentNullException("file");
       }
-      var ext = file.Extension.ToLower().Substring(1);
+      var ext = file.Extension.ToUpperInvariant().Substring(1);
       var mediaType = DlnaMaps.Ext2Media[ext];
 
       var key = file.FullName;
@@ -166,7 +166,7 @@ namespace NMaier.SimpleDlna.Thumbnails
       return new Thumbnail(width, height, rv);
     }
 
-    private class CacheItem
+    private sealed class CacheItem
     {
       public readonly byte[] Data;
 

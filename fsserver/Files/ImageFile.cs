@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using System;
 using System.IO;
 using System.Runtime.Serialization;
-using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -9,15 +9,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
   internal sealed class ImageFile : BaseFile, IMediaImageResource, ISerializable
   {
     private string creator;
+
     private string description;
-    private int? width, height;
+
     private bool initialized = false;
+
     private string title;
 
-    internal ImageFile(FileServer server, FileInfo aFile, DlnaMime aType)
-      : base(server, aFile, aType, DlnaMediaTypes.Image)
-    {
-    }
+    private int? width,
+
+    height;
 
     private ImageFile(SerializationInfo info, StreamingContext context)
       : this((context.Context as DeserializeInfo).Server, (context.Context as DeserializeInfo).Info, (context.Context as DeserializeInfo).Type)
@@ -34,6 +35,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       height = info.GetInt32("h");
 
       initialized = true;
+    }
+
+    internal ImageFile(FileServer server, FileInfo aFile, DlnaMime aType)
+      : base(server, aFile, aType, DlnaMediaTypes.Image)
+    {
     }
 
     public string MetaCreator
@@ -86,9 +92,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
         if (width != null && height != null) {
           rv.Add(
-            "Resolution",
-            string.Format("{0}x{1}", width.Value, height.Value)
-            );
+          "Resolution",
+          string.Format("{0}x{1}", width.Value, height.Value)
+          );
         }
         return rv;
       }
@@ -103,19 +109,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
         return base.Title;
       }
-    }
-
-    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
-    {
-      if (info == null) {
-        throw new ArgumentNullException("info");
-      }
-      MaybeInit();
-      info.AddValue("cr", creator);
-      info.AddValue("d", description);
-      info.AddValue("t", title);
-      info.AddValue("w", width);
-      info.AddValue("h", height);
     }
 
     private void MaybeInit()
@@ -170,6 +163,19 @@ namespace NMaier.SimpleDlna.FileMediaServer
       catch (Exception ex) {
         Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
       }
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      if (info == null) {
+        throw new ArgumentNullException("info");
+      }
+      MaybeInit();
+      info.AddValue("cr", creator);
+      info.AddValue("d", description);
+      info.AddValue("t", title);
+      info.AddValue("w", width);
+      info.AddValue("h", height);
     }
   }
 }

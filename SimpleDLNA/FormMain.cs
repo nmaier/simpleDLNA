@@ -1,4 +1,10 @@
-﻿using System;
+﻿using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using log4net.Layout;
+using NMaier.SimpleDlna.Server;
+using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
@@ -7,12 +13,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using log4net;
-using log4net.Appender;
-using log4net.Config;
-using log4net.Core;
-using log4net.Layout;
-using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -318,8 +318,7 @@ namespace NMaier.SimpleDlna.GUI
 
       Task.Factory.StartNew(() =>
       {
-        var po = new ParallelOptions()
-        {
+        var po = new ParallelOptions() {
           MaxDegreeOfParallelism = Math.Min(4, Environment.ProcessorCount)
         };
         Parallel.ForEach(descs, po, i =>
@@ -365,13 +364,11 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
 
-      var layout = new PatternLayout()
-      {
+      var layout = new PatternLayout() {
         ConversionPattern = "%date %6level [%3thread] %-30.30logger{1} - %message%newline%exception"
       };
       layout.ActivateOptions();
-      var fileAppender = new RollingFileAppender()
-      {
+      var fileAppender = new RollingFileAppender() {
         File = logFile.FullName,
         Layout = layout,
         MaximumFileSize = "10MB",
@@ -437,8 +434,7 @@ namespace NMaier.SimpleDlna.GUI
           key = "warn";
         }
       }
-      pendingLogEntries.Enqueue(new LogEntry()
-      {
+      pendingLogEntries.Enqueue(new LogEntry() {
         Class = cls,
         Exception = loggingEvent.GetExceptionString(),
         Key = key,

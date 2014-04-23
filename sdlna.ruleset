@@ -1,14 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="sdlna" ToolsVersion="10.0">
-  <Include Path="basiccorrectnessrules.ruleset" Action="Default" />
-  <Include Path="basicdesignguidelinerules.ruleset" Action="Default" />
-  <Include Path="extendedcorrectnessrules.ruleset" Action="Default" />
-  <Include Path="extendeddesignguidelinerules.ruleset" Action="Default" />
-  <Include Path="minimumrecommendedrules.ruleset" Action="Default" />
-  <Include Path="securityrules.ruleset" Action="Default" />
+<RuleSet Name="SimpleDLNA Rules" ToolsVersion="12.0">
+  <IncludeAll Action="Warning" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1031" Action="None" />
     <Rule Id="CA1059" Action="None" />
+    <Rule Id="CA1300" Action="None" />
     <Rule Id="CA1303" Action="None" />
+    <Rule Id="CA1305" Action="None" />
+    <Rule Id="CA2201" Action="None" />
   </Rules>
 </RuleSet>

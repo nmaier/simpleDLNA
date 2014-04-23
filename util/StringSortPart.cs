@@ -8,7 +8,7 @@ namespace NMaier.SimpleDlna.Utilities
 
     private readonly string str;
 
-    public StringSortPart(string str, StringComparer comparer)
+    internal StringSortPart(string str, StringComparer comparer)
     {
       this.str = str;
       this.comparer = comparer;

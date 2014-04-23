@@ -1,10 +1,10 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -12,6 +12,8 @@ namespace NMaier.SimpleDlna.Utilities
   {
     private readonly static AddressToMacResolver macResolver =
       new AddressToMacResolver();
+
+    private readonly static ILog logger = LogManager.GetLogger(typeof(IP));
 
     private static bool warned = false;
 
@@ -24,8 +26,7 @@ namespace NMaier.SimpleDlna.Utilities
         }
         catch (Exception ex) {
           if (!warned) {
-            LogManager.GetLogger(typeof(IP)).Warn(
-              "Failed to retrieve IP addresses the usual way, falling back to naive mode", ex);
+            logger.Warn("Failed to retrieve IP addresses the usual way, falling back to naive mode", ex);
             warned = true;
           }
           return GetIPsFallback();
@@ -52,17 +53,17 @@ namespace NMaier.SimpleDlna.Utilities
                        where !ga.Address.Equals(IPAddress.Any)
                        select true;
         if (gateways.Count() == 0) {
-          LogManager.GetLogger(typeof(IP)).DebugFormat("Skipping {0}. No gateways", props);
+          logger.DebugFormat("Skipping {0}. No gateways", props);
           continue;
         }
-        LogManager.GetLogger(typeof(IP)).DebugFormat("Using {0}", props);
+        logger.DebugFormat("Using {0}", props);
         foreach (var uni in props.UnicastAddresses) {
           var address = uni.Address;
           if (address.AddressFamily != AddressFamily.InterNetwork) {
-            LogManager.GetLogger(typeof(IP)).DebugFormat("Skipping {0}. Not IPv4", address);
+            logger.DebugFormat("Skipping {0}. Not IPv4", address);
             continue;
           }
-          LogManager.GetLogger(typeof(IP)).DebugFormat("Found {0}", address);
+          logger.DebugFormat("Found {0}", address);
           returned = true;
           yield return address;
         }
@@ -77,7 +78,7 @@ namespace NMaier.SimpleDlna.Utilities
       var returned = false;
       foreach (var i in Dns.GetHostEntry(Dns.GetHostName()).AddressList) {
         if (i.AddressFamily == AddressFamily.InterNetwork) {
-          LogManager.GetLogger(typeof(IP)).DebugFormat("Found {0}", i);
+          logger.DebugFormat("Found {0}", i);
           returned = true;
           yield return i;
         }
@@ -87,9 +88,9 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
-    public static string GetMAC(IPAddress ip)
+    public static string GetMAC(IPAddress address)
     {
-      return macResolver.Resolve(ip);
+      return macResolver.Resolve(address);
     }
 
     public static bool IsAcceptedMAC(string mac)

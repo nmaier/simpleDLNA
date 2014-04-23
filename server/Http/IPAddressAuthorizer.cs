@@ -1,8 +1,8 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -26,17 +26,16 @@ namespace NMaier.SimpleDlna.Server
     }
 
     public IPAddressAuthorizer(IEnumerable<string> addresses)
-      : this((from a in addresses
-              select IPAddress.Parse(a)))
+      : this((from a in addresses select IPAddress.Parse(a)))
     {
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
+    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
     {
-      if (ep == null) {
+      if (endPoint == null) {
         return false;
       }
-      var addr = ep.Address;
+      var addr = endPoint.Address;
       if (addr == null) {
         return false;
       }

@@ -1,8 +1,8 @@
+using NMaier.SimpleDlna.Server.Metadata;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -10,11 +10,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private static readonly BlockingCollection<Item> queue = CreateQueue();
 
-
     private static BlockingCollection<Item> CreateQueue()
     {
-      new Thread(Run)
-      {
+      new Thread(Run) {
         IsBackground = true,
         Priority = ThreadPriority.Lowest
       }.Start();
@@ -44,7 +42,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
               continue;
             }
             file.LoadCover();
-            using (var k = file.Cover.Content) {
+            using (var k = file.Cover.CreateContentStream()) {
               k.ReadByte();
             }
           }
@@ -57,7 +55,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-
     public static void AddFiles(FileStore store, IEnumerable<WeakReference> items)
     {
       var storeRef = new WeakReference(store);
@@ -66,10 +63,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-
     private struct Item
     {
       public readonly WeakReference File;
+
       public readonly WeakReference Store;
 
       public Item(WeakReference store, WeakReference file)

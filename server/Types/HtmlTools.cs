@@ -1,6 +1,6 @@
-﻿using System.Reflection;
+﻿using NMaier.SimpleDlna.Utilities;
+using System.Reflection;
 using System.Xml;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -20,7 +20,11 @@ namespace NMaier.SimpleDlna.Server
       head.AppendChild(document.EL("title", text: title));
       head.AppendChild(document.EL(
         "link",
-        new AttributeCollection() { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "/static/browse.css" } }
+        new AttributeCollection() {
+          { "rel", "stylesheet" },
+          { "type", "text/css" },
+          { "href", "/static/browse.css" }
+        }
         ));
 
       var body = document.EL("body");
@@ -34,14 +38,24 @@ namespace NMaier.SimpleDlna.Server
       article.AppendChild(header);
 
       var footer = document.EL("footer");
-      footer.AppendChild(document.EL("img", new AttributeCollection() { { "src", "/icon/smallPNG" } }));
+      footer.AppendChild(document.EL(
+        "img",
+        new AttributeCollection() { { "src", "/icon/smallPNG" } }
+        ));
       footer.AppendChild(document.EL("h3", text: string.Format(
         "SimpleDLNA Media Server: sdlna/{0}.{1}",
         Assembly.GetExecutingAssembly().GetName().Version.Major,
         Assembly.GetExecutingAssembly().GetName().Version.Minor
         )));
-      footer.AppendChild(document.EL("p", new AttributeCollection() { { "class", "desc" } }, "A simple, zero-config DLNA media server, that you can just fire up and be done with it."));
-      footer.AppendChild(document.EL("a", new AttributeCollection() { { "href", "https://github.com/nmaier/simpleDLNA/" } }, "Fork me on GitHub"));
+      footer.AppendChild(document.EL(
+        "p",
+        new AttributeCollection() { { "class", "desc" } },
+        "A simple, zero-config DLNA media server, that you can just fire up and be done with it."
+        ));
+      footer.AppendChild(document.EL("a",
+        new AttributeCollection() { { "href", "https://github.com/nmaier/simpleDLNA/" } },
+        "Fork me on GitHub"
+        ));
       body.AppendChild(footer);
 
       return article;

@@ -7,12 +7,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private readonly FileInfo info;
 
-
     public TagLibFileAbstraction(FileInfo info)
     {
       this.info = info;
     }
-
 
     public string Name
     {
@@ -21,6 +19,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return info.FullName;
       }
     }
+
     public Stream ReadStream
     {
       get
@@ -32,6 +31,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           );
       }
     }
+
     public Stream WriteStream
     {
       get
@@ -39,7 +39,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         throw new NotImplementedException();
       }
     }
-
 
     public void CloseStream(Stream stream)
     {

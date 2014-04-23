@@ -1,5 +1,5 @@
-using System.IO;
 using log4net;
+using System.IO;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -7,11 +7,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private const int BUFFER_SIZE = 1 << 16;
 
-
     private readonly FileInfo info;
 
     private readonly static ILog logger = LogManager.GetLogger(typeof(FileReadStream));
-
 
     public FileReadStream(FileInfo info)
       : base(info.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, BUFFER_SIZE, FileOptions.Asynchronous | FileOptions.SequentialScan)
@@ -19,7 +17,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       this.info = info;
       logger.DebugFormat("Opened file {0}", this.info.FullName);
     }
-
 
     public override void Close()
     {

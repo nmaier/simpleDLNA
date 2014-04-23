@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -8,9 +8,9 @@ namespace NMaier.SimpleDlna.Server
     /// Checks if a request is authorized.
     /// </summary>
     /// <param name="headers">Client supplied HttpHeaders.</param>
-    /// <param name="ep">Client EndPoint</param>
+    /// <param name="endPoint">Client EndPoint</param>
     /// <param name="mac">Client MAC address</param>
     /// <returns>true if authorized</returns>
-    bool Authorize(IHeaders headers, IPEndPoint ep, string mac);
+    bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac);
   }
 }

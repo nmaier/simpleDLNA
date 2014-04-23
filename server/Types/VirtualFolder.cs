@@ -1,7 +1,7 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -37,7 +37,8 @@ namespace NMaier.SimpleDlna.Server
     {
       get
       {
-        return folders.SelectMany(f => (f as VirtualFolder).AllItems).Concat(resources);
+        return folders.SelectMany(f => (f as VirtualFolder).AllItems).
+          Concat(resources);
       }
     }
 
@@ -79,20 +80,21 @@ namespace NMaier.SimpleDlna.Server
     {
       get
       {
-        if (string.IsNullOrEmpty(path)) {
-          var p = string.IsNullOrEmpty(Id) ? Name : Id;
-          if (Parent != null) {
-            var vp = Parent as VirtualFolder;
-            if (vp != null) {
-              path = string.Format("{0}/:{1}", vp.Path, p);
-            }
-            else {
-              path = string.Format("{0}/:{1}", Parent.Id, p);
-            }
+        if (!string.IsNullOrEmpty(path)) {
+          return path;
+        }
+        var p = string.IsNullOrEmpty(Id) ? Name : Id;
+        if (Parent != null) {
+          var vp = Parent as VirtualFolder;
+          if (vp != null) {
+            path = string.Format("{0}/:{1}", vp.Path, p);
           }
           else {
-            path = p;
+            path = string.Format("{0}/:{1}", Parent.Id, p);
           }
+        }
+        else {
+          path = p;
         }
         return path;
       }
@@ -158,7 +160,7 @@ namespace NMaier.SimpleDlna.Server
       if (other == null) {
         throw new ArgumentNullException("other");
       }
-      return Title.CompareTo(other.Title);
+      return StringComparer.CurrentCultureIgnoreCase.Compare(Title, other.Title);
     }
 
     public bool Equals(IMediaItem other)

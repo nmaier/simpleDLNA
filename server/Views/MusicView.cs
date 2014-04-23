@@ -1,5 +1,6 @@
+﻿using NMaier.SimpleDlna.Utilities;
+using System.Globalization;
 using System.Linq;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
@@ -30,15 +31,15 @@ namespace NMaier.SimpleDlna.Server.Views
         return;
       }
       var targetFolder = folder
-        .GetFolder(key1.StemCompareBase().First().ToString().ToUpper())
+        .GetFolder(key1.StemCompareBase().First().ToString().ToUpper(CultureInfo.CurrentUICulture))
         .GetFolder(key1.StemNameBase());
       targetFolder
         .GetFolder(key2.StemNameBase())
         .AddResource(r);
       var allRes = new AlbumInTitleAudioResource(r);
       targetFolder
-       .GetFolder("All Albums")
-       .AddResource(allRes);
+      .GetFolder("All Albums")
+      .AddResource(allRes);
     }
 
     private static void SortFolder(VirtualFolder folder, TripleKeyedVirtualFolder artists, TripleKeyedVirtualFolder performers, DoubleKeyedVirtualFolder albums, SimpleKeyedVirtualFolder genres)
@@ -55,7 +56,9 @@ namespace NMaier.SimpleDlna.Server.Views
         if (album == null) {
           album = "Unspecified album";
         }
-        albums.GetFolder(album.StemCompareBase().First().ToString().ToUpper()).GetFolder(album.StemNameBase()).AddResource(i);
+        albums.GetFolder(album.StemCompareBase().First().ToString().
+          ToUpper(CultureInfo.CurrentUICulture)).
+          GetFolder(album.StemNameBase()).AddResource(i);
         LinkTriple(artists, ai, ai.MetaArtist, album);
         LinkTriple(performers, ai, ai.MetaPerformer, album);
         var genre = ai.MetaGenre;
@@ -98,7 +101,7 @@ namespace NMaier.SimpleDlna.Server.Views
         {
           var album = MetaAlbum;
           if (!string.IsNullOrWhiteSpace(album)) {
-            return string.Format("{0} � {1}", album, base.Title);
+            return string.Format("{0} — {1}", album, base.Title);
           }
           return base.Title;
         }

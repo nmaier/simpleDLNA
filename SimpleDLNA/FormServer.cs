@@ -1,12 +1,12 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Views;
+using NMaier.SimpleDlna.Utilities;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Windows.Forms;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Comparers;
-using NMaier.SimpleDlna.Server.Views;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -98,8 +98,7 @@ namespace NMaier.SimpleDlna.GUI
         var uas = (from ListViewItem i in listRestrictions.Items
                    where (int)i.Tag == 2
                    select i.Text).ToArray();
-        var rv = new ServerDescription()
-        {
+        var rv = new ServerDescription() {
           Name = textName.Text,
           Order = ((IItemComparer)comboOrder.SelectedItem).Name,
           OrderDescending = checkOrderDescending.Checked,

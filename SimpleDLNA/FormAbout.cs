@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Text;
 using System.Windows.Forms;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.GUI
 {

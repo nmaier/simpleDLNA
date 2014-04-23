@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 
 namespace NMaier.SimpleDlna.Server
@@ -21,8 +21,8 @@ namespace NMaier.SimpleDlna.Server
       Code = code;
     }
 
-    public HttpStatusException(string msg)
-      : base(msg)
+    public HttpStatusException(string message)
+      : base(message)
     {
       Code = HttpCode.None;
     }

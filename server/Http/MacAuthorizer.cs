@@ -1,13 +1,14 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class MacAuthorizer : Logging, IHttpAuthorizationMethod
   {
-    private readonly Dictionary<string, object> macs = new Dictionary<string, object>();
+    private readonly Dictionary<string, object> macs =
+      new Dictionary<string, object>();
 
     private MacAuthorizer()
     {
@@ -27,7 +28,7 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint ep, string mac)
+    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
     {
       if (string.IsNullOrEmpty(mac)) {
         return false;

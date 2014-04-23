@@ -15,8 +15,8 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-    public HttpException(string msg)
-      : base(msg)
+    public HttpException(string message)
+      : base(message)
     {
     }
 

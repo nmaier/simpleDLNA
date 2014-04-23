@@ -1,14 +1,14 @@
-using System;
-using System.IO;
-using System.Net;
-using log4net;
+﻿using log4net;
 using log4net.Appender;
 using log4net.Config;
+using log4net.Core;
 using log4net.Layout;
 using NMaier.GetOptNet;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
-using log4net.Core;
+using System;
+using System.IO;
+using System.Net;
 
 namespace NMaier.SimpleDlna
 {
@@ -163,16 +163,14 @@ namespace NMaier.SimpleDlna
     public void SetupLogging()
     {
       var appender = new ConsoleAppender();
-      var layout = new PatternLayout()
-      {
+      var layout = new PatternLayout() {
         ConversionPattern = "%6level [%3thread] %-20.20logger{1} - %message%newline%exception"
       };
       layout.ActivateOptions();
       appender.Layout = layout;
       appender.ActivateOptions();
       if (LogFile != null) {
-        var fileAppender = new RollingFileAppender()
-        {
+        var fileAppender = new RollingFileAppender() {
           File = LogFile.FullName,
           Layout = layout,
           MaximumFileSize = "1MB",
@@ -189,7 +187,7 @@ namespace NMaier.SimpleDlna
       }
 
       var repo = LogManager.GetRepository();
-      var level = repo.LevelMap[LogLevel.ToUpper()];
+      var level = repo.LevelMap[LogLevel.ToUpperInvariant()];
       if (level == null) {
         throw new GetOptException("Invalid log level");
       }

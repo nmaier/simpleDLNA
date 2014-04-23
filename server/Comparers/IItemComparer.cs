@@ -1,5 +1,5 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System.Collections.Generic;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Comparers
 {

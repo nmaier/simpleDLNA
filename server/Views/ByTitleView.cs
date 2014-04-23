@@ -1,5 +1,5 @@
+﻿using NMaier.SimpleDlna.Utilities;
 using System.Linq;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
@@ -32,7 +32,7 @@ namespace NMaier.SimpleDlna.Server.Views
         if (string.IsNullOrEmpty(pre)) {
           pre = "Unnamed";
         }
-        pre = pre.First().ToString().ToUpper();
+        pre = pre.First().ToString().ToUpperInvariant();
         titles.GetFolder(pre).AddResource(c);
         folder.RemoveResource(c);
       }

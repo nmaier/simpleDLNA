@@ -6,7 +6,8 @@ namespace NMaier.SimpleDlna.Utilities
   public abstract class Repository<TInterface>
     where TInterface : class, IRepositoryItem
   {
-    private static readonly Dictionary<string, TInterface> items = BuildRepository();
+    private static readonly Dictionary<string, TInterface> items =
+      BuildRepository();
 
     private static Dictionary<string, TInterface> BuildRepository()
     {
@@ -26,7 +27,7 @@ namespace NMaier.SimpleDlna.Utilities
           if (item == null) {
             continue;
           }
-          items.Add(item.Name, item);
+          items.Add(item.Name.ToUpperInvariant(), item);
         }
         catch (Exception) {
           continue;
@@ -52,7 +53,7 @@ namespace NMaier.SimpleDlna.Utilities
           "name");
       }
       var n_p = name.Split(new char[] { ':' }, 2);
-      name = n_p[0].ToLower().Trim();
+      name = n_p[0].ToUpperInvariant().Trim();
       var result = (TInterface)null;
       if (!items.TryGetValue(name, out result)) {
         throw new RepositoryLookupException(name);

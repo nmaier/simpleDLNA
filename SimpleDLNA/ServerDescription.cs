@@ -1,5 +1,5 @@
-using System;
 using NMaier.SimpleDlna.Server;
+using System;
 
 namespace NMaier.SimpleDlna.GUI
 {

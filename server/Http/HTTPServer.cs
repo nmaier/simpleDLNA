@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server.Ssdp;
+using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,8 +8,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Timers;
-using NMaier.SimpleDlna.Server.Ssdp;
-using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -42,10 +42,14 @@ namespace NMaier.SimpleDlna.Server
     {
       prefixes.TryAdd(
         "/favicon.ico",
-        new StaticHandler(new ResourceResponse(HttpCode.Ok, "image/icon", "favicon")));
+        new StaticHandler(
+          new ResourceResponse(HttpCode.Ok, "image/icon", "favicon"))
+        );
       prefixes.TryAdd(
         "/static/browse.css",
-        new StaticHandler(new ResourceResponse(HttpCode.Ok, "text/css", "browse_css")));
+        new StaticHandler(
+          new ResourceResponse(HttpCode.Ok, "text/css", "browse_css"))
+        );
       RegisterHandler(new IconHandler());
 
       listener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
@@ -137,14 +141,14 @@ namespace NMaier.SimpleDlna.Server
           break;
       }
       return String.Format(
-        "{0}{1}/{2}.{3} UPnP/1.0 DLNADOC/1.5 sdlna/{4}.{5}",
-        pstring,
-        IntPtr.Size * 8,
-        os.Version.Major,
-        os.Version.Minor,
-        Assembly.GetExecutingAssembly().GetName().Version.Major,
-        Assembly.GetExecutingAssembly().GetName().Version.Minor
-        );
+      "{0}{1}/{2}.{3} UPnP/1.0 DLNADOC/1.5 sdlna/{4}.{5}",
+      pstring,
+      IntPtr.Size * 8,
+      os.Version.Major,
+      os.Version.Minor,
+      Assembly.GetExecutingAssembly().GetName().Version.Major,
+      Assembly.GetExecutingAssembly().GetName().Version.Minor
+      );
     }
 
     private void TimeouterCallback(object sender, ElapsedEventArgs e)
@@ -181,7 +185,7 @@ namespace NMaier.SimpleDlna.Server
       }
 
       foreach (var s in prefixes.Keys) {
-        if (prefix.StartsWith(s)) {
+        if (prefix.StartsWith(s, StringComparison.Ordinal)) {
           return prefixes[s];
         }
       }
@@ -194,10 +198,10 @@ namespace NMaier.SimpleDlna.Server
         throw new ArgumentNullException("handler");
       }
       var prefix = handler.Prefix;
-      if (!prefix.StartsWith("/")) {
+      if (!prefix.StartsWith("/", StringComparison.Ordinal)) {
         throw new ArgumentException("Invalid prefix; must start with /");
       }
-      if (!prefix.EndsWith("/")) {
+      if (!prefix.EndsWith("/", StringComparison.Ordinal)) {
         throw new ArgumentException("Invalid prefix; must end with /");
       }
       if (FindHandler(prefix) != null) {
@@ -262,7 +266,12 @@ namespace NMaier.SimpleDlna.Server
           list.Add(deviceGuid);
         }
         mount.AddDeviceGuid(deviceGuid, address);
-        var uri = new Uri(string.Format("http://{0}:{1}{2}", address, end.Port, mount.DescriptorURI));
+        var uri = new Uri(string.Format(
+          "http://{0}:{1}{2}",
+          address,
+          end.Port,
+          mount.DescriptorURI
+          ));
         ssdpServer.RegisterNotification(deviceGuid, uri, address);
         NoticeFormat("New mount at: {0}", uri);
       }
