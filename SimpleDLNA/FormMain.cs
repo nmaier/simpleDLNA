@@ -6,6 +6,7 @@ using log4net.Layout;
 using NMaier.SimpleDlna.Server;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
@@ -13,11 +14,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace NMaier.SimpleDlna.GUI
 {
   public partial class FormMain : Form, IAppender, IDisposable
   {
+    private const string descriptorFile = "descriptors.xml";
+
     private bool canClose = false;
 
     private static readonly Properties.Settings Config = Properties.Settings.Default;
@@ -35,6 +39,8 @@ namespace NMaier.SimpleDlna.GUI
     private readonly System.Timers.Timer appenderTimer = new System.Timers.Timer(2000);
 
     private readonly ConcurrentQueue<LogEntry> pendingLogEntries = new ConcurrentQueue<LogEntry>();
+
+    private static readonly ILog log = LogManager.GetLogger(typeof(FormMain));
 
     private HttpServer httpServer;
 
@@ -238,7 +244,7 @@ namespace NMaier.SimpleDlna.GUI
         }
       }
       catch (Exception ex) {
-        LogManager.GetLogger(GetType()).Error(string.Format("Failed to remove cache file {0}", cacheFile.FullName), ex);
+        log.Error(string.Format("Failed to remove cache file {0}", cacheFile.FullName), ex);
       }
       foreach (var item in running) {
         item.Toggle();
@@ -311,10 +317,8 @@ namespace NMaier.SimpleDlna.GUI
 
     private void LoadConfig()
     {
-      var descs = (from d in Config.Descriptors
-                   let i = new ServerListViewItem(httpServer, cacheFile, d)
-                   select i).ToArray();
-      listDescriptions.Items.AddRange(descs);
+      var descs = LoadDescriptors();
+      listDescriptions.Items.AddRange(descs.ToArray());
 
       Task.Factory.StartNew(() =>
       {
@@ -325,7 +329,29 @@ namespace NMaier.SimpleDlna.GUI
         {
           i.Load();
         });
+        BeginInvoke((Action)(() =>
+        {
+          Config.Descriptors.Clear();
+          SaveConfig();
+        }));
       });
+    }
+
+    private ServerListViewItem[] LoadDescriptors()
+    {
+      List<ServerDescription> rv;
+      try {
+        var serializer = new XmlSerializer(typeof(List<ServerDescription>));
+        using (var reader = new StreamReader(Path.Combine(cacheDir, descriptorFile))) {
+          rv = serializer.Deserialize(reader) as List<ServerDescription>;
+        }
+      }
+      catch (Exception) {
+        rv = Config.Descriptors;
+      }
+      return (from d in rv
+              let i = new ServerListViewItem(httpServer, cacheFile, d)
+              select i).ToArray();
     }
 
     private void notifyIcon_DoubleClick(object sender, EventArgs e)
@@ -343,8 +369,21 @@ namespace NMaier.SimpleDlna.GUI
 
     private void SaveConfig()
     {
-      Config.Descriptors = (from ServerListViewItem item in listDescriptions.Items
-                            select item.Description).ToList();
+      try {
+        var descs = (from ServerListViewItem item in listDescriptions.Items
+                     select item.Description).ToArray();
+        var serializer = new XmlSerializer(descs.GetType());
+        var file = new FileInfo(Path.Combine(cacheDir, descriptorFile + ".tmp"));
+        using (var writer = new StreamWriter(file.FullName)) {
+          serializer.Serialize(writer, descs);
+        }
+        var outfile = Path.Combine(cacheDir, descriptorFile);
+        File.Copy(file.FullName, outfile, true);
+        file.Delete();
+      }
+      catch (Exception ex) {
+        log.Error("Failed to write descriptors", ex);
+      }
       Config.Save();
     }
 
@@ -385,7 +424,7 @@ namespace NMaier.SimpleDlna.GUI
     private void StartPipeNotification()
     {
 #if DEBUG
-      log4net.LogManager.GetLogger(this.GetType()).Info("Debug mode / Skipping one-instance-only stuff");
+      logger.Info("Debug mode / Skipping one-instance-only stuff");
 #else
       if (Type.GetType("Mono.Runtime") != null) {
         // XXX Mono sometimes stack overflows for whatever reason.
