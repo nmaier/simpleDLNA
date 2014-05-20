@@ -22,19 +22,7 @@
         "Entry"
         {
         "MsmKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
-        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
-        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
+        "OwnerKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -46,7 +34,19 @@
         "Entry"
         {
         "MsmKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
-        "OwnerKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
+        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
+        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -82,7 +82,7 @@
         "Entry"
         {
         "MsmKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -94,7 +94,7 @@
         "Entry"
         {
         "MsmKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
-        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -124,13 +124,7 @@
         "Entry"
         {
         "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
-        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
+        "OwnerKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -142,7 +136,13 @@
         "Entry"
         {
         "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
-        "OwnerKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
+        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -166,13 +166,13 @@
         "Entry"
         {
         "MsmKey" = "8:_F2D9FAA8E45D8FE6A4182B1B40C0D797"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_F2D9FAA8E45D8FE6A4182B1B40C0D797"
-        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -184,13 +184,13 @@
         "Entry"
         {
         "MsmKey" = "8:_FB9661F65E953F7C90D04CCB23CB1AF9"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_FB9661F65E953F7C90D04CCB23CB1AF9"
-        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -202,13 +202,13 @@
         "Entry"
         {
         "MsmKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
-        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
+        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
-        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
+        "OwnerKey" = "8:_D76DE9BBA3294BD69BDD0AC9BB0554D7"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -220,43 +220,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_9748DB2620D275F5A9EC96C6367B4657"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_F2D9FAA8E45D8FE6A4182B1B40C0D797"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
+        "OwnerKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -268,7 +232,43 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0D7D479132B8ED6B1F08C9F094364DD9"
+        "OwnerKey" = "8:_D4AC720A49A3302B93FE5716E205514D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8B027FF01F1C9D3A2EB9B544E468D6BF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_FF60C74C923980A10AE5C7BBA9493FB1"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_F2D9FAA8E45D8FE6A4182B1B40C0D797"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_16DF506659DEFD7B608074EFC39D915D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_9748DB2620D275F5A9EC96C6367B4657"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_C7AE57F4886A4A948AB423AB22EA9486"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -439,11 +439,6 @@
             "AssemblyAsmDisplayName" = "8:log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_0D7D479132B8ED6B1F08C9F094364DD9"
-                    {
-                    "Name" = "8:log4net.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:log4net.dll"
             "TargetName" = "8:"
@@ -470,11 +465,6 @@
             "AssemblyAsmDisplayName" = "8:SimpleDlna.FileMediaServer, Version=0.14.5226.13303, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_16DF506659DEFD7B608074EFC39D915D"
-                    {
-                    "Name" = "8:SimpleDlna.FileMediaServer.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:SimpleDlna.FileMediaServer.dll"
             "TargetName" = "8:"
@@ -541,11 +531,6 @@
             "AssemblyAsmDisplayName" = "8:SimpleDlna.Server, Version=0.14.5226.13303, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_8B027FF01F1C9D3A2EB9B544E468D6BF"
-                    {
-                    "Name" = "8:SimpleDlna.Server.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:SimpleDlna.Server.dll"
             "TargetName" = "8:"
@@ -572,11 +557,6 @@
             "AssemblyAsmDisplayName" = "8:GetOptNet, Version=1.2.0.0, Culture=neutral, PublicKeyToken=c9bf2c3a9070fff0, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_9748DB2620D275F5A9EC96C6367B4657"
-                    {
-                    "Name" = "8:GetOptNet.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:GetOptNet.dll"
             "TargetName" = "8:"
@@ -623,11 +603,6 @@
             "AssemblyAsmDisplayName" = "8:SimpleDlna.Utilities, Version=0.14.5226.13302, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_D4AC720A49A3302B93FE5716E205514D"
-                    {
-                    "Name" = "8:SimpleDlna.Utilities.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:SimpleDlna.Utilities.dll"
             "TargetName" = "8:"
@@ -674,11 +649,6 @@
             "AssemblyAsmDisplayName" = "8:taglib-sharp, Version=2.1.0.0, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_F2D9FAA8E45D8FE6A4182B1B40C0D797"
-                    {
-                    "Name" = "8:taglib-sharp.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:taglib-sharp.dll"
             "TargetName" = "8:"
@@ -705,11 +675,6 @@
             "AssemblyAsmDisplayName" = "8:System.Data.SQLite, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_FB9661F65E953F7C90D04CCB23CB1AF9"
-                    {
-                    "Name" = "8:System.Data.SQLite.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Data.SQLite.dll"
             "TargetName" = "8:"
@@ -736,11 +701,6 @@
             "AssemblyAsmDisplayName" = "8:SimpleDlna.Thumbnails, Version=0.14.5226.13303, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_FF60C74C923980A10AE5C7BBA9493FB1"
-                    {
-                    "Name" = "8:SimpleDlna.Thumbnails.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:SimpleDlna.Thumbnails.dll"
             "TargetName" = "8:"
@@ -849,15 +809,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SimpleDLNA"
-        "ProductCode" = "8:{3691AAA4-FD06-45A5-962D-AA39CCD6C3F3}"
-        "PackageCode" = "8:{7CD41D99-3292-41D0-B30C-FF77CC0049B7}"
+        "ProductCode" = "8:{700323F1-65A6-468E-90D0-3D48832DCB38}"
+        "PackageCode" = "8:{173F50B1-B373-4E4A-B909-3AF116B0B8EF}"
         "UpgradeCode" = "8:{9BB9834F-0082-46E1-A93B-5411738F6C5C}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.14"
+        "ProductVersion" = "8:0.15"
         "Manufacturer" = "8:Nils Maier"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://nmaier.github.io/simpleDLNA/"
