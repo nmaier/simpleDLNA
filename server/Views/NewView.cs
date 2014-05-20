@@ -1,11 +1,10 @@
 ﻿using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
 using System;
-using System.Linq;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal class NewView : BaseView
+  internal class NewView : FilteringView
   {
     private DateTime minDate = DateTime.Now.AddDays(-7.0);
 
@@ -25,21 +24,13 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private void ProcessFolder(IMediaFolder root)
+    protected override bool DoFilter(IMediaResource res)
     {
-      foreach (var f in root.ChildFolders) {
-        ProcessFolder(f);
+      var i = res as IMetaInfo;
+      if (i == null) {
+        return false;
       }
-      foreach (var f in root.ChildItems.ToList()) {
-        var i = f as IMetaInfo;
-        if (i == null) {
-          continue;
-        }
-        if (i.InfoDate != null && i.InfoDate >= minDate) {
-          continue;
-        }
-        root.RemoveResource(f);
-      }
+      return i.InfoDate != null && i.InfoDate >= minDate;
     }
 
     public override void SetParameters(AttributeCollection parameters)
@@ -55,13 +46,6 @@ namespace NMaier.SimpleDlna.Server.Views
           minDate = min;
         }
       }
-    }
-
-    public override IMediaFolder Transform(IMediaFolder root)
-    {
-      root = new VirtualClonedFolder(root);
-      ProcessFolder(root);
-      return root;
     }
   }
 }

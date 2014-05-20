@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal class LargeView : BaseView
+  internal class LargeView : FilteringView
   {
     private long minSize = 300 * 1024 * 1024;
 
@@ -25,21 +25,13 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private void ProcessFolder(IMediaFolder root)
+    protected override bool DoFilter(IMediaResource res)
     {
-      foreach (var f in root.ChildFolders) {
-        ProcessFolder(f);
+      var i = res as IMetaInfo;
+      if (i == null) {
+        return false;
       }
-      foreach (var f in root.ChildItems.ToList()) {
-        var i = f as IMetaInfo;
-        if (i == null) {
-          continue;
-        }
-        if (i.InfoSize.HasValue && i.InfoSize.Value >= minSize) {
-          continue;
-        }
-        root.RemoveResource(f);
-      }
+      return i.InfoSize.HasValue && i.InfoSize.Value >= minSize;
     }
 
     public override void SetParameters(AttributeCollection parameters)
@@ -56,13 +48,6 @@ namespace NMaier.SimpleDlna.Server.Views
           break;
         }
       }
-    }
-
-    public override IMediaFolder Transform(IMediaFolder root)
-    {
-      root = new VirtualClonedFolder(root);
-      ProcessFolder(root);
-      return root;
     }
   }
 }

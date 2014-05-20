@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal class FilterView : BaseView
+  internal class FilterView : FilteringView
   {
     private Regex filter = null;
 
@@ -25,17 +25,9 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private void ProcessFolder(IMediaFolder root)
+    protected override bool DoFilter(IMediaResource res)
     {
-      foreach (var f in root.ChildFolders) {
-        ProcessFolder(f);
-      }
-      foreach (var f in root.ChildItems.ToList()) {
-        if (filter.IsMatch(f.Title)) {
-          continue;
-        }
-        root.RemoveResource(f);
-      }
+      return filter.IsMatch(res.Title);
     }
 
     public override void SetParameters(AttributeCollection parameters)
@@ -65,9 +57,7 @@ namespace NMaier.SimpleDlna.Server.Views
       if (filter == null) {
         return root;
       }
-      root = new VirtualClonedFolder(root);
-      ProcessFolder(root);
-      return root;
+      return base.Transform(root);
     }
   }
 }
