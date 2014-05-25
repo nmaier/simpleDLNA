@@ -42,6 +42,8 @@ namespace NMaier.SimpleDlna.GUI
 
     private static readonly ILog log = LogManager.GetLogger(typeof(FormMain));
 
+    private bool minimized = Config.startminimized;
+
     private HttpServer httpServer;
 
     private bool logging = false;
@@ -285,8 +287,8 @@ namespace NMaier.SimpleDlna.GUI
     private void FormMain_Resize(object sender, EventArgs e)
     {
       if (WindowState == FormWindowState.Minimized) {
-        notifyIcon.Visible = true;
         ShowInTaskbar = false;
+        minimized = true;
         Hide();
       }
     }
@@ -356,10 +358,10 @@ namespace NMaier.SimpleDlna.GUI
 
     private void notifyIcon_DoubleClick(object sender, EventArgs e)
     {
+      minimized = false;
       Show();
       WindowState = FormWindowState.Normal;
       ShowInTaskbar = true;
-      notifyIcon.Visible = false;
     }
 
     private void openInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
@@ -424,7 +426,7 @@ namespace NMaier.SimpleDlna.GUI
     private void StartPipeNotification()
     {
 #if DEBUG
-      logger.Info("Debug mode / Skipping one-instance-only stuff");
+      log.Info("Debug mode / Skipping one-instance-only stuff");
 #else
       if (Type.GetType("Mono.Runtime") != null) {
         // XXX Mono sometimes stack overflows for whatever reason.
@@ -449,6 +451,18 @@ namespace NMaier.SimpleDlna.GUI
         }
       }) { IsBackground = true }.Start();
 #endif
+    }
+
+    protected override void SetVisibleCore(bool value)
+    {
+      if (minimized) {
+        value = false;
+        if (!IsHandleCreated) {
+          CreateHandle();
+        }
+      }
+      notifyIcon.Visible = !value;
+      base.SetVisibleCore(value);
     }
 
     public void DoAppend(LoggingEvent loggingEvent)
