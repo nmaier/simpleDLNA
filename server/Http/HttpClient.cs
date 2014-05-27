@@ -375,6 +375,7 @@ namespace NMaier.SimpleDlna.Server
         responseStream.AddStream(headerStream);
         if (method != "HEAD" && responseBody != null) {
           responseStream.AddStream(responseBody);
+          responseBody = null;
         }
         InfoFormat("{0} - {1} response for {2}", this, (uint)statusCode, path);
         state = HttpStates.WRITING;
@@ -402,6 +403,11 @@ namespace NMaier.SimpleDlna.Server
       catch (Exception) {
         responseStream.Dispose();
         throw;
+      }
+      finally {
+        if (responseBody != null) {
+          responseBody.Dispose();
+        }
       }
     }
 
