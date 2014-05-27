@@ -184,18 +184,18 @@ namespace NMaier.SimpleDlna.Server
     private long GetContentLengthFromStream(Stream responseBody)
     {
       long contentLength = -1;
-      string clf;
-      if (!response.Headers.TryGetValue("Content-Length", out clf) ||
-        !long.TryParse(clf, out contentLength)) {
-        try {
+      try {
+        string clf;
+        if (!response.Headers.TryGetValue("Content-Length", out clf) ||
+          !long.TryParse(clf, out contentLength)) {
           contentLength = responseBody.Length - responseBody.Position;
           if (contentLength < 0) {
             throw new InvalidDataException();
           }
           response.Headers["Content-Length"] = contentLength.ToString();
         }
-        catch (Exception) {
-        }
+      }
+      catch (Exception) {
       }
       return contentLength;
     }
@@ -238,7 +238,7 @@ namespace NMaier.SimpleDlna.Server
         rangedResponse.Headers.Add(
           "Content-Range",
           String.Format("bytes {0}-{1}/{2}", start, end, totalLength)
-          );
+        );
         status = HttpCode.Partial;
       }
       catch (Exception ex) {
@@ -364,7 +364,7 @@ namespace NMaier.SimpleDlna.Server
         "HTTP/1.1 {0} {1}\r\n",
         (uint)statusCode,
         HttpPhrases.Phrases[statusCode]
-        );
+      );
       headerBlock.Append(response.Headers.HeaderBlock);
       headerBlock.Append(CRLF);
 
