@@ -140,7 +140,7 @@ namespace NMaier.SimpleDlna.Thumbnails
           last = ex;
         }
       }
-      throw last;
+      throw last ?? new Exception("Not reached");
     }
 
     private long IdentifyBestCapturePosition(FileInfo file)
