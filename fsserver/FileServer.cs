@@ -350,8 +350,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public void Load()
     {
-      if (types == DlnaMediaTypes.Audio && !ids.HasViews) {
-        ids.AddView("music");
+      if (types == DlnaMediaTypes.Audio) {
+        lock (ids) {
+          if (!ids.HasViews) {
+            ids.AddView("music");
+          }
+        }
       }
       DoRoot();
 
