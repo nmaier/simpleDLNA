@@ -64,6 +64,7 @@ namespace NMaier.SimpleDlna.Utilities
         stream.Dispose();
       }
       streams.Clear();
+      base.Close();
     }
 
     public override void Flush()

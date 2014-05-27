@@ -241,6 +241,7 @@ namespace NMaier.SimpleDlna.Utilities
       if (response != null) {
         response.Close();
       }
+      base.Close();
     }
 
     public new void Dispose()
