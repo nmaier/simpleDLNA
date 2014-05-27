@@ -25,6 +25,9 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly static IDictionary<string, AttributeCollection> soapCache = new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
 
+    private readonly static XmlNamespaceManager namespaceMgr = CreateNamespaceManager();
+
+
     private static void AddBookmarkInfo(IMediaResource resource, XmlElement item)
     {
       var bookmarkable = resource as IBookmarkable;
@@ -300,6 +303,13 @@ namespace NMaier.SimpleDlna.Server
       return provided;
     }
 
+    private static XmlNamespaceManager CreateNamespaceManager()
+    {
+      var rv = new XmlNamespaceManager(new NameTable());
+      rv.AddNamespace("soap", NS_SOAPENV);
+      return rv;
+    }
+
     private static XmlElement CreateObjectClass(XmlDocument result, IMediaResource resource)
     {
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
@@ -415,7 +425,7 @@ namespace NMaier.SimpleDlna.Server
       var soap = new XmlDocument();
       soap.LoadXml(request.Body);
       var sparams = new RawHeaders();
-      var body = soap.GetElementsByTagName("Body", NS_SOAPENV).Item(0);
+      var body = soap.SelectSingleNode("//soap:Body", namespaceMgr);
       var method = body.FirstChild;
       foreach (var p in method.ChildNodes) {
         var e = p as XmlElement;

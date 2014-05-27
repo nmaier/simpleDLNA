@@ -84,17 +84,17 @@ namespace NMaier.SimpleDlna.Server
       doc.LoadXml(Properties.Resources.description);
       var guid = Uuid;
       guidsForAddresses.TryGetValue(source, out guid);
-      doc.GetElementsByTagName("UDN").Item(0).InnerText =
+      doc.SelectSingleNode("//*[local-name() = 'UDN']").InnerText =
         String.Format("uuid:{0}", guid);
-      doc.GetElementsByTagName("modelNumber").Item(0).InnerText =
+      doc.SelectSingleNode("//*[local-name() = 'modelNumber']").InnerText =
         Assembly.GetExecutingAssembly().GetName().Version.ToString();
-      doc.GetElementsByTagName("friendlyName").Item(0).InnerText =
+      doc.SelectSingleNode("//*[local-name() = 'friendlyName']").InnerText =
         FriendlyName + " — sdlna";
-      doc.GetElementsByTagName("SCPDURL").Item(0).InnerText =
+      doc.SelectSingleNode("//*[local-name() = 'SCPDURL']").InnerText =
         String.Format("{0}contentDirectory.xml", prefix);
-      doc.GetElementsByTagName("controlURL").Item(0).InnerText =
+      doc.SelectSingleNode("//*[local-name() = 'controlURL']").InnerText =
         String.Format("{0}control", prefix);
-      doc.GetElementsByTagName("eventSubURL").Item(0).InnerText =
+      doc.SelectSingleNode("//*[local-name() = 'eventSubURL']").InnerText =
         String.Format("{0}events", prefix);
 
       return doc.OuterXml;
