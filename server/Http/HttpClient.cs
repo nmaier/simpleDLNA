@@ -204,12 +204,12 @@ namespace NMaier.SimpleDlna.Server
     {
       var responseBody = rangedResponse.Body;
       var contentLength = GetContentLengthFromStream(responseBody);
-      string ar;
-      if (status != HttpCode.Ok && contentLength > 0 ||
-        !headers.TryGetValue("Range", out ar)) {
-        return responseBody;
-      }
       try {
+        string ar;
+        if (status != HttpCode.Ok && contentLength > 0 ||
+          !headers.TryGetValue("Range", out ar)) {
+          return responseBody;
+        }
         var m = bytes.Match(ar);
         if (!m.Success) {
           throw new InvalidDataException("Not parsed!");
@@ -358,18 +358,17 @@ namespace NMaier.SimpleDlna.Server
     {
       var statusCode = response.Status;
       var responseBody = ProcessRanges(response, ref statusCode);
-
-      var headerBlock = new StringBuilder();
-      headerBlock.AppendFormat(
-        "HTTP/1.1 {0} {1}\r\n",
-        (uint)statusCode,
-        HttpPhrases.Phrases[statusCode]
-      );
-      headerBlock.Append(response.Headers.HeaderBlock);
-      headerBlock.Append(CRLF);
-
       var responseStream = new ConcatenatedStream();
       try {
+        var headerBlock = new StringBuilder();
+        headerBlock.AppendFormat(
+          "HTTP/1.1 {0} {1}\r\n",
+          (uint)statusCode,
+          HttpPhrases.Phrases[statusCode]
+        );
+        headerBlock.Append(response.Headers.HeaderBlock);
+        headerBlock.Append(CRLF);
+
         var headerStream = new MemoryStream(
           Encoding.ASCII.GetBytes(headerBlock.ToString()));
         responseStream.AddStream(headerStream);
