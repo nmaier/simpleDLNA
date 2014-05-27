@@ -84,6 +84,8 @@ namespace NMaier.SimpleDlna.GUI
       if (!string.IsNullOrWhiteSpace(Config.cache)) {
         cacheFile = new FileInfo(Config.cache);
       }
+      CreateHandle();
+      SetupServer();
     }
 
     private delegate void logDelegate(string level, string logger, string msg, string ex);
@@ -275,13 +277,11 @@ namespace NMaier.SimpleDlna.GUI
       }
     }
 
-    private void FormMain_Load(object sender, EventArgs e)
+    private void SetupServer()
     {
       httpServer = new HttpServer((int)Config.port);
-
-      Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
-
       LoadConfig();
+      Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
     }
 
     private void FormMain_Resize(object sender, EventArgs e)
