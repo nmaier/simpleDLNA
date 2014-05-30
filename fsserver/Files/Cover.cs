@@ -58,13 +58,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        if (bytes == null) {
-          ForceLoad();
-        }
-        if (bytes.Length == 0) {
+        var rv = ForceLoad();
+        if (rv == null || rv.Length == 0) {
           throw new NotSupportedException();
         }
-        return bytes;
+        return rv;
       }
     }
 
@@ -180,7 +178,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    internal void ForceLoad()
+    internal byte[] ForceLoad()
     {
       try {
         if (bytes == null) {
@@ -199,6 +197,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       catch (Exception ex) {
         Warn("Failed to load thumb for " + file.FullName, ex);
+        return null;
       }
       if (bytes == null) {
         bytes = new byte[0];
@@ -206,6 +205,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (OnCoverLazyLoaded != null) {
         OnCoverLazyLoaded(this, null);
       }
+      return bytes;
     }
 
     public int CompareTo(IMediaItem other)
@@ -227,6 +227,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       if (info == null) {
         throw new ArgumentNullException("info");
+      }
+      if (bytes == null) {
+        throw new NotSupportedException("No cover loaded");
       }
       info.AddValue("b", bytes);
       info.AddValue("w", width);

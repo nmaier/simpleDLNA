@@ -294,17 +294,19 @@ namespace NMaier.SimpleDlna.FileMediaServer
             insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
             insertData.Value = s.ToArray();
 
-            var cover = file.MaybeGetCover();
-            if (cover != null) {
-              using (var c = new MemoryStream()) {
-                formatter.Serialize(c, cover);
-                insertCover.Value = c.ToArray();
+            insertCover.Value = null;
+            try {
+              var cover = file.MaybeGetCover();
+              if (cover != null) {
+                using (var c = new MemoryStream()) {
+                  formatter.Serialize(c, cover);
+                  insertCover.Value = c.ToArray();
+                }
               }
             }
-            else {
-              insertCover.Value = null;
+            catch (NotSupportedException) {
+              // Ignore and store null.
             }
-
             try {
               insert.ExecuteNonQuery();
             }
