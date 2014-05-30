@@ -33,6 +33,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private static readonly double ChangeDeleteTime = TimeSpan.FromSeconds(2).TotalMilliseconds;
 
+    private readonly List<WeakReference> pendingFiles = new List<WeakReference>();
+
     private readonly Identifiers ids;
 
     private FileStore store = null;
@@ -239,13 +241,16 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private void Thumbnail()
     {
       if (store == null) {
+        lock (this) {
+          pendingFiles.Clear();
+        }
         return;
       }
-      IEnumerable<WeakReference> items;
-      lock (ids) {
-        items = ids.Resources.ToList();
+      lock (this) {
+        DebugFormat("Passing {0} files to background cacher", pendingFiles.Count);
+        BackgroundCacher.AddFiles(store, pendingFiles);
+        pendingFiles.Clear();
       }
-      BackgroundCacher.AddFiles(store, items);
     }
 
     internal void DelayedRescan(WatcherChangeTypes changeType)
@@ -311,11 +316,18 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (store != null) {
         item = store.MaybeGetFile(this, info, type);
         if (item != null) {
+          lock (this) {
+            pendingFiles.Add(new WeakReference(item));
+          }
           return item;
         }
       }
 
-      return BaseFile.GetFile(aParent, info, type, mediaType);
+      lock (this) {
+        var rv = BaseFile.GetFile(aParent, info, type, mediaType);
+        pendingFiles.Add(new WeakReference(rv));
+        return rv;
+      }
     }
 
     internal void UpdateFileCache(BaseFile aFile)
@@ -389,7 +401,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         store = new FileStore(info);
       }
       catch (Exception ex) {
-        Warn("FileStore is not availble; failed to load SQLite Adapter", ex);
+        Warn("FileStore is not available; failed to load SQLite Adapter", ex);
         store = null;
       }
     }
