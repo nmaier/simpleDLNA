@@ -151,7 +151,7 @@
       this.ShowIcon = false;
       this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-      this.Text = "3";
+      this.Text = "Settings";
       this.groupBox1.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)(this.numericPort)).EndInit();
       this.groupBox2.ResumeLayout(false);
