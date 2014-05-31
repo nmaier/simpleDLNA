@@ -83,7 +83,7 @@
       this.groupName.Location = new System.Drawing.Point(12, 12);
       this.groupName.Name = "groupName";
       this.groupName.Size = new System.Drawing.Size(520, 46);
-      this.groupName.TabIndex = 0;
+      this.groupName.TabIndex = 2;
       this.groupName.TabStop = false;
       this.groupName.Text = "Name";
       // 
@@ -106,7 +106,7 @@
       this.groupOrder.Location = new System.Drawing.Point(12, 64);
       this.groupOrder.Name = "groupOrder";
       this.groupOrder.Size = new System.Drawing.Size(520, 46);
-      this.groupOrder.TabIndex = 1;
+      this.groupOrder.TabIndex = 3;
       this.groupOrder.TabStop = false;
       this.groupOrder.Text = "Order";
       // 
@@ -142,7 +142,7 @@
       this.groupTypes.Location = new System.Drawing.Point(12, 116);
       this.groupTypes.Name = "groupTypes";
       this.groupTypes.Size = new System.Drawing.Size(520, 46);
-      this.groupTypes.TabIndex = 2;
+      this.groupTypes.TabIndex = 4;
       this.groupTypes.TabStop = false;
       this.groupTypes.Text = "Types";
       this.groupTypes.Validating += new System.ComponentModel.CancelEventHandler(this.checkTypes_Validating);
@@ -189,7 +189,7 @@
       this.groupDirectories.Location = new System.Drawing.Point(13, 334);
       this.groupDirectories.Name = "groupDirectories";
       this.groupDirectories.Size = new System.Drawing.Size(519, 138);
-      this.groupDirectories.TabIndex = 4;
+      this.groupDirectories.TabIndex = 6;
       this.groupDirectories.TabStop = false;
       this.groupDirectories.Text = "Directories";
       // 
@@ -199,7 +199,7 @@
       this.listDirectoriesAnchor.Location = new System.Drawing.Point(441, 74);
       this.listDirectoriesAnchor.Name = "listDirectoriesAnchor";
       this.listDirectoriesAnchor.Size = new System.Drawing.Size(0, 13);
-      this.listDirectoriesAnchor.TabIndex = 3;
+      this.listDirectoriesAnchor.TabIndex = 2;
       // 
       // buttonRemoveDirectory
       // 
@@ -218,7 +218,7 @@
       this.buttonAddDirectory.Location = new System.Drawing.Point(438, 19);
       this.buttonAddDirectory.Name = "buttonAddDirectory";
       this.buttonAddDirectory.Size = new System.Drawing.Size(75, 23);
-      this.buttonAddDirectory.TabIndex = 1;
+      this.buttonAddDirectory.TabIndex = 0;
       this.buttonAddDirectory.Text = "Add";
       this.buttonAddDirectory.UseVisualStyleBackColor = true;
       this.buttonAddDirectory.Click += new System.EventHandler(this.buttonAddDirectory_Click);
@@ -234,7 +234,7 @@
       this.listDirectories.Name = "listDirectories";
       this.listDirectories.Size = new System.Drawing.Size(429, 113);
       this.listDirectories.Sorting = System.Windows.Forms.SortOrder.Ascending;
-      this.listDirectories.TabIndex = 0;
+      this.listDirectories.TabIndex = 3;
       this.listDirectories.UseCompatibleStateImageBehavior = false;
       this.listDirectories.View = System.Windows.Forms.View.Details;
       this.listDirectories.Validating += new System.ComponentModel.CancelEventHandler(this.listDirectories_Validating);
@@ -251,7 +251,7 @@
       this.buttonCancel.Location = new System.Drawing.Point(457, 478);
       this.buttonCancel.Name = "buttonCancel";
       this.buttonCancel.Size = new System.Drawing.Size(75, 23);
-      this.buttonCancel.TabIndex = 5;
+      this.buttonCancel.TabIndex = 1;
       this.buttonCancel.Text = "&Cancel";
       this.buttonCancel.UseVisualStyleBackColor = true;
       // 
@@ -262,7 +262,7 @@
       this.buttonAccept.Location = new System.Drawing.Point(376, 478);
       this.buttonAccept.Name = "buttonAccept";
       this.buttonAccept.Size = new System.Drawing.Size(75, 23);
-      this.buttonAccept.TabIndex = 6;
+      this.buttonAccept.TabIndex = 0;
       this.buttonAccept.Text = "&OK";
       this.buttonAccept.UseVisualStyleBackColor = true;
       // 
@@ -279,7 +279,7 @@
       this.tabbedOptions.Name = "tabbedOptions";
       this.tabbedOptions.SelectedIndex = 0;
       this.tabbedOptions.Size = new System.Drawing.Size(520, 160);
-      this.tabbedOptions.TabIndex = 7;
+      this.tabbedOptions.TabIndex = 6;
       // 
       // tabPageViews
       // 
@@ -306,7 +306,7 @@
       this.comboNewView.Location = new System.Drawing.Point(6, 6);
       this.comboNewView.Name = "comboNewView";
       this.comboNewView.Size = new System.Drawing.Size(419, 21);
-      this.comboNewView.TabIndex = 12;
+      this.comboNewView.TabIndex = 0;
       // 
       // buttonViewDown
       // 
@@ -314,7 +314,7 @@
       this.buttonViewDown.Location = new System.Drawing.Point(431, 102);
       this.buttonViewDown.Name = "buttonViewDown";
       this.buttonViewDown.Size = new System.Drawing.Size(75, 23);
-      this.buttonViewDown.TabIndex = 11;
+      this.buttonViewDown.TabIndex = 4;
       this.buttonViewDown.Text = "Down";
       this.buttonViewDown.UseVisualStyleBackColor = true;
       // 
@@ -324,7 +324,7 @@
       this.buttonViewUp.Location = new System.Drawing.Point(431, 73);
       this.buttonViewUp.Name = "buttonViewUp";
       this.buttonViewUp.Size = new System.Drawing.Size(75, 23);
-      this.buttonViewUp.TabIndex = 10;
+      this.buttonViewUp.TabIndex = 3;
       this.buttonViewUp.Text = "Up";
       this.buttonViewUp.UseVisualStyleBackColor = true;
       // 
@@ -334,7 +334,7 @@
       this.buttonRemoveView.Location = new System.Drawing.Point(431, 35);
       this.buttonRemoveView.Name = "buttonRemoveView";
       this.buttonRemoveView.Size = new System.Drawing.Size(75, 23);
-      this.buttonRemoveView.TabIndex = 9;
+      this.buttonRemoveView.TabIndex = 2;
       this.buttonRemoveView.Text = "Remove";
       this.buttonRemoveView.UseVisualStyleBackColor = true;
       this.buttonRemoveView.Click += new System.EventHandler(this.buttonRemoveView_Click);
@@ -345,7 +345,7 @@
       this.buttonAddView.Location = new System.Drawing.Point(431, 6);
       this.buttonAddView.Name = "buttonAddView";
       this.buttonAddView.Size = new System.Drawing.Size(75, 23);
-      this.buttonAddView.TabIndex = 8;
+      this.buttonAddView.TabIndex = 1;
       this.buttonAddView.Text = "Add";
       this.buttonAddView.UseVisualStyleBackColor = true;
       this.buttonAddView.Click += new System.EventHandler(this.buttonAddView_Click);
@@ -362,7 +362,7 @@
       this.listViews.Location = new System.Drawing.Point(6, 33);
       this.listViews.Name = "listViews";
       this.listViews.Size = new System.Drawing.Size(419, 95);
-      this.listViews.TabIndex = 7;
+      this.listViews.TabIndex = 5;
       this.listViews.UseCompatibleStateImageBehavior = false;
       this.listViews.View = System.Windows.Forms.View.Details;
       // 
@@ -398,7 +398,7 @@
       this.textRestriction.Location = new System.Drawing.Point(6, 6);
       this.textRestriction.Name = "textRestriction";
       this.textRestriction.Size = new System.Drawing.Size(274, 20);
-      this.textRestriction.TabIndex = 14;
+      this.textRestriction.TabIndex = 0;
       // 
       // comboNewRestriction
       // 
@@ -412,7 +412,7 @@
       this.comboNewRestriction.Location = new System.Drawing.Point(305, 6);
       this.comboNewRestriction.Name = "comboNewRestriction";
       this.comboNewRestriction.Size = new System.Drawing.Size(120, 21);
-      this.comboNewRestriction.TabIndex = 13;
+      this.comboNewRestriction.TabIndex = 1;
       // 
       // listRestrictions
       // 
@@ -426,7 +426,7 @@
       this.listRestrictions.Location = new System.Drawing.Point(6, 33);
       this.listRestrictions.Name = "listRestrictions";
       this.listRestrictions.Size = new System.Drawing.Size(419, 95);
-      this.listRestrictions.TabIndex = 12;
+      this.listRestrictions.TabIndex = 4;
       this.listRestrictions.UseCompatibleStateImageBehavior = false;
       this.listRestrictions.View = System.Windows.Forms.View.Details;
       // 
@@ -446,7 +446,7 @@
       this.buttonRemoveRestriction.Location = new System.Drawing.Point(431, 35);
       this.buttonRemoveRestriction.Name = "buttonRemoveRestriction";
       this.buttonRemoveRestriction.Size = new System.Drawing.Size(75, 23);
-      this.buttonRemoveRestriction.TabIndex = 11;
+      this.buttonRemoveRestriction.TabIndex = 3;
       this.buttonRemoveRestriction.Text = "Remove";
       this.buttonRemoveRestriction.UseVisualStyleBackColor = true;
       this.buttonRemoveRestriction.Click += new System.EventHandler(this.buttonRemoveRestriction_Click);
@@ -457,7 +457,7 @@
       this.buttonAddRestriction.Location = new System.Drawing.Point(431, 6);
       this.buttonAddRestriction.Name = "buttonAddRestriction";
       this.buttonAddRestriction.Size = new System.Drawing.Size(75, 23);
-      this.buttonAddRestriction.TabIndex = 10;
+      this.buttonAddRestriction.TabIndex = 2;
       this.buttonAddRestriction.Text = "Add";
       this.buttonAddRestriction.UseVisualStyleBackColor = true;
       this.buttonAddRestriction.Click += new System.EventHandler(this.buttonAddRestriction_Click);

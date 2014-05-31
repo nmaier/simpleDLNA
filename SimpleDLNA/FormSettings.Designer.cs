@@ -49,7 +49,7 @@
       this.groupBox1.Location = new System.Drawing.Point(12, 12);
       this.groupBox1.Name = "groupBox1";
       this.groupBox1.Size = new System.Drawing.Size(260, 48);
-      this.groupBox1.TabIndex = 0;
+      this.groupBox1.TabIndex = 1;
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "Port";
       // 
@@ -75,7 +75,7 @@
       this.textCacheFile.Location = new System.Drawing.Point(6, 19);
       this.textCacheFile.Name = "textCacheFile";
       this.textCacheFile.Size = new System.Drawing.Size(167, 20);
-      this.textCacheFile.TabIndex = 0;
+      this.textCacheFile.TabIndex = 1;
       this.textCacheFile.Text = global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.cache;
       this.toolTip.SetToolTip(this.textCacheFile, "Location of the cache directory.\r\nLeave blank to use the default location (TEMP)." +
         "\r\n\r\n(Requires restart)");
@@ -87,7 +87,7 @@
       this.groupBox2.Location = new System.Drawing.Point(12, 66);
       this.groupBox2.Name = "groupBox2";
       this.groupBox2.Size = new System.Drawing.Size(260, 48);
-      this.groupBox2.TabIndex = 1;
+      this.groupBox2.TabIndex = 2;
       this.groupBox2.TabStop = false;
       this.groupBox2.Text = "Cache directory";
       // 
@@ -96,7 +96,7 @@
       this.buttonBrowseCacheFile.Location = new System.Drawing.Point(179, 17);
       this.buttonBrowseCacheFile.Name = "buttonBrowseCacheFile";
       this.buttonBrowseCacheFile.Size = new System.Drawing.Size(75, 23);
-      this.buttonBrowseCacheFile.TabIndex = 1;
+      this.buttonBrowseCacheFile.TabIndex = 0;
       this.buttonBrowseCacheFile.Text = "Browse";
       this.buttonBrowseCacheFile.UseVisualStyleBackColor = true;
       this.buttonBrowseCacheFile.Click += new System.EventHandler(this.buttonBrowseCacheFile_Click);
@@ -109,7 +109,7 @@
       this.checkStartMinimized.Location = new System.Drawing.Point(12, 143);
       this.checkStartMinimized.Name = "checkStartMinimized";
       this.checkStartMinimized.Size = new System.Drawing.Size(96, 17);
-      this.checkStartMinimized.TabIndex = 3;
+      this.checkStartMinimized.TabIndex = 4;
       this.checkStartMinimized.Text = "Start minimized";
       this.checkStartMinimized.UseVisualStyleBackColor = true;
       // 
@@ -121,7 +121,7 @@
       this.checkFileLogging.Location = new System.Drawing.Point(12, 120);
       this.checkFileLogging.Name = "checkFileLogging";
       this.checkFileLogging.Size = new System.Drawing.Size(182, 17);
-      this.checkFileLogging.TabIndex = 2;
+      this.checkFileLogging.TabIndex = 3;
       this.checkFileLogging.Text = "Log diagnostic messages to a file";
       this.checkFileLogging.UseVisualStyleBackColor = true;
       // 
@@ -132,7 +132,7 @@
       this.buttonOK.Location = new System.Drawing.Point(197, 166);
       this.buttonOK.Name = "buttonOK";
       this.buttonOK.Size = new System.Drawing.Size(75, 23);
-      this.buttonOK.TabIndex = 4;
+      this.buttonOK.TabIndex = 0;
       this.buttonOK.Text = "OK";
       this.buttonOK.UseVisualStyleBackColor = true;
       // 

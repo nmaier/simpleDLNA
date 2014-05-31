@@ -89,7 +89,7 @@
       this.listDescriptions.Name = "listDescriptions";
       this.listDescriptions.Size = new System.Drawing.Size(599, 184);
       this.listDescriptions.SmallImageList = this.listImages;
-      this.listDescriptions.TabIndex = 0;
+      this.listDescriptions.TabIndex = 5;
       this.listDescriptions.UseCompatibleStateImageBehavior = false;
       this.listDescriptions.View = System.Windows.Forms.View.Details;
       this.listDescriptions.SelectedIndexChanged += new System.EventHandler(this.ListDescriptions_SelectedIndexChanged);
@@ -119,7 +119,7 @@
       this.buttonNewServer.Location = new System.Drawing.Point(536, 217);
       this.buttonNewServer.Name = "buttonNewServer";
       this.buttonNewServer.Size = new System.Drawing.Size(75, 23);
-      this.buttonNewServer.TabIndex = 1;
+      this.buttonNewServer.TabIndex = 0;
       this.buttonNewServer.Text = "New Server";
       this.buttonNewServer.UseVisualStyleBackColor = true;
       this.buttonNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
@@ -143,7 +143,7 @@
       this.buttonStartStop.Location = new System.Drawing.Point(12, 217);
       this.buttonStartStop.Name = "buttonStartStop";
       this.buttonStartStop.Size = new System.Drawing.Size(75, 23);
-      this.buttonStartStop.TabIndex = 3;
+      this.buttonStartStop.TabIndex = 1;
       this.buttonStartStop.Text = "Start/Stop";
       this.buttonStartStop.UseVisualStyleBackColor = true;
       this.buttonStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
@@ -155,7 +155,7 @@
       this.buttonRemove.Location = new System.Drawing.Point(174, 217);
       this.buttonRemove.Name = "buttonRemove";
       this.buttonRemove.Size = new System.Drawing.Size(75, 23);
-      this.buttonRemove.TabIndex = 4;
+      this.buttonRemove.TabIndex = 3;
       this.buttonRemove.Text = "Remove";
       this.buttonRemove.UseVisualStyleBackColor = true;
       this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
@@ -201,7 +201,7 @@
       this.mainMenu.Location = new System.Drawing.Point(0, 0);
       this.mainMenu.Name = "mainMenu";
       this.mainMenu.Size = new System.Drawing.Size(623, 24);
-      this.mainMenu.TabIndex = 7;
+      this.mainMenu.TabIndex = 6;
       this.mainMenu.Text = "menuStrip1";
       // 
       // fileToolStripMenuItem
@@ -307,7 +307,7 @@
       this.logger.Name = "logger";
       this.logger.Size = new System.Drawing.Size(599, 148);
       this.logger.SmallImageList = this.listImages;
-      this.logger.TabIndex = 8;
+      this.logger.TabIndex = 7;
       this.logger.UseCompatibleStateImageBehavior = false;
       this.logger.View = System.Windows.Forms.View.Details;
       // 
@@ -332,7 +332,7 @@
       this.buttonRescan.Location = new System.Drawing.Point(255, 217);
       this.buttonRescan.Name = "buttonRescan";
       this.buttonRescan.Size = new System.Drawing.Size(75, 23);
-      this.buttonRescan.TabIndex = 9;
+      this.buttonRescan.TabIndex = 4;
       this.buttonRescan.Text = "Rescan";
       this.buttonRescan.UseVisualStyleBackColor = true;
       this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
