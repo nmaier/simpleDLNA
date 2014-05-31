@@ -41,6 +41,13 @@
       this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colDirectories = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+      this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+      this.ctxStartStop = new System.Windows.Forms.ToolStripMenuItem();
+      this.ctxEdit = new System.Windows.Forms.ToolStripMenuItem();
+      this.ctxRemove = new System.Windows.Forms.ToolStripMenuItem();
+      this.ctxRescan = new System.Windows.Forms.ToolStripMenuItem();
+      this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+      this.ctxNewServer = new System.Windows.Forms.ToolStripMenuItem();
       this.listImages = new System.Windows.Forms.ImageList(this.components);
       this.buttonNewServer = new System.Windows.Forms.Button();
       this.buttonEdit = new System.Windows.Forms.Button();
@@ -53,6 +60,7 @@
       this.exitContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.mainMenu = new System.Windows.Forms.MenuStrip();
       this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.newServerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
       this.openInBrowserToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,6 +77,7 @@
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.buttonRescan = new System.Windows.Forms.Button();
+      this.contextMenu.SuspendLayout();
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -82,17 +91,19 @@
             this.colName,
             this.colDirectories,
             this.colActive});
+      this.listDescriptions.ContextMenuStrip = this.contextMenu;
       this.listDescriptions.FullRowSelect = true;
       this.listDescriptions.HideSelection = false;
-      this.listDescriptions.Location = new System.Drawing.Point(12, 27);
+      this.listDescriptions.Location = new System.Drawing.Point(14, 31);
       this.listDescriptions.MultiSelect = false;
       this.listDescriptions.Name = "listDescriptions";
-      this.listDescriptions.Size = new System.Drawing.Size(599, 184);
+      this.listDescriptions.Size = new System.Drawing.Size(698, 212);
       this.listDescriptions.SmallImageList = this.listImages;
       this.listDescriptions.TabIndex = 5;
       this.listDescriptions.UseCompatibleStateImageBehavior = false;
       this.listDescriptions.View = System.Windows.Forms.View.Details;
       this.listDescriptions.SelectedIndexChanged += new System.EventHandler(this.ListDescriptions_SelectedIndexChanged);
+      this.listDescriptions.DoubleClick += new System.EventHandler(this.listDescriptions_DoubleClick);
       // 
       // colName
       // 
@@ -107,6 +118,63 @@
       // 
       this.colActive.Text = "Active";
       // 
+      // contextMenu
+      // 
+      this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.ctxStartStop,
+            this.ctxEdit,
+            this.ctxRemove,
+            this.ctxRescan,
+            this.toolStripMenuItem5,
+            this.ctxNewServer});
+      this.contextMenu.Name = "contextMenu";
+      this.contextMenu.Size = new System.Drawing.Size(134, 120);
+      // 
+      // ctxStartStop
+      // 
+      this.ctxStartStop.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.active;
+      this.ctxStartStop.Name = "ctxStartStop";
+      this.ctxStartStop.Size = new System.Drawing.Size(133, 22);
+      this.ctxStartStop.Text = "Start/Stop";
+      this.ctxStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
+      // 
+      // ctxEdit
+      // 
+      this.ctxEdit.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.edit;
+      this.ctxEdit.Name = "ctxEdit";
+      this.ctxEdit.Size = new System.Drawing.Size(133, 22);
+      this.ctxEdit.Text = "Edit";
+      this.ctxEdit.Click += new System.EventHandler(this.ButtonEdit_Click);
+      // 
+      // ctxRemove
+      // 
+      this.ctxRemove.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.remove;
+      this.ctxRemove.Name = "ctxRemove";
+      this.ctxRemove.Size = new System.Drawing.Size(133, 22);
+      this.ctxRemove.Text = "Remove";
+      this.ctxRemove.Click += new System.EventHandler(this.buttonRemove_Click);
+      // 
+      // ctxRescan
+      // 
+      this.ctxRescan.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.refreshing;
+      this.ctxRescan.Name = "ctxRescan";
+      this.ctxRescan.Size = new System.Drawing.Size(133, 22);
+      this.ctxRescan.Text = "Rescan";
+      this.ctxRescan.Click += new System.EventHandler(this.buttonRescan_Click);
+      // 
+      // toolStripMenuItem5
+      // 
+      this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+      this.toolStripMenuItem5.Size = new System.Drawing.Size(130, 6);
+      // 
+      // ctxNewServer
+      // 
+      this.ctxNewServer.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.add;
+      this.ctxNewServer.Name = "ctxNewServer";
+      this.ctxNewServer.Size = new System.Drawing.Size(133, 22);
+      this.ctxNewServer.Text = "New Server";
+      this.ctxNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
+      // 
       // listImages
       // 
       this.listImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
@@ -116,11 +184,13 @@
       // buttonNewServer
       // 
       this.buttonNewServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonNewServer.Location = new System.Drawing.Point(536, 217);
+      this.buttonNewServer.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.add;
+      this.buttonNewServer.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      this.buttonNewServer.Location = new System.Drawing.Point(625, 250);
       this.buttonNewServer.Name = "buttonNewServer";
-      this.buttonNewServer.Size = new System.Drawing.Size(75, 23);
+      this.buttonNewServer.Size = new System.Drawing.Size(87, 27);
       this.buttonNewServer.TabIndex = 0;
-      this.buttonNewServer.Text = "New Server";
+      this.buttonNewServer.Text = "New";
       this.buttonNewServer.UseVisualStyleBackColor = true;
       this.buttonNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
       // 
@@ -128,9 +198,11 @@
       // 
       this.buttonEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonEdit.Enabled = false;
-      this.buttonEdit.Location = new System.Drawing.Point(93, 217);
+      this.buttonEdit.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.edit;
+      this.buttonEdit.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      this.buttonEdit.Location = new System.Drawing.Point(108, 250);
       this.buttonEdit.Name = "buttonEdit";
-      this.buttonEdit.Size = new System.Drawing.Size(75, 23);
+      this.buttonEdit.Size = new System.Drawing.Size(87, 27);
       this.buttonEdit.TabIndex = 2;
       this.buttonEdit.Text = "Edit";
       this.buttonEdit.UseVisualStyleBackColor = true;
@@ -140,11 +212,13 @@
       // 
       this.buttonStartStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonStartStop.Enabled = false;
-      this.buttonStartStop.Location = new System.Drawing.Point(12, 217);
+      this.buttonStartStop.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.active;
+      this.buttonStartStop.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      this.buttonStartStop.Location = new System.Drawing.Point(14, 250);
       this.buttonStartStop.Name = "buttonStartStop";
-      this.buttonStartStop.Size = new System.Drawing.Size(75, 23);
+      this.buttonStartStop.Size = new System.Drawing.Size(87, 27);
       this.buttonStartStop.TabIndex = 1;
-      this.buttonStartStop.Text = "Start/Stop";
+      this.buttonStartStop.Text = "Start";
       this.buttonStartStop.UseVisualStyleBackColor = true;
       this.buttonStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
       // 
@@ -152,9 +226,11 @@
       // 
       this.buttonRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonRemove.Enabled = false;
-      this.buttonRemove.Location = new System.Drawing.Point(174, 217);
+      this.buttonRemove.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.remove;
+      this.buttonRemove.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      this.buttonRemove.Location = new System.Drawing.Point(203, 250);
       this.buttonRemove.Name = "buttonRemove";
-      this.buttonRemove.Size = new System.Drawing.Size(75, 23);
+      this.buttonRemove.Size = new System.Drawing.Size(87, 27);
       this.buttonRemove.TabIndex = 3;
       this.buttonRemove.Text = "Remove";
       this.buttonRemove.UseVisualStyleBackColor = true;
@@ -200,13 +276,15 @@
             this.helpToolStripMenuItem});
       this.mainMenu.Location = new System.Drawing.Point(0, 0);
       this.mainMenu.Name = "mainMenu";
-      this.mainMenu.Size = new System.Drawing.Size(623, 24);
+      this.mainMenu.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
+      this.mainMenu.Size = new System.Drawing.Size(727, 24);
       this.mainMenu.TabIndex = 6;
       this.mainMenu.Text = "menuStrip1";
       // 
       // fileToolStripMenuItem
       // 
       this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newServerToolStripMenuItem,
             this.settingsToolStripMenuItem,
             this.toolStripMenuItem2,
             this.openInBrowserToolStripMenuItem,
@@ -219,8 +297,17 @@
       this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
       this.fileToolStripMenuItem.Text = "&File";
       // 
+      // newServerToolStripMenuItem
+      // 
+      this.newServerToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.add;
+      this.newServerToolStripMenuItem.Name = "newServerToolStripMenuItem";
+      this.newServerToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+      this.newServerToolStripMenuItem.Text = "New Server";
+      this.newServerToolStripMenuItem.Click += new System.EventHandler(this.ButtonNewServer_Click);
+      // 
       // settingsToolStripMenuItem
       // 
+      this.settingsToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.preferences;
       this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
       this.settingsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.settingsToolStripMenuItem.Text = "Settings";
@@ -233,6 +320,7 @@
       // 
       // openInBrowserToolStripMenuItem
       // 
+      this.openInBrowserToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.go;
       this.openInBrowserToolStripMenuItem.Name = "openInBrowserToolStripMenuItem";
       this.openInBrowserToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.openInBrowserToolStripMenuItem.Text = "Open in Browser";
@@ -245,6 +333,7 @@
       // 
       // dropCacheToolStripMenuItem
       // 
+      this.dropCacheToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.delete;
       this.dropCacheToolStripMenuItem.Name = "dropCacheToolStripMenuItem";
       this.dropCacheToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.dropCacheToolStripMenuItem.Text = "Drop cache";
@@ -264,6 +353,7 @@
       // 
       // exitToolStripMenuItem
       // 
+      this.exitToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.close;
       this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
       this.exitToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.exitToolStripMenuItem.Text = "&Exit";
@@ -280,6 +370,7 @@
       // 
       // homepageToolStripMenuItem
       // 
+      this.homepageToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.homepage;
       this.homepageToolStripMenuItem.Name = "homepageToolStripMenuItem";
       this.homepageToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
       this.homepageToolStripMenuItem.Text = "Homepage";
@@ -287,6 +378,7 @@
       // 
       // aboutToolStripMenuItem
       // 
+      this.aboutToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.about;
       this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
       this.aboutToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
       this.aboutToolStripMenuItem.Text = "About";
@@ -302,10 +394,10 @@
             this.colLogMessage});
       this.logger.FullRowSelect = true;
       this.logger.HideSelection = false;
-      this.logger.Location = new System.Drawing.Point(12, 246);
+      this.logger.Location = new System.Drawing.Point(14, 284);
       this.logger.MultiSelect = false;
       this.logger.Name = "logger";
-      this.logger.Size = new System.Drawing.Size(599, 148);
+      this.logger.Size = new System.Drawing.Size(698, 170);
       this.logger.SmallImageList = this.listImages;
       this.logger.TabIndex = 7;
       this.logger.UseCompatibleStateImageBehavior = false;
@@ -329,9 +421,11 @@
       // 
       this.buttonRescan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonRescan.Enabled = false;
-      this.buttonRescan.Location = new System.Drawing.Point(255, 217);
+      this.buttonRescan.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.refreshing;
+      this.buttonRescan.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+      this.buttonRescan.Location = new System.Drawing.Point(297, 250);
       this.buttonRescan.Name = "buttonRescan";
-      this.buttonRescan.Size = new System.Drawing.Size(75, 23);
+      this.buttonRescan.Size = new System.Drawing.Size(87, 27);
       this.buttonRescan.TabIndex = 4;
       this.buttonRescan.Text = "Rescan";
       this.buttonRescan.UseVisualStyleBackColor = true;
@@ -339,9 +433,9 @@
       // 
       // FormMain
       // 
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(623, 406);
+      this.ClientSize = new System.Drawing.Size(727, 468);
       this.Controls.Add(this.buttonRescan);
       this.Controls.Add(this.logger);
       this.Controls.Add(this.mainMenu);
@@ -358,6 +452,7 @@
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormMain_FormClosing);
       this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
       this.Resize += new System.EventHandler(this.FormMain_Resize);
+      this.contextMenu.ResumeLayout(false);
       this.notifyContext.ResumeLayout(false);
       this.mainMenu.ResumeLayout(false);
       this.mainMenu.PerformLayout();
@@ -400,6 +495,14 @@
     private System.Windows.Forms.ToolStripMenuItem dropCacheToolStripMenuItem;
     private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
     private System.Windows.Forms.ToolStripMenuItem homepageToolStripMenuItem;
+    private System.Windows.Forms.ContextMenuStrip contextMenu;
+    private System.Windows.Forms.ToolStripMenuItem ctxStartStop;
+    private System.Windows.Forms.ToolStripMenuItem ctxEdit;
+    private System.Windows.Forms.ToolStripMenuItem ctxRemove;
+    private System.Windows.Forms.ToolStripMenuItem ctxRescan;
+    private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
+    private System.Windows.Forms.ToolStripMenuItem ctxNewServer;
+    private System.Windows.Forms.ToolStripMenuItem newServerToolStripMenuItem;
   }
 }
 

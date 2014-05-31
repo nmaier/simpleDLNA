@@ -46,9 +46,9 @@
       // groupBox1
       // 
       this.groupBox1.Controls.Add(this.numericPort);
-      this.groupBox1.Location = new System.Drawing.Point(12, 12);
+      this.groupBox1.Location = new System.Drawing.Point(14, 14);
       this.groupBox1.Name = "groupBox1";
-      this.groupBox1.Size = new System.Drawing.Size(260, 48);
+      this.groupBox1.Size = new System.Drawing.Size(303, 55);
       this.groupBox1.TabIndex = 1;
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "Port";
@@ -56,14 +56,14 @@
       // numericPort
       // 
       this.numericPort.DataBindings.Add(new System.Windows.Forms.Binding("Value", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "port", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-      this.numericPort.Location = new System.Drawing.Point(6, 19);
+      this.numericPort.Location = new System.Drawing.Point(7, 22);
       this.numericPort.Maximum = new decimal(new int[] {
             65535,
             0,
             0,
             0});
       this.numericPort.Name = "numericPort";
-      this.numericPort.Size = new System.Drawing.Size(69, 20);
+      this.numericPort.Size = new System.Drawing.Size(80, 23);
       this.numericPort.TabIndex = 0;
       this.toolTip.SetToolTip(this.numericPort, "Port of the http server.\r\nLeave at 0 to automatically have a port selected on sta" +
         "rtup.\r\n\r\n(Requires restart)");
@@ -72,9 +72,9 @@
       // textCacheFile
       // 
       this.textCacheFile.DataBindings.Add(new System.Windows.Forms.Binding("Text", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "cache", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-      this.textCacheFile.Location = new System.Drawing.Point(6, 19);
+      this.textCacheFile.Location = new System.Drawing.Point(7, 22);
       this.textCacheFile.Name = "textCacheFile";
-      this.textCacheFile.Size = new System.Drawing.Size(167, 20);
+      this.textCacheFile.Size = new System.Drawing.Size(194, 23);
       this.textCacheFile.TabIndex = 1;
       this.textCacheFile.Text = global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.cache;
       this.toolTip.SetToolTip(this.textCacheFile, "Location of the cache directory.\r\nLeave blank to use the default location (TEMP)." +
@@ -84,18 +84,18 @@
       // 
       this.groupBox2.Controls.Add(this.buttonBrowseCacheFile);
       this.groupBox2.Controls.Add(this.textCacheFile);
-      this.groupBox2.Location = new System.Drawing.Point(12, 66);
+      this.groupBox2.Location = new System.Drawing.Point(14, 76);
       this.groupBox2.Name = "groupBox2";
-      this.groupBox2.Size = new System.Drawing.Size(260, 48);
+      this.groupBox2.Size = new System.Drawing.Size(303, 55);
       this.groupBox2.TabIndex = 2;
       this.groupBox2.TabStop = false;
       this.groupBox2.Text = "Cache directory";
       // 
       // buttonBrowseCacheFile
       // 
-      this.buttonBrowseCacheFile.Location = new System.Drawing.Point(179, 17);
+      this.buttonBrowseCacheFile.Location = new System.Drawing.Point(209, 20);
       this.buttonBrowseCacheFile.Name = "buttonBrowseCacheFile";
-      this.buttonBrowseCacheFile.Size = new System.Drawing.Size(75, 23);
+      this.buttonBrowseCacheFile.Size = new System.Drawing.Size(87, 27);
       this.buttonBrowseCacheFile.TabIndex = 0;
       this.buttonBrowseCacheFile.Text = "Browse";
       this.buttonBrowseCacheFile.UseVisualStyleBackColor = true;
@@ -106,9 +106,9 @@
       this.checkStartMinimized.AutoSize = true;
       this.checkStartMinimized.Checked = global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.startminimized;
       this.checkStartMinimized.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "startminimized", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-      this.checkStartMinimized.Location = new System.Drawing.Point(12, 143);
+      this.checkStartMinimized.Location = new System.Drawing.Point(14, 165);
       this.checkStartMinimized.Name = "checkStartMinimized";
-      this.checkStartMinimized.Size = new System.Drawing.Size(96, 17);
+      this.checkStartMinimized.Size = new System.Drawing.Size(109, 19);
       this.checkStartMinimized.TabIndex = 4;
       this.checkStartMinimized.Text = "Start minimized";
       this.checkStartMinimized.UseVisualStyleBackColor = true;
@@ -118,9 +118,9 @@
       this.checkFileLogging.AutoSize = true;
       this.checkFileLogging.Checked = global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.filelogging;
       this.checkFileLogging.DataBindings.Add(new System.Windows.Forms.Binding("Checked", global::NMaier.SimpleDlna.GUI.Properties.Settings.Default, "filelogging", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
-      this.checkFileLogging.Location = new System.Drawing.Point(12, 120);
+      this.checkFileLogging.Location = new System.Drawing.Point(14, 138);
       this.checkFileLogging.Name = "checkFileLogging";
-      this.checkFileLogging.Size = new System.Drawing.Size(182, 17);
+      this.checkFileLogging.Size = new System.Drawing.Size(200, 19);
       this.checkFileLogging.TabIndex = 3;
       this.checkFileLogging.Text = "Log diagnostic messages to a file";
       this.checkFileLogging.UseVisualStyleBackColor = true;
@@ -129,9 +129,9 @@
       // 
       this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.buttonOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.buttonOK.Location = new System.Drawing.Point(197, 166);
+      this.buttonOK.Location = new System.Drawing.Point(230, 192);
       this.buttonOK.Name = "buttonOK";
-      this.buttonOK.Size = new System.Drawing.Size(75, 23);
+      this.buttonOK.Size = new System.Drawing.Size(87, 27);
       this.buttonOK.TabIndex = 0;
       this.buttonOK.Text = "OK";
       this.buttonOK.UseVisualStyleBackColor = true;
@@ -139,16 +139,16 @@
       // FormSettings
       // 
       this.AcceptButton = this.buttonOK;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(284, 201);
+      this.ClientSize = new System.Drawing.Size(331, 232);
       this.Controls.Add(this.buttonOK);
       this.Controls.Add(this.checkFileLogging);
       this.Controls.Add(this.checkStartMinimized);
       this.Controls.Add(this.groupBox2);
       this.Controls.Add(this.groupBox1);
+      this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
       this.Name = "FormSettings";
-      this.ShowIcon = false;
       this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
       this.Text = "Settings";

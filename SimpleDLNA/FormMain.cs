@@ -19,7 +19,7 @@ using System.Xml.Serialization;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  public partial class FormMain : Form, IAppender, IDisposable
+  public partial class FormMain : NMaier.Windows.Forms.Form, IAppender, IDisposable
   {
     private const string descriptorFile = "descriptors.xml";
 
@@ -61,15 +61,16 @@ namespace NMaier.SimpleDlna.GUI
       };
 
       InitializeComponent();
-      SetFlatStyle(this);
 
-      listImages.Images.Add("server", Properties.Resources.server);
+      listImages.Images.Add("idle", Properties.Resources.idle);
       listImages.Images.Add("active", Properties.Resources.active);
       listImages.Images.Add("inactive", Properties.Resources.inactive);
       listImages.Images.Add("refreshing", Properties.Resources.refreshing);
+      listImages.Images.Add("loading", Properties.Resources.loading);
       listImages.Images.Add("info", Properties.Resources.info);
       listImages.Images.Add("warn", Properties.Resources.warn);
       listImages.Images.Add("error", Properties.Resources.error);
+      listImages.Images.Add("server", Properties.Resources.server.ToBitmap());
 
       appenderTimer.Elapsed += (s, e) =>
       {
@@ -89,25 +90,6 @@ namespace NMaier.SimpleDlna.GUI
       }
       CreateHandle();
       SetupServer();
-    }
-
-    public static void SetFlatStyle(object control)
-    {
-      var f = control as Form;
-      if (f != null) {
-        f.Font = SystemFonts.MessageBoxFont;
-      }
-      var t = control.GetType();
-      var p = t.GetProperty("FlatStyle", typeof(FlatStyle));
-      if (p != null && p.CanWrite) {
-        p.SetValue(control, FlatStyle.System, null);
-      }
-      var ctrl = control as Control;
-      if (ctrl != null) {
-        foreach (var sc in ctrl.Controls) {
-          SetFlatStyle(sc);
-        }
-      }
     }
 
     private delegate void logDelegate(string level, string logger, string msg, string ex);
@@ -242,7 +224,12 @@ namespace NMaier.SimpleDlna.GUI
         BeginInvoke((Action)(() =>
         {
           SaveConfig();
-          buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
+          ctxStartStop.Text = buttonStartStop.Text =
+            item.Description.Active ? "Stop" : "Start";
+          ctxStartStop.Image = buttonStartStop.Image =
+            item.Description.Active ?
+            Properties.Resources.inactive :
+            Properties.Resources.active;
         }));
       });
     }
@@ -328,14 +315,21 @@ namespace NMaier.SimpleDlna.GUI
     private void ListDescriptions_SelectedIndexChanged(object sender, EventArgs e)
     {
       var enable = listDescriptions.SelectedItems.Count != 0;
-      buttonStartStop.Enabled = buttonRemove.Enabled = buttonEdit.Enabled = enable;
+      ctxStartStop.Enabled = ctxRemove.Enabled = ctxEdit.Enabled =
+        buttonStartStop.Enabled = buttonRemove.Enabled = buttonEdit.Enabled =
+        enable;
       if (enable) {
         var item = (listDescriptions.SelectedItems[0] as ServerListViewItem);
-        buttonStartStop.Text = item.Description.Active ? "Stop" : "Start";
-        buttonRescan.Enabled = item.Description.Active;
+        ctxStartStop.Text = buttonStartStop.Text =
+          item.Description.Active ? "Stop" : "Start";
+        ctxStartStop.Image = buttonStartStop.Image =
+          item.Description.Active ?
+          Properties.Resources.inactive :
+          Properties.Resources.active;
+        ctxRescan.Enabled = buttonRescan.Enabled = item.Description.Active;
       }
       else {
-        buttonRescan.Enabled = false;
+        ctxRescan.Enabled = buttonRescan.Enabled = false;
       }
     }
 
@@ -347,7 +341,7 @@ namespace NMaier.SimpleDlna.GUI
       Task.Factory.StartNew(() =>
       {
         var po = new ParallelOptions() {
-          MaxDegreeOfParallelism = Math.Min(4, Environment.ProcessorCount)
+          MaxDegreeOfParallelism = Math.Min(3, Environment.ProcessorCount)
         };
         Parallel.ForEach(descs, po, i =>
         {
@@ -384,6 +378,9 @@ namespace NMaier.SimpleDlna.GUI
       Show();
       WindowState = FormWindowState.Normal;
       ShowInTaskbar = true;
+      if (logger != null && logger.Items.Count > 0) {
+        logger.EnsureVisible(logger.Items.Count - 1);
+      }
     }
 
     private void openInBrowserToolStripMenuItem_Click(object sender, EventArgs e)
@@ -568,6 +565,16 @@ namespace NMaier.SimpleDlna.GUI
       public string Message;
 
       public string Time;
+    }
+
+    private void listDescriptions_DoubleClick(object sender, EventArgs e)
+    {
+      if (buttonEdit.Enabled) {
+        ButtonEdit_Click(sender, e);
+      }
+      else {
+        ButtonNewServer_Click(sender, e);
+      }
     }
   }
 }

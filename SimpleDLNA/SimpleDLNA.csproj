@@ -125,7 +125,6 @@
     <Compile Include="ServerDescription.cs" />
     <Compile Include="ServerListViewItem.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="ToolStripRealSystemRenderer.cs" />
     <EmbeddedResource Include="FormAbout.resx">
       <DependentUpon>FormAbout.cs</DependentUpon>
     </EmbeddedResource>
@@ -171,6 +170,18 @@
     <None Include="Resources\error.png" />
     <None Include="Resources\info.png" />
     <None Include="Resources\warn.png" />
+    <None Include="Resources\idle.png" />
+    <None Include="Resources\about.png" />
+    <None Include="Resources\close.png" />
+    <None Include="Resources\add.png" />
+    <Content Include="Resources\delete.png" />
+    <None Include="Resources\homepage.png" />
+    <None Include="Resources\go.png" />
+    <None Include="Resources\edit.png" />
+    <Content Include="Resources\loading.png" />
+    <None Include="Resources\preferences.ico" />
+    <Content Include="Resources\preferences.png" />
+    <None Include="Resources\remove.png" />
     <Content Include="sdlna.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -199,6 +210,10 @@
     <ProjectReference Include="..\fsserver\fsserver.csproj">
       <Project>{50E06B21-E11A-42F0-81E2-0911E771E861}</Project>
       <Name>fsserver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NMaier.Windows.Forms\NMaier.Windows.Forms.csproj">
+      <Project>{56667283-ebcd-4d63-bf61-ff319cb28a0b}</Project>
+      <Name>NMaier.Windows.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\server\server.csproj">
       <Project>{232A96F6-A2BF-44C8-B623-6E411F6296F2}</Project>

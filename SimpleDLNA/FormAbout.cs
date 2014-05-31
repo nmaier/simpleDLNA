@@ -6,18 +6,17 @@ using System.Windows.Forms;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  partial class FormAbout : Form
+  partial class FormAbout : NMaier.Windows.Forms.Form
   {
     public FormAbout()
     {
       InitializeComponent();
-      FormMain.SetFlatStyle(this);
       Text = String.Format("About {0}", ProductInformation.Title);
       Product.Text = ProductInformation.Title;
-      Product.Font = new Font(SystemFonts.MessageBoxFont, FontStyle.Bold);
+      Product.Font = BoldFont;
       Version.Text = String.Format("Version {0}", ProductInformation.ProductVersion);
       Copyright.Text = ProductInformation.Copyright;
-      Copyright.Font = new Font(SystemFonts.MessageBoxFont, FontStyle.Italic);
+      Copyright.Font = ItalicFont;
       License.Text = Encoding.UTF8.GetString(Properties.Resources.LICENSE);
     }
   }

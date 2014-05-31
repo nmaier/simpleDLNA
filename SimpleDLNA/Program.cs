@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NMaier.Windows.Forms;
+using System;
 using System.IO.Pipes;
 using System.Threading;
 using System.Windows.Forms;
@@ -26,12 +27,6 @@ namespace NMaier.SimpleDlna.GUI
         }
         GC.Collect();
 #endif
-
-        Application.EnableVisualStyles();
-        Application.VisualStyleState = VisualStyleState.ClientAndNonClientAreasEnabled;
-        Application.SetCompatibleTextRenderingDefault(false);
-        ToolStripManager.VisualStylesEnabled = true;
-        ToolStripManager.Renderer = new ToolStripRealSystemRenderer();
 
         using (var main = new FormMain()) {
           try {

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  internal partial class FormServer : Form
+  internal partial class FormServer : NMaier.Windows.Forms.Form
   {
     public FormServer()
     {
@@ -20,7 +20,6 @@ namespace NMaier.SimpleDlna.GUI
       SizeDirectoryColumn();
       SizeColumns(listViews);
       SizeColumns(listRestrictions);
-      FormMain.SetFlatStyle(this);
     }
 
     public FormServer(ServerDescription description)

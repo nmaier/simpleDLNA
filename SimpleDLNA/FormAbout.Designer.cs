@@ -49,7 +49,7 @@
       this.tableLayoutPanel.Controls.Add(this.License, 1, 4);
       this.tableLayoutPanel.Controls.Add(this.okButton, 1, 5);
       this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.tableLayoutPanel.Location = new System.Drawing.Point(9, 9);
+      this.tableLayoutPanel.Location = new System.Drawing.Point(10, 10);
       this.tableLayoutPanel.Name = "tableLayoutPanel";
       this.tableLayoutPanel.RowCount = 6;
       this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
@@ -58,7 +58,7 @@
       this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
       this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
       this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-      this.tableLayoutPanel.Size = new System.Drawing.Size(417, 265);
+      this.tableLayoutPanel.Size = new System.Drawing.Size(487, 307);
       this.tableLayoutPanel.TabIndex = 0;
       // 
       // logoPictureBox
@@ -68,18 +68,18 @@
       this.logoPictureBox.Location = new System.Drawing.Point(3, 3);
       this.logoPictureBox.Name = "logoPictureBox";
       this.tableLayoutPanel.SetRowSpan(this.logoPictureBox, 6);
-      this.logoPictureBox.Size = new System.Drawing.Size(131, 259);
+      this.logoPictureBox.Size = new System.Drawing.Size(154, 301);
       this.logoPictureBox.TabIndex = 12;
       this.logoPictureBox.TabStop = false;
       // 
       // Product
       // 
       this.Product.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.Product.Location = new System.Drawing.Point(143, 0);
-      this.Product.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
-      this.Product.MaximumSize = new System.Drawing.Size(0, 17);
+      this.Product.Location = new System.Drawing.Point(167, 0);
+      this.Product.Margin = new System.Windows.Forms.Padding(7, 0, 3, 0);
+      this.Product.MaximumSize = new System.Drawing.Size(0, 20);
       this.Product.Name = "Product";
-      this.Product.Size = new System.Drawing.Size(271, 17);
+      this.Product.Size = new System.Drawing.Size(317, 20);
       this.Product.TabIndex = 19;
       this.Product.Text = "Product Name";
       this.Product.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -87,11 +87,11 @@
       // Version
       // 
       this.Version.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.Version.Location = new System.Drawing.Point(143, 26);
-      this.Version.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
-      this.Version.MaximumSize = new System.Drawing.Size(0, 17);
+      this.Version.Location = new System.Drawing.Point(167, 30);
+      this.Version.Margin = new System.Windows.Forms.Padding(7, 0, 3, 0);
+      this.Version.MaximumSize = new System.Drawing.Size(0, 20);
       this.Version.Name = "Version";
-      this.Version.Size = new System.Drawing.Size(271, 17);
+      this.Version.Size = new System.Drawing.Size(317, 20);
       this.Version.TabIndex = 0;
       this.Version.Text = "Version";
       this.Version.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -99,11 +99,11 @@
       // Copyright
       // 
       this.Copyright.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.Copyright.Location = new System.Drawing.Point(143, 52);
-      this.Copyright.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
-      this.Copyright.MaximumSize = new System.Drawing.Size(0, 17);
+      this.Copyright.Location = new System.Drawing.Point(167, 60);
+      this.Copyright.Margin = new System.Windows.Forms.Padding(7, 0, 3, 0);
+      this.Copyright.MaximumSize = new System.Drawing.Size(0, 20);
       this.Copyright.Name = "Copyright";
-      this.Copyright.Size = new System.Drawing.Size(271, 17);
+      this.Copyright.Size = new System.Drawing.Size(317, 20);
       this.Copyright.TabIndex = 21;
       this.Copyright.Text = "Copyright";
       this.Copyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -113,13 +113,13 @@
       this.License.AcceptsReturn = true;
       this.License.AcceptsTab = true;
       this.License.Dock = System.Windows.Forms.DockStyle.Fill;
-      this.License.Location = new System.Drawing.Point(143, 107);
-      this.License.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
+      this.License.Location = new System.Drawing.Point(167, 123);
+      this.License.Margin = new System.Windows.Forms.Padding(7, 3, 3, 3);
       this.License.Multiline = true;
       this.License.Name = "License";
       this.License.ReadOnly = true;
       this.License.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-      this.License.Size = new System.Drawing.Size(271, 126);
+      this.License.Size = new System.Drawing.Size(317, 147);
       this.License.TabIndex = 23;
       this.License.TabStop = false;
       this.License.Text = "Description";
@@ -128,24 +128,24 @@
       // 
       this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.okButton.Location = new System.Drawing.Point(339, 239);
+      this.okButton.Location = new System.Drawing.Point(397, 277);
       this.okButton.Name = "okButton";
-      this.okButton.Size = new System.Drawing.Size(75, 23);
+      this.okButton.Size = new System.Drawing.Size(87, 27);
       this.okButton.TabIndex = 24;
       this.okButton.Text = "&OK";
       // 
       // FormAbout
       // 
       this.AcceptButton = this.okButton;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(435, 283);
+      this.ClientSize = new System.Drawing.Size(507, 327);
       this.Controls.Add(this.tableLayoutPanel);
       this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
       this.MaximizeBox = false;
       this.MinimizeBox = false;
       this.Name = "FormAbout";
-      this.Padding = new System.Windows.Forms.Padding(9);
+      this.Padding = new System.Windows.Forms.Padding(10, 10, 10, 10);
       this.ShowIcon = false;
       this.ShowInTaskbar = false;
       this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

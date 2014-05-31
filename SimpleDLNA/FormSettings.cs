@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  public partial class FormSettings : Form
+  public partial class FormSettings : NMaier.Windows.Forms.Form
   {
     public FormSettings()
     {
       InitializeComponent();
-      FormMain.SetFlatStyle(this);
+      Icon = Properties.Resources.preferencesIcon;
     }
 
     private void buttonBrowseCacheFile_Click(object sender, EventArgs e)

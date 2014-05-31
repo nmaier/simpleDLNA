@@ -1,3 +1,5 @@
+using log4net;
+using log4net.Core;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Comparers;
@@ -14,7 +16,7 @@ namespace NMaier.SimpleDlna.GUI
 
     private FileServer fileServer;
 
-    private State internalState = State.Loading;
+    private State internalState = State.Idle;
 
     private readonly HttpServer server;
 
@@ -28,15 +30,17 @@ namespace NMaier.SimpleDlna.GUI
 
       Text = Description.Name;
       SubItems.Add(Description.Directories.Length.ToString());
+      SubItems.Add(internalState.ToString());
       ImageIndex = 0;
     }
 
     private enum State : int
     {
-      Loading = 0,
+      Idle = 0,
       Running = 1,
       Stopped = 2,
-      Refreshing = 3
+      Refreshing = 3,
+      Loading = 4,
     }
 
     private State state
@@ -78,6 +82,7 @@ namespace NMaier.SimpleDlna.GUI
         state = State.Stopped;
         return;
       }
+      var start = DateTime.Now;
       try {
         state = State.Loading;
         var ids = new Identifiers(ComparerRepository.Lookup(Description.Order), Description.OrderDescending);
@@ -121,6 +126,16 @@ namespace NMaier.SimpleDlna.GUI
         fileServer.Authorizer = authorizer;
         server.RegisterMediaServer(fileServer);
         state = State.Running;
+        var elapsed = DateTime.Now - start;
+        LogManager.GetLogger("State").Logger.Log(
+          GetType(),
+          Level.Notice,
+          string.Format(
+            "{0} loaded in {1:F2} seconds",
+            fileServer.FriendlyName,
+            elapsed.TotalSeconds),
+          null
+          );
       }
       catch (Exception ex) {
         server.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
