@@ -20,6 +20,7 @@ namespace NMaier.SimpleDlna.GUI
       SizeDirectoryColumn();
       SizeColumns(listViews);
       SizeColumns(listRestrictions);
+      FormMain.SetFlatStyle(this);
     }
 
     public FormServer(ServerDescription description)

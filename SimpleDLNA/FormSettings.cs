@@ -8,6 +8,7 @@ namespace NMaier.SimpleDlna.GUI
     public FormSettings()
     {
       InitializeComponent();
+      FormMain.SetFlatStyle(this);
     }
 
     private void buttonBrowseCacheFile_Click(object sender, EventArgs e)

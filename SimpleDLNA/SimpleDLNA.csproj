@@ -125,6 +125,7 @@
     <Compile Include="ServerDescription.cs" />
     <Compile Include="ServerListViewItem.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="ToolStripRealSystemRenderer.cs" />
     <EmbeddedResource Include="FormAbout.resx">
       <DependentUpon>FormAbout.cs</DependentUpon>
     </EmbeddedResource>

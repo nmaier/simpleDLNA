@@ -2,6 +2,7 @@
 using System.IO.Pipes;
 using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -27,7 +28,11 @@ namespace NMaier.SimpleDlna.GUI
 #endif
 
         Application.EnableVisualStyles();
+        Application.VisualStyleState = VisualStyleState.ClientAndNonClientAreasEnabled;
         Application.SetCompatibleTextRenderingDefault(false);
+        ToolStripManager.VisualStylesEnabled = true;
+        ToolStripManager.Renderer = new ToolStripRealSystemRenderer();
+
         using (var main = new FormMain()) {
           try {
             Application.Run(main);

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -60,6 +61,8 @@ namespace NMaier.SimpleDlna.GUI
       };
 
       InitializeComponent();
+      SetFlatStyle(this);
+
       listImages.Images.Add("server", Properties.Resources.server);
       listImages.Images.Add("active", Properties.Resources.active);
       listImages.Images.Add("inactive", Properties.Resources.inactive);
@@ -86,6 +89,25 @@ namespace NMaier.SimpleDlna.GUI
       }
       CreateHandle();
       SetupServer();
+    }
+
+    public static void SetFlatStyle(object control)
+    {
+      var f = control as Form;
+      if (f != null) {
+        f.Font = SystemFonts.MessageBoxFont;
+      }
+      var t = control.GetType();
+      var p = t.GetProperty("FlatStyle", typeof(FlatStyle));
+      if (p != null && p.CanWrite) {
+        p.SetValue(control, FlatStyle.System, null);
+      }
+      var ctrl = control as Control;
+      if (ctrl != null) {
+        foreach (var sc in ctrl.Controls) {
+          SetFlatStyle(sc);
+        }
+      }
     }
 
     private delegate void logDelegate(string level, string logger, string msg, string ex);

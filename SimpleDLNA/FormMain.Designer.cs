@@ -62,13 +62,13 @@
       this.hideToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.homepageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.logger = new System.Windows.Forms.ListView();
       this.colLogTime = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogLogger = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.colLogMessage = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.buttonRescan = new System.Windows.Forms.Button();
-      this.homepageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
@@ -278,10 +278,17 @@
       this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
       this.helpToolStripMenuItem.Text = "Help";
       // 
+      // homepageToolStripMenuItem
+      // 
+      this.homepageToolStripMenuItem.Name = "homepageToolStripMenuItem";
+      this.homepageToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
+      this.homepageToolStripMenuItem.Text = "Homepage";
+      this.homepageToolStripMenuItem.Click += new System.EventHandler(this.homepageToolStripMenuItem_Click);
+      // 
       // aboutToolStripMenuItem
       // 
       this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.aboutToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
       this.aboutToolStripMenuItem.Text = "About";
       this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
       // 
@@ -329,13 +336,6 @@
       this.buttonRescan.Text = "Rescan";
       this.buttonRescan.UseVisualStyleBackColor = true;
       this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
-      // 
-      // homepageToolStripMenuItem
-      // 
-      this.homepageToolStripMenuItem.Name = "homepageToolStripMenuItem";
-      this.homepageToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-      this.homepageToolStripMenuItem.Text = "Homepage";
-      this.homepageToolStripMenuItem.Click += new System.EventHandler(this.homepageToolStripMenuItem_Click);
       // 
       // FormMain
       // 
