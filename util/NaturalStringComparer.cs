@@ -16,6 +16,11 @@ namespace NMaier.SimpleDlna.Utilities
 
     private readonly bool stemBase;
 
+    public NaturalStringComparer()
+      : this(false)
+    {
+    }
+
     public NaturalStringComparer(bool stemBase)
     {
       this.stemBase = stemBase;

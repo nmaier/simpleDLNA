@@ -2,11 +2,11 @@ namespace NMaier.SimpleDlna.Thumbnails
 {
   internal sealed class Thumbnail : IThumbnail
   {
-    private readonly byte[] data;
+    readonly byte[] data;
 
-    private readonly int height;
+    readonly int height;
 
-    private readonly int width;
+    readonly int width;
 
     internal Thumbnail(int width, int height, byte[] data)
     {

@@ -5,7 +5,8 @@ namespace NMaier.SimpleDlna.Server.Comparers
 {
   internal class TitleComparer : BaseComparer
   {
-    private readonly static StringComparer comp = new NaturalStringComparer(false);
+    private readonly static StringComparer comparer =
+      new NaturalStringComparer(false);
 
     public override string Description
     {
@@ -33,10 +34,10 @@ namespace NMaier.SimpleDlna.Server.Comparers
       }
       var tx = x as ITitleComparable;
       var ty = y as ITitleComparable;
-      return comp.Compare(
-      tx != null ? tx.ToComparableTitle() : x.Title.StemCompareBase(),
-      ty != null ? ty.ToComparableTitle() : y.Title.StemCompareBase()
-      );
+      return comparer.Compare(
+        tx != null ? tx.ToComparableTitle() : x.Title.StemCompareBase(),
+        ty != null ? ty.ToComparableTitle() : y.Title.StemCompareBase()
+        );
     }
   }
 }

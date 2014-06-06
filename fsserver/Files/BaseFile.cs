@@ -24,6 +24,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private static readonly CoverCache coverCache = new CoverCache(500);
 
+    private static readonly StringComparer comparer =
+      new NaturalStringComparer(false);
+
     protected BaseFile(FileServer server, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
     {
       if (server == null) {
@@ -217,17 +220,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public virtual int CompareTo(IMediaItem other)
     {
       if (other == null) {
-        throw new ArgumentNullException("other");
+        return 1;
       }
-      return StringComparer.CurrentCulture.Compare(title, other.Title);
-    }
-
-    public bool Equals(IMediaItem other)
-    {
-      if (other == null) {
-        throw new ArgumentNullException("other");
-      }
-      return StringComparer.CurrentCulture.Equals(title, other.Title);
+      return comparer.Compare(title, other.Title);
     }
 
     public Stream CreateContentStream()
@@ -250,6 +245,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
         server.DelayedRescan(WatcherChangeTypes.Changed);
         throw;
       }
+    }
+
+    public bool Equals(IMediaItem other)
+    {
+      if (other == null) {
+        return false;
+      }
+      return comparer.Equals(title, other.Title);
     }
 
     public void LazyLoadedCover(object sender, EventArgs e)

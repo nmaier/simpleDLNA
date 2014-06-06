@@ -15,6 +15,9 @@ namespace NMaier.SimpleDlna.Server
 
     protected List<IMediaResource> resources = new List<IMediaResource>();
 
+    private static readonly StringComparer comparer =
+      new NaturalStringComparer(true);
+
     private string path;
 
     public VirtualFolder()
@@ -158,9 +161,9 @@ namespace NMaier.SimpleDlna.Server
     public int CompareTo(IMediaItem other)
     {
       if (other == null) {
-        throw new ArgumentNullException("other");
+        return 1;
       }
-      return StringComparer.CurrentCultureIgnoreCase.Compare(Title, other.Title);
+      return comparer.Compare(Title, other.Title);
     }
 
     public bool Equals(IMediaItem other)

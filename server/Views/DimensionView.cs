@@ -78,7 +78,7 @@ namespace NMaier.SimpleDlna.Server.Views
       maxHeight = SetParametersFor(parameters, "maxheight");
     }
 
-    public uint? SetParametersFor(AttributeCollection parameters, string key)
+    public static uint? SetParametersFor(AttributeCollection parameters, string key)
     {
       var val = (uint?)null;
       foreach (var v in parameters.GetValuesForKey(key)) {

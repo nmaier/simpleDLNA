@@ -72,3 +72,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Scope = "member", Target = "NMaier.SimpleDlna.Server.DlnaMaps.#Media2Ext")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes", Scope = "member", Target = "NMaier.SimpleDlna.Server.DlnaMaps.#Mime")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Scope = "member", Target = "NMaier.SimpleDlna.Server.Redirect.#.ctor(NMaier.SimpleDlna.Server.HttpCode,System.Uri)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Scope = "type", Target = "NMaier.SimpleDlna.Server.Views.DimensionView")]
