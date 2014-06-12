@@ -7,7 +7,7 @@ using System.Text;
 namespace NMaier.SimpleDlna.Server
 {
   [Serializable]
-  public class Subtitle : IMediaResource
+  public sealed class Subtitle : IMediaResource
   {
     [NonSerialized]
     private byte[] encodedText = null;

@@ -1,12 +1,12 @@
 ﻿namespace NMaier.SimpleDlna.Server
 {
-  public class VirtualClonedFolder : VirtualFolder
+  public sealed class VirtualClonedFolder : VirtualFolder
   {
     private readonly IMediaFolder clone;
 
     private readonly DlnaMediaTypes types;
 
-    protected VirtualClonedFolder(IMediaFolder parent, string name, string id, DlnaMediaTypes types)
+    private VirtualClonedFolder(IMediaFolder parent, string name, string id, DlnaMediaTypes types)
       : base(parent, name, id)
     {
       this.types = types;

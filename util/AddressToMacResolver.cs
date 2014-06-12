@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  internal class AddressToMacResolver : Logging
+  internal sealed class AddressToMacResolver : Logging
   {
     private static readonly Regex regMac =
       new Regex(@"(?:[0-9A-F]{2}:){5}[0-9A-F]{2}", RegexOptions.Compiled);

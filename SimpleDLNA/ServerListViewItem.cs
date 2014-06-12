@@ -20,9 +20,9 @@ namespace NMaier.SimpleDlna.GUI
 
     private readonly HttpServer server;
 
-    public readonly ServerDescription Description;
+    internal readonly ServerDescription Description;
 
-    public ServerListViewItem(HttpServer server, FileInfo cacheFile, ServerDescription description)
+    internal ServerListViewItem(HttpServer server, FileInfo cacheFile, ServerDescription description)
     {
       this.server = server;
       this.cacheFile = cacheFile;
@@ -135,7 +135,7 @@ namespace NMaier.SimpleDlna.GUI
             fileServer.FriendlyName,
             elapsed.TotalSeconds),
           null
-          );
+        );
       }
       catch (Exception ex) {
         server.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
@@ -169,21 +169,13 @@ namespace NMaier.SimpleDlna.GUI
       });
     }
 
-    public void Dispose()
-    {
-      if (fileServer != null) {
-        fileServer.Dispose();
-        fileServer = null;
-      }
-    }
-
-    public void Load()
+    internal void Load()
     {
       state = State.Loading;
       StartFileServer();
     }
 
-    public void Rescan()
+    internal void Rescan()
     {
       if (fileServer == null) {
         throw new ArgumentException("Server is not running");
@@ -195,18 +187,26 @@ namespace NMaier.SimpleDlna.GUI
       vs.Rescan();
     }
 
-    public void Toggle()
+    internal void Toggle()
     {
       StopFileServer();
       Description.ToggleActive();
       StartFileServer();
     }
 
-    public void UpdateInfo(ServerDescription description)
+    internal void UpdateInfo(ServerDescription description)
     {
       StopFileServer();
       Description.AdoptInfo(description);
       StartFileServer();
+    }
+
+    public void Dispose()
+    {
+      if (fileServer != null) {
+        fileServer.Dispose();
+        fileServer = null;
+      }
     }
   }
 }

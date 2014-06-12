@@ -5,7 +5,7 @@ namespace NMaier.SimpleDlna.Utilities
 {
   using PartsCache = LeastRecentlyUsedDictionary<string, BaseSortPart[]>;
 
-  public class NaturalStringComparer : StringComparer
+  public sealed class NaturalStringComparer : StringComparer
   {
     private static readonly StringComparer comparer =
       StringComparer.CurrentCultureIgnoreCase;

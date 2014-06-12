@@ -96,9 +96,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
     <None Include="sdlna.key.snk" />
   </ItemGroup>

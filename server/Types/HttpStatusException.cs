@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 namespace NMaier.SimpleDlna.Server
 {
   [Serializable]
-  public class HttpStatusException : HttpException
+  public sealed class HttpStatusException : HttpException
   {
-    protected HttpStatusException(SerializationInfo info, StreamingContext context)
+    private HttpStatusException(SerializationInfo info, StreamingContext context)
       : base(info, context)
     {
     }

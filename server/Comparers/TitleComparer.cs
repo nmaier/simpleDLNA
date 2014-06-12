@@ -26,11 +26,15 @@ namespace NMaier.SimpleDlna.Server.Comparers
 
     public override int Compare(IMediaItem x, IMediaItem y)
     {
-      if (x == null) {
+      if (x == null && y == null) {
+        return 0;
         throw new ArgumentNullException("x");
       }
+      if (x == null) {
+        return 1;
+      }
       if (y == null) {
-        throw new ArgumentNullException("y");
+        return -1;
       }
       var tx = x as ITitleComparable;
       var ty = y as ITitleComparable;

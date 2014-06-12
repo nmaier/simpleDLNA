@@ -3,7 +3,7 @@ using System.Net;
 
 namespace NMaier.SimpleDlna.Server
 {
-  public class HttpAuthorizationEventArgs : EventArgs
+  public sealed class HttpAuthorizationEventArgs : EventArgs
   {
     private HttpAuthorizationEventArgs()
     {

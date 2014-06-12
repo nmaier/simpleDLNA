@@ -4,7 +4,7 @@ using System;
 namespace NMaier.SimpleDlna.GUI
 {
   [Serializable]
-  public class ServerDescription
+  public sealed class ServerDescription
   {
     public ServerDescription()
     {
