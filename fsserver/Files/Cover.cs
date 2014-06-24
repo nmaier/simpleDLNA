@@ -150,7 +150,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        return "DLNA.ORG_PN=JPEG_TN";
+        return "JPEG_TN";
       }
     }
 
@@ -174,7 +174,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        return DlnaMime.JPEG;
+        return DlnaMime.ImageJPEG;
       }
     }
 

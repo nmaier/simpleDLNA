@@ -30,7 +30,7 @@ namespace NMaier.SimpleDlna.Server
             headers.Add(
               "contentFeatures.dlna.org",
               String.Format(
-                "{0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
+                "DLNA.ORG_PN={0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
                 item.PN,
                 DlnaMaps.DefaultInteractive
                 )
@@ -40,7 +40,7 @@ namespace NMaier.SimpleDlna.Server
             headers.Add(
               "contentFeatures.dlna.org",
               String.Format(
-                "{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
+                "DLNA.ORG_PN={0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
                 item.PN,
                 DlnaMaps.DefaultStreaming
                 )

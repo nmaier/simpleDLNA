@@ -27,7 +27,6 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly static XmlNamespaceManager namespaceMgr = CreateNamespaceManager();
 
-
     private static void AddBookmarkInfo(IMediaResource resource, XmlElement item)
     {
       var bookmarkable = resource as IBookmarkable;
@@ -75,9 +74,9 @@ namespace NMaier.SimpleDlna.Server
         res.InnerText = curl;
 
         res.SetAttribute("protocolInfo", string.Format(
-        "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
-        c.PN, DlnaMaps.Mime[c.Type], DlnaMaps.DefaultStreaming
-        ));
+          "http-get:*:{1}:DLNA.ORG_PN={0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
+          c.PN, DlnaMaps.Mime[c.Type], DlnaMaps.DefaultStreaming
+          ));
         var width = c.MetaWidth;
         var height = c.MetaHeight;
         if (width.HasValue && height.HasValue) {
@@ -87,9 +86,9 @@ namespace NMaier.SimpleDlna.Server
           res.SetAttribute("resolution", "200x200");
         }
         res.SetAttribute("protocolInfo", string.Format(
-        "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_CI=1;DLNA.ORG_FLAGS={0}",
-        DlnaMaps.DefaultInteractive
-        ));
+          "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_CI=1;DLNA.ORG_FLAGS={0}",
+          DlnaMaps.DefaultInteractive
+          ));
         item.AppendChild(res);
       }
       catch (Exception) {
@@ -266,9 +265,9 @@ namespace NMaier.SimpleDlna.Server
       }
 
       res.SetAttribute("protocolInfo", String.Format(
-      "http-get:*:{1}:{0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
-      resource.PN, DlnaMaps.Mime[resource.Type], DlnaMaps.DefaultStreaming
-      ));
+        "http-get:*:{1}:DLNA.ORG_PN={0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
+        resource.PN, DlnaMaps.Mime[resource.Type], DlnaMaps.DefaultStreaming
+        ));
       item.AppendChild(res);
 
       AddCover(request, resource, item);
@@ -383,6 +382,32 @@ namespace NMaier.SimpleDlna.Server
       return rv;
     }
 
+    private static IHeaders HandleGetCurrentConnectionIDs()
+    {
+      return new RawHeaders() { { "ConnectionIDs", "0" } };
+    }
+
+    private static IHeaders HandleGetCurrentConnectionInfo()
+    {
+      return new RawHeaders() {
+        { "RcsID", "-1" },
+        { "AVTransportID", "-1" },
+        { "ProtocolInfo", string.Empty },
+        { "PeerConnectionmanager", string.Empty },
+        { "PeerConnectionID", "0" },
+        { "Direction", "Output" },
+        { "Status", "OK" }
+      };
+    }
+
+    private static IHeaders HandleGetProtocolInfo()
+    {
+      return new RawHeaders() {
+        { "Source", DlnaMaps.ProtocolInfo },
+        { "Sink", string.Empty }
+      };
+    }
+
     private static IHeaders HandleGetSearchCapabilities()
     {
       return new RawHeaders() { { "SearchCaps", string.Empty } };
@@ -464,6 +489,15 @@ namespace NMaier.SimpleDlna.Server
             break;
           case "X_SetBookmark":
             result = HandleXSetBookmark(sparams);
+            break;
+          case "GetCurrentConnectionIDs":
+            result = HandleGetCurrentConnectionIDs();
+            break;
+          case "GetCurrentConnectionInfo":
+            result = HandleGetCurrentConnectionInfo();
+            break;
+          case "GetProtocolInfo":
+            result = HandleGetProtocolInfo();
             break;
           default:
             throw new HttpStatusException(HttpCode.NotFound);

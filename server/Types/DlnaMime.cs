@@ -2,15 +2,23 @@
 {
   public enum DlnaMime
   {
-    AAC,
-    AVC,
-    AVI,
-    JPEG,
-    MATROSKA,
-    MP3,
-    MPEG,
-    SRT,
-    VORBIS,
-    WMV
+    AudioAAC,
+    AudioFLAC,
+    AudioMP2,
+    AudioMP3,
+    AudioRAW,
+    AudioVORBIS,
+    ImageGIF,
+    ImageJPEG,
+    ImagePNG,
+    SubtitleSRT,
+    Video3GPP,
+    VideoAVC,
+    VideoAVI,
+    VideoFLV,
+    VideoMATROSKA,
+    VideoMPEG,
+    VideoOGV,
+    VideoWMV
   }
 }

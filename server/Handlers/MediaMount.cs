@@ -90,11 +90,19 @@ namespace NMaier.SimpleDlna.Server
         Assembly.GetExecutingAssembly().GetName().Version.ToString();
       doc.SelectSingleNode("//*[local-name() = 'friendlyName']").InnerText =
         FriendlyName + " — sdlna";
-      doc.SelectSingleNode("//*[local-name() = 'SCPDURL']").InnerText =
+
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ContentDirectory:1']/../*[local-name() = 'SCPDURL']").InnerText =
         String.Format("{0}contentDirectory.xml", prefix);
-      doc.SelectSingleNode("//*[local-name() = 'controlURL']").InnerText =
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ContentDirectory:1']/../*[local-name() = 'controlURL']").InnerText =
         String.Format("{0}control", prefix);
       doc.SelectSingleNode("//*[local-name() = 'eventSubURL']").InnerText =
+        String.Format("{0}events", prefix);
+
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'SCPDURL']").InnerText =
+        String.Format("{0}connectionManager.xml", prefix);
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'controlURL']").InnerText =
+        String.Format("{0}control", prefix);
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'eventSubURL']").InnerText =
         String.Format("{0}events", prefix);
 
       return doc.OuterXml;
@@ -136,6 +144,13 @@ namespace NMaier.SimpleDlna.Server
           HttpCode.Ok,
           "text/xml",
           "contentdirectory"
+          );
+      }
+      if (path == "connectionManager.xml") {
+        return new ResourceResponse(
+          HttpCode.Ok,
+          "text/xml",
+          "connectionmanager"
           );
       }
       if (path == "control") {

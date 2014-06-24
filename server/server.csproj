@@ -173,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\browse.css" />
+    <None Include="Resources\connectionmanager.xml" />
     <Content Include="Resources\large.jpg" />
     <Content Include="Resources\large.png" />
     <Content Include="Resources\small.jpg" />

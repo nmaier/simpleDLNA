@@ -232,6 +232,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         "upnp:rootdevice",
         "urn:schemas-upnp-org:device:MediaServer:1",
         "urn:schemas-upnp-org:service:ContentDirectory:1",
+        "urn:schemas-upnp-org:service:ConnectionManager:1",
         "uuid:" + UUID
       }) {
         list.Add(new UpnpDevice(UUID, t, Descriptor, address));

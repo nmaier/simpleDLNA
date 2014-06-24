@@ -58,6 +58,13 @@
         <controlURL>/serviceControl</controlURL>
         <eventSubURL></eventSubURL>
       </service>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
+        <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
+        <SCPDURL>/connectionManager.xml</SCPDURL>
+        <controlURL>/serviceControl</controlURL>
+        <eventSubURL></eventSubURL>
+      </service>
     </serviceList>
   </device>
 </root>

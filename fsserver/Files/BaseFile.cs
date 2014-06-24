@@ -143,7 +143,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        return DlnaMaps.PN[Type];
+        return DlnaMaps.MainPN[Type];
       }
     }
 

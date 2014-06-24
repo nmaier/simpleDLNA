@@ -204,7 +204,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         using (var s = new MemoryStream(data)) {
           var ctx = new StreamingContext(
             StreamingContextStates.Persistence,
-            new DeserializeInfo(null, info, DlnaMime.JPEG)
+            new DeserializeInfo(null, info, DlnaMime.ImageJPEG)
             );
           var formatter = new BinaryFormatter(null, ctx) {
             TypeFormat = FormatterTypeStyle.TypesWhenNeeded,

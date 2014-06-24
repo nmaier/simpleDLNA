@@ -112,7 +112,7 @@ namespace NMaier.SimpleDlna.Server
     {
       get
       {
-        return DlnaMaps.PN[Type];
+        return DlnaMaps.MainPN[Type];
       }
     }
 
@@ -144,7 +144,7 @@ namespace NMaier.SimpleDlna.Server
     {
       get
       {
-        return DlnaMime.SRT;
+        return DlnaMime.SubtitleSRT;
       }
     }
 
