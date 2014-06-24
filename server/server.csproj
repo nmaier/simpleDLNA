@@ -174,6 +174,7 @@
   <ItemGroup>
     <Content Include="Resources\browse.css" />
     <None Include="Resources\connectionmanager.xml" />
+    <None Include="Resources\MSMediaReceiverRegistrar.xml" />
     <Content Include="Resources\large.jpg" />
     <Content Include="Resources\large.png" />
     <Content Include="Resources\small.jpg" />

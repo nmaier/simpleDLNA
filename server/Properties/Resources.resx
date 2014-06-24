@@ -127,6 +127,9 @@
   <data name="connectionmanager" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\connectionmanager.xml;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="MSMediaReceiverRegistrar" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\MSMediaReceiverRegistrar.xml;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="description" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\description.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;UTF-8</value>
   </data>

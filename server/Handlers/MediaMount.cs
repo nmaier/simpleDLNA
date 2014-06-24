@@ -105,6 +105,13 @@ namespace NMaier.SimpleDlna.Server
       doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'eventSubURL']").InnerText =
         String.Format("{0}events", prefix);
 
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'SCPDURL']").InnerText =
+        String.Format("{0}MSMediaReceiverRegistrar.xml", prefix);
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'controlURL']").InnerText =
+        String.Format("{0}control", prefix);
+      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'eventSubURL']").InnerText =
+        String.Format("{0}events", prefix);
+
       return doc.OuterXml;
     }
 
@@ -153,6 +160,13 @@ namespace NMaier.SimpleDlna.Server
           "connectionmanager"
           );
       }
+      if (path == "MSMediaReceiverRegistrar.xml") {
+        return new ResourceResponse(
+          HttpCode.Ok,
+          "text/xml",
+          "MSMediaReceiverRegistrar"
+          );
+      }
       if (path == "control") {
         return ProcessSoapRequest(request);
       }
@@ -182,6 +196,15 @@ namespace NMaier.SimpleDlna.Server
         var id = path.Substring("index/".Length);
         var item = GetItem(id);
         return ProcessHtmlRequest(item);
+      }
+      if (request.Method == "SUBSCRIBE") {
+        var res = new StringResponse(HttpCode.Ok, string.Empty);
+        res.Headers.Add("SID", string.Format("uuid:{0}", Guid.NewGuid()));
+        res.Headers.Add("TIMEOUT", request.Headers["timeout"]);
+        return res;
+      }
+      if (request.Method == "UNSUBSCRIBE") {
+        return new StringResponse(HttpCode.Ok, string.Empty);
       }
       WarnFormat("Did not understand {0} {1}", request.Method, path);
       throw new HttpStatusException(HttpCode.NotFound);

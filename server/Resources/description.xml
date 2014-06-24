@@ -65,6 +65,13 @@
         <controlURL>/serviceControl</controlURL>
         <eventSubURL></eventSubURL>
       </service>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1</serviceType>
+        <serviceId>urn:microsoft.com:serviceId:X_MS_MediaReceiverRegistrar</serviceId>
+        <SCPDURL>/MSMediaReceiverRegistrar.xml</SCPDURL>
+        <controlURL>/serviceControl</controlURL>
+        <eventSubURL></eventSubURL>
+      </service>
     </serviceList>
   </device>
 </root>

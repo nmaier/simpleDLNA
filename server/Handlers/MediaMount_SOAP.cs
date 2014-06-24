@@ -423,6 +423,21 @@ namespace NMaier.SimpleDlna.Server
       return new RawHeaders() { { "Id", systemID.ToString() } };
     }
 
+    private static IHeaders HandleIsAuthorized()
+    {
+      return new RawHeaders() { { "Result", "1" } };
+    }
+
+    private static IHeaders HandleIsValidated()
+    {
+      return new RawHeaders() { { "Result", "1" } };
+    }
+
+    private static IHeaders HandleRegisterDevice()
+    {
+      return new RawHeaders() { { "RegistrationRespMsg", string.Empty } };
+    }
+
     private static IHeaders HandleXGetFeatureList()
     {
       return new RawHeaders() { { "FeatureList", featureList } };
@@ -498,6 +513,15 @@ namespace NMaier.SimpleDlna.Server
             break;
           case "GetProtocolInfo":
             result = HandleGetProtocolInfo();
+            break;
+          case "IsAuthorized":
+            result = HandleIsAuthorized();
+            break;
+          case "IsValidated":
+            result = HandleIsValidated();
+            break;
+          case "RegisterDevice":
+            result = HandleRegisterDevice();
             break;
           default:
             throw new HttpStatusException(HttpCode.NotFound);

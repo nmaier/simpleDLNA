@@ -89,7 +89,7 @@ namespace NMaier.SimpleDlna.Server.Properties {
                 return ((byte[])(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot;?&gt;
         ///&lt;root xmlns=&quot;urn:schemas-upnp-org:device-1-0&quot; xmlns:dlna=&quot;urn:schemas-dlna-org:device-1-0&quot; xmlns:sec=&quot;http://www.sec.co.kr/dlna&quot;&gt;
@@ -139,6 +139,16 @@ namespace NMaier.SimpleDlna.Server.Properties {
         internal static byte[] largePNG {
             get {
                 object obj = ResourceManager.GetObject("largePNG", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] MSMediaReceiverRegistrar {
+            get {
+                object obj = ResourceManager.GetObject("MSMediaReceiverRegistrar", resourceCulture);
                 return ((byte[])(obj));
             }
         }
