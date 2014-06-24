@@ -71,6 +71,7 @@ namespace NMaier.SimpleDlna.Utilities
       }
 
       foreach (var i in places) {
+        LogManager.GetLogger(typeof(FFmpeg)).DebugFormat("Searching {0}", i.FullName);
         if (!i.Exists) {
           continue;
         }
