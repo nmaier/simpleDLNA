@@ -5,7 +5,7 @@ using System.IO;
 namespace NMaier.SimpleDlna.Server
 {
   internal class MediaResourceDecorator<T> : IMediaResource, IMetaInfo
-      where T : IMediaResource, IMetaInfo
+    where T : IMediaResource, IMetaInfo
   {
     protected T resource;
 
@@ -103,14 +103,19 @@ namespace NMaier.SimpleDlna.Server
       return resource.CompareTo(other);
     }
 
+    public virtual Stream CreateContentStream()
+    {
+      return resource.CreateContentStream();
+    }
+
     public bool Equals(IMediaItem other)
     {
       return resource.Equals(other);
     }
 
-    public virtual Stream CreateContentStream()
+    public string ToComparableTitle()
     {
-      return resource.CreateContentStream();
+      return resource.ToComparableTitle();
     }
   }
 }

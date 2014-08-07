@@ -188,11 +188,6 @@ namespace NMaier.SimpleDlna.Server
       throw new NotImplementedException();
     }
 
-    public bool Equals(IMediaItem other)
-    {
-      throw new NotImplementedException();
-    }
-
     public Stream CreateContentStream()
     {
       if (!HasSubtitle) {
@@ -202,6 +197,16 @@ namespace NMaier.SimpleDlna.Server
         encodedText = Encoding.UTF8.GetBytes(text);
       }
       return new MemoryStream(encodedText, false);
+    }
+
+    public bool Equals(IMediaItem other)
+    {
+      throw new NotImplementedException();
+    }
+
+    public string ToComparableTitle()
+    {
+      throw new NotImplementedException();
     }
   }
 }

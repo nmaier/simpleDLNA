@@ -213,14 +213,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
       throw new NotSupportedException();
     }
 
-    public bool Equals(IMediaItem other)
-    {
-      throw new NotImplementedException();
-    }
-
     public Stream CreateContentStream()
     {
       return new MemoryStream(Bytes);
+    }
+
+    public bool Equals(IMediaItem other)
+    {
+      throw new NotImplementedException();
     }
 
     public void GetObjectData(SerializationInfo info, StreamingContext ctx)
@@ -234,6 +234,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       info.AddValue("b", bytes);
       info.AddValue("w", width);
       info.AddValue("h", height);
+    }
+
+    public string ToComparableTitle()
+    {
+      throw new NotImplementedException();
     }
   }
 }

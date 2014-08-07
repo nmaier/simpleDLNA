@@ -8,7 +8,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   using CoverCache = LeastRecentlyUsedDictionary<string, Cover>;
 
-  internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo, ITitleComparable
+  internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo
   {
     private string comparableTitle;
 

@@ -36,12 +36,7 @@ namespace NMaier.SimpleDlna.Server.Comparers
       if (y == null) {
         return -1;
       }
-      var tx = x as ITitleComparable;
-      var ty = y as ITitleComparable;
-      return comparer.Compare(
-        tx != null ? tx.ToComparableTitle() : x.Title.StemCompareBase(),
-        ty != null ? ty.ToComparableTitle() : y.Title.StemCompareBase()
-        );
+      return comparer.Compare(x.ToComparableTitle(), y.ToComparableTitle());
     }
   }
 }
