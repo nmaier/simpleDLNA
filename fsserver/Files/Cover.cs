@@ -20,6 +20,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private static readonly ThumbnailMaker thumber =
       new ThumbnailMaker();
 
+    private bool warned = false;
+
     private int width = 240;
 
     private Cover(SerializationInfo info, StreamingContext ctx)
@@ -196,7 +198,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Debug("Failed to load thumb for " + file.FullName, ex);
       }
       catch (Exception ex) {
-        Warn("Failed to load thumb for " + file.FullName, ex);
+        if (!warned) {
+          Warn("Failed to load thumb for " + file.FullName, ex);
+          warned = true;
+        }
+        else {
+          Debug("Failed to load thumb for " + file.FullName, ex);
+        }
         return null;
       }
       if (bytes == null) {
