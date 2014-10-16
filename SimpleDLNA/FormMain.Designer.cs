@@ -56,7 +56,9 @@
       this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
       this.notifyContext = new System.Windows.Forms.ContextMenuStrip(this.components);
       this.showContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-      this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+      this.rescanAllContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+      this.ContextSeperatorPre = new System.Windows.Forms.ToolStripSeparator();
+      this.ContextSeperatorPost = new System.Windows.Forms.ToolStripSeparator();
       this.exitContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.mainMenu = new System.Windows.Forms.MenuStrip();
       this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -245,27 +247,42 @@
       // 
       this.notifyContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showContextMenuItem,
-            this.toolStripMenuItem1,
+            this.rescanAllContextMenuItem,
+            this.ContextSeperatorPre,
+            this.ContextSeperatorPost,
             this.exitContextMenuItem});
       this.notifyContext.Name = "notifyContext";
-      this.notifyContext.Size = new System.Drawing.Size(104, 54);
+      this.notifyContext.Size = new System.Drawing.Size(153, 104);
+      this.notifyContext.Opening += new System.ComponentModel.CancelEventHandler(this.notifyContext_Opening);
       // 
       // showContextMenuItem
       // 
       this.showContextMenuItem.Name = "showContextMenuItem";
-      this.showContextMenuItem.Size = new System.Drawing.Size(103, 22);
+      this.showContextMenuItem.Size = new System.Drawing.Size(152, 22);
       this.showContextMenuItem.Text = "Show";
       this.showContextMenuItem.Click += new System.EventHandler(this.notifyIcon_DoubleClick);
       // 
-      // toolStripMenuItem1
+      // rescanAllContextMenuItem
       // 
-      this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-      this.toolStripMenuItem1.Size = new System.Drawing.Size(100, 6);
+      this.rescanAllContextMenuItem.Name = "rescanAllContextMenuItem";
+      this.rescanAllContextMenuItem.Size = new System.Drawing.Size(152, 22);
+      this.rescanAllContextMenuItem.Text = "Rescan all";
+      this.rescanAllContextMenuItem.Click += new System.EventHandler(this.rescanAllContextMenuItem_Click);
+      // 
+      // ContextSeperatorPre
+      // 
+      this.ContextSeperatorPre.Name = "ContextSeperatorPre";
+      this.ContextSeperatorPre.Size = new System.Drawing.Size(149, 6);
+      // 
+      // ContextSeperatorPost
+      // 
+      this.ContextSeperatorPost.Name = "ContextSeperatorPost";
+      this.ContextSeperatorPost.Size = new System.Drawing.Size(149, 6);
       // 
       // exitContextMenuItem
       // 
       this.exitContextMenuItem.Name = "exitContextMenuItem";
-      this.exitContextMenuItem.Size = new System.Drawing.Size(103, 22);
+      this.exitContextMenuItem.Size = new System.Drawing.Size(152, 22);
       this.exitContextMenuItem.Text = "Exit";
       this.exitContextMenuItem.Click += new System.EventHandler(this.exitContextMenuItem_Click);
       // 
@@ -474,7 +491,7 @@
     private System.Windows.Forms.NotifyIcon notifyIcon;
     private System.Windows.Forms.ContextMenuStrip notifyContext;
     private System.Windows.Forms.ToolStripMenuItem showContextMenuItem;
-    private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+    private System.Windows.Forms.ToolStripSeparator ContextSeperatorPost;
     private System.Windows.Forms.ToolStripMenuItem exitContextMenuItem;
     private System.Windows.Forms.MenuStrip mainMenu;
     private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
@@ -503,6 +520,8 @@
     private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
     private System.Windows.Forms.ToolStripMenuItem ctxNewServer;
     private System.Windows.Forms.ToolStripMenuItem newServerToolStripMenuItem;
+    private System.Windows.Forms.ToolStripSeparator ContextSeperatorPre;
+    private System.Windows.Forms.ToolStripMenuItem rescanAllContextMenuItem;
   }
 }
 

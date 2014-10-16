@@ -576,5 +576,60 @@ namespace NMaier.SimpleDlna.GUI
         ButtonNewServer_Click(sender, e);
       }
     }
+
+    private void rescanAllContextMenuItem_Click(object sender, EventArgs e)
+    {
+      foreach (ServerListViewItem l in listDescriptions.Items) {
+        try {
+          l.Rescan();
+        }
+        catch (Exception) {
+          // no op
+        }
+      }
+    }
+
+    private void notifyContext_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+      var items = new List<ToolStripItem>();
+      foreach (ToolStripItem i in notifyContext.Items) {
+        if (i.Tag != null) {
+          items.Add(i);
+        }
+      }
+      foreach (var i in items) {
+        notifyContext.Items.Remove(i);
+      }
+      items.Clear();
+      if (listDescriptions.Items.Count == 0) {
+        ContextSeperatorPre.Visible = false;
+        return;
+      }
+      ContextSeperatorPre.Visible = true;
+      foreach (ServerListViewItem item in listDescriptions.Items) {
+        if (!item.Description.Active) {
+          continue;
+        }
+        var innerItem = item;
+        var sm = new ToolStripMenuItem(item.Text);
+        sm.Tag = innerItem;
+        var rescan = sm.DropDownItems.Add("Rescan");
+        rescan.Click += (s, a) =>
+        {
+          try {
+            innerItem.Rescan();
+          }
+          catch (Exception) {
+            // no op
+          }
+        };
+        items.Add(sm);
+      }
+      items.Reverse();
+      var idx = notifyContext.Items.IndexOf(ContextSeperatorPre) + 1;
+      foreach (var i in items) {
+        notifyContext.Items.Insert(idx, i);
+      }
+    }
   }
 }
