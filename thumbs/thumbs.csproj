@@ -65,6 +65,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Thumbnail.cs" />
     <Compile Include="ThumbnailMaker.cs" />
+    <Compile Include="ThumbnailMakerBorder.cs" />
     <Compile Include="VideoThumbnailLoader.cs" />
   </ItemGroup>
   <ItemGroup>

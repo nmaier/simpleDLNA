@@ -22,7 +22,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private WeakReference weakCover = new WeakReference(null);
 
-    private static readonly CoverCache coverCache = new CoverCache(500);
+    private static readonly CoverCache coverCache = new CoverCache(50);
 
     private static readonly StringComparer comparer =
       new NaturalStringComparer(false);

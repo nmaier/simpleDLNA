@@ -33,7 +33,9 @@ namespace NMaier.SimpleDlna.Thumbnails
         }
       }
       using (img) {
-        using (var scaled = ThumbnailMaker.ResizeImage(img, ref width, ref height)) {
+        using (var scaled = ThumbnailMaker.ResizeImage(img, width, height, ThumbnailMakerBorder.Borderless)) {
+          width = scaled.Width;
+          height = scaled.Height;
           var rv = new MemoryStream();
           try {
             scaled.Save(rv, ImageFormat.Jpeg);

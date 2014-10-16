@@ -87,27 +87,23 @@ namespace NMaier.SimpleDlna.Thumbnails
       throw new ArgumentException("Not a supported resource");
     }
 
-    internal static Image ResizeImage(Image image, ref int width, ref int height)
+    internal static Image ResizeImage(Image image, int width, int height, ThumbnailMakerBorder border)
     {
-      if (image.Width <= width && image.Height <= height) {
-        foreach (var p in image.PropertyIdList.Clone() as int[]) {
-          image.RemovePropertyItem(p);
-        }
-        return image;
-      }
       var nw = (float)image.Width;
       var nh = (float)image.Height;
-      var factor = 1.0f;
-      if (nw > nh) {
-        factor = width / nw;
+      if (nw > width) {
+        nh = width * nh / nw;
+        nw = width;
       }
-      else {
-        factor = height / nh;
+      if (nh > height) {
+        nw = height * nw / nh;
+        nh = height;
       }
-      nw = nw * factor;
-      nh = nh * factor;
 
-      var result = new Bitmap((int)nw, (int)nh);
+      var result = new Bitmap(
+        border == ThumbnailMakerBorder.Bordered ? width : (int)nw,
+        border == ThumbnailMakerBorder.Bordered ? height : (int)nh
+        );
       try {
         try {
           result.SetResolution(image.HorizontalResolution, image.VerticalResolution);
@@ -124,10 +120,14 @@ namespace NMaier.SimpleDlna.Thumbnails
             graphics.CompositingQuality = Drawing2D.CompositingQuality.HighSpeed;
             graphics.InterpolationMode = Drawing2D.InterpolationMode.Bicubic;
           }
+          var rect = new Rectangle(
+            (int)(result.Width - nw) / 2,
+            (int)(result.Height - nh) / 2,
+            (int)nw, (int)nh
+            );
           graphics.SmoothingMode = Drawing2D.SmoothingMode.HighSpeed;
-          graphics.DrawImage(image, 0, 0, result.Width, result.Height);
-          width = result.Width;
-          height = result.Height;
+          graphics.FillRectangle(Brushes.Black, new Rectangle(0, 0, result.Width, result.Height));
+          graphics.DrawImage(image, rect);
         }
         return result;
       }
@@ -166,7 +166,7 @@ namespace NMaier.SimpleDlna.Thumbnails
       return new Thumbnail(width, height, rv);
     }
 
-    private sealed class CacheItem
+    private struct CacheItem
     {
       public readonly byte[] Data;
 

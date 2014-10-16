@@ -14,7 +14,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStore : Logging, IDisposable
   {
-    private const uint SCHEMA = 0x20140420;
+    private const uint SCHEMA = 0x20140818;
 
     private readonly IDbConnection connection;
 

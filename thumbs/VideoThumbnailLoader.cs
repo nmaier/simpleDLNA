@@ -48,7 +48,9 @@ namespace NMaier.SimpleDlna.Thumbnails
           }
 
           using (var img = Image.FromStream(thumb)) {
-            using (var scaled = ThumbnailMaker.ResizeImage(img, ref width, ref height)) {
+            using (var scaled = ThumbnailMaker.ResizeImage(img, width, height, ThumbnailMakerBorder.Bordered)) {
+              width = scaled.Width;
+              height = scaled.Height;
               var rv = new MemoryStream();
               try {
                 scaled.Save(rv, ImageFormat.Jpeg);

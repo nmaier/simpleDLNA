@@ -15,14 +15,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private readonly FileInfo file;
 
-    private int height = 240;
+    private int height = 216;
 
     private static readonly ThumbnailMaker thumber =
       new ThumbnailMaker();
 
     private bool warned = false;
 
-    private int width = 240;
+    private int width = 384;
 
     private Cover(SerializationInfo info, StreamingContext ctx)
     {
