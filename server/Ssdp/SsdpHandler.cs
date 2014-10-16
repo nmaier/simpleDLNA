@@ -120,11 +120,24 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       try {
         var endpoint = new IPEndPoint(IPAddress.None, SSDP_PORT);
         var received = client.EndReceive(result, ref endpoint);
+        if (received == null) {
+          throw new IOException("Didn't receive anything");
+        }
+        if (received.Length == 0) {
+          throw new IOException("Didn't receive any bytes");
+        }
 #if DUMP_ALL_SSDP
         DebugFormat("{0} - SSDP Received a datagram", endpoint);
 #endif
         using (var reader = new StreamReader(new MemoryStream(received), Encoding.ASCII)) {
-          var proto = reader.ReadLine().Trim();
+          var proto = reader.ReadLine();
+          if (proto == null) {
+            throw new IOException("Couldn't read protocol line");
+          }
+          proto = proto.Trim();
+          if (string.IsNullOrEmpty(proto)) {
+            throw new IOException("Invalid protocol line");
+          }
           var method = proto.Split(new char[] { ' ' }, 2)[0];
           var headers = new Headers();
           for (var line = reader.ReadLine(); line != null;
@@ -144,6 +157,9 @@ namespace NMaier.SimpleDlna.Server.Ssdp
             RespondToSearch(endpoint, headers["st"]);
           }
         }
+      }
+      catch (IOException ex) {
+        Debug("Failed to read SSDP message", ex);
       }
       catch (Exception ex) {
         Warn("Failed to read SSDP message", ex);
