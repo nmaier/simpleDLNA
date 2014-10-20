@@ -59,7 +59,8 @@ namespace NMaier.SimpleDlna.Server
 
       RealPort = (listener.LocalEndpoint as IPEndPoint).Port;
 
-      NoticeFormat("Running HTTP Server: {0} on port {1}", Signature, RealPort);
+      NoticeFormat(
+        "Running HTTP Server: {0} on port {1}", Signature, RealPort);
       ssdpServer = new SsdpHandler();
 
       timeouter.Elapsed += TimeouterCallback;
@@ -169,7 +170,8 @@ namespace NMaier.SimpleDlna.Server
       if (IPAddress.IsLoopback(client.RemoteEndpoint.Address)) {
         return true;
       }
-      var e = new HttpAuthorizationEventArgs(client.Headers, client.RemoteEndpoint);
+      var e = new HttpAuthorizationEventArgs(
+        client.Headers, client.RemoteEndpoint);
       OnAuthorizeClient(this, e);
       return !e.Cancel;
     }

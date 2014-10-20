@@ -153,7 +153,8 @@ namespace NMaier.SimpleDlna.Server
       try {
         // Try external
         foreach (var i in exts) {
-          var sti = new FileInfo(System.IO.Path.ChangeExtension(file.FullName, i));
+          var sti = new FileInfo(
+            System.IO.Path.ChangeExtension(file.FullName, i));
           try {
             if (!sti.Exists) {
               sti = new FileInfo(file.FullName + i);
@@ -166,7 +167,8 @@ namespace NMaier.SimpleDlna.Server
           catch (NotSupportedException) {
           }
           catch (Exception ex) {
-            logger.Debug(string.Format("Failed to get subtitle from {0}", sti.FullName), ex);
+            logger.Debug(string.Format(
+              "Failed to get subtitle from {0}", sti.FullName), ex);
           }
         }
         try {
@@ -175,11 +177,13 @@ namespace NMaier.SimpleDlna.Server
         catch (NotSupportedException) {
         }
         catch (Exception ex) {
-          logger.Debug(string.Format("Failed to get subtitle from {0}", file.FullName), ex);
+          logger.Debug(string.Format(
+            "Failed to get subtitle from {0}", file.FullName), ex);
         }
       }
       catch (Exception ex) {
-        logger.Error(string.Format("Failed to load subtitle for {0}", file.FullName), ex);
+        logger.Error(string.Format(
+          "Failed to load subtitle for {0}", file.FullName), ex);
       }
     }
 

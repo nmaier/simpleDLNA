@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Net.Sockets;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -25,7 +26,7 @@ namespace NMaier.SimpleDlna.Utilities
     public string Resolve(IPAddress ip)
     {
       try {
-        if (ip.AddressFamily != System.Net.Sockets.AddressFamily.InterNetwork) {
+        if (ip.AddressFamily != AddressFamily.InterNetwork) {
           throw new NotSupportedException(
             "Addresses other than IPV4 are not supported");
         }
@@ -50,8 +51,7 @@ namespace NMaier.SimpleDlna.Utilities
         catch (DllNotFoundException) {
           // ignore
         }
-        cache.TryAdd(ip, new MACInfo()
-        {
+        cache.TryAdd(ip, new MACInfo() {
           MAC = mac,
           Fresh = DateTime.Now.AddMinutes(mac != null ? 10 : 1)
         });

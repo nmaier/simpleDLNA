@@ -11,7 +11,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private readonly DirectoryInfo dir;
 
-    private PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir, IEnumerable<string> exts)
+    private PlainFolder(FileServer server, DlnaMediaTypes types,
+                        VirtualFolder parent, DirectoryInfo dir,
+                        IEnumerable<string> exts)
       : base(parent, dir.Name)
     {
       Server = server;
@@ -40,7 +42,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       resources.AddRange(files);
     }
 
-    protected PlainFolder(FileServer server, DlnaMediaTypes types, VirtualFolder parent, DirectoryInfo dir)
+    protected PlainFolder(FileServer server, DlnaMediaTypes types,
+                          VirtualFolder parent, DirectoryInfo dir)
       : this(server, types, parent, dir, types.GetExtensions())
     {
     }
@@ -83,7 +86,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    private PlainFolder TryGetFolder(FileServer server, DlnaMediaTypes types, DirectoryInfo d)
+    private PlainFolder TryGetFolder(FileServer server, DlnaMediaTypes types,
+                                     DirectoryInfo d)
     {
       try {
         return new PlainFolder(server, types, this, d);

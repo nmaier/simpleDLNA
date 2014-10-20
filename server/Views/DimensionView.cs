@@ -78,7 +78,8 @@ namespace NMaier.SimpleDlna.Server.Views
       maxHeight = SetParametersFor(parameters, "maxheight");
     }
 
-    public static uint? SetParametersFor(AttributeCollection parameters, string key)
+    public static uint? SetParametersFor(AttributeCollection parameters,
+                                         string key)
     {
       var val = (uint?)null;
       foreach (var v in parameters.GetValuesForKey(key)) {
@@ -92,7 +93,8 @@ namespace NMaier.SimpleDlna.Server.Views
 
     public override IMediaFolder Transform(IMediaFolder root)
     {
-      if (!min.HasValue && !max.HasValue && !minWidth.HasValue && !maxWidth.HasValue && !minHeight.HasValue && !maxHeight.HasValue) {
+      if (!min.HasValue && !max.HasValue && !minWidth.HasValue &&
+          !maxWidth.HasValue && !minHeight.HasValue && !maxHeight.HasValue) {
         return root;
       }
       return base.Transform(root);

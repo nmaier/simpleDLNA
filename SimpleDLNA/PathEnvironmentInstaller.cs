@@ -18,7 +18,8 @@ namespace NMaier.SimpleDlna.GUI
 
     private const string REG_PATH = "PATH";
 
-    private readonly DirectoryInfo directory = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+    private readonly DirectoryInfo directory =
+      new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
 
     public override void Install(IDictionary stateSaver)
     {
@@ -28,12 +29,15 @@ namespace NMaier.SimpleDlna.GUI
       }
 
       using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
-        var path = registry.GetValue(REG_PATH, string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
+        var path = registry.GetValue(
+          REG_PATH, string.Empty,
+          RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
         if (path == null) {
           return;
         }
+        var c = StringComparer.CurrentCultureIgnoreCase;
         var exists = from p in path.Split(';')
-                     where StringComparer.CurrentCultureIgnoreCase.Equals(p, directory.FullName)
+                     where c.Equals(p, directory.FullName)
                      select p;
         if (exists.Count() > 0) {
           return;
@@ -54,7 +58,8 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
       using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
-        registry.SetValue(REG_PATH, savedState[ENV_PATH], registry.GetValueKind(REG_PATH));
+        registry.SetValue(
+          REG_PATH, savedState[ENV_PATH], registry.GetValueKind(REG_PATH));
       }
     }
 
@@ -66,13 +71,17 @@ namespace NMaier.SimpleDlna.GUI
       }
 
       using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
-        var path = registry.GetValue(REG_PATH, string.Empty, RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
+        var path = registry.GetValue(
+          REG_PATH, string.Empty,
+          RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
         if (string.IsNullOrEmpty(path)) {
           return;
         }
-        var cleaned = string.Join(";", from p in path.Split(';')
-                                       where !StringComparer.CurrentCultureIgnoreCase.Equals(p, directory.FullName)
-                                       select p);
+        var c = StringComparer.CurrentCultureIgnoreCase;
+        var paths = from p in path.Split(';')
+                    where !c.Equals(p, directory.FullName)
+                    select p;
+        var cleaned = string.Join(";", paths);
         if (StringComparer.CurrentCultureIgnoreCase.Equals(path, cleaned)) {
           return;
         }

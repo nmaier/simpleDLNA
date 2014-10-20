@@ -7,7 +7,8 @@ using System.Runtime.CompilerServices;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  public sealed class LeastRecentlyUsedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+  public sealed class LeastRecentlyUsedDictionary<TKey, TValue>
+    : IDictionary<TKey, TValue>
   {
     private readonly uint capacity;
 

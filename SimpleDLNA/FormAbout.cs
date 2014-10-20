@@ -14,7 +14,8 @@ namespace NMaier.SimpleDlna.GUI
       Text = String.Format("About {0}", ProductInformation.Title);
       Product.Text = ProductInformation.Title;
       Product.Font = BoldFont;
-      Version.Text = String.Format("Version {0}", ProductInformation.ProductVersion);
+      Version.Text = String.Format(
+        "Version {0}", ProductInformation.ProductVersion);
       Copyright.Text = ProductInformation.Copyright;
       Copyright.Font = ItalicFont;
       License.Text = Encoding.UTF8.GetString(Properties.Resources.LICENSE);

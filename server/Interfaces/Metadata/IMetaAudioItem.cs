@@ -1,6 +1,7 @@
 ﻿namespace NMaier.SimpleDlna.Server.Metadata
 {
-  public interface IMetaAudioItem : IMetaInfo, IMetaDescription, IMetaDuration, IMetaGenre
+  public interface IMetaAudioItem
+    : IMetaInfo, IMetaDescription, IMetaDuration, IMetaGenre
   {
     string MetaAlbum { get; }
 

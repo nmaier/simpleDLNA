@@ -198,7 +198,8 @@ namespace NMaier.SimpleDlna.Utilities
         throw new IOException("Position cannot be negative");
       }
       if (offset > 0 && method == HttpMethod.HEAD) {
-        throw new ArgumentException("Cannot use a position (seek) with HEAD request");
+        throw new ArgumentException(
+          "Cannot use a position (seek) with HEAD request");
       }
       Close();
       Dispose();
@@ -220,7 +221,8 @@ namespace NMaier.SimpleDlna.Utilities
         bufferedStream = new BufferedStream(responseStream, BUFFER_SIZE);
       }
       if (offset > 0 && response.StatusCode != HttpStatusCode.PartialContent) {
-        throw new IOException("Failed to open the http stream at a specific position");
+        throw new IOException(
+          "Failed to open the http stream at a specific position");
       }
       else {
         if (offset == 0 && response.StatusCode != HttpStatusCode.OK) {
@@ -306,7 +308,7 @@ namespace NMaier.SimpleDlna.Utilities
         }
       }
       position = np;
-      logger.DebugFormat("Successfully seeked to {0}", position);
+      logger.DebugFormat("Successfully sought to {0}", position);
       return position;
     }
 

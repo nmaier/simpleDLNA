@@ -8,7 +8,8 @@ using System.Xml;
 
 namespace NMaier.SimpleDlna.Server
 {
-  internal sealed partial class MediaMount : Logging, IMediaServer, IPrefixHandler
+  internal sealed partial class MediaMount
+    : Logging, IMediaServer, IPrefixHandler
   {
     private readonly Dictionary<IPAddress, Guid> guidsForAddresses =
       new Dictionary<IPAddress, Guid>();
@@ -91,25 +92,33 @@ namespace NMaier.SimpleDlna.Server
       doc.SelectSingleNode("//*[local-name() = 'friendlyName']").InnerText =
         FriendlyName + " — sdlna";
 
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ContentDirectory:1']/../*[local-name() = 'SCPDURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:ContentDirectory:1']/../*[local-name() = 'SCPDURL']").InnerText =
         String.Format("{0}contentDirectory.xml", prefix);
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ContentDirectory:1']/../*[local-name() = 'controlURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:ContentDirectory:1']/../*[local-name() = 'controlURL']").InnerText =
         String.Format("{0}control", prefix);
       doc.SelectSingleNode("//*[local-name() = 'eventSubURL']").InnerText =
         String.Format("{0}events", prefix);
 
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'SCPDURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'SCPDURL']").InnerText =
         String.Format("{0}connectionManager.xml", prefix);
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'controlURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'controlURL']").InnerText =
         String.Format("{0}control", prefix);
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'eventSubURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:ConnectionManager:1']/../*[local-name() = 'eventSubURL']").InnerText =
         String.Format("{0}events", prefix);
 
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'SCPDURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'SCPDURL']").InnerText =
         String.Format("{0}MSMediaReceiverRegistrar.xml", prefix);
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'controlURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'controlURL']").InnerText =
         String.Format("{0}control", prefix);
-      doc.SelectSingleNode("//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'eventSubURL']").InnerText =
+      doc.SelectSingleNode(
+        "//*[text() = 'urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1']/../*[local-name() = 'eventSubURL']").InnerText =
         String.Format("{0}events", prefix);
 
       return doc.OuterXml;

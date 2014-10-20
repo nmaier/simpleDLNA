@@ -6,7 +6,8 @@ using System.Runtime.Serialization;
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
-  internal sealed class ImageFile : BaseFile, IMediaImageResource, ISerializable
+  internal sealed class ImageFile :
+    BaseFile, IMediaImageResource, ISerializable
   {
     private string creator;
 
@@ -21,7 +22,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
     height;
 
     private ImageFile(SerializationInfo info, StreamingContext context)
-      : this((context.Context as DeserializeInfo).Server, (context.Context as DeserializeInfo).Info, (context.Context as DeserializeInfo).Type)
+      : this((context.Context as DeserializeInfo).Server,
+             (context.Context as DeserializeInfo).Info,
+             (context.Context as DeserializeInfo).Type)
     {
     }
 
@@ -153,15 +156,19 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
-        Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
+        Debug(
+          "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (TagLib.UnsupportedFormatException ex) {
-        Debug("Failed to read metadata via taglib for file " + Item.FullName, ex);
+        Debug(
+          "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (Exception ex) {
-        Warn("Unhandled exception reading metadata for file " + Item.FullName, ex);
+        Warn(
+          "Unhandled exception reading meta data for file " + Item.FullName,
+          ex);
       }
     }
 

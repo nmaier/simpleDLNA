@@ -2,7 +2,8 @@
 
 namespace NMaier.SimpleDlna.Server.Metadata
 {
-  public interface IMetaVideoItem : IMetaInfo, IMetaDescription, IMetaGenre, IMetaDuration, IMetaResolution
+  public interface IMetaVideoItem
+    : IMetaInfo, IMetaDescription, IMetaGenre, IMetaDuration, IMetaResolution
   {
     IEnumerable<string> MetaActors { get; }
 

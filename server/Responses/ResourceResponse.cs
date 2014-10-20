@@ -18,7 +18,8 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-    public ResourceResponse(HttpCode aStatus, string type, ResourceManager aResourceManager, string aResource)
+    public ResourceResponse(HttpCode aStatus, string type,
+                            ResourceManager aResourceManager, string aResource)
     {
       status = aStatus;
       try {

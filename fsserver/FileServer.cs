@@ -11,29 +11,38 @@ using System.Timers;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
-  public sealed class FileServer : Logging, IMediaServer, IVolatileMediaServer, IDisposable
+  public sealed class FileServer
+    : Logging, IMediaServer, IVolatileMediaServer, IDisposable
   {
     private readonly DirectoryInfo[] directories;
 
-    private readonly static StringComparer icomparer = StringComparer.CurrentCultureIgnoreCase;
+    private readonly static StringComparer icomparer =
+      StringComparer.CurrentCultureIgnoreCase;
 
-    private readonly Timer changeTimer = new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
+    private readonly Timer changeTimer =
+      new Timer(TimeSpan.FromSeconds(20).TotalMilliseconds);
 
     private readonly Guid uuid = Guid.NewGuid();
 
-    private readonly Timer watchTimer = new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
+    private readonly Timer watchTimer =
+      new Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
 
-    private readonly Regex re_sansitizeExt = new Regex(@"[^\w\d]+", RegexOptions.Compiled);
+    private readonly Regex re_sansitizeExt =
+      new Regex(@"[^\w\d]+", RegexOptions.Compiled);
 
     private DateTime lastChanged = DateTime.Now;
 
-    private static readonly double ChangeDefaultTime = TimeSpan.FromSeconds(30).TotalMilliseconds;
+    private static readonly double ChangeDefaultTime =
+      TimeSpan.FromSeconds(30).TotalMilliseconds;
 
-    private static readonly double ChangeRenamedTime = TimeSpan.FromSeconds(10).TotalMilliseconds;
+    private static readonly double ChangeRenamedTime =
+      TimeSpan.FromSeconds(10).TotalMilliseconds;
 
-    private static readonly double ChangeDeleteTime = TimeSpan.FromSeconds(2).TotalMilliseconds;
+    private static readonly double ChangeDeleteTime =
+      TimeSpan.FromSeconds(2).TotalMilliseconds;
 
-    private readonly List<WeakReference> pendingFiles = new List<WeakReference>();
+    private readonly List<WeakReference> pendingFiles =
+      new List<WeakReference>();
 
     private readonly Identifiers ids;
 
@@ -43,7 +52,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private readonly FileSystemWatcher[] watchers;
 
-    public FileServer(DlnaMediaTypes types, Identifiers ids, params DirectoryInfo[] directories)
+    public FileServer(DlnaMediaTypes types, Identifiers ids,
+                      params DirectoryInfo[] directories)
     {
       this.types = types;
       this.ids = ids;
@@ -172,16 +182,24 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private void OnChanged(Object source, FileSystemEventArgs e)
     {
       try {
-        if (store != null && icomparer.Equals(e.FullPath, store.StoreFile.FullName)) {
+        if (store != null &&
+            icomparer.Equals(e.FullPath, store.StoreFile.FullName)) {
           return;
         }
-        var ext = string.IsNullOrEmpty(e.FullPath) ? Path.GetExtension(e.FullPath) : string.Empty;
+        var ext = string.IsNullOrEmpty(e.FullPath) ?
+          Path.GetExtension(e.FullPath) :
+          string.Empty;
         if (!string.IsNullOrEmpty(ext) &&
-          !types.GetExtensions().Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase)) {
-          DebugFormat("Skipping name {0} {1} {2}", e.Name, Path.GetExtension(e.FullPath), string.Join(", ", types.GetExtensions()));
+            !types.GetExtensions().Contains(
+              ext.Substring(1), StringComparer.OrdinalIgnoreCase)) {
+          DebugFormat(
+            "Skipping name {0} {1} {2}",
+            e.Name, Path.GetExtension(e.FullPath),
+            string.Join(", ", types.GetExtensions()));
           return;
         }
-        DebugFormat("File System changed ({1}): {0}", e.FullPath, e.ChangeType);
+        DebugFormat(
+          "File System changed ({1}): {0}", e.FullPath, e.ChangeType);
         DelayedRescan(e.ChangeType);
       }
       catch (Exception ex) {
@@ -193,14 +211,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       try {
         var exts = types.GetExtensions();
-        var ext = string.IsNullOrEmpty(e.FullPath) ? Path.GetExtension(e.FullPath) : string.Empty;
+        var ext = string.IsNullOrEmpty(e.FullPath) ?
+          Path.GetExtension(e.FullPath) :
+          string.Empty;
+        var c = StringComparer.OrdinalIgnoreCase;
         if (!string.IsNullOrEmpty(ext) &&
-          !exts.Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase) &&
-          !exts.Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase)) {
-          DebugFormat("Skipping name {0} {1} {2}", e.Name, Path.GetExtension(e.FullPath), string.Join(", ", exts));
+            !exts.Contains(ext.Substring(1), c) &&
+            !exts.Contains(ext.Substring(1), c)) {
+          DebugFormat(
+            "Skipping name {0} {1} {2}",
+            e.Name, Path.GetExtension(e.FullPath), string.Join(", ", exts));
           return;
         }
-        DebugFormat("File System changed ({1}): {0}", e.FullPath, e.ChangeType);
+        DebugFormat(
+          "File System changed ({1}): {0}", e.FullPath, e.ChangeType);
         DelayedRescan(e.ChangeType);
       }
       catch (Exception ex) {
@@ -247,7 +271,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return;
       }
       lock (this) {
-        DebugFormat("Passing {0} files to background cacher", pendingFiles.Count);
+        DebugFormat(
+          "Passing {0} files to background cacher", pendingFiles.Count);
         BackgroundCacher.AddFiles(store, pendingFiles);
         pendingFiles.Clear();
       }

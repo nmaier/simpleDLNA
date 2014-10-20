@@ -9,10 +9,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private readonly FileInfo info;
 
-    private readonly static ILog logger = LogManager.GetLogger(typeof(FileReadStream));
+    private readonly static ILog logger =
+      LogManager.GetLogger(typeof(FileReadStream));
 
     public FileReadStream(FileInfo info)
-      : base(info.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, BUFFER_SIZE, FileOptions.Asynchronous | FileOptions.SequentialScan)
+      : base(info.FullName, FileMode.Open,
+             FileAccess.Read, FileShare.ReadWrite | FileShare.Delete,
+             BUFFER_SIZE,
+             FileOptions.Asynchronous | FileOptions.SequentialScan)
     {
       this.info = info;
       logger.DebugFormat("Opened file {0}", this.info.FullName);

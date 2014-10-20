@@ -9,7 +9,8 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-    internal HttpAuthorizationEventArgs(IHeaders headers, IPEndPoint remoteEndpoint)
+    internal HttpAuthorizationEventArgs(IHeaders headers,
+                                        IPEndPoint remoteEndpoint)
     {
       Headers = headers;
       RemoteEndpoint = remoteEndpoint;

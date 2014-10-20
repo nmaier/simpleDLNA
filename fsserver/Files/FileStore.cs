@@ -61,7 +61,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       SetupDatabase();
 
       select = connection.CreateCommand();
-      select.CommandText = "SELECT data FROM store WHERE key = ? AND size = ? AND time = ?";
+      select.CommandText =
+        "SELECT data FROM store WHERE key = ? AND size = ? AND time = ?";
       select.Parameters.Add(selectKey = select.CreateParameter());
       selectKey.DbType = DbType.String;
       select.Parameters.Add(selectSize = select.CreateParameter());
@@ -70,7 +71,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       selectTime.DbType = DbType.Int64;
 
       selectCover = connection.CreateCommand();
-      selectCover.CommandText = "SELECT cover FROM store WHERE key = ? AND size = ? AND time = ?";
+      selectCover.CommandText =
+        "SELECT cover FROM store WHERE key = ? AND size = ? AND time = ?";
       selectCover.Parameters.Add(selectCoverKey = select.CreateParameter());
       selectCoverKey.DbType = DbType.String;
       selectCover.Parameters.Add(selectCoverSize = select.CreateParameter());
@@ -103,7 +105,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       vacuumer.Add(connection);
     }
 
-    private void OpenConnection(FileInfo storeFile, out IDbConnection newConnection)
+    private void OpenConnection(FileInfo storeFile,
+                                out IDbConnection newConnection)
     {
       lock (globalLock) {
         newConnection = Sqlite.GetDatabaseConnection(storeFile);
@@ -144,11 +147,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       using (var transaction = connection.BeginTransaction()) {
         using (var pragma = connection.CreateCommand()) {
-          pragma.CommandText = string.Format("PRAGMA user_version = {0}", SCHEMA);
+          pragma.CommandText = string.Format(
+            "PRAGMA user_version = {0}", SCHEMA);
           pragma.ExecuteNonQuery();
         }
         using (var create = connection.CreateCommand()) {
-          create.CommandText = "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, size INT, time INT, data BINARY, cover BINARY)";
+          create.CommandText =
+            "CREATE TABLE IF NOT EXISTS store (key TEXT PRIMARY KEY ON CONFLICT REPLACE, size INT, time INT, data BINARY, cover BINARY)";
           create.ExecuteNonQuery();
         }
         transaction.Commit();
@@ -224,7 +229,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    internal BaseFile MaybeGetFile(FileServer server, FileInfo info, DlnaMime type)
+    internal BaseFile MaybeGetFile(FileServer server, FileInfo info,
+                                   DlnaMime type)
     {
       if (connection == null) {
         return null;

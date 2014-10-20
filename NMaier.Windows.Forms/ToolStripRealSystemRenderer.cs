@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ***/
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -245,7 +246,8 @@ namespace NMaier.Windows.Forms
       return renderer.GetColor(ColorProperty.TextColor);
     }
 
-    private Padding GetThemeMargins(IDeviceContext dc, MarginProperty marginType)
+    private Padding GetThemeMargins(IDeviceContext dc,
+                                    MarginProperty marginType)
     {
       NativeMethods.MARGINS margins;
       try {
@@ -299,7 +301,8 @@ namespace NMaier.Windows.Forms
       base.InitializePanel(toolStripPanel);
     }
 
-    protected static bool IsElementDefined(string className, int part, int state)
+    protected static bool IsElementDefined(string className, int part,
+                                           int state)
     {
       var el = new VSEInternal(className, part, state);
       bool rv;
@@ -335,9 +338,11 @@ namespace NMaier.Windows.Forms
       var rect = e.AffectedBounds;
       rect.Y += 2;
       rect.Height -= 4;
-      var sepWidth = renderer.GetPartSize(e.Graphics, ThemeSizeType.True).Width;
+      var sepWidth =
+        renderer.GetPartSize(e.Graphics, ThemeSizeType.True).Width;
       if (e.ToolStrip.RightToLeft == RightToLeft.Yes) {
-        rect = new Rectangle(rect.X - extraWidth, rect.Y, sepWidth, rect.Height);
+        rect = new Rectangle(
+          rect.X - extraWidth, rect.Y, sepWidth, rect.Height);
         rect.X += sepWidth;
       }
       else {
@@ -432,7 +437,8 @@ namespace NMaier.Windows.Forms
           rebarClass,
           VisualStyleElement.Rebar.Chevron.Normal.Part,
           state);
-        renderer.DrawBackground(e.Graphics, new Rectangle(Point.Empty, e.Item.Size));
+        renderer.DrawBackground(
+          e.Graphics, new Rectangle(Point.Empty, e.Item.Size));
       }
       else {
         base.OnRenderOverflowButtonBackground(e);

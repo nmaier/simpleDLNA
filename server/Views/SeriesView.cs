@@ -32,7 +32,8 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private static void SortFolder(IMediaFolder folder, SimpleKeyedVirtualFolder series)
+    private static void SortFolder(IMediaFolder folder,
+                                   SimpleKeyedVirtualFolder series)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
         SortFolder(f, series);

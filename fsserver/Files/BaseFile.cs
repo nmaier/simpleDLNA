@@ -27,19 +27,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private static readonly StringComparer comparer =
       new NaturalStringComparer(false);
 
-    protected BaseFile(FileServer server, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
+    protected BaseFile(FileServer server, FileInfo file, DlnaMime type,
+                       DlnaMediaTypes mediaType)
     {
       if (server == null) {
         throw new ArgumentNullException("server");
       }
       this.server = server;
-      Item = aFile;
+      Item = file;
 
       length = Item.Length;
       lastModified = Item.LastWriteTimeUtc;
 
-      Type = aType;
-      MediaType = aMediaType;
+      Type = type;
+      MediaType = mediaType;
 
       title = System.IO.Path.GetFileNameWithoutExtension(Item.Name);
       if (string.IsNullOrEmpty(title)) {
@@ -193,22 +194,18 @@ namespace NMaier.SimpleDlna.FileMediaServer
       return cover != null;
     }
 
-    internal static BaseFile GetFile(PlainFolder aParentFolder, FileInfo aFile, DlnaMime aType, DlnaMediaTypes aMediaType)
+    internal static BaseFile GetFile(PlainFolder parentFolder, FileInfo file,
+                                     DlnaMime type, DlnaMediaTypes mediaType)
     {
-      switch (aMediaType) {
+      switch (mediaType) {
         case DlnaMediaTypes.Video:
-          return new VideoFile(aParentFolder.Server, aFile, aType);
+          return new VideoFile(parentFolder.Server, file, type);
         case DlnaMediaTypes.Audio:
-          return new AudioFile(aParentFolder.Server, aFile, aType);
+          return new AudioFile(parentFolder.Server, file, type);
         case DlnaMediaTypes.Image:
-          return new ImageFile(aParentFolder.Server, aFile, aType);
+          return new ImageFile(parentFolder.Server, file, type);
         default:
-          return new BaseFile(
-          aParentFolder.Server,
-          aFile,
-          aType,
-          aMediaType
-          );
+          return new BaseFile(parentFolder.Server, file, type, mediaType);
       }
     }
 

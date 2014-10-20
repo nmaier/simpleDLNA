@@ -25,7 +25,10 @@ namespace NMaier.SimpleDlna.Server.Views
       var merges = from f in aFrom.ChildFolders
                    join t in aTo.ChildFolders on f.Title equals t.Title
                    where f != t
-                   select new { f = f as VirtualFolder, t = t as VirtualFolder };
+                   select new {
+                     f = f as VirtualFolder,
+                     t = t as VirtualFolder
+                   };
       foreach (var m in merges.ToList()) {
         MergeFolders(m.f, m.t);
         foreach (var c in m.f.ChildFolders.ToList()) {
@@ -39,7 +42,8 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private static bool TransformInternal(VirtualFolder root, VirtualFolder current)
+    private static bool TransformInternal(VirtualFolder root,
+                                          VirtualFolder current)
     {
       foreach (var f in current.ChildFolders.ToList()) {
         var vf = f as VirtualFolder;
@@ -77,7 +81,10 @@ namespace NMaier.SimpleDlna.Server.Views
                   from t in r.ChildFolders
                   where f != t
                   orderby f.Title, t.Title
-                  select new { f = f as VirtualFolder, t = t as VirtualFolder };
+                  select new {
+                    f = f as VirtualFolder,
+                    t = t as VirtualFolder
+                  };
       foreach (var c in cross) {
         MergeFolders(c.f, c.t);
       }

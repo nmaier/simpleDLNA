@@ -129,7 +129,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 #if DUMP_ALL_SSDP
         DebugFormat("{0} - SSDP Received a datagram", endpoint);
 #endif
-        using (var reader = new StreamReader(new MemoryStream(received), Encoding.ASCII)) {
+        using (var reader = new StreamReader(
+          new MemoryStream(received), Encoding.ASCII)) {
           var proto = reader.ReadLine();
           if (proto == null) {
             throw new IOException("Couldn't read protocol line");
@@ -167,7 +168,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       Receive();
     }
 
-    private void SendDatagram(IPEndPoint endpoint, IPAddress address, string message, bool sticky)
+    private void SendDatagram(IPEndPoint endpoint, IPAddress address,
+                              string message, bool sticky)
     {
       if (!running) {
         return;
@@ -197,7 +199,9 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock),
         false
         );
-      InfoFormat("{2}, {1} - Responded to a {0} request", dev.Type, endpoint, dev.Address);
+      InfoFormat(
+        "{2}, {1} - Responded to a {0} request", dev.Type, endpoint,
+        dev.Address);
     }
 
     private void Tick(object sender, Timers.ElapsedEventArgs e)
@@ -236,7 +240,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       DebugFormat("{0} said {1}", dev.USN, type);
     }
 
-    internal void RegisterNotification(Guid UUID, Uri Descriptor, IPAddress address)
+    internal void RegisterNotification(Guid UUID, Uri Descriptor,
+                                       IPAddress address)
     {
       List<UpnpDevice> list;
       lock (devices) {

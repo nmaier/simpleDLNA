@@ -15,7 +15,8 @@ namespace NMaier.SimpleDlna.Server
 
     public readonly Guid Uuid;
 
-    public UpnpDevice(Guid uuid, string type, Uri descriptor, IPAddress address)
+    public UpnpDevice(Guid uuid, string type, Uri descriptor,
+                      IPAddress address)
     {
       Uuid = uuid;
       Type = type;

@@ -15,14 +15,17 @@ namespace NMaier.SimpleDlna
 {
   public static class Program
   {
-    private readonly static ManualResetEvent BlockEvent = new ManualResetEvent(false);
+    private readonly static ManualResetEvent BlockEvent =
+      new ManualResetEvent(false);
 
     private static uint CancelHitCount = 0;
 
-    private static void CancelKeyPressed(object sender, ConsoleCancelEventArgs e)
+    private static void CancelKeyPressed(object sender,
+                                         ConsoleCancelEventArgs e)
     {
       if (CancelHitCount++ == 3) {
-        LogManager.GetLogger(typeof(Program)).Fatal("Emergency exit commencing");
+        LogManager.GetLogger(typeof(Program)).Fatal(
+          "Emergency exit commencing");
         return;
       }
       e.Cancel = true;
@@ -105,7 +108,8 @@ namespace NMaier.SimpleDlna
                 authorizer.AddMethod(new MacAuthorizer(options.Macs));
               }
               if (options.UserAgents.Length != 0) {
-                authorizer.AddMethod(new UserAgentAuthorizer(options.UserAgents));
+                authorizer.AddMethod(
+                  new UserAgentAuthorizer(options.UserAgents));
               }
 
               Console.Title = "SimpleDLNA - starting ...";
@@ -121,18 +125,23 @@ namespace NMaier.SimpleDlna
               if (options.Seperate) {
                 foreach (var d in options.Directories) {
                   server.InfoFormat("Mounting FileServer for {0}", d.FullName);
-                  var fs = SetupFileServer(options, types, new DirectoryInfo[] { d });
+                  var fs = SetupFileServer(
+                    options, types, new DirectoryInfo[] { d });
                   friendlyName = fs.FriendlyName;
                   server.RegisterMediaServer(fs);
                   server.NoticeFormat("{0} mounted", d.FullName);
                 }
               }
               else {
-                server.InfoFormat("Mounting FileServer for {0} ({1})", options.Directories[0], options.Directories.Length);
+                server.InfoFormat(
+                  "Mounting FileServer for {0} ({1})",
+                  options.Directories[0], options.Directories.Length);
                 var fs = SetupFileServer(options, types, options.Directories);
                 friendlyName = fs.FriendlyName;
                 server.RegisterMediaServer(fs);
-                server.NoticeFormat("{0} ({1}) mounted", options.Directories[0], options.Directories.Length);
+                server.NoticeFormat(
+                  "{0} ({1}) mounted",
+                  options.Directories[0], options.Directories.Length);
               }
 
               Console.Title = String.Format("{0} - running ...", friendlyName);
@@ -165,9 +174,12 @@ namespace NMaier.SimpleDlna
       server.Info("Closed!");
     }
 
-    private static FileServer SetupFileServer(Options options, DlnaMediaTypes types, DirectoryInfo[] d)
+    private static FileServer SetupFileServer(Options options,
+                                              DlnaMediaTypes types,
+                                              DirectoryInfo[] d)
     {
-      var ids = new Identifiers(ComparerRepository.Lookup(options.Order), options.DescendingOrder);
+      var ids = new Identifiers(
+        ComparerRepository.Lookup(options.Order), options.DescendingOrder);
       foreach (var v in options.Views) {
         try {
           ids.AddView(v);

@@ -22,7 +22,9 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private static void LinkTriple(TripleKeyedVirtualFolder folder, IMediaAudioResource r, string key1, string key2)
+    private static void LinkTriple(TripleKeyedVirtualFolder folder,
+                                   IMediaAudioResource r, string key1,
+                                   string key2)
     {
       if (string.IsNullOrWhiteSpace(key1)) {
         return;
@@ -31,7 +33,8 @@ namespace NMaier.SimpleDlna.Server.Views
         return;
       }
       var targetFolder = folder
-        .GetFolder(key1.StemCompareBase().First().ToString().ToUpper(CultureInfo.CurrentUICulture))
+        .GetFolder(key1.StemCompareBase().First().ToString()
+        .ToUpper(CultureInfo.CurrentUICulture))
         .GetFolder(key1.StemNameBase());
       targetFolder
         .GetFolder(key2.StemNameBase())
@@ -42,7 +45,11 @@ namespace NMaier.SimpleDlna.Server.Views
       .AddResource(allRes);
     }
 
-    private static void SortFolder(VirtualFolder folder, TripleKeyedVirtualFolder artists, TripleKeyedVirtualFolder performers, DoubleKeyedVirtualFolder albums, SimpleKeyedVirtualFolder genres)
+    private static void SortFolder(VirtualFolder folder,
+                                   TripleKeyedVirtualFolder artists,
+                                   TripleKeyedVirtualFolder performers,
+                                   DoubleKeyedVirtualFolder albums,
+                                   SimpleKeyedVirtualFolder genres)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
         SortFolder(f as VirtualFolder, artists, performers, albums, genres);
@@ -108,7 +115,8 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private class DoubleKeyedVirtualFolder : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
+    private class DoubleKeyedVirtualFolder
+      : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
     {
       public DoubleKeyedVirtualFolder()
       {
@@ -132,7 +140,8 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private class TripleKeyedVirtualFolder : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
+    private class TripleKeyedVirtualFolder
+      : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
     {
       public TripleKeyedVirtualFolder()
       {

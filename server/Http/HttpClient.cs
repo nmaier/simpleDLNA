@@ -22,7 +22,8 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly byte[] buffer = new byte[2048];
 
-    private static readonly Regex bytes = new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
+    private static readonly Regex bytes =
+      new Regex(@"^bytes=(\d+)(?:-(\d+)?)?$", RegexOptions.Compiled);
 
     private readonly static IHandler Error403 =
       new StaticHandler(new StringResponse(
@@ -220,8 +221,9 @@ namespace NMaier.SimpleDlna.Server
         if (!long.TryParse(m.Groups[1].Value, out start) || start < 0) {
           throw new InvalidDataException("Not parsed");
         }
-        if (m.Groups.Count != 3 || !long.TryParse(m.Groups[2].Value, out end) ||
-          end <= start || end >= totalLength) {
+        if (m.Groups.Count != 3 ||
+            !long.TryParse(m.Groups[2].Value, out end) ||
+            end <= start || end >= totalLength) {
           end = totalLength - 1;
         }
         if (start >= end) {
@@ -242,7 +244,8 @@ namespace NMaier.SimpleDlna.Server
         status = HttpCode.Partial;
       }
       catch (Exception ex) {
-        Warn(String.Format("{0} - Failed to process range request!", this), ex);
+        Warn(String.Format(
+          "{0} - Failed to process range request!", this), ex);
       }
       return responseBody;
     }
@@ -321,7 +324,8 @@ namespace NMaier.SimpleDlna.Server
           }
         }
         if (bodyBytes != 0 && bodyBytes > readStream.Length) {
-          DebugFormat("{0} - Bytes to go {1}", this, bodyBytes - readStream.Length);
+          DebugFormat(
+            "{0} - Bytes to go {1}", this, bodyBytes - readStream.Length);
           Read();
           return;
         }
@@ -465,7 +469,8 @@ namespace NMaier.SimpleDlna.Server
     {
       State = HttpStates.CLOSED;
 
-      DebugFormat("{0} - Closing connection after {1} requests", this, requestCount);
+      DebugFormat(
+        "{0} - Closing connection after {1} requests", this, requestCount);
       try {
         client.Close();
       }

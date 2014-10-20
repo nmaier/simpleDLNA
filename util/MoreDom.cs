@@ -10,7 +10,8 @@ namespace NMaier.SimpleDlna.Utilities
       return EL(doc, name, null, null);
     }
 
-    public static XmlElement EL(this XmlDocument doc, string name, AttributeCollection attributes)
+    public static XmlElement EL(this XmlDocument doc, string name,
+                                AttributeCollection attributes)
     {
       return EL(doc, name, attributes, null);
     }
@@ -20,7 +21,8 @@ namespace NMaier.SimpleDlna.Utilities
       return EL(doc, name, null, text);
     }
 
-    public static XmlElement EL(this XmlDocument doc, string name, AttributeCollection attributes, string text)
+    public static XmlElement EL(this XmlDocument doc, string name,
+                                AttributeCollection attributes, string text)
     {
       if (doc == null) {
         throw new ArgumentNullException("doc");

@@ -100,12 +100,14 @@ namespace NMaier.SimpleDlna.Utilities
       logger.DebugFormat(format, arg0, arg1);
     }
 
-    public void DebugFormat(IFormatProvider provider, string format, params object[] args)
+    public void DebugFormat(IFormatProvider provider, string format,
+                            params object[] args)
     {
       logger.DebugFormat(provider, format, args);
     }
 
-    public void DebugFormat(string format, object arg0, object arg1, object arg2)
+    public void DebugFormat(string format, object arg0, object arg1,
+                            object arg2)
     {
       logger.DebugFormat(format, arg0, arg1, arg2);
     }
@@ -135,12 +137,14 @@ namespace NMaier.SimpleDlna.Utilities
       logger.ErrorFormat(format, arg0, arg1);
     }
 
-    public void ErrorFormat(IFormatProvider provider, string format, params object[] args)
+    public void ErrorFormat(IFormatProvider provider, string format,
+                            params object[] args)
     {
       logger.ErrorFormat(provider, format, args);
     }
 
-    public void ErrorFormat(string format, object arg0, object arg1, object arg2)
+    public void ErrorFormat(string format, object arg0, object arg1,
+                            object arg2)
     {
       logger.ErrorFormat(format, arg0, arg1, arg2);
     }
@@ -170,12 +174,14 @@ namespace NMaier.SimpleDlna.Utilities
       logger.FatalFormat(format, arg0, arg1);
     }
 
-    public void FatalFormat(IFormatProvider provider, string format, params object[] args)
+    public void FatalFormat(IFormatProvider provider, string format,
+                            params object[] args)
     {
       logger.FatalFormat(provider, format, args);
     }
 
-    public void FatalFormat(string format, object arg0, object arg1, object arg2)
+    public void FatalFormat(string format, object arg0, object arg1,
+                            object arg2)
     {
       logger.FatalFormat(format, arg0, arg1, arg2);
     }
@@ -205,12 +211,14 @@ namespace NMaier.SimpleDlna.Utilities
       logger.InfoFormat(format, arg0, arg1);
     }
 
-    public void InfoFormat(IFormatProvider provider, string format, params object[] args)
+    public void InfoFormat(IFormatProvider provider, string format,
+                           params object[] args)
     {
       logger.InfoFormat(provider, format, args);
     }
 
-    public void InfoFormat(string format, object arg0, object arg1, object arg2)
+    public void InfoFormat(string format, object arg0, object arg1,
+                           object arg2)
     {
       logger.InfoFormat(format, arg0, arg1, arg2);
     }
@@ -237,17 +245,23 @@ namespace NMaier.SimpleDlna.Utilities
 
     public void NoticeFormat(string format, object arg0, object arg1)
     {
-      Logger.Log(GetType(), Level.Notice, string.Format(format, arg0, arg1), null);
+      Logger.Log(
+        GetType(), Level.Notice, string.Format(format, arg0, arg1), null);
     }
 
-    public void NoticeFormat(IFormatProvider provider, string format, params object[] args)
+    public void NoticeFormat(IFormatProvider provider, string format,
+                             params object[] args)
     {
-      Logger.Log(GetType(), Level.Notice, string.Format(provider, format, args), null);
+      Logger.Log(
+        GetType(), Level.Notice, string.Format(provider, format, args), null);
     }
 
-    public void NoticeFormat(string format, object arg0, object arg1, object arg2)
+    public void NoticeFormat(string format, object arg0, object arg1,
+                             object arg2)
     {
-      Logger.Log(GetType(), Level.Notice, string.Format(format, arg0, arg1, arg2), null);
+      Logger.Log(
+        GetType(), Level.Notice, string.Format(format, arg0, arg1, arg2),
+        null);
     }
 
     public void Warn(object message)
@@ -275,12 +289,14 @@ namespace NMaier.SimpleDlna.Utilities
       logger.WarnFormat(format, arg0, arg1);
     }
 
-    public void WarnFormat(IFormatProvider provider, string format, params object[] args)
+    public void WarnFormat(IFormatProvider provider, string format,
+                           params object[] args)
     {
       logger.WarnFormat(provider, format, args);
     }
 
-    public void WarnFormat(string format, object arg0, object arg1, object arg2)
+    public void WarnFormat(string format, object arg0, object arg1,
+                           object arg2)
     {
       logger.WarnFormat(format, arg0, arg1, arg2);
     }

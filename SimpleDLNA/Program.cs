@@ -1,9 +1,7 @@
-﻿using NMaier.Windows.Forms;
-using System;
+﻿using System;
 using System.IO.Pipes;
 using System.Threading;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -15,7 +13,8 @@ namespace NMaier.SimpleDlna.GUI
       using (var mutex = new Mutex(false, @"Global\simpledlnaguilock")) {
 #if !DEBUG
         if (!mutex.WaitOne(0, false)) {
-          using (var pipe = new NamedPipeClientStream(".", "simpledlnagui", PipeDirection.Out)) {
+          using (var pipe = new NamedPipeClientStream(
+              ".", "simpledlnagui", PipeDirection.Out)) {
             try {
               pipe.Connect(10000);
               pipe.WriteByte(1);
@@ -33,9 +32,12 @@ namespace NMaier.SimpleDlna.GUI
             Application.Run(main);
           }
           catch (Exception ex) {
-            log4net.LogManager.GetLogger(typeof(Program)).Fatal("Encountered fatal unhandled exception", ex);
+            log4net.LogManager.GetLogger(typeof(Program)).Fatal(
+              "Encountered fatal unhandled exception", ex);
             MessageBox.Show(
-              string.Format("Encountered an unhandled error. Will exit now.\n\n{0}\n{1}", ex.Message, ex.StackTrace),
+              string.Format(
+                "Encountered an unhandled error. Will exit now.\n\n{0}\n{1}",
+                ex.Message, ex.StackTrace),
               "Error",
               MessageBoxButtons.OK,
               MessageBoxIcon.Error

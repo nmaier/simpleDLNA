@@ -28,9 +28,12 @@ namespace NMaier.SimpleDlna.GUI
 
       textName.Text = description.Name;
 
-      checkVideo.Checked = (description.Types & DlnaMediaTypes.Video) == DlnaMediaTypes.Video;
-      checkAudio.Checked = (description.Types & DlnaMediaTypes.Audio) == DlnaMediaTypes.Audio;
-      checkImages.Checked = (description.Types & DlnaMediaTypes.Image) == DlnaMediaTypes.Image;
+      checkVideo.Checked =
+        (description.Types & DlnaMediaTypes.Video) == DlnaMediaTypes.Video;
+      checkAudio.Checked =
+        (description.Types & DlnaMediaTypes.Audio) == DlnaMediaTypes.Audio;
+      checkImages.Checked =
+        (description.Types & DlnaMediaTypes.Image) == DlnaMediaTypes.Image;
 
       foreach (var i in comboOrder.Items) {
         if (((IItemComparer)i).Name == description.Order) {
@@ -41,7 +44,9 @@ namespace NMaier.SimpleDlna.GUI
       checkOrderDescending.Checked = description.OrderDescending;
 
       foreach (var v in description.Views) {
-        var i = new ListViewItem(new string[] { v, ViewRepository.Lookup(v).Description });
+        var i = new ListViewItem(new string[] {
+          v, ViewRepository.Lookup(v).Description
+        });
         listViews.Items.Add(i);
       }
       foreach (var d in description.Directories) {
@@ -169,7 +174,8 @@ namespace NMaier.SimpleDlna.GUI
           break;
       }
       if (!valid) {
-        errorProvider.SetError(textRestriction, "You must provide a valid value");
+        errorProvider.SetError(
+          textRestriction, "You must provide a valid value");
         return;
       }
       var item = listRestrictions.Items.Add(re);
@@ -184,7 +190,8 @@ namespace NMaier.SimpleDlna.GUI
       if (i == null) {
         return;
       }
-      listViews.Items.Add(new ListViewItem(new string[] { i.Name, i.Description }));
+      listViews.Items.Add(
+        new ListViewItem(new string[] { i.Name, i.Description }));
       SizeColumns(listViews);
     }
 
@@ -244,7 +251,8 @@ namespace NMaier.SimpleDlna.GUI
     private void listDirectories_Validating(object sender, CancelEventArgs e)
     {
       if (listDirectories.Items.Count == 0) {
-        errorProvider.SetError(listDirectoriesAnchor, "Must specify at least one directory");
+        errorProvider.SetError(
+          listDirectoriesAnchor, "Must specify at least one directory");
         e.Cancel = true;
       }
       else {

@@ -6,7 +6,8 @@ namespace NMaier.SimpleDlna.Utilities
   [Serializable]
   public sealed class RepositoryLookupException : ArgumentException
   {
-    private RepositoryLookupException(SerializationInfo info, StreamingContext context)
+    private RepositoryLookupException(SerializationInfo info,
+                                      StreamingContext context)
       : base(info, context)
     {
     }
@@ -32,7 +33,8 @@ namespace NMaier.SimpleDlna.Utilities
       private set;
     }
 
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    public override void GetObjectData(SerializationInfo info,
+                                       StreamingContext context)
     {
       base.GetObjectData(info, context);
     }

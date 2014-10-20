@@ -2,7 +2,8 @@
 
 namespace NMaier.SimpleDlna.Server
 {
-  internal class AudioResourceDecorator : MediaResourceDecorator<IMediaAudioResource>
+  internal class AudioResourceDecorator
+    : MediaResourceDecorator<IMediaAudioResource>
   {
     public AudioResourceDecorator(IMediaAudioResource resource)
       : base(resource)

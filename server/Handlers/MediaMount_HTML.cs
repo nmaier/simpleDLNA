@@ -58,27 +58,36 @@ namespace NMaier.SimpleDlna.Server
       article.AppendChild(folders);
 
       var items = (XmlNode)null;
-      article.AppendChild(items = document.EL("ul", new AttributeCollection() { { "class", "items" } }));
+      article.AppendChild(items = document.EL(
+        "ul", new AttributeCollection() { { "class", "items" } }));
       foreach (var i in item.ChildItems) {
         items.AppendChild(e = document.EL("li"));
         var link = document.EL(
           "a",
           new AttributeCollection() {
-            { "href", string.Format("{0}file/{1}/{2}.{3}", prefix, i.Id, i.Title, DlnaMaps.Dlna2Ext[i.Type][0]) }
+            { "href", string.Format(
+              "{0}file/{1}/{2}.{3}", prefix, i.Id, i.Title,
+              DlnaMaps.Dlna2Ext[i.Type][0]) }
           }
           );
         var details = document.EL("section");
         link.AppendChild(details);
         e.AppendChild(link);
 
-        details.AppendChild(document.EL("h3", new AttributeCollection { { "title", i.Title } }, i.Title));
+        details.AppendChild(document.EL(
+          "h3", new AttributeCollection { { "title", i.Title } }, i.Title));
 
         var props = i.Properties;
         if (props.ContainsKey("HasCover")) {
           details.AppendChild(document.EL(
-          "img",
-          new AttributeCollection { { "title", "Cover image" }, { "alt", "Cover image" }, { "src", String.Format("{0}cover/{1}/{2}.{3}", prefix, i.Id, i.Title, DlnaMaps.Dlna2Ext[i.Type][0]) } }
-          ));
+            "img",
+            new AttributeCollection {
+              { "title", "Cover image" },
+              { "alt", "Cover image" },
+              { "src", String.Format(
+                "{0}cover/{1}/{2}.{3}", prefix, i.Id, i.Title,
+                DlnaMaps.Dlna2Ext[i.Type][0]) }
+            }));
         }
 
         var table = document.EL("table");
@@ -96,7 +105,9 @@ namespace NMaier.SimpleDlna.Server
 
         string description;
         if (props.TryGetValue("Description", out description)) {
-          link.AppendChild(document.EL("p", new AttributeCollection() { { "class", "desc" } }, description));
+          link.AppendChild(document.EL(
+            "p", new AttributeCollection() { { "class", "desc" } },
+            description));
         }
       }
 

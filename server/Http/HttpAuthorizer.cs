@@ -5,7 +5,8 @@ using System.Net;
 
 namespace NMaier.SimpleDlna.Server
 {
-  public sealed class HttpAuthorizer : Logging, IHttpAuthorizationMethod, IDisposable
+  public sealed class HttpAuthorizer
+    : Logging, IHttpAuthorizationMethod, IDisposable
   {
     private readonly List<IHttpAuthorizationMethod> methods =
       new List<IHttpAuthorizationMethod>();

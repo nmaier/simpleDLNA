@@ -9,7 +9,8 @@ using System.Threading;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  internal sealed class VideoThumbnailLoader : Logging, IThumbnailLoader, IDisposable
+  internal sealed class VideoThumbnailLoader
+    : Logging, IThumbnailLoader, IDisposable
   {
     private Semaphore semaphore = new Semaphore(2, 2);
 
@@ -28,10 +29,13 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
-    private static MemoryStream GetThumbnailFromProcess(Process p, ref int width, ref int height)
+    private static MemoryStream GetThumbnailFromProcess(Process p,
+                                                        ref int width,
+                                                        ref int height)
     {
       using (var thumb = new MemoryStream()) {
-        using (var pump = new StreamPump(p.StandardOutput.BaseStream, thumb, 4096)) {
+        using (var pump = new StreamPump(
+          p.StandardOutput.BaseStream, thumb, 4096)) {
           pump.Pump(null);
           if (!p.WaitForExit(20000)) {
             p.Kill();
@@ -48,7 +52,8 @@ namespace NMaier.SimpleDlna.Thumbnails
           }
 
           using (var img = Image.FromStream(thumb)) {
-            using (var scaled = ThumbnailMaker.ResizeImage(img, width, height, ThumbnailMakerBorder.Bordered)) {
+            using (var scaled = ThumbnailMaker.ResizeImage(img, width, height,
+              ThumbnailMakerBorder.Bordered)) {
               width = scaled.Width;
               height = scaled.Height;
               var rv = new MemoryStream();
@@ -66,7 +71,9 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
-    private static MemoryStream GetThumbnailInternal(Stream stream, ref int width, ref int height)
+    private static MemoryStream GetThumbnailInternal(Stream stream,
+                                                     ref int width,
+                                                     ref int height)
     {
       using (var p = new Process()) {
         var pos = 20L;
@@ -113,10 +120,13 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
-    private MemoryStream GetThumbnailInternal(FileInfo file, ref int width, ref int height)
+    private MemoryStream GetThumbnailInternal(FileInfo file, ref int width,
+                                              ref int height)
     {
       Exception last = null;
-      for (var best = IdentifyBestCapturePosition(file); best >= 0; best -= Math.Max(best / 2, 5)) {
+      for (var best = IdentifyBestCapturePosition(file);
+           best >= 0;
+           best -= Math.Max(best / 2, 5)) {
         try {
           using (var p = new Process()) {
             var sti = p.StartInfo;
@@ -184,7 +194,8 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
-    public MemoryStream GetThumbnail(object item, ref int width, ref int height)
+    public MemoryStream GetThumbnail(object item, ref int width,
+                                     ref int height)
     {
       semaphore.WaitOne();
       try {

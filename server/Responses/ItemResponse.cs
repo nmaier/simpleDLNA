@@ -13,7 +13,8 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly HttpCode status = HttpCode.Ok;
 
-    public ItemResponse(string prefix, IRequest request, IMediaResource item, string transferMode = "Streaming")
+    public ItemResponse(string prefix, IRequest request, IMediaResource item,
+                        string transferMode = "Streaming")
     {
       this.item = item;
       headers = new ResponseHeaders(noCache: !(item is IMediaCoverResource));

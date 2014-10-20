@@ -55,7 +55,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    public static void AddFiles(FileStore store, IEnumerable<WeakReference> items)
+    public static void AddFiles(FileStore store,
+                                IEnumerable<WeakReference> items)
     {
       var storeRef = new WeakReference(store);
       foreach (var i in items) {

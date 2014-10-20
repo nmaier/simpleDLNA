@@ -11,23 +11,30 @@ namespace NMaier.SimpleDlna.Server
   {
     private const string NS_DC = "http://purl.org/dc/elements/1.1/";
 
-    private const string NS_DIDL = "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/";
+    private const string NS_DIDL =
+      "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/";
 
-    private const string NS_DLNA = "urn:schemas-dlna-org:metadata-1-0/";
+    private const string NS_DLNA =
+      "urn:schemas-dlna-org:metadata-1-0/";
 
     private const string NS_SEC = "http://www.sec.co.kr/";
 
-    private const string NS_SOAPENV = "http://schemas.xmlsoap.org/soap/envelope/";
+    private const string NS_SOAPENV =
+      "http://schemas.xmlsoap.org/soap/envelope/";
 
     private const string NS_UPNP = "urn:schemas-upnp-org:metadata-1-0/upnp/";
 
-    private static readonly string featureList = Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
+    private static readonly string featureList =
+      Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
 
-    private readonly static IDictionary<string, AttributeCollection> soapCache = new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
+    private readonly static IDictionary<string, AttributeCollection> soapCache =
+      new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
 
-    private readonly static XmlNamespaceManager namespaceMgr = CreateNamespaceManager();
+    private readonly static XmlNamespaceManager namespaceMgr =
+      CreateNamespaceManager();
 
-    private static void AddBookmarkInfo(IMediaResource resource, XmlElement item)
+    private static void AddBookmarkInfo(IMediaResource resource,
+                                        XmlElement item)
     {
       var bookmarkable = resource as IBookmarkable;
       if (bookmarkable == null) {
@@ -35,13 +42,15 @@ namespace NMaier.SimpleDlna.Server
       }
       var bookmark = bookmarkable.Bookmark;
       if (bookmark.HasValue) {
-        var dcmInfo = item.OwnerDocument.CreateElement("sec", "dcmInfo", NS_SEC);
+        var dcmInfo = item.OwnerDocument.CreateElement(
+          "sec", "dcmInfo", NS_SEC);
         dcmInfo.InnerText = string.Format("BM={0}", bookmark.Value);
         item.AppendChild(dcmInfo);
       }
     }
 
-    private void AddCover(IRequest request, IMediaResource resource, XmlElement item)
+    private void AddCover(IRequest request, IMediaResource resource,
+                          XmlElement item)
     {
       var result = item.OwnerDocument;
       var cover = resource as IMediaCover;
@@ -135,7 +144,8 @@ namespace NMaier.SimpleDlna.Server
         item.AppendChild(e);
       }
       if (props.TryGetValue("Track", out prop)) {
-        var e = item.OwnerDocument.CreateElement("upnp", "originalTrackNumber", NS_UPNP);
+        var e = item.OwnerDocument.CreateElement(
+          "upnp", "originalTrackNumber", NS_UPNP);
         e.InnerText = prop;
         item.AppendChild(e);
       }
@@ -152,7 +162,9 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    private static void AddVideoProperties(IRequest request, IMediaResource resource, XmlElement item)
+    private static void AddVideoProperties(IRequest request,
+                                           IMediaResource resource,
+                                           XmlElement item)
     {
       var mvi = resource as IMetaVideoItem;
       if (mvi == null) {
@@ -171,9 +183,10 @@ namespace NMaier.SimpleDlna.Server
       catch (Exception) {
       }
 #if ANNOUNCE_SUBTITLE_IN_SOAP
-      // This is a kind of costly operation, as getting subtitles in general for the
-      // first time is costly. Most Samsung TVs seem to query the subtitle when actually
-      // playing a file anyway (see ItemResponse), and that should be enough.
+      // This is a kind of costly operation, as getting subtitles in general
+      // for the first time is costly. Most Samsung TVs seem to query the
+      // subtitle when actually playing a file anyway (see ItemResponse), and 
+      // that should be enough.
       if (mvi.SubTitle.HasSubtitle) {
         var surl = String.Format(
           "http://{0}:{1}{2}subtitle/{3}/st.srt",
@@ -223,7 +236,8 @@ namespace NMaier.SimpleDlna.Server
       result.DocumentElement.AppendChild(container);
     }
 
-    private void Browse_AddItem(IRequest request, XmlDocument result, IMediaResource resource)
+    private void Browse_AddItem(IRequest request, XmlDocument result,
+                                IMediaResource resource)
     {
       var props = resource.Properties;
 
@@ -274,7 +288,9 @@ namespace NMaier.SimpleDlna.Server
       result.DocumentElement.AppendChild(item);
     }
 
-    private int BrowseFolder_AddItems(IRequest request, XmlDocument result, IMediaFolder root, int start, int requested)
+    private int BrowseFolder_AddItems(IRequest request, XmlDocument result,
+                                      IMediaFolder root, int start,
+                                      int requested)
     {
       var provided = 0;
       foreach (var i in root.ChildFolders) {
@@ -309,7 +325,8 @@ namespace NMaier.SimpleDlna.Server
       return rv;
     }
 
-    private static XmlElement CreateObjectClass(XmlDocument result, IMediaResource resource)
+    private static XmlElement CreateObjectClass(XmlDocument result,
+                                                IMediaResource resource)
     {
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
       switch (resource.MediaType) {
@@ -328,7 +345,8 @@ namespace NMaier.SimpleDlna.Server
       return objectClass;
     }
 
-    private IEnumerable<KeyValuePair<string, string>> HandleBrowse(IRequest request, IHeaders sparams)
+    private IEnumerable<KeyValuePair<string, string>> HandleBrowse(
+      IRequest request, IHeaders sparams)
     {
       var key = Prefix + sparams.HeaderBlock;
       AttributeCollection rv;
@@ -343,7 +361,8 @@ namespace NMaier.SimpleDlna.Server
       var provided = 0;
       var start = 0;
       try {
-        if (int.TryParse(sparams["RequestedCount"], out requested) && requested <= 0) {
+        if (int.TryParse(sparams["RequestedCount"], out requested) &&
+            requested <= 0) {
           requested = 20;
         }
         if (int.TryParse(sparams["StartingIndex"], out start) && start <= 0) {
@@ -369,7 +388,8 @@ namespace NMaier.SimpleDlna.Server
         provided++;
       }
       else {
-        provided = BrowseFolder_AddItems(request, result, root, start, requested);
+        provided = BrowseFolder_AddItems(
+          request, result, root, start, requested);
       }
       var resXML = result.OuterXml;
       rv = new AttributeCollection() {
@@ -452,7 +472,8 @@ namespace NMaier.SimpleDlna.Server
         if (newbookmark > 30) {
           newbookmark -= 5;
         }
-        if (newbookmark > 30 || !item.Bookmark.HasValue || item.Bookmark.Value < 60) {
+        if (newbookmark > 30 || !item.Bookmark.HasValue ||
+            item.Bookmark.Value < 60) {
           item.Bookmark = newbookmark;
           soapCache.Clear();
         }
@@ -478,7 +499,9 @@ namespace NMaier.SimpleDlna.Server
       env.AppendChild(env.CreateXmlDeclaration("1.0", "utf-8", "yes"));
       var envelope = env.CreateElement("SOAP-ENV", "Envelope", NS_SOAPENV);
       env.AppendChild(envelope);
-      envelope.SetAttribute("encodingStyle", NS_SOAPENV, "http://schemas.xmlsoap.org/soap/encoding/");
+      envelope.SetAttribute(
+        "encodingStyle", NS_SOAPENV,
+        "http://schemas.xmlsoap.org/soap/encoding/");
 
       var rbody = env.CreateElement("SOAP-ENV:Body", NS_SOAPENV);
       env.DocumentElement.AppendChild(rbody);
@@ -526,7 +549,8 @@ namespace NMaier.SimpleDlna.Server
           default:
             throw new HttpStatusException(HttpCode.NotFound);
         }
-        var response = env.CreateElement(String.Format("u:{0}Response", method.LocalName), method.NamespaceURI);
+        var response = env.CreateElement(String.Format(
+          "u:{0}Response", method.LocalName), method.NamespaceURI);
         rbody.AppendChild(response);
 
         foreach (var i in result) {
@@ -545,10 +569,13 @@ namespace NMaier.SimpleDlna.Server
         faultString.InnerText = ex.ToString();
         fault.AppendChild(faultString);
         var detail = env.CreateDocumentFragment();
-        detail.InnerXml = "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>401</errorCode><errorDescription>Invalid Action</errorDescription></UPnPError></detail>";
+        detail.InnerXml =
+          "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>401</errorCode><errorDescription>Invalid Action</errorDescription></UPnPError></detail>";
         fault.AppendChild(detail);
         rbody.AppendChild(fault);
-        WarnFormat("Invalid call: Action: {0}, Params: {1}, Problem {2}", method.LocalName, sparams, ex.Message);
+        WarnFormat(
+          "Invalid call: Action: {0}, Params: {1}, Problem {2}",
+          method.LocalName, sparams, ex.Message);
       }
 
       var rv = new StringResponse(code, "text/xml", env.OuterXml);

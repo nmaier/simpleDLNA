@@ -11,7 +11,8 @@ namespace NMaier.SimpleDlna.Server
       title += " – SimpleDLNA";
 
       var document = new XmlDocument();
-      document.AppendChild(document.CreateDocumentType("html", null, null, null));
+      document.AppendChild(document.CreateDocumentType(
+        "html", null, null, null));
 
       document.AppendChild(document.EL("html"));
 
@@ -53,7 +54,9 @@ namespace NMaier.SimpleDlna.Server
         "A simple, zero-config DLNA media server, that you can just fire up and be done with it."
         ));
       footer.AppendChild(document.EL("a",
-        new AttributeCollection() { { "href", "https://github.com/nmaier/simpleDLNA/" } },
+        new AttributeCollection() {
+          { "href", "https://github.com/nmaier/simpleDLNA/" }
+        },
         "Fork me on GitHub"
         ));
       body.AppendChild(footer);

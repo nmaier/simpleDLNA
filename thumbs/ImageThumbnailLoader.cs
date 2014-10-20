@@ -16,7 +16,8 @@ namespace NMaier.SimpleDlna.Thumbnails
       }
     }
 
-    public MemoryStream GetThumbnail(object item, ref int width, ref int height)
+    public MemoryStream GetThumbnail(object item, ref int width,
+                                     ref int height)
     {
       Image img = null;
       var stream = item as Stream;
@@ -33,7 +34,8 @@ namespace NMaier.SimpleDlna.Thumbnails
         }
       }
       using (img) {
-        using (var scaled = ThumbnailMaker.ResizeImage(img, width, height, ThumbnailMakerBorder.Borderless)) {
+        using (var scaled = ThumbnailMaker.ResizeImage(
+          img, width, height, ThumbnailMakerBorder.Borderless)) {
           width = scaled.Width;
           height = scaled.Height;
           var rv = new MemoryStream();

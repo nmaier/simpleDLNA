@@ -16,10 +16,11 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     public readonly bool Sticky;
 
-    public Datagram(IPEndPoint endPoint, IPAddress localAddresss, string message, bool sticky)
+    public Datagram(IPEndPoint endPoint, IPAddress localAddress,
+                    string message, bool sticky)
     {
       EndPoint = endPoint;
-      LocalAddress = localAddresss;
+      LocalAddress = localAddress;
       Message = message;
       Sticky = sticky;
       SendCount = 0;

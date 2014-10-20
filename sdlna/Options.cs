@@ -22,12 +22,14 @@ namespace NMaier.SimpleDlna
     private string[] uas = new string[0];
 
     [Parameters(HelpVar = "Directory")]
-    public DirectoryInfo[] Directories = new DirectoryInfo[] { new DirectoryInfo(".") };
+    public DirectoryInfo[] Directories =
+      new DirectoryInfo[] { new DirectoryInfo(".") };
 
     [Argument("type", HelpText = "Types to serv (IMAGE, VIDEO, AUDIO; default: all)")]
     [ArgumentAlias("what")]
     [ShortArgument('t')]
-    public DlnaMediaTypes[] Types = new DlnaMediaTypes[] { DlnaMediaTypes.Video, DlnaMediaTypes.Image, DlnaMediaTypes.Audio };
+    public DlnaMediaTypes[] Types =
+      new DlnaMediaTypes[] { DlnaMediaTypes.Video, DlnaMediaTypes.Image, DlnaMediaTypes.Audio };
 
     [Argument("view", HelpText = "Apply a view (default: no views applied)", HelpVar = "view")]
     [ShortArgument('v')]
@@ -98,7 +100,8 @@ namespace NMaier.SimpleDlna
             IPAddress.Parse(ip);
           }
           catch (Exception) {
-            throw new GetOptException(string.Format("Not a valid IP address: {0}", ip));
+            throw new GetOptException(string.Format(
+              "Not a valid IP address: {0}", ip));
           }
         }
         ips = value;
@@ -117,14 +120,15 @@ namespace NMaier.SimpleDlna
       {
         foreach (var mac in value) {
           if (!IP.IsAcceptedMAC(mac)) {
-            throw new GetOptException(string.Format("Not a valid mac address: {0}. Must have a form of 01:AF:BC:00:0A:FF!", mac));
+            throw new GetOptException(string.Format(
+              "Not a valid mac address: {0}. Must have a form of 01:AF:BC:00:0A:FF!", mac));
           }
         }
         macs = value;
       }
     }
 
-    [Argument("port", HelpVar = "port", HelpText = "Webserver listen port (default: 0, bind an available port)")]
+    [Argument("port", HelpVar = "port", HelpText = "Web server listen port (default: 0, bind an available port)")]
     [ShortArgument('p')]
     public int Port
     {
@@ -135,7 +139,8 @@ namespace NMaier.SimpleDlna
       set
       {
         if (value != 0 && (value < 1 || value > ushort.MaxValue)) {
-          throw new GetOptException("Port must be between 2 and " + ushort.MaxValue);
+          throw new GetOptException(
+            "Port must be between 2 and " + ushort.MaxValue);
         }
         port = value;
       }

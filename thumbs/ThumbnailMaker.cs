@@ -48,7 +48,8 @@ namespace NMaier.SimpleDlna.Thumbnails
       return thumbers;
     }
 
-    private static bool GetThumbnailFromCache(ref string key, ref int width, ref int height, out byte[] rv)
+    private static bool GetThumbnailFromCache(ref string key, ref int width,
+                                              ref int height, out byte[] rv)
     {
       key = string.Format("{0}x{1} {2}", width, height, key);
       CacheItem ci;
@@ -64,7 +65,9 @@ namespace NMaier.SimpleDlna.Thumbnails
       return false;
     }
 
-    private byte[] GetThumbnailInternal(string key, object item, DlnaMediaTypes type, ref int width, ref int height)
+    private byte[] GetThumbnailInternal(string key, object item,
+                                        DlnaMediaTypes type, ref int width,
+                                        ref int height)
     {
       var thumbnailers = thumbers[type];
       var rw = width;
@@ -80,14 +83,16 @@ namespace NMaier.SimpleDlna.Thumbnails
           }
         }
         catch (Exception ex) {
-          Debug(String.Format("{0} failed to thumbnail a resource", thumber.GetType()), ex);
+          Debug(String.Format(
+            "{0} failed to thumbnail a resource", thumber.GetType()), ex);
           continue;
         }
       }
       throw new ArgumentException("Not a supported resource");
     }
 
-    internal static Image ResizeImage(Image image, int width, int height, ThumbnailMakerBorder border)
+    internal static Image ResizeImage(Image image, int width, int height,
+                                      ThumbnailMakerBorder border)
     {
       var nw = (float)image.Width;
       var nh = (float)image.Height;
@@ -113,11 +118,14 @@ namespace NMaier.SimpleDlna.Thumbnails
         }
         using (var graphics = Graphics.FromImage(result)) {
           if (result.Width > image.Width && result.Height > image.Height) {
-            graphics.CompositingQuality = Drawing2D.CompositingQuality.HighQuality;
-            graphics.InterpolationMode = Drawing2D.InterpolationMode.High;
+            graphics.CompositingQuality =
+              Drawing2D.CompositingQuality.HighQuality;
+            graphics.InterpolationMode =
+              Drawing2D.InterpolationMode.High;
           }
           else {
-            graphics.CompositingQuality = Drawing2D.CompositingQuality.HighSpeed;
+            graphics.CompositingQuality =
+              Drawing2D.CompositingQuality.HighSpeed;
             graphics.InterpolationMode = Drawing2D.InterpolationMode.Bicubic;
           }
           var rect = new Rectangle(
@@ -126,7 +134,8 @@ namespace NMaier.SimpleDlna.Thumbnails
             (int)nw, (int)nh
             );
           graphics.SmoothingMode = Drawing2D.SmoothingMode.HighSpeed;
-          graphics.FillRectangle(Brushes.Black, new Rectangle(0, 0, result.Width, result.Height));
+          graphics.FillRectangle(
+            Brushes.Black, new Rectangle(0, 0, result.Width, result.Height));
           graphics.DrawImage(image, rect);
         }
         return result;
@@ -156,7 +165,8 @@ namespace NMaier.SimpleDlna.Thumbnails
       return new Thumbnail(width, height, rv);
     }
 
-    public IThumbnail GetThumbnail(string key, DlnaMediaTypes type, Stream stream, int width, int height)
+    public IThumbnail GetThumbnail(string key, DlnaMediaTypes type,
+                                   Stream stream, int width, int height)
     {
       byte[] rv;
       if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {

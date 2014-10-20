@@ -2,7 +2,8 @@
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  internal sealed class StringSortPart : BaseSortPart, IComparable<StringSortPart>
+  internal sealed class StringSortPart
+  : BaseSortPart, IComparable<StringSortPart>
   {
     private readonly StringComparer comparer;
 

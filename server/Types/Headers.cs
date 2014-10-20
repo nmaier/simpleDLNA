@@ -14,8 +14,9 @@ namespace NMaier.SimpleDlna.Server
     private readonly Dictionary<string, string> dict =
       new Dictionary<string, string>();
 
-    private readonly static Regex validator =
-      new Regex(@"^[a-z\d][a-z\d_.-]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private readonly static Regex validator = new Regex(
+      @"^[a-z\d][a-z\d_.-]+$",
+      RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     protected Headers(bool asIs)
     {
@@ -125,7 +126,8 @@ namespace NMaier.SimpleDlna.Server
 
     public bool Contains(KeyValuePair<string, string> item)
     {
-      var p = new KeyValuePair<string, string>(Normalize(item.Key), item.Value);
+      var p = new KeyValuePair<string, string>(
+        Normalize(item.Key), item.Value);
       return dict.Contains(p);
     }
 

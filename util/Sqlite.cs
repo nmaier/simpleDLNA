@@ -55,7 +55,8 @@ namespace NMaier.SimpleDlna.Utilities
         rv.SetChunkSize(GROW_SIZE);
       }
       catch (Exception ex) {
-        log4net.LogManager.GetLogger(typeof(Sqlite)).Error("Failed to sqlite control", ex);
+        log4net.LogManager.GetLogger(typeof(Sqlite)).Error(
+          "Failed to sqlite control", ex);
       }
 
       if (clearPool == null) {
