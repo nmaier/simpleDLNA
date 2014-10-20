@@ -418,9 +418,12 @@ namespace NMaier.SimpleDlna.GUI
           continue;
         }
         var innerItem = item;
-        var sm = new ToolStripMenuItem(item.Text) { Tag = innerItem };
-        var rescan = sm.DropDownItems.Add("Rescan");
-        rescan.Click += (s, a) =>
+        var menuItem =
+          new ToolStripMenuItem(String.Format("Rescan {0}", item.Text)) {
+            Tag = innerItem,
+            Image = Properties.Resources.refreshing
+          };
+        menuItem.Click += (s, a) =>
         {
           try {
             innerItem.Rescan();
@@ -429,7 +432,7 @@ namespace NMaier.SimpleDlna.GUI
             // no op
           }
         };
-        items.Add(sm);
+        items.Add(menuItem);
       }
       items.Reverse();
       var idx = notifyContext.Items.IndexOf(ContextSeperatorPre) + 1;
