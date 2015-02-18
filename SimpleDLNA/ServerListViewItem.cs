@@ -124,7 +124,7 @@ namespace NMaier.SimpleDlna.GUI
           authorizer.AddMethod(new UserAgentAuthorizer(Description.UserAgents));
         }
         fileServer.Authorizer = authorizer;
-        server.RegisterMediaServer(fileServer);
+        server.RegisterMediaServer(fileServer, global::NMaier.SimpleDlna.GUI.Properties.Settings.Default.listeninterface);
         state = State.Running;
         var elapsed = DateTime.Now - start;
         LogManager.GetLogger("State").Logger.Log(

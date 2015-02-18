@@ -128,7 +128,7 @@ namespace NMaier.SimpleDlna
                   var fs = SetupFileServer(
                     options, types, new DirectoryInfo[] { d });
                   friendlyName = fs.FriendlyName;
-                  server.RegisterMediaServer(fs);
+                  server.RegisterMediaServer(fs, "Auto");
                   server.NoticeFormat("{0} mounted", d.FullName);
                 }
               }
@@ -138,7 +138,7 @@ namespace NMaier.SimpleDlna
                   options.Directories[0], options.Directories.Length);
                 var fs = SetupFileServer(options, types, options.Directories);
                 friendlyName = fs.FriendlyName;
-                server.RegisterMediaServer(fs);
+                server.RegisterMediaServer(fs, "Auto");
                 server.NoticeFormat(
                   "{0} ({1}) mounted",
                   options.Directories[0], options.Directories.Length);

@@ -49,6 +49,7 @@ namespace NMaier.SimpleDlna.Utilities
     private static IEnumerable<IPAddress> GetIPsDefault()
     {
       var returned = false;
+
       foreach (var adapter in NetworkInterface.GetAllNetworkInterfaces()) {
         var props = adapter.GetIPProperties();
         var gateways = from ga in props.GatewayAddresses
