@@ -12,5 +12,8 @@ namespace NMaier.SimpleDlna.Utilities
     public static extern UInt32 SendARP(
       UInt32 DestIP, UInt32 SrcIP, [Out] byte[] pMacAddr,
       ref UInt32 PhyAddrLen);
+
+    [DllImport("libc", CharSet = CharSet.Ansi)]
+    public static extern Int32 uname(IntPtr buf);
   }
 }

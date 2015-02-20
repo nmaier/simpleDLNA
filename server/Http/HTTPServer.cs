@@ -1,4 +1,5 @@
-﻿using NMaier.SimpleDlna.Server.Ssdp;
+﻿using log4net;
+using NMaier.SimpleDlna.Server.Ssdp;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -139,6 +140,12 @@ namespace NMaier.SimpleDlna.Server
           pstring = "WIN";
           break;
         default:
+          try {
+            pstring = Formatting.GetSystemName();
+          }
+          catch (Exception ex) {
+            LogManager.GetLogger(typeof(HttpServer)).Debug("Failed to get uname", ex);
+          }
           break;
       }
       return String.Format(
