@@ -140,6 +140,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
           newConnection = Sqlite.GetDatabaseConnection(storeFile);
         }
+        using (var pragma = connection.CreateCommand()) {
+          pragma.CommandText = "PRAGMA journal_size_limt = 33554432";
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA wal_autocheckpoint = 100";
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA wal_checkpoint(TRUNCATE)";
+          pragma.ExecuteNonQuery();
+        }
       }
     }
 
@@ -149,6 +157,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
         using (var pragma = connection.CreateCommand()) {
           pragma.CommandText = string.Format(
             "PRAGMA user_version = {0}", SCHEMA);
+          pragma.ExecuteNonQuery();
+          pragma.CommandText = "PRAGMA page_size = 8192";
           pragma.ExecuteNonQuery();
         }
         using (var create = connection.CreateCommand()) {
