@@ -401,6 +401,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (store != null) {
         store.Dispose();
       }
+      FileStreamCache.Clear();
     }
 
     public IMediaItem GetItem(string id)

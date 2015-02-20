@@ -225,7 +225,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     public Stream CreateContentStream()
     {
       try {
-        return new FileReadStream(Item);
+        return FileStreamCache.Get(Item);
       }
       catch (FileNotFoundException ex) {
         Error("Failed to access: " + Item.FullName, ex);

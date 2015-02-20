@@ -93,36 +93,53 @@ namespace NMaier.SimpleDlna.Utilities
       return items.GetEnumerator();
     }
 
-    private void MaybeDropSome()
+    private TValue MaybeDropSome()
     {
       if (Count <= capacity) {
-        return;
+        return default(TValue);
       }
       lock (order) {
-        LinkedListNode<KeyValuePair<TKey, TValue>> ignore;
+        LinkedListNode<KeyValuePair<TKey, TValue>> item;
+        TValue rv = default(TValue);
         for (var i = 0; i < toDrop; ++i) {
-          items.TryRemove(order.Last.Value.Key, out ignore);
+          if (items.TryRemove(order.Last.Value.Key, out item)) {
+            rv = item.Value.Value;
+          }
           order.RemoveLast();
         }
+        return rv;
       }
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
-    public void Add(KeyValuePair<TKey, TValue> item)
+    public TValue AddAndPop(KeyValuePair<TKey, TValue> item)
     {
       LinkedListNode<KeyValuePair<TKey, TValue>> node;
       lock (order) {
         node = order.AddFirst(item);
       }
       items.TryAdd(item.Key, node);
-      MaybeDropSome();
+      return MaybeDropSome();
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public void Add(KeyValuePair<TKey, TValue> item)
+    {
+      AddAndPop(item);
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public TValue AddAndPop(TKey key, TValue value)
+    {
+      return AddAndPop(new KeyValuePair<TKey, TValue>(key, value));
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Add(TKey key, TValue value)
     {
-      Add(new KeyValuePair<TKey, TValue>(key, value));
+      AddAndPop(new KeyValuePair<TKey, TValue>(key, value));
     }
+
 
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Clear()
