@@ -189,6 +189,9 @@ namespace NMaier.SimpleDlna
         }
       }
       var fs = new FileServer(types, ids, d);
+      if (!string.IsNullOrEmpty(options.FriendlyName)) {
+        fs.FriendlyName = options.FriendlyName;
+      }
       try {
         if (options.CacheFile != null) {
           fs.SetCacheFile(options.CacheFile);

@@ -41,6 +41,10 @@ namespace NMaier.SimpleDlna
     [ShortArgument('c')]
     public FileInfo CacheFile = null;
 
+    [Argument("name", HelpVar = "name", HelpText = "Friendly name for this server (group)")]
+    [ShortArgument('n')]
+    public string FriendlyName = string.Empty;
+
     [Argument("sort-descending", HelpText = "Sort order; see --list-sort-orders")]
     [ShortArgument('d')]
     [FlagArgument(true)]
