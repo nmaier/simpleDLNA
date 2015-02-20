@@ -67,13 +67,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       DebugFormat("VACUUM {0}", connection.Database);
       var files = new List<string>();
-      lock (connection) {
-        using (var q = connection.CreateCommand()) {
-          q.CommandText = "SELECT key FROM store";
-          using (var r = q.ExecuteReader()) {
-            while (r.Read()) {
-              files.Add(r.GetString(0));
-            }
+
+      using (var q = connection.CreateCommand()) {
+        q.CommandText = "SELECT key FROM store";
+        using (var r = q.ExecuteReader()) {
+          while (r.Read()) {
+            files.Add(r.GetString(0));
           }
         }
       }
@@ -81,17 +80,22 @@ namespace NMaier.SimpleDlna.FileMediaServer
                   let m = new FileInfo(f)
                   where !m.Exists
                   select f);
-      using (var q = connection.CreateCommand()) {
-        q.CommandText = "DELETE FROM store WHERE key = ?";
-        var p = q.CreateParameter();
-        p.DbType = DbType.String;
-        q.Parameters.Add(p);
-        foreach (var f in gone) {
-          p.Value = f;
-          lock (connection) {
-            q.ExecuteNonQuery();
+      lock (connection) {
+        using (var trans = connection.BeginTransaction()) {
+          using (var q = connection.CreateCommand()) {
+            q.Transaction = trans;
+            q.CommandText = "DELETE FROM store WHERE key = ?";
+            var p = q.CreateParameter();
+            p.DbType = DbType.String;
+            q.Parameters.Add(p);
+            foreach (var f in gone) {
+              p.Value = f;
+              lock (connection) {
+                q.ExecuteNonQuery();
+              }
+              DebugFormat("Purging {0}", f);
+            }
           }
-          DebugFormat("Purging {0}", f);
         }
       }
       lock (connection) {
