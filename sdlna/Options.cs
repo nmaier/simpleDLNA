@@ -85,6 +85,10 @@ namespace NMaier.SimpleDlna
     [FlagArgument(true)]
     public bool ShowVersion = false;
 
+    [Argument("no-rescanning", HelpText = "Disable rescanning of locations after first scan")]
+    [FlagArgument(false)]
+    public bool Rescanning = true;
+
     [Argument("ip", HelpText = "Allow only specified IPs", HelpVar = "IP")]
     [ShortArgument('i')]
     public string[] Ips

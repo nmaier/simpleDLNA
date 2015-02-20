@@ -194,6 +194,9 @@ namespace NMaier.SimpleDlna
           fs.SetCacheFile(options.CacheFile);
         }
         fs.Load();
+        if (!options.Rescanning) {
+          fs.Rescanning = false;
+        }
       }
       catch (Exception) {
         fs.Dispose();
