@@ -43,6 +43,9 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private static readonly IPEndPoint SSDP_ENDP =
       new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
 
+    internal static readonly IPEndPoint BROAD_ENDP =
+      new IPEndPoint(IPAddress.Parse("255.255.255.255"), SSDP_PORT);
+
     private static readonly IPAddress SSDP_IP =
       IPAddress.Parse(SSDP_ADDR);
 
@@ -233,6 +236,14 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
       SendDatagram(
         SSDP_ENDP,
+        dev.Address,
+        String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock),
+        sticky
+        );
+      // Some buggy network equipment will swallow multicast packets, so lets
+      // cheat, increase the odds, by sending to broadcast.
+      SendDatagram(
+        BROAD_ENDP,
         dev.Address,
         String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock),
         sticky
