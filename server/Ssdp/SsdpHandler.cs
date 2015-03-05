@@ -15,7 +15,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 {
   internal sealed class SsdpHandler : Logging, IDisposable
   {
-    private const int DATAGRAMS_PER_MESSAGE = 2;
+    private const int DATAGRAMS_PER_MESSAGE = 3;
 
     private const string SSDP_ADDR = "239.255.255.250";
 
@@ -63,7 +63,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         );
       client.ExclusiveAddressUse = false;
       client.Client.Bind(new IPEndPoint(IPAddress.Any, SSDP_PORT));
-      client.JoinMulticastGroup(SSDP_IP, 2);
+      client.JoinMulticastGroup(SSDP_IP, 10);
       Notice("SSDP service started");
       Receive();
     }
@@ -103,7 +103,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
       datagramPosted.Set();
       queueTimer.Enabled = messageQueue.Count != 0;
-      queueTimer.Interval = random.Next(50, running ? 300 : 100);
+      queueTimer.Interval = random.Next(25, running ? 75 : 50);
     }
 
     private void Receive()

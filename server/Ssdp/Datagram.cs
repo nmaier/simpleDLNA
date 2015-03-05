@@ -38,6 +38,8 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       try {
         var client = new UdpClient();
         client.Client.Bind(new IPEndPoint(LocalAddress, 0));
+        client.Ttl = 10;
+        client.Client.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.MulticastTimeToLive, 10);
         client.BeginSend(msg, msg.Length, EndPoint, result =>
         {
           try {
