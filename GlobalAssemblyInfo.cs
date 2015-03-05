@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 #endif
 [assembly: AssemblyCompany("Nils Maier")]
 [assembly: AssemblyProduct("SimpleDLNA")]
-[assembly: AssemblyCopyright("Copyright © 2012-2015s Nils Maier")]
+[assembly: AssemblyCopyright("Copyright © 2012-2015 Nils Maier")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
