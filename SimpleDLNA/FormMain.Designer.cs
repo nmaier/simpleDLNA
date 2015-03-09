@@ -83,11 +83,11 @@
       this.notifyContext.SuspendLayout();
       this.mainMenu.SuspendLayout();
       this.SuspendLayout();
-      // 
+      //
       // listDescriptions
-      // 
-      this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+      //
+      this.listDescriptions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
       this.listDescriptions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colName,
@@ -106,22 +106,22 @@
       this.listDescriptions.View = System.Windows.Forms.View.Details;
       this.listDescriptions.SelectedIndexChanged += new System.EventHandler(this.ListDescriptions_SelectedIndexChanged);
       this.listDescriptions.DoubleClick += new System.EventHandler(this.listDescriptions_DoubleClick);
-      // 
+      //
       // colName
-      // 
+      //
       this.colName.Text = "Name";
-      // 
+      //
       // colDirectories
-      // 
+      //
       this.colDirectories.Text = "Directories";
       this.colDirectories.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-      // 
+      //
       // colActive
-      // 
+      //
       this.colActive.Text = "Active";
-      // 
+      //
       // contextMenu
-      // 
+      //
       this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ctxStartStop,
             this.ctxEdit,
@@ -131,60 +131,60 @@
             this.ctxNewServer});
       this.contextMenu.Name = "contextMenu";
       this.contextMenu.Size = new System.Drawing.Size(134, 120);
-      // 
+      //
       // ctxStartStop
-      // 
+      //
       this.ctxStartStop.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.active;
       this.ctxStartStop.Name = "ctxStartStop";
       this.ctxStartStop.Size = new System.Drawing.Size(133, 22);
       this.ctxStartStop.Text = "Start/Stop";
       this.ctxStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
-      // 
+      //
       // ctxEdit
-      // 
+      //
       this.ctxEdit.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.edit;
       this.ctxEdit.Name = "ctxEdit";
       this.ctxEdit.Size = new System.Drawing.Size(133, 22);
       this.ctxEdit.Text = "Edit";
       this.ctxEdit.Click += new System.EventHandler(this.ButtonEdit_Click);
-      // 
+      //
       // ctxRemove
-      // 
+      //
       this.ctxRemove.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.remove;
       this.ctxRemove.Name = "ctxRemove";
       this.ctxRemove.Size = new System.Drawing.Size(133, 22);
       this.ctxRemove.Text = "Remove";
       this.ctxRemove.Click += new System.EventHandler(this.buttonRemove_Click);
-      // 
+      //
       // ctxRescan
-      // 
+      //
       this.ctxRescan.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.refreshing;
       this.ctxRescan.Name = "ctxRescan";
       this.ctxRescan.Size = new System.Drawing.Size(133, 22);
       this.ctxRescan.Text = "Rescan";
       this.ctxRescan.Click += new System.EventHandler(this.buttonRescan_Click);
-      // 
+      //
       // toolStripMenuItem5
-      // 
+      //
       this.toolStripMenuItem5.Name = "toolStripMenuItem5";
       this.toolStripMenuItem5.Size = new System.Drawing.Size(130, 6);
-      // 
+      //
       // ctxNewServer
-      // 
+      //
       this.ctxNewServer.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.add;
       this.ctxNewServer.Name = "ctxNewServer";
       this.ctxNewServer.Size = new System.Drawing.Size(133, 22);
       this.ctxNewServer.Text = "New Server";
       this.ctxNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
-      // 
+      //
       // listImages
-      // 
+      //
       this.listImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
       this.listImages.ImageSize = new System.Drawing.Size(16, 16);
       this.listImages.TransparentColor = System.Drawing.Color.Transparent;
-      // 
+      //
       // buttonNewServer
-      // 
+      //
       this.buttonNewServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.buttonNewServer.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.add;
       this.buttonNewServer.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -195,9 +195,9 @@
       this.buttonNewServer.Text = "New";
       this.buttonNewServer.UseVisualStyleBackColor = true;
       this.buttonNewServer.Click += new System.EventHandler(this.ButtonNewServer_Click);
-      // 
+      //
       // buttonEdit
-      // 
+      //
       this.buttonEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonEdit.Enabled = false;
       this.buttonEdit.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.edit;
@@ -209,9 +209,9 @@
       this.buttonEdit.Text = "Edit";
       this.buttonEdit.UseVisualStyleBackColor = true;
       this.buttonEdit.Click += new System.EventHandler(this.ButtonEdit_Click);
-      // 
+      //
       // buttonStartStop
-      // 
+      //
       this.buttonStartStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonStartStop.Enabled = false;
       this.buttonStartStop.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.active;
@@ -223,9 +223,9 @@
       this.buttonStartStop.Text = "Start";
       this.buttonStartStop.UseVisualStyleBackColor = true;
       this.buttonStartStop.Click += new System.EventHandler(this.ButtonStartStop_Click);
-      // 
+      //
       // buttonRemove
-      // 
+      //
       this.buttonRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonRemove.Enabled = false;
       this.buttonRemove.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.remove;
@@ -237,14 +237,14 @@
       this.buttonRemove.Text = "Remove";
       this.buttonRemove.UseVisualStyleBackColor = true;
       this.buttonRemove.Click += new System.EventHandler(this.buttonRemove_Click);
-      // 
+      //
       // notifyIcon
-      // 
+      //
       this.notifyIcon.ContextMenuStrip = this.notifyContext;
       this.notifyIcon.DoubleClick += new System.EventHandler(this.notifyIcon_DoubleClick);
-      // 
+      //
       // notifyContext
-      // 
+      //
       this.notifyContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showContextMenuItem,
             this.rescanAllContextMenuItem,
@@ -254,40 +254,40 @@
       this.notifyContext.Name = "notifyContext";
       this.notifyContext.Size = new System.Drawing.Size(153, 104);
       this.notifyContext.Opening += new System.ComponentModel.CancelEventHandler(this.notifyContext_Opening);
-      // 
+      //
       // showContextMenuItem
-      // 
+      //
       this.showContextMenuItem.Name = "showContextMenuItem";
       this.showContextMenuItem.Size = new System.Drawing.Size(152, 22);
       this.showContextMenuItem.Text = "Show";
       this.showContextMenuItem.Click += new System.EventHandler(this.notifyIcon_DoubleClick);
-      // 
+      //
       // rescanAllContextMenuItem
-      // 
+      //
       this.rescanAllContextMenuItem.Name = "rescanAllContextMenuItem";
       this.rescanAllContextMenuItem.Size = new System.Drawing.Size(152, 22);
       this.rescanAllContextMenuItem.Text = "Rescan all";
       this.rescanAllContextMenuItem.Click += new System.EventHandler(this.rescanAllContextMenuItem_Click);
-      // 
+      //
       // ContextSeperatorPre
-      // 
+      //
       this.ContextSeperatorPre.Name = "ContextSeperatorPre";
       this.ContextSeperatorPre.Size = new System.Drawing.Size(149, 6);
-      // 
+      //
       // ContextSeperatorPost
-      // 
+      //
       this.ContextSeperatorPost.Name = "ContextSeperatorPost";
       this.ContextSeperatorPost.Size = new System.Drawing.Size(149, 6);
-      // 
+      //
       // exitContextMenuItem
-      // 
+      //
       this.exitContextMenuItem.Name = "exitContextMenuItem";
       this.exitContextMenuItem.Size = new System.Drawing.Size(152, 22);
       this.exitContextMenuItem.Text = "Exit";
       this.exitContextMenuItem.Click += new System.EventHandler(this.exitContextMenuItem_Click);
-      // 
+      //
       // mainMenu
-      // 
+      //
       this.mainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.helpToolStripMenuItem});
@@ -297,9 +297,9 @@
       this.mainMenu.Size = new System.Drawing.Size(727, 24);
       this.mainMenu.TabIndex = 6;
       this.mainMenu.Text = "menuStrip1";
-      // 
+      //
       // fileToolStripMenuItem
-      // 
+      //
       this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.newServerToolStripMenuItem,
             this.settingsToolStripMenuItem,
@@ -313,97 +313,97 @@
       this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
       this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
       this.fileToolStripMenuItem.Text = "&File";
-      // 
+      //
       // newServerToolStripMenuItem
-      // 
+      //
       this.newServerToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.add;
       this.newServerToolStripMenuItem.Name = "newServerToolStripMenuItem";
       this.newServerToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.newServerToolStripMenuItem.Text = "New Server";
       this.newServerToolStripMenuItem.Click += new System.EventHandler(this.ButtonNewServer_Click);
-      // 
+      //
       // settingsToolStripMenuItem
-      // 
+      //
       this.settingsToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.preferences;
       this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
       this.settingsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.settingsToolStripMenuItem.Text = "Settings";
       this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
-      // 
+      //
       // toolStripMenuItem2
-      // 
+      //
       this.toolStripMenuItem2.Name = "toolStripMenuItem2";
       this.toolStripMenuItem2.Size = new System.Drawing.Size(158, 6);
-      // 
+      //
       // openInBrowserToolStripMenuItem
-      // 
+      //
       this.openInBrowserToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.go;
       this.openInBrowserToolStripMenuItem.Name = "openInBrowserToolStripMenuItem";
       this.openInBrowserToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.openInBrowserToolStripMenuItem.Text = "Open in Browser";
       this.openInBrowserToolStripMenuItem.Click += new System.EventHandler(this.openInBrowserToolStripMenuItem_Click);
-      // 
+      //
       // toolStripMenuItem3
-      // 
+      //
       this.toolStripMenuItem3.Name = "toolStripMenuItem3";
       this.toolStripMenuItem3.Size = new System.Drawing.Size(158, 6);
-      // 
+      //
       // dropCacheToolStripMenuItem
-      // 
+      //
       this.dropCacheToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.delete;
       this.dropCacheToolStripMenuItem.Name = "dropCacheToolStripMenuItem";
       this.dropCacheToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.dropCacheToolStripMenuItem.Text = "Drop cache";
       this.dropCacheToolStripMenuItem.Click += new System.EventHandler(this.dropCacheToolStripMenuItem_Click);
-      // 
+      //
       // toolStripMenuItem4
-      // 
+      //
       this.toolStripMenuItem4.Name = "toolStripMenuItem4";
       this.toolStripMenuItem4.Size = new System.Drawing.Size(158, 6);
-      // 
+      //
       // hideToolStripMenuItem
-      // 
+      //
       this.hideToolStripMenuItem.Name = "hideToolStripMenuItem";
       this.hideToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.hideToolStripMenuItem.Text = "Hide";
       this.hideToolStripMenuItem.Click += new System.EventHandler(this.hideToolStripMenuItem_Click);
-      // 
+      //
       // exitToolStripMenuItem
-      // 
+      //
       this.exitToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.close;
       this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
       this.exitToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
       this.exitToolStripMenuItem.Text = "&Exit";
       this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitContextMenuItem_Click);
-      // 
+      //
       // helpToolStripMenuItem
-      // 
+      //
       this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.homepageToolStripMenuItem,
             this.aboutToolStripMenuItem});
       this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
       this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
       this.helpToolStripMenuItem.Text = "Help";
-      // 
+      //
       // homepageToolStripMenuItem
-      // 
+      //
       this.homepageToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.homepage;
       this.homepageToolStripMenuItem.Name = "homepageToolStripMenuItem";
       this.homepageToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
       this.homepageToolStripMenuItem.Text = "Homepage";
       this.homepageToolStripMenuItem.Click += new System.EventHandler(this.homepageToolStripMenuItem_Click);
-      // 
+      //
       // aboutToolStripMenuItem
-      // 
+      //
       this.aboutToolStripMenuItem.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.about;
       this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
       this.aboutToolStripMenuItem.Size = new System.Drawing.Size(133, 22);
       this.aboutToolStripMenuItem.Text = "About";
       this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-      // 
+      //
       // logger
-      // 
-      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+      //
+      this.logger.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
       this.logger.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colLogTime,
@@ -419,23 +419,23 @@
       this.logger.TabIndex = 7;
       this.logger.UseCompatibleStateImageBehavior = false;
       this.logger.View = System.Windows.Forms.View.Details;
-      // 
+      //
       // colLogTime
-      // 
+      //
       this.colLogTime.Text = "Time";
       this.colLogTime.Width = 80;
-      // 
+      //
       // colLogLogger
-      // 
+      //
       this.colLogLogger.Text = "Logger";
-      // 
+      //
       // colLogMessage
-      // 
+      //
       this.colLogMessage.Text = "Message";
       this.colLogMessage.Width = 200;
-      // 
+      //
       // buttonRescan
-      // 
+      //
       this.buttonRescan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
       this.buttonRescan.Enabled = false;
       this.buttonRescan.Image = global::NMaier.SimpleDlna.GUI.Properties.Resources.refreshing;
@@ -447,9 +447,9 @@
       this.buttonRescan.Text = "Rescan";
       this.buttonRescan.UseVisualStyleBackColor = true;
       this.buttonRescan.Click += new System.EventHandler(this.buttonRescan_Click);
-      // 
+      //
       // FormMain
-      // 
+      //
       this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.ClientSize = new System.Drawing.Size(727, 468);

@@ -125,6 +125,7 @@
     <Compile Include="ServerDescription.cs" />
     <Compile Include="ServerListViewItem.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="StartupUtilities.cs" />
     <EmbeddedResource Include="FormAbout.resx">
       <DependentUpon>FormAbout.cs</DependentUpon>
     </EmbeddedResource>

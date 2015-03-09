@@ -92,10 +92,11 @@ namespace NMaier.SimpleDlna.Utilities
         database.FullName
         );
 
-      if (Type.GetType("Mono.Runtime") == null) {
-        return GetDatabaseConnectionSDS(cs);
+      if (Utilities.SystemInformation.IsRunningOnMono())
+      {
+        return GetDatabaseConnectionMono(cs);
       }
-      return GetDatabaseConnectionMono(cs);
+      return GetDatabaseConnectionSDS(cs);
     }
   }
 }

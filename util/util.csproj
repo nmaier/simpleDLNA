@@ -86,6 +86,7 @@
     <Compile Include="StreamPumpCallback.cs" />
     <Compile Include="StreamPumpResult.cs" />
     <Compile Include="StringSortPart.cs" />
+    <Compile Include="SystemInformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
