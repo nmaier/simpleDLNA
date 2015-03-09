@@ -14,7 +14,7 @@ namespace NMaier.SimpleDlna.GUI
       InitializeComponent();
       Icon = Properties.Resources.preferencesIcon;
 
-      if(!StartUpUtilities.IsRunningOnMono()){
+      if(!Utilities.SystemInformation.IsRunningOnMono()){
           startUpUtilities = new StartUpUtilities(StartUpUtilities.StartupUserScope.CurrentUser);
           checkAutoStart.Checked = startUpUtilities.CheckIfRunAtWinBoot(AppKeyName);
       }

@@ -70,12 +70,5 @@ namespace NMaier.SimpleDlna.GUI
             rkApp.DeleteValue(AppName, false);
         }
 
-        /// <summary>
-        /// Returns true if applicaton is running under mono
-        /// </summary>
-        public static bool IsRunningOnMono()
-        {
-            return Type.GetType("Mono.Runtime") != null;
-        }
     }
 }
