@@ -538,7 +538,7 @@ namespace NMaier.SimpleDlna.GUI
 #if DEBUG
       log.Info("Debug mode / Skipping one-instance-only stuff");
 #else
-      if (Type.GetType("Mono.Runtime") != null) {
+      if (Utilities.SystemInformation.IsRunningOnMono()) {
         // XXX Mono sometimes stack overflows for whatever reason.
         return;
       }
