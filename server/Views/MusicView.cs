@@ -115,33 +115,8 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    private class DoubleKeyedVirtualFolder
-      : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
-    {
-      public DoubleKeyedVirtualFolder()
-      {
-      }
-
-      public DoubleKeyedVirtualFolder(IMediaFolder aParent, string aName)
-        : base(aParent, aName)
-      {
-      }
-    }
-
-    private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
-    {
-      public SimpleKeyedVirtualFolder()
-      {
-      }
-
-      public SimpleKeyedVirtualFolder(IMediaFolder aParent, string aName)
-        : base(aParent, aName)
-      {
-      }
-    }
-
     private class TripleKeyedVirtualFolder
-      : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
+    : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
     {
       public TripleKeyedVirtualFolder()
       {

@@ -22,6 +22,13 @@ namespace NMaier.SimpleDlna.Utilities
     private readonly static Regex respace =
       new Regex(@"[.+]+", RegexOptions.Compiled);
 
+    public static bool Booley(string str)
+    {
+      str = str.Trim();
+      var sc = StringComparer.CurrentCultureIgnoreCase;
+      return sc.Equals("yes", str) || sc.Equals("1", str) || sc.Equals("true", str);
+    }
+
     public static string FormatFileSize(this long size)
     {
       if (size < 900) {
@@ -45,6 +52,18 @@ namespace NMaier.SimpleDlna.Utilities
       }
       ds /= 1024.0;
       return string.Format("{0:F4} PB", ds);
+    }
+
+    public static string GetSystemName()
+    {
+      var buf = Marshal.AllocHGlobal(8192);
+      // This is a hacktastic way of getting sysname from uname ()
+      if (SafeNativeMethods.uname(buf) != 0) {
+        throw new ArgumentException("Failed to get uname");
+      }
+      var rv = Marshal.PtrToStringAnsi(buf);
+      Marshal.FreeHGlobal(buf);
+      return rv;
     }
 
     public static string StemCompareBase(this string name)
@@ -86,18 +105,6 @@ namespace NMaier.SimpleDlna.Utilities
         return name;
       }
       return ws;
-    }
-
-    public static string GetSystemName()
-    {
-      var buf = Marshal.AllocHGlobal(8192);
-      // This is a hacktastic way of getting sysname from uname ()
-      if (SafeNativeMethods.uname(buf) != 0) {
-        throw new ArgumentException("Failed to get uname");
-      }
-      var rv = Marshal.PtrToStringAnsi(buf);
-      Marshal.FreeHGlobal(buf);
-      return rv;
     }
   }
 }

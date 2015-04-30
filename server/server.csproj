@@ -143,6 +143,7 @@
     <Compile Include="Views\BaseView.cs" />
     <Compile Include="Views\ByTitleView.cs" />
     <Compile Include="Views\DimensionView.cs" />
+    <Compile Include="Views\DoubleKeyedVirtualFolder.cs" />
     <Compile Include="Views\FilteringView.cs" />
     <Compile Include="Views\FilterView.cs" />
     <Compile Include="Views\NewView.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Views\MusicView.cs" />
     <Compile Include="Views\PlainView.cs" />
     <Compile Include="Views\SeriesView.cs" />
+    <Compile Include="Views\SimpleKeyedVirtualFolder.cs" />
     <Compile Include="Views\ViewRepository.cs" />
   </ItemGroup>
   <ItemGroup>

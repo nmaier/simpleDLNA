@@ -1,4 +1,5 @@
 ﻿using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -6,6 +7,8 @@ namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class SeriesView : BaseView
   {
+    private bool cascade = true;
+
     private readonly static Regex re_series = new Regex(
       @"^(.+?)(?:s\d+[\s_-]*e\d+|" + // S01E10
       @"\d+[\s_-]*x[\s_-]*\d+|" + // 1x01
@@ -56,6 +59,19 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
+    public override void SetParameters(AttributeCollection parameters)
+    {
+      var sc = StringComparer.CurrentCultureIgnoreCase;
+      foreach (var attr in parameters) {
+        if (sc.Equals(attr.Key, "cascade") && !string.IsNullOrWhiteSpace(attr.Value) && !Formatting.Booley(attr.Value)) {
+          cascade = false;
+        }
+        if (sc.Equals("no-cascade")) {
+          cascade = true;
+        }
+      }
+    }
+
     public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
@@ -71,19 +87,19 @@ namespace NMaier.SimpleDlna.Server.Views
         var fsmi = f as VirtualFolder;
         root.AdoptFolder(fsmi);
       }
-      return root;
-    }
-
-    private class SimpleKeyedVirtualFolder : KeyedVirtualFolder<VirtualFolder>
-    {
-      public SimpleKeyedVirtualFolder()
-      {
+      if (!cascade || root.ChildFolders.LongCount() <= 50) {
+        return root;
       }
-
-      public SimpleKeyedVirtualFolder(IMediaFolder aParent, string aName)
-        : base(aParent, aName)
-      {
+      var cascaded = new DoubleKeyedVirtualFolder(root, "Series");
+      foreach (var i in root.ChildFolders.ToList()) {
+        var folder = cascaded.GetFolder(i.Title.StemCompareBase().Substring(0, 1).ToUpper());
+        folder.AdoptFolder(i);
       }
+      foreach (var i in root.ChildItems.ToList()) {
+        var folder = cascaded.GetFolder(i.Title.StemCompareBase().Substring(0, 1).ToUpper());
+        folder.AddResource(i);
+      }
+      return cascaded;
     }
   }
 }
