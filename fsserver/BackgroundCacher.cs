@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -12,10 +13,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private static BlockingCollection<Item> CreateQueue()
     {
-      new Thread(Run) {
-        IsBackground = true,
-        Priority = ThreadPriority.Lowest
-      }.Start();
+      for (var i = 0; i < 4; ++i) {
+        new Thread(Run) {
+          IsBackground = true,
+          Priority = ThreadPriority.Lowest
+        }.Start();
+      }
 
       return new BlockingCollection<Item>(new ConcurrentQueue<Item>());
     }
@@ -27,6 +30,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       var loadedSubTitles = 0ul;
       try {
         for (; ; ) {
+          if (queue == null) {
+            Thread.Sleep(100);
+            continue;
+          }
           var item = queue.Take();
           var store = item.Store.Target as FileStore;
           var file = item.File.Target as BaseFile;

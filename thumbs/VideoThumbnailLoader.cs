@@ -12,7 +12,7 @@ namespace NMaier.SimpleDlna.Thumbnails
   internal sealed class VideoThumbnailLoader
     : Logging, IThumbnailLoader, IDisposable
   {
-    private Semaphore semaphore = new Semaphore(2, 2);
+    private Semaphore semaphore = new Semaphore(5, 5);
 
     public VideoThumbnailLoader()
     {
