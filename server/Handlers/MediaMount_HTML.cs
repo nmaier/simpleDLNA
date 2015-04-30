@@ -52,7 +52,7 @@ namespace NMaier.SimpleDlna.Server
           new AttributeCollection() {
             { "href", String.Format("{0}index/{1}", prefix, i.Id) }
           },
-          string.Format("{0} ({1})", i.Title, i.ChildCount)
+          string.Format("{0} ({1})", i.Title, i.FullChildCount)
           ));
       }
       article.AppendChild(folders);

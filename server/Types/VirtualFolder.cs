@@ -53,6 +53,14 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
+    public int FullChildCount
+    {
+      get
+      {
+        return resources.Count + (from f in folders select f.FullChildCount).Sum();
+      }
+    }
+
     public IEnumerable<IMediaFolder> ChildFolders
     {
       get

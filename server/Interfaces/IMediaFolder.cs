@@ -6,6 +6,8 @@ namespace NMaier.SimpleDlna.Server
   {
     int ChildCount { get; }
 
+    int FullChildCount { get; }
+
     IEnumerable<IMediaFolder> ChildFolders { get; }
 
     IEnumerable<IMediaResource> ChildItems { get; }
