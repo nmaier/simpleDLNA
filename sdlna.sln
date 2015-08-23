@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sdlna", "sdlna\sdlna.csproj", "{C99E77FD-0728-4A2F-A9C0-47AAC7CAEFED}"
 EndProject
@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{311651
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{ED38A2A8-C0E5-4881-8F8E-591B34FD2C06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,6 +72,10 @@ Global
 		{56667283-EBCD-4D63-BF61-FF319CB28A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56667283-EBCD-4D63-BF61-FF319CB28A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56667283-EBCD-4D63-BF61-FF319CB28A0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED38A2A8-C0E5-4881-8F8E-591B34FD2C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED38A2A8-C0E5-4881-8F8E-591B34FD2C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED38A2A8-C0E5-4881-8F8E-591B34FD2C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED38A2A8-C0E5-4881-8F8E-591B34FD2C06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

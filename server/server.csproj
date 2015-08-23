@@ -141,6 +141,7 @@
     <Compile Include="Types\VirtualClonedFolder.cs" />
     <Compile Include="Types\VirtualFolder.cs" />
     <Compile Include="Views\BaseView.cs" />
+    <Compile Include="Views\ByDateView.cs" />
     <Compile Include="Views\ByTitleView.cs" />
     <Compile Include="Views\DimensionView.cs" />
     <Compile Include="Views\DoubleKeyedVirtualFolder.cs" />
