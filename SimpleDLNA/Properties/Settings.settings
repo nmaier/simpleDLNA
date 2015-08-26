@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="cache" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">cache.db</Value>
     </Setting>
     <Setting Name="port" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">0</Value>

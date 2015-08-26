@@ -65,6 +65,8 @@
       this.colRestrictionType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
       this.buttonRemoveRestriction = new System.Windows.Forms.Button();
       this.buttonAddRestriction = new System.Windows.Forms.Button();
+      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.comboCache = new System.Windows.Forms.ComboBox();
       this.groupName.SuspendLayout();
       this.groupOrder.SuspendLayout();
       this.groupTypes.SuspendLayout();
@@ -73,6 +75,7 @@
       this.tabbedOptions.SuspendLayout();
       this.tabPageViews.SuspendLayout();
       this.tabPageRestrictions.SuspendLayout();
+      this.groupBox1.SuspendLayout();
       this.SuspendLayout();
       // 
       // groupName
@@ -80,9 +83,9 @@
       this.groupName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
       this.groupName.Controls.Add(this.textName);
-      this.groupName.Location = new System.Drawing.Point(12, 12);
+      this.groupName.Location = new System.Drawing.Point(14, 14);
       this.groupName.Name = "groupName";
-      this.groupName.Size = new System.Drawing.Size(520, 46);
+      this.groupName.Size = new System.Drawing.Size(607, 53);
       this.groupName.TabIndex = 2;
       this.groupName.TabStop = false;
       this.groupName.Text = "Name";
@@ -91,9 +94,9 @@
       // 
       this.textName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.textName.Location = new System.Drawing.Point(6, 19);
+      this.textName.Location = new System.Drawing.Point(7, 22);
       this.textName.Name = "textName";
-      this.textName.Size = new System.Drawing.Size(485, 20);
+      this.textName.Size = new System.Drawing.Size(565, 23);
       this.textName.TabIndex = 0;
       this.textName.Validating += new System.ComponentModel.CancelEventHandler(this.textName_Validating);
       // 
@@ -103,9 +106,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.groupOrder.Controls.Add(this.checkOrderDescending);
       this.groupOrder.Controls.Add(this.comboOrder);
-      this.groupOrder.Location = new System.Drawing.Point(12, 64);
+      this.groupOrder.Location = new System.Drawing.Point(14, 74);
       this.groupOrder.Name = "groupOrder";
-      this.groupOrder.Size = new System.Drawing.Size(520, 46);
+      this.groupOrder.Size = new System.Drawing.Size(607, 53);
       this.groupOrder.TabIndex = 3;
       this.groupOrder.TabStop = false;
       this.groupOrder.Text = "Order";
@@ -114,9 +117,9 @@
       // 
       this.checkOrderDescending.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
       this.checkOrderDescending.AutoSize = true;
-      this.checkOrderDescending.Location = new System.Drawing.Point(431, 19);
+      this.checkOrderDescending.Location = new System.Drawing.Point(511, 22);
       this.checkOrderDescending.Name = "checkOrderDescending";
-      this.checkOrderDescending.Size = new System.Drawing.Size(83, 17);
+      this.checkOrderDescending.Size = new System.Drawing.Size(88, 19);
       this.checkOrderDescending.TabIndex = 1;
       this.checkOrderDescending.Text = "Descending";
       this.checkOrderDescending.UseVisualStyleBackColor = true;
@@ -127,9 +130,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.comboOrder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.comboOrder.FormattingEnabled = true;
-      this.comboOrder.Location = new System.Drawing.Point(6, 19);
+      this.comboOrder.Location = new System.Drawing.Point(7, 22);
       this.comboOrder.Name = "comboOrder";
-      this.comboOrder.Size = new System.Drawing.Size(419, 21);
+      this.comboOrder.Size = new System.Drawing.Size(488, 23);
       this.comboOrder.TabIndex = 0;
       // 
       // groupTypes
@@ -139,9 +142,9 @@
       this.groupTypes.Controls.Add(this.checkImages);
       this.groupTypes.Controls.Add(this.checkAudio);
       this.groupTypes.Controls.Add(this.checkVideo);
-      this.groupTypes.Location = new System.Drawing.Point(12, 116);
+      this.groupTypes.Location = new System.Drawing.Point(14, 134);
       this.groupTypes.Name = "groupTypes";
-      this.groupTypes.Size = new System.Drawing.Size(520, 46);
+      this.groupTypes.Size = new System.Drawing.Size(607, 53);
       this.groupTypes.TabIndex = 4;
       this.groupTypes.TabStop = false;
       this.groupTypes.Text = "Types";
@@ -150,9 +153,9 @@
       // checkImages
       // 
       this.checkImages.AutoSize = true;
-      this.checkImages.Location = new System.Drawing.Point(133, 19);
+      this.checkImages.Location = new System.Drawing.Point(155, 22);
       this.checkImages.Name = "checkImages";
-      this.checkImages.Size = new System.Drawing.Size(60, 17);
+      this.checkImages.Size = new System.Drawing.Size(64, 19);
       this.checkImages.TabIndex = 2;
       this.checkImages.Text = "Images";
       this.checkImages.UseVisualStyleBackColor = true;
@@ -160,9 +163,9 @@
       // checkAudio
       // 
       this.checkAudio.AutoSize = true;
-      this.checkAudio.Location = new System.Drawing.Point(74, 19);
+      this.checkAudio.Location = new System.Drawing.Point(86, 22);
       this.checkAudio.Name = "checkAudio";
-      this.checkAudio.Size = new System.Drawing.Size(53, 17);
+      this.checkAudio.Size = new System.Drawing.Size(58, 19);
       this.checkAudio.TabIndex = 1;
       this.checkAudio.Text = "Audio";
       this.checkAudio.UseVisualStyleBackColor = true;
@@ -170,9 +173,9 @@
       // checkVideo
       // 
       this.checkVideo.AutoSize = true;
-      this.checkVideo.Location = new System.Drawing.Point(15, 19);
+      this.checkVideo.Location = new System.Drawing.Point(17, 22);
       this.checkVideo.Name = "checkVideo";
-      this.checkVideo.Size = new System.Drawing.Size(53, 17);
+      this.checkVideo.Size = new System.Drawing.Size(56, 19);
       this.checkVideo.TabIndex = 0;
       this.checkVideo.Text = "Video";
       this.checkVideo.UseVisualStyleBackColor = true;
@@ -186,9 +189,9 @@
       this.groupDirectories.Controls.Add(this.buttonRemoveDirectory);
       this.groupDirectories.Controls.Add(this.buttonAddDirectory);
       this.groupDirectories.Controls.Add(this.listDirectories);
-      this.groupDirectories.Location = new System.Drawing.Point(13, 334);
+      this.groupDirectories.Location = new System.Drawing.Point(15, 385);
       this.groupDirectories.Name = "groupDirectories";
-      this.groupDirectories.Size = new System.Drawing.Size(519, 138);
+      this.groupDirectories.Size = new System.Drawing.Size(605, 170);
       this.groupDirectories.TabIndex = 6;
       this.groupDirectories.TabStop = false;
       this.groupDirectories.Text = "Directories";
@@ -196,17 +199,17 @@
       // listDirectoriesAnchor
       // 
       this.listDirectoriesAnchor.AutoSize = true;
-      this.listDirectoriesAnchor.Location = new System.Drawing.Point(441, 74);
+      this.listDirectoriesAnchor.Location = new System.Drawing.Point(514, 85);
       this.listDirectoriesAnchor.Name = "listDirectoriesAnchor";
-      this.listDirectoriesAnchor.Size = new System.Drawing.Size(0, 13);
+      this.listDirectoriesAnchor.Size = new System.Drawing.Size(0, 15);
       this.listDirectoriesAnchor.TabIndex = 2;
       // 
       // buttonRemoveDirectory
       // 
       this.buttonRemoveDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonRemoveDirectory.Location = new System.Drawing.Point(438, 48);
+      this.buttonRemoveDirectory.Location = new System.Drawing.Point(511, 55);
       this.buttonRemoveDirectory.Name = "buttonRemoveDirectory";
-      this.buttonRemoveDirectory.Size = new System.Drawing.Size(75, 23);
+      this.buttonRemoveDirectory.Size = new System.Drawing.Size(87, 27);
       this.buttonRemoveDirectory.TabIndex = 2;
       this.buttonRemoveDirectory.Text = "Remove";
       this.buttonRemoveDirectory.UseVisualStyleBackColor = true;
@@ -215,9 +218,9 @@
       // buttonAddDirectory
       // 
       this.buttonAddDirectory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonAddDirectory.Location = new System.Drawing.Point(438, 19);
+      this.buttonAddDirectory.Location = new System.Drawing.Point(511, 22);
       this.buttonAddDirectory.Name = "buttonAddDirectory";
-      this.buttonAddDirectory.Size = new System.Drawing.Size(75, 23);
+      this.buttonAddDirectory.Size = new System.Drawing.Size(87, 27);
       this.buttonAddDirectory.TabIndex = 0;
       this.buttonAddDirectory.Text = "Add";
       this.buttonAddDirectory.UseVisualStyleBackColor = true;
@@ -230,9 +233,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.listDirectories.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colDirectory});
-      this.listDirectories.Location = new System.Drawing.Point(6, 19);
+      this.listDirectories.Location = new System.Drawing.Point(7, 22);
       this.listDirectories.Name = "listDirectories";
-      this.listDirectories.Size = new System.Drawing.Size(429, 113);
+      this.listDirectories.Size = new System.Drawing.Size(500, 141);
       this.listDirectories.Sorting = System.Windows.Forms.SortOrder.Ascending;
       this.listDirectories.TabIndex = 3;
       this.listDirectories.UseCompatibleStateImageBehavior = false;
@@ -248,9 +251,9 @@
       // 
       this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-      this.buttonCancel.Location = new System.Drawing.Point(457, 478);
+      this.buttonCancel.Location = new System.Drawing.Point(533, 631);
       this.buttonCancel.Name = "buttonCancel";
-      this.buttonCancel.Size = new System.Drawing.Size(75, 23);
+      this.buttonCancel.Size = new System.Drawing.Size(87, 27);
       this.buttonCancel.TabIndex = 1;
       this.buttonCancel.Text = "&Cancel";
       this.buttonCancel.UseVisualStyleBackColor = true;
@@ -259,9 +262,9 @@
       // 
       this.buttonAccept.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
       this.buttonAccept.DialogResult = System.Windows.Forms.DialogResult.OK;
-      this.buttonAccept.Location = new System.Drawing.Point(376, 478);
+      this.buttonAccept.Location = new System.Drawing.Point(439, 631);
       this.buttonAccept.Name = "buttonAccept";
-      this.buttonAccept.Size = new System.Drawing.Size(75, 23);
+      this.buttonAccept.Size = new System.Drawing.Size(87, 27);
       this.buttonAccept.TabIndex = 0;
       this.buttonAccept.Text = "&OK";
       this.buttonAccept.UseVisualStyleBackColor = true;
@@ -275,10 +278,10 @@
       // 
       this.tabbedOptions.Controls.Add(this.tabPageViews);
       this.tabbedOptions.Controls.Add(this.tabPageRestrictions);
-      this.tabbedOptions.Location = new System.Drawing.Point(12, 168);
+      this.tabbedOptions.Location = new System.Drawing.Point(14, 194);
       this.tabbedOptions.Name = "tabbedOptions";
       this.tabbedOptions.SelectedIndex = 0;
-      this.tabbedOptions.Size = new System.Drawing.Size(520, 160);
+      this.tabbedOptions.Size = new System.Drawing.Size(607, 185);
       this.tabbedOptions.TabIndex = 6;
       // 
       // tabPageViews
@@ -289,10 +292,10 @@
       this.tabPageViews.Controls.Add(this.buttonRemoveView);
       this.tabPageViews.Controls.Add(this.buttonAddView);
       this.tabPageViews.Controls.Add(this.listViews);
-      this.tabPageViews.Location = new System.Drawing.Point(4, 22);
+      this.tabPageViews.Location = new System.Drawing.Point(4, 24);
       this.tabPageViews.Name = "tabPageViews";
       this.tabPageViews.Padding = new System.Windows.Forms.Padding(3);
-      this.tabPageViews.Size = new System.Drawing.Size(512, 134);
+      this.tabPageViews.Size = new System.Drawing.Size(599, 157);
       this.tabPageViews.TabIndex = 0;
       this.tabPageViews.Text = "Views";
       this.tabPageViews.UseVisualStyleBackColor = true;
@@ -303,17 +306,17 @@
             | System.Windows.Forms.AnchorStyles.Right)));
       this.comboNewView.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.comboNewView.FormattingEnabled = true;
-      this.comboNewView.Location = new System.Drawing.Point(6, 6);
+      this.comboNewView.Location = new System.Drawing.Point(7, 7);
       this.comboNewView.Name = "comboNewView";
-      this.comboNewView.Size = new System.Drawing.Size(419, 21);
+      this.comboNewView.Size = new System.Drawing.Size(488, 23);
       this.comboNewView.TabIndex = 0;
       // 
       // buttonViewDown
       // 
       this.buttonViewDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonViewDown.Location = new System.Drawing.Point(431, 102);
+      this.buttonViewDown.Location = new System.Drawing.Point(503, 118);
       this.buttonViewDown.Name = "buttonViewDown";
-      this.buttonViewDown.Size = new System.Drawing.Size(75, 23);
+      this.buttonViewDown.Size = new System.Drawing.Size(87, 27);
       this.buttonViewDown.TabIndex = 4;
       this.buttonViewDown.Text = "Down";
       this.buttonViewDown.UseVisualStyleBackColor = true;
@@ -321,9 +324,9 @@
       // buttonViewUp
       // 
       this.buttonViewUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonViewUp.Location = new System.Drawing.Point(431, 73);
+      this.buttonViewUp.Location = new System.Drawing.Point(503, 84);
       this.buttonViewUp.Name = "buttonViewUp";
-      this.buttonViewUp.Size = new System.Drawing.Size(75, 23);
+      this.buttonViewUp.Size = new System.Drawing.Size(87, 27);
       this.buttonViewUp.TabIndex = 3;
       this.buttonViewUp.Text = "Up";
       this.buttonViewUp.UseVisualStyleBackColor = true;
@@ -331,9 +334,9 @@
       // buttonRemoveView
       // 
       this.buttonRemoveView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonRemoveView.Location = new System.Drawing.Point(431, 35);
+      this.buttonRemoveView.Location = new System.Drawing.Point(503, 40);
       this.buttonRemoveView.Name = "buttonRemoveView";
-      this.buttonRemoveView.Size = new System.Drawing.Size(75, 23);
+      this.buttonRemoveView.Size = new System.Drawing.Size(87, 27);
       this.buttonRemoveView.TabIndex = 2;
       this.buttonRemoveView.Text = "Remove";
       this.buttonRemoveView.UseVisualStyleBackColor = true;
@@ -342,9 +345,9 @@
       // buttonAddView
       // 
       this.buttonAddView.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonAddView.Location = new System.Drawing.Point(431, 6);
+      this.buttonAddView.Location = new System.Drawing.Point(503, 7);
       this.buttonAddView.Name = "buttonAddView";
-      this.buttonAddView.Size = new System.Drawing.Size(75, 23);
+      this.buttonAddView.Size = new System.Drawing.Size(87, 27);
       this.buttonAddView.TabIndex = 1;
       this.buttonAddView.Text = "Add";
       this.buttonAddView.UseVisualStyleBackColor = true;
@@ -359,9 +362,9 @@
             this.colViewName,
             this.colViewDesc});
       this.listViews.FullRowSelect = true;
-      this.listViews.Location = new System.Drawing.Point(6, 33);
+      this.listViews.Location = new System.Drawing.Point(7, 38);
       this.listViews.Name = "listViews";
-      this.listViews.Size = new System.Drawing.Size(419, 95);
+      this.listViews.Size = new System.Drawing.Size(488, 109);
       this.listViews.TabIndex = 5;
       this.listViews.UseCompatibleStateImageBehavior = false;
       this.listViews.View = System.Windows.Forms.View.Details;
@@ -383,10 +386,10 @@
       this.tabPageRestrictions.Controls.Add(this.listRestrictions);
       this.tabPageRestrictions.Controls.Add(this.buttonRemoveRestriction);
       this.tabPageRestrictions.Controls.Add(this.buttonAddRestriction);
-      this.tabPageRestrictions.Location = new System.Drawing.Point(4, 22);
+      this.tabPageRestrictions.Location = new System.Drawing.Point(4, 24);
       this.tabPageRestrictions.Name = "tabPageRestrictions";
       this.tabPageRestrictions.Padding = new System.Windows.Forms.Padding(3);
-      this.tabPageRestrictions.Size = new System.Drawing.Size(512, 134);
+      this.tabPageRestrictions.Size = new System.Drawing.Size(599, 157);
       this.tabPageRestrictions.TabIndex = 1;
       this.tabPageRestrictions.Text = "Restrictions";
       this.tabPageRestrictions.UseVisualStyleBackColor = true;
@@ -395,9 +398,9 @@
       // 
       this.textRestriction.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-      this.textRestriction.Location = new System.Drawing.Point(6, 6);
+      this.textRestriction.Location = new System.Drawing.Point(7, 7);
       this.textRestriction.Name = "textRestriction";
-      this.textRestriction.Size = new System.Drawing.Size(274, 20);
+      this.textRestriction.Size = new System.Drawing.Size(319, 23);
       this.textRestriction.TabIndex = 0;
       // 
       // comboNewRestriction
@@ -409,9 +412,9 @@
             "MAC",
             "IP",
             "User-Agent"});
-      this.comboNewRestriction.Location = new System.Drawing.Point(305, 6);
+      this.comboNewRestriction.Location = new System.Drawing.Point(356, 7);
       this.comboNewRestriction.Name = "comboNewRestriction";
-      this.comboNewRestriction.Size = new System.Drawing.Size(120, 21);
+      this.comboNewRestriction.Size = new System.Drawing.Size(139, 23);
       this.comboNewRestriction.TabIndex = 1;
       // 
       // listRestrictions
@@ -423,9 +426,9 @@
             this.colRestriction,
             this.colRestrictionType});
       this.listRestrictions.FullRowSelect = true;
-      this.listRestrictions.Location = new System.Drawing.Point(6, 33);
+      this.listRestrictions.Location = new System.Drawing.Point(7, 38);
       this.listRestrictions.Name = "listRestrictions";
-      this.listRestrictions.Size = new System.Drawing.Size(419, 95);
+      this.listRestrictions.Size = new System.Drawing.Size(488, 109);
       this.listRestrictions.TabIndex = 4;
       this.listRestrictions.UseCompatibleStateImageBehavior = false;
       this.listRestrictions.View = System.Windows.Forms.View.Details;
@@ -443,9 +446,9 @@
       // buttonRemoveRestriction
       // 
       this.buttonRemoveRestriction.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonRemoveRestriction.Location = new System.Drawing.Point(431, 35);
+      this.buttonRemoveRestriction.Location = new System.Drawing.Point(503, 40);
       this.buttonRemoveRestriction.Name = "buttonRemoveRestriction";
-      this.buttonRemoveRestriction.Size = new System.Drawing.Size(75, 23);
+      this.buttonRemoveRestriction.Size = new System.Drawing.Size(87, 27);
       this.buttonRemoveRestriction.TabIndex = 3;
       this.buttonRemoveRestriction.Text = "Remove";
       this.buttonRemoveRestriction.UseVisualStyleBackColor = true;
@@ -454,22 +457,46 @@
       // buttonAddRestriction
       // 
       this.buttonAddRestriction.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-      this.buttonAddRestriction.Location = new System.Drawing.Point(431, 6);
+      this.buttonAddRestriction.Location = new System.Drawing.Point(503, 7);
       this.buttonAddRestriction.Name = "buttonAddRestriction";
-      this.buttonAddRestriction.Size = new System.Drawing.Size(75, 23);
+      this.buttonAddRestriction.Size = new System.Drawing.Size(87, 27);
       this.buttonAddRestriction.TabIndex = 2;
       this.buttonAddRestriction.Text = "Add";
       this.buttonAddRestriction.UseVisualStyleBackColor = true;
       this.buttonAddRestriction.Click += new System.EventHandler(this.buttonAddRestriction_Click);
       // 
+      // groupBox1
+      // 
+      this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.groupBox1.Controls.Add(this.comboCache);
+      this.groupBox1.Location = new System.Drawing.Point(14, 561);
+      this.groupBox1.Name = "groupBox1";
+      this.groupBox1.Size = new System.Drawing.Size(607, 53);
+      this.groupBox1.TabIndex = 8;
+      this.groupBox1.TabStop = false;
+      this.groupBox1.Text = "Cache";
+      // 
+      // comboCache
+      // 
+      this.comboCache.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+      this.comboCache.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboCache.FormattingEnabled = true;
+      this.comboCache.Location = new System.Drawing.Point(7, 22);
+      this.comboCache.Name = "comboCache";
+      this.comboCache.Size = new System.Drawing.Size(488, 23);
+      this.comboCache.TabIndex = 0;
+      // 
       // FormServer
       // 
       this.AcceptButton = this.buttonAccept;
-      this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+      this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
       this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
       this.CancelButton = this.buttonCancel;
-      this.ClientSize = new System.Drawing.Size(544, 508);
+      this.ClientSize = new System.Drawing.Size(635, 665);
+      this.Controls.Add(this.groupBox1);
       this.Controls.Add(this.tabbedOptions);
       this.Controls.Add(this.buttonAccept);
       this.Controls.Add(this.buttonCancel);
@@ -496,6 +523,7 @@
       this.tabPageViews.ResumeLayout(false);
       this.tabPageRestrictions.ResumeLayout(false);
       this.tabPageRestrictions.PerformLayout();
+      this.groupBox1.ResumeLayout(false);
       this.ResumeLayout(false);
 
     }
@@ -539,5 +567,7 @@
     private System.Windows.Forms.ColumnHeader colRestrictionType;
     private System.Windows.Forms.Button buttonRemoveRestriction;
     private System.Windows.Forms.Button buttonAddRestriction;
+    private System.Windows.Forms.GroupBox groupBox1;
+    private System.Windows.Forms.ComboBox comboCache;
   }
 }

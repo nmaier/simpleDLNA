@@ -7,6 +7,7 @@ namespace NMaier.SimpleDlna.Server.Views
 {
   internal class FilterView : FilteringView
   {
+   private static readonly ILogging Logger = Logging.GetLogger<FilterView>();
     private Regex filter = null;
 
     public override string Description
@@ -61,7 +62,7 @@ namespace NMaier.SimpleDlna.Server.Views
         String.Join("|", filters),
         RegexOptions.Compiled | RegexOptions.IgnoreCase
       );
-      NoticeFormat("Using filter {0}", filter.ToString());
+      Logger.NoticeFormat("Using filter {0}", filter.ToString());
     }
 
     public override IMediaFolder Transform(IMediaFolder root)

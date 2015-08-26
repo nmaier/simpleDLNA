@@ -6,8 +6,9 @@ using System.Text;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
 {
-  internal sealed class Datagram : Logging
+  internal sealed class Datagram// : Logging
   {
+   private static readonly ILogging Logger = Logging.GetLogger<Datagram>();
     public readonly IPEndPoint EndPoint;
 
     public readonly IPAddress LocalAddress;
@@ -46,7 +47,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
             client.EndSend(result);
           }
           catch (Exception ex) {
-            Debug(ex);
+            Logger.Debug(ex);
           }
           finally {
             try {
@@ -58,7 +59,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         }, null);
       }
       catch (Exception ex) {
-        Error(ex);
+        Logger.Error(ex);
       }
       ++SendCount;
     }

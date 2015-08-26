@@ -1,4 +1,5 @@
-﻿using NMaier.SimpleDlna.Server;
+﻿using NMaier.SimpleDlna.FileMediaServer;
+using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Comparers;
 using NMaier.SimpleDlna.Server.Views;
 using NMaier.SimpleDlna.Utilities;
@@ -38,6 +39,12 @@ namespace NMaier.SimpleDlna.GUI
       foreach (var i in comboOrder.Items) {
         if (((IItemComparer)i).Name == description.Order) {
           comboOrder.SelectedItem = i;
+          break;
+        }
+      }
+      foreach (var i in comboCache.Items) {
+        if ((i is IFileStore) && (((IFileStore)i).Name == description.FileStore)) {
+          comboCache.SelectedItem = i;
           break;
         }
       }
@@ -106,6 +113,7 @@ namespace NMaier.SimpleDlna.GUI
         var rv = new ServerDescription() {
           Name = textName.Text,
           Order = ((IItemComparer)comboOrder.SelectedItem).Name,
+          FileStore = (comboCache.SelectedItem is IFileStore) ? ((IFileStore)comboCache.SelectedItem).Name : null,
           OrderDescending = checkOrderDescending.Checked,
           Types = types,
           Views = views,
@@ -129,6 +137,14 @@ namespace NMaier.SimpleDlna.GUI
           comboOrder.SelectedIndex = i;
         }
       }
+    }
+
+    private void AddCacheItems()
+    {
+      var items = FileStoreRepository.ListItems().OrderBy(l => l.Key).ToList();
+      comboCache.Items.Clear();
+      comboCache.Items.Add(string.Empty);
+      comboCache.Items.AddRange(items.Select(i => i.Value).ToArray());
     }
 
     private void AddViewItems()
@@ -245,6 +261,7 @@ namespace NMaier.SimpleDlna.GUI
       Icon = Properties.Resources.server;
       AddOrderItems();
       AddViewItems();
+      AddCacheItems();
       comboNewRestriction.SelectedIndex = 0;
     }
 

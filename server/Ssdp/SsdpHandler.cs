@@ -12,9 +12,12 @@ using Threading = System.Threading;
 using Timers = System.Timers;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
-{
-  internal sealed class SsdpHandler : Logging, IDisposable
+{//Logging, 
+  internal sealed class SsdpHandler : IDisposable
   {
+
+   private static readonly ILogging Logger = Logging.GetLogger<SsdpHandler>();
+
     private const int DATAGRAMS_PER_MESSAGE = 3;
 
     private const string SSDP_ADDR = "239.255.255.250";
@@ -67,7 +70,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       client.ExclusiveAddressUse = false;
       client.Client.Bind(new IPEndPoint(IPAddress.Any, SSDP_PORT));
       client.JoinMulticastGroup(SSDP_IP, 10);
-      Notice("SSDP service started");
+      Logger.Notice("SSDP service started");
       Receive();
     }
 
@@ -163,10 +166,10 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         }
       }
       catch (IOException ex) {
-        Debug("Failed to read SSDP message", ex);
+        Logger.Debug("Failed to read SSDP message", ex);
       }
       catch (Exception ex) {
-        Warn("Failed to read SSDP message", ex);
+        Logger.Warn("Failed to read SSDP message", ex);
       }
       Receive();
     }
@@ -202,21 +205,21 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock),
         false
         );
-      InfoFormat(
+      Logger.InfoFormat(
         "{2}, {1} - Responded to a {0} request", dev.Type, endpoint,
         dev.Address);
     }
 
     private void Tick(object sender, Timers.ElapsedEventArgs e)
     {
-      Debug("Sending SSDP notifications!");
+      Logger.Debug("Sending SSDP notifications!");
       notificationTimer.Interval = random.Next(60000, 120000);
       NotifyAll();
     }
 
     internal void NotifyAll()
     {
-      Debug("NotifyAll");
+      Logger.Debug("NotifyAll");
       foreach (var d in Devices) {
         NotifyDevice(d, "alive", false);
       }
@@ -224,7 +227,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     internal void NotifyDevice(UpnpDevice dev, string type, bool sticky)
     {
-      Debug("NotifyDevice");
+      Logger.Debug("NotifyDevice");
       var headers = new RawHeaders();
       headers.Add("HOST", "239.255.255.250:1900");
       headers.Add("CACHE-CONTROL", "max-age = 600");
@@ -248,7 +251,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock),
         sticky
         );
-      DebugFormat("{0} said {1}", dev.USN, type);
+      Logger.DebugFormat("{0} said {1}", dev.USN, type);
     }
 
     internal void RegisterNotification(Guid UUID, Uri Descriptor,
@@ -272,7 +275,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
 
       NotifyAll();
-      DebugFormat("Registered mount {0}, {1}", UUID, address);
+      Logger.DebugFormat("Registered mount {0}, {1}", UUID, address);
     }
 
     internal void RespondToSearch(IPEndPoint endpoint, string req)
@@ -281,7 +284,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         req = null;
       }
 
-      DebugFormat("RespondToSearch {0} {1}", endpoint, req);
+      Logger.DebugFormat("RespondToSearch {0} {1}", endpoint, req);
       foreach (var d in Devices) {
         if (!string.IsNullOrEmpty(req) && req != d.Type) {
           continue;
@@ -302,12 +305,12 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       foreach (var d in dl) {
         NotifyDevice(d, "byebye", true);
       }
-      DebugFormat("Unregistered mount {0}", UUID);
+      Logger.DebugFormat("Unregistered mount {0}", UUID);
     }
 
     public void Dispose()
     {
-      Debug("Disposing SSDP");
+      Logger.Debug("Disposing SSDP");
       running = false;
       while (messageQueue.Count != 0) {
         datagramPosted.WaitOne();

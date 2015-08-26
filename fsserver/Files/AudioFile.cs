@@ -211,7 +211,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           cover = new Cover(Item, pic.Data.ToStream());
         }
         catch (Exception ex) {
-          Debug("Failed to generate thumb for " + Item.FullName, ex);
+          Logger.Debug("Failed to generate thumb for " + Item.FullName, ex);
         }
       }
     }
@@ -231,7 +231,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             }
           }
           catch (Exception ex) {
-            Debug("Failed to transpose Properties props", ex);
+            Logger.Debug("Failed to transpose Properties props", ex);
           }
 
           try {
@@ -240,7 +240,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             InitCover(t);
           }
           catch (Exception ex) {
-            Debug("Failed to transpose Tag props", ex);
+            Logger.Debug("Failed to transpose Tag props", ex);
           }
         }
 
@@ -249,17 +249,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
-        Debug(
+        Logger.Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (TagLib.UnsupportedFormatException ex) {
-        Debug(
+        Logger.Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (Exception ex) {
-        Warn(
+        Logger.Warn(
           "Unhandled exception reading meta data for file " + Item.FullName,
           ex);
       }

@@ -4,7 +4,7 @@ using NMaier.SimpleDlna.Server.Comparers;
 using System.Linq;
 using tests.Mocks;
 
-namespace tests
+namespace SimpleDlna.Tests
 {
   /// <summary>
   /// ByTitleView transformation tests

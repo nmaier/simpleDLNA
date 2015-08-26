@@ -1,5 +1,4 @@
-﻿using log4net;
-using NMaier.SimpleDlna.Server.Ssdp;
+﻿using NMaier.SimpleDlna.Server.Ssdp;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -11,9 +10,13 @@ using System.Reflection;
 using System.Timers;
 
 namespace NMaier.SimpleDlna.Server
-{
-  public sealed class HttpServer : Logging, IDisposable
+{//Logging, 
+  public sealed class HttpServer : IDisposable
   {
+
+    private static readonly ILogging _logger = Logging.GetLogger<HttpServer>();
+    public ILogging Logger{get{return _logger;} }
+
     private readonly ConcurrentDictionary<HttpClient, DateTime> clients =
       new ConcurrentDictionary<HttpClient, DateTime>();
 
@@ -60,7 +63,7 @@ namespace NMaier.SimpleDlna.Server
 
       RealPort = (listener.LocalEndpoint as IPEndPoint).Port;
 
-      NoticeFormat(
+      Logger.NoticeFormat(
         "Running HTTP Server: {0} on port {1}", Signature, RealPort);
       ssdpServer = new SsdpHandler();
 
@@ -97,7 +100,7 @@ namespace NMaier.SimpleDlna.Server
       catch (ObjectDisposedException) {
       }
       catch (Exception ex) {
-        Fatal("Failed to accept", ex);
+        Logger.Fatal("Failed to accept", ex);
       }
     }
 
@@ -111,7 +114,7 @@ namespace NMaier.SimpleDlna.Server
           {
             return DateTime.Now;
           });
-          DebugFormat("Accepted client {0}", client);
+          Logger.DebugFormat("Accepted client {0}", client);
           client.Start();
         }
         catch (Exception) {
@@ -122,7 +125,7 @@ namespace NMaier.SimpleDlna.Server
       catch (ObjectDisposedException) {
       }
       catch (Exception ex) {
-        Error("Failed to accept a client", ex);
+        Logger.Error("Failed to accept a client", ex);
       }
       finally {
         Accept();
@@ -144,7 +147,7 @@ namespace NMaier.SimpleDlna.Server
             pstring = Formatting.GetSystemName();
           }
           catch (Exception ex) {
-            LogManager.GetLogger(typeof(HttpServer)).Debug("Failed to get uname", ex);
+            _logger.Debug("Failed to get uname", ex);
           }
           break;
       }
@@ -163,7 +166,7 @@ namespace NMaier.SimpleDlna.Server
     {
       foreach (var c in clients.ToList()) {
         if (c.Key.IsATimeout) {
-          DebugFormat("Collected timeout client {0}", c);
+          Logger.DebugFormat("Collected timeout client {0}", c);
           c.Key.Close();
         }
       }
@@ -219,7 +222,7 @@ namespace NMaier.SimpleDlna.Server
       if (!prefixes.TryAdd(prefix, handler)) {
         throw new ArgumentException("Invalid preifx; already taken");
       }
-      DebugFormat("Registered Handler for {0}", prefix);
+      Logger.DebugFormat("Registered Handler for {0}", prefix);
     }
 
     internal void RemoveClient(HttpClient client)
@@ -232,13 +235,13 @@ namespace NMaier.SimpleDlna.Server
     {
       IPrefixHandler ignored;
       if (prefixes.TryRemove(handler.Prefix, out ignored)) {
-        DebugFormat("Unregistered Handler for {0}", handler.Prefix);
+        Logger.DebugFormat("Unregistered Handler for {0}", handler.Prefix);
       }
     }
 
     public void Dispose()
     {
-      Debug("Disposing HTTP");
+      Logger.Debug("Disposing HTTP");
       timeouter.Enabled = false;
       foreach (var s in servers.Values.ToList()) {
         UnregisterMediaServer(s);
@@ -268,7 +271,7 @@ namespace NMaier.SimpleDlna.Server
       RegisterHandler(mount);
 
       foreach (var address in IP.ExternalIPAddresses) {
-        DebugFormat("Registering device for {0}", address);
+        Logger.DebugFormat("Registering device for {0}", address);
         var deviceGuid = Guid.NewGuid();
         var list = devicesForServers.GetOrAdd(guid, new List<Guid>());
         lock (list) {
@@ -282,7 +285,7 @@ namespace NMaier.SimpleDlna.Server
           mount.DescriptorURI
           ));
         ssdpServer.RegisterNotification(deviceGuid, uri, address);
-        NoticeFormat("New mount at: {0}", uri);
+        Logger.NoticeFormat("New mount at: {0}", uri);
       }
     }
 
@@ -310,7 +313,7 @@ namespace NMaier.SimpleDlna.Server
 
       MediaMount ignored;
       if (servers.TryRemove(server.Uuid, out ignored)) {
-        InfoFormat("Unregistered Media Server {0}", server.Uuid);
+        Logger.InfoFormat("Unregistered Media Server {0}", server.Uuid);
       }
     }
   }

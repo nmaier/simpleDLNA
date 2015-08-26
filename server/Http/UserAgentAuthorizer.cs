@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Net;
 
 namespace NMaier.SimpleDlna.Server
-{
-  public sealed class UserAgentAuthorizer : Logging, IHttpAuthorizationMethod
+{//Logging, 
+  public sealed class UserAgentAuthorizer : IHttpAuthorizationMethod
   {
+   private static readonly ILogging Logger = Logging.GetLogger<UserAgentAuthorizer>();
     private readonly Dictionary<string, object> userAgents =
       new Dictionary<string, object>();
 
@@ -41,10 +42,10 @@ namespace NMaier.SimpleDlna.Server
       }
       var rv = userAgents.ContainsKey(ua);
       if (!rv) {
-        DebugFormat("Rejecting {0}. Not in User-Agent whitelist", ua);
+        Logger.DebugFormat("Rejecting {0}. Not in User-Agent whitelist", ua);
       }
       else {
-        DebugFormat("Accepted {0} via User-Agent whitelist", ua);
+        Logger.DebugFormat("Accepted {0} via User-Agent whitelist", ua);
       }
       return rv;
     }

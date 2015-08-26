@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Net;
 
 namespace NMaier.SimpleDlna.Server
-{
-  public sealed class MacAuthorizer : Logging, IHttpAuthorizationMethod
+{//Logging, 
+  public sealed class MacAuthorizer : IHttpAuthorizationMethod
   {
+   private static readonly ILogging Logger = Logging.GetLogger<MacAuthorizer>();
     private readonly Dictionary<string, object> macs =
       new Dictionary<string, object>();
 
@@ -36,10 +37,10 @@ namespace NMaier.SimpleDlna.Server
 
       var rv = macs.ContainsKey(mac);
       if (!rv) {
-        DebugFormat("Rejecting {0}. Not in MAC whitelist", mac ?? "<UNKNOWN>");
+        Logger.DebugFormat("Rejecting {0}. Not in MAC whitelist", mac ?? "<UNKNOWN>");
       }
       else {
-        DebugFormat("Accepted {0} via MAC whitelist", mac);
+        Logger.DebugFormat("Accepted {0} via MAC whitelist", mac);
       }
       return rv;
     }

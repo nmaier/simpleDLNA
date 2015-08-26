@@ -7,8 +7,9 @@ using System.Linq;
 
 namespace NMaier.SimpleDlna.Server
 {
-  public sealed class Identifiers : Logging
+  public sealed class Identifiers// : Logging
   {
+   private static readonly ILogging Logger = Logging.GetLogger<Identifiers>();
     public const string GeneralRoot = "0";
 
     public const string SamsungAudio = "A";
@@ -92,7 +93,7 @@ namespace NMaier.SimpleDlna.Server
         views.Add(ViewRepository.Lookup(name));
       }
       catch (Exception ex) {
-        Error("Failed to add view", ex);
+        Logger.Error("Failed to add view", ex);
         throw;
       }
     }
@@ -112,7 +113,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       paths = npaths;
-      DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
+      Logger.DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
     }
 
     public IMediaItem GetItemById(string id)

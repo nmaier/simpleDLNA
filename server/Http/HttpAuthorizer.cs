@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Net;
 
 namespace NMaier.SimpleDlna.Server
-{
-  public sealed class HttpAuthorizer
-    : Logging, IHttpAuthorizationMethod, IDisposable
+{//Logging, 
+  public sealed class HttpAuthorizer : IHttpAuthorizationMethod, IDisposable
   {
-    private readonly List<IHttpAuthorizationMethod> methods =
-      new List<IHttpAuthorizationMethod>();
-
+    private static readonly ILogging Logger = Logging.GetLogger<HttpAuthorizer>();
+    private readonly List<IHttpAuthorizationMethod> methods = new List<IHttpAuthorizationMethod>();
     private readonly HttpServer server = null;
 
     public HttpAuthorizer()
@@ -45,6 +43,7 @@ namespace NMaier.SimpleDlna.Server
 
     public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
     {
+      Logger.NoticeFormat("Authorize:[{0}][{1}][{2}]", endPoint, mac, headers["User-Agent"]);
       if (methods.Count == 0) {
         return true;
       }
@@ -57,7 +56,7 @@ namespace NMaier.SimpleDlna.Server
         return false;
       }
       catch (Exception ex) {
-        Error("Failed to authorize", ex);
+        Logger.Error("Failed to authorize", ex);
         return false;
       }
     }

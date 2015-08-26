@@ -1,5 +1,4 @@
-﻿using log4net;
-using NMaier.SimpleDlna.Utilities;
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.IO;
 using System.Text;
@@ -12,12 +11,9 @@ namespace NMaier.SimpleDlna.Server
     [NonSerialized]
     private byte[] encodedText = null;
 
-    [NonSerialized]
-    private static readonly ILog logger =
-      LogManager.GetLogger(typeof(Subtitle));
+   private static readonly ILogging logger = Logging.GetLogger<Subtitle>();
 
-    [NonSerialized]
-    private static readonly string[] exts = new string[] {
+   private static readonly string[] exts = new string[] {
       ".srt", ".SRT",
       ".ass", ".ASS",
       ".ssa", ".SSA",

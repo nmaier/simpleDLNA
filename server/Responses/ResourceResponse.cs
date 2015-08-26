@@ -4,9 +4,10 @@ using System.IO;
 using System.Resources;
 
 namespace NMaier.SimpleDlna.Server
-{
-  internal sealed class ResourceResponse : Logging, IResponse
+{//Logging, 
+  internal sealed class ResourceResponse : IResponse
   {
+   private static readonly ILogging Logger = Logging.GetLogger<ResourceResponse>();
     private readonly IHeaders headers = new ResponseHeaders();
 
     private readonly byte[] resource;
@@ -29,7 +30,7 @@ namespace NMaier.SimpleDlna.Server
         headers["Content-Length"] = resource.Length.ToString();
       }
       catch (Exception ex) {
-        Error("Failed to prepare resource " + aResource, ex);
+        Logger.Error("Failed to prepare resource " + aResource, ex);
         throw;
       }
     }

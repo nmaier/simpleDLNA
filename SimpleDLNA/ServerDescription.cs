@@ -31,6 +31,8 @@ namespace NMaier.SimpleDlna.GUI
 
     public string[] Views { get; set; }
 
+    public string FileStore { get; set; }
+
     public void AdoptInfo(ServerDescription other)
     {
       if (other == null) {
@@ -39,6 +41,7 @@ namespace NMaier.SimpleDlna.GUI
       Directories = other.Directories;
       Name = other.Name;
       Order = other.Order;
+      FileStore = other.FileStore;
       OrderDescending = other.OrderDescending;
       Types = other.Types;
       Views = other.Views;

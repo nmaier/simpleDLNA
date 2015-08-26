@@ -7,9 +7,9 @@ using System.Reflection;
 using System.Xml;
 
 namespace NMaier.SimpleDlna.Server
-{
+{//Logging, 
   internal sealed partial class MediaMount
-    : Logging, IMediaServer, IPrefixHandler
+    : IMediaServer, IPrefixHandler
   {
     private readonly Dictionary<IPAddress, Guid> guidsForAddresses =
       new Dictionary<IPAddress, Guid>();
@@ -75,7 +75,7 @@ namespace NMaier.SimpleDlna.Server
     private void ChangedServer(object sender, EventArgs e)
     {
       soapCache.Clear();
-      InfoFormat("Rescanned mount {0}", Uuid);
+      Logger.InfoFormat("Rescanned mount {0}", Uuid);
       systemID++;
     }
 
@@ -147,7 +147,7 @@ namespace NMaier.SimpleDlna.Server
       }
 
       var path = request.Path.Substring(prefix.Length);
-      Debug(path);
+      Logger.Debug(path);
       if (path == "description.xml") {
         return new StringResponse(
           HttpCode.Ok,
@@ -181,19 +181,19 @@ namespace NMaier.SimpleDlna.Server
       }
       if (path.StartsWith("file/", StringComparison.Ordinal)) {
         var id = path.Split('/')[1];
-        InfoFormat("Serving file {0}", id);
+        Logger.InfoFormat("Serving file {0}", id);
         var item = GetItem(id) as IMediaResource;
         return new ItemResponse(prefix, request, item);
       }
       if (path.StartsWith("cover/", StringComparison.Ordinal)) {
         var id = path.Split('/')[1];
-        InfoFormat("Serving cover {0}", id);
+        Logger.InfoFormat("Serving cover {0}", id);
         var item = GetItem(id) as IMediaCover;
         return new ItemResponse(prefix, request, item.Cover, "Interactive");
       }
       if (path.StartsWith("subtitle/", StringComparison.Ordinal)) {
         var id = path.Split('/')[1];
-        InfoFormat("Serving subtitle {0}", id);
+        Logger.InfoFormat("Serving subtitle {0}", id);
         var item = GetItem(id) as IMetaVideoItem;
         return new ItemResponse(prefix, request, item.Subtitle, "Background");
       }
@@ -215,7 +215,7 @@ namespace NMaier.SimpleDlna.Server
       if (request.Method == "UNSUBSCRIBE") {
         return new StringResponse(HttpCode.Ok, string.Empty);
       }
-      WarnFormat("Did not understand {0} {1}", request.Method, path);
+      Logger.WarnFormat("Did not understand {0} {1}", request.Method, path);
       throw new HttpStatusException(HttpCode.NotFound);
     }
   }

@@ -99,11 +99,14 @@ namespace NMaier.SimpleDlna.GUI
         fileServer = new FileServer(Description.Types, ids, dirs) {
           FriendlyName = Description.Name
         };
-#if !DEBUG
-        if (cacheFile != null) {
-          fileServer.SetCacheFile(cacheFile);
+//#if !DEBUG
+        if(!string.IsNullOrEmpty(Description.FileStore)) {
+          fileServer.SetCacheFile(FileStoreRepository.Lookup(Description.FileStore));
         }
-#endif
+        //if (cacheFile != null) {
+        //  fileServer.SetCacheFile();
+        //}
+//#endif
         fileServer.Changing += (o, e) =>
         {
           state = State.Refreshing;
@@ -138,7 +141,7 @@ namespace NMaier.SimpleDlna.GUI
         );
       }
       catch (Exception ex) {
-        server.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
+        server.Logger.ErrorFormat("Failed to start {0}, {1}", Description.Name, ex);
         Description.ToggleActive();
         state = State.Stopped;
       }

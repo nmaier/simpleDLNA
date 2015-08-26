@@ -1,8 +1,6 @@
-using log4net;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -10,8 +8,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal class FileStreamCache
   {
-    private readonly static ILog logger =
-      LogManager.GetLogger(typeof(FileReadStream));
+    private readonly static ILogging logger = Logging.GetLogger<FileReadStream>();
 
     private class CacheItem
     {
@@ -100,8 +97,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private readonly FileInfo info;
 
-    private readonly static ILog logger =
-      LogManager.GetLogger(typeof(FileReadStream));
+    private readonly static ILogging logger = Logging.GetLogger<FileReadStream>();
 
     private bool killed = false;
 

@@ -5,9 +5,10 @@ using System.Linq;
 using System.Net;
 
 namespace NMaier.SimpleDlna.Server
-{
-  public sealed class IPAddressAuthorizer : Logging, IHttpAuthorizationMethod
+{//Logging, 
+  public sealed class IPAddressAuthorizer : IHttpAuthorizationMethod
   {
+   private static readonly ILogging Logger = Logging.GetLogger<IPAddressAuthorizer>();
     private readonly Dictionary<IPAddress, object> ips =
       new Dictionary<IPAddress, object>();
 
@@ -41,10 +42,10 @@ namespace NMaier.SimpleDlna.Server
       }
       var rv = ips.ContainsKey(addr);
       if (!rv) {
-        DebugFormat("Rejecting {0}. Not in IP whitelist", addr);
+        Logger.DebugFormat("Rejecting {0}. Not in IP whitelist", addr);
       }
       else {
-        DebugFormat("Accepted {0} via IP whitelist", addr);
+        Logger.DebugFormat("Accepted {0} via IP whitelist", addr);
       }
       return rv;
     }

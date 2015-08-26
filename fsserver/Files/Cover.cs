@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   [Serializable]
-  internal sealed class Cover
+  public sealed class Cover
     : Logging, IMediaCoverResource, IMetaInfo, ISerializable
   {
     private byte[] bytes;
