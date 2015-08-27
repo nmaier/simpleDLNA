@@ -198,7 +198,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
         }
         catch (Exception ex) {
-          Logger.Error("Failed to look up subtitle", ex);
+          _logger.Error("Failed to look up subtitle", ex);
           subTitle = new Subtitle();
         }
         return subTitle;
@@ -233,7 +233,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             height = tl.Properties.VideoHeight;
           }
           catch (Exception ex) {
-            Logger.Debug("Failed to transpose Properties props", ex);
+            _logger.Debug("Failed to transpose Properties props", ex);
           }
 
           try {
@@ -257,7 +257,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             }
           }
           catch (Exception ex) {
-            Logger.Debug("Failed to transpose Tag props", ex);
+            _logger.Debug("Failed to transpose Tag props", ex);
           }
         }
 
@@ -266,17 +266,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
-        Logger.Debug(
+        _logger.Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (TagLib.UnsupportedFormatException ex) {
-        Logger.Debug(
+        _logger.Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (Exception ex) {
-        Logger.Warn(
+        _logger.Warn(
           "Unhandled exception reading meta data for file " + Item.FullName,
           ex);
       }

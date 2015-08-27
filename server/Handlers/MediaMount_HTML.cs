@@ -1,4 +1,5 @@
-﻿using NMaier.SimpleDlna.Utilities;
+﻿using NMaier.SimpleDlna.Server.Http;
+using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Xml;

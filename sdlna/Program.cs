@@ -3,6 +3,7 @@ using NMaier.GetOptNet;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Http;
 using NMaier.SimpleDlna.Server.Views;
 using NMaier.SimpleDlna.Utilities;
 using System;
@@ -193,9 +194,9 @@ namespace NMaier.SimpleDlna
         fs.FriendlyName = options.FriendlyName;
       }
       try {
-        //if (options.CacheFile != null) {
-        //  fs.SetCacheFile(options.CacheFile);
-        //}
+        if (options.FileStore != null) {
+          fs.SetCacheFile(FileStoreRepository.Lookup(options.FileStore));
+        }
         fs.Load();
         if (!options.Rescanning) {
           fs.Rescanning = false;
@@ -218,7 +219,7 @@ namespace NMaier.SimpleDlna
     private static void ShowVersion()
     {
       Console.WriteLine("Version: {0}", ProductInformation.ProductVersion);
-      Console.WriteLine("Http:    {0}", HttpServer.Signature);
+      Console.WriteLine("Http:    {0}", Server.Http.HttpServer.Signature);
     }
   }
 }

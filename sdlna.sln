@@ -40,8 +40,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileStoreSQLite", "FileStor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileStoreRaptorDB", "FileStoreRaptorDB\FileStoreRaptorDB.csproj", "{6961F1C2-41E9-4E7F-8E88-7D4A259B3DF8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{1A8B9EDC-A2A5-4132-B274-736431F411AA}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

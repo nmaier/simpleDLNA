@@ -28,7 +28,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private static readonly StringComparer comparer =
       new NaturalStringComparer(false);
 
-    protected static readonly ILogging Logger = Logging.GetLogger<BaseFile>();
+    protected static readonly ILogging _logger = Logging.GetLogger<BaseFile>();
 
     protected BaseFile(FileServer server, FileInfo file, DlnaMime type,
                        DlnaMediaTypes mediaType)
@@ -171,7 +171,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
         }
         catch (Exception ex) {
-          Logger.Debug("Failed to access cover", ex);
+          _logger.Debug("Failed to access cover", ex);
         }
         return rv;
       }
@@ -231,17 +231,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return FileStreamCache.Get(Item);
       }
       catch (FileNotFoundException ex) {
-        Logger.Error("Failed to access: " + Item.FullName, ex);
+        _logger.Error("Failed to access: " + Item.FullName, ex);
         server.DelayedRescan(WatcherChangeTypes.Deleted);
         throw;
       }
       catch (UnauthorizedAccessException ex) {
-        Logger.Error("Failed to access: " + Item.FullName, ex);
+        _logger.Error("Failed to access: " + Item.FullName, ex);
         server.DelayedRescan(WatcherChangeTypes.Changed);
         throw;
       }
       catch (IOException ex) {
-        Logger.Error("Failed to access: " + Item.FullName, ex);
+        _logger.Error("Failed to access: " + Item.FullName, ex);
         server.DelayedRescan(WatcherChangeTypes.Changed);
         throw;
       }

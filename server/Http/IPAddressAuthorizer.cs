@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
-namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server.Http
 {//Logging, 
   public sealed class IPAddressAuthorizer : IHttpAuthorizationMethod
   {
-   private static readonly ILogging Logger = Logging.GetLogger<IPAddressAuthorizer>();
+   private static readonly ILogging _logger = Logging.GetLogger<IPAddressAuthorizer>();
     private readonly Dictionary<IPAddress, object> ips =
       new Dictionary<IPAddress, object>();
 
@@ -31,21 +31,21 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
+    public bool Authorize(HttpRequestAuthParameters ap)//IHeaders headers, IPEndPoint endPoint, string mac)
     {
-      if (endPoint == null) {
+      //if (endPoint == null) {
+      //  return false;
+      //}
+      //var addr = endPoint.Address;
+      if (ap.Address == null) {
         return false;
       }
-      var addr = endPoint.Address;
-      if (addr == null) {
-        return false;
-      }
-      var rv = ips.ContainsKey(addr);
+      var rv = ips.ContainsKey(ap.Address);
       if (!rv) {
-        Logger.DebugFormat("Rejecting {0}. Not in IP whitelist", addr);
+        _logger.DebugFormat("Rejecting {0}. Not in IP whitelist", ap.Address);
       }
       else {
-        Logger.DebugFormat("Accepted {0} via IP whitelist", addr);
+        _logger.DebugFormat("Accepted {0} via IP whitelist", ap.Address);
       }
       return rv;
     }

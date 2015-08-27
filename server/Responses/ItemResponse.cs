@@ -1,4 +1,5 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
+﻿using NMaier.SimpleDlna.Server.Http;
+using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.IO;
@@ -7,7 +8,7 @@ namespace NMaier.SimpleDlna.Server
 {//Logging, 
   internal sealed class ItemResponse : IResponse
   {
-   private static readonly ILogging Logger = Logging.GetLogger<ItemResponse>();
+    private static readonly ILogging _logger = Logging.GetLogger<ItemResponse>();
     private readonly Headers headers;
 
     private readonly IMediaResource item;
@@ -64,7 +65,7 @@ namespace NMaier.SimpleDlna.Server
           prefix,
           item.Id
           );
-          Logger.DebugFormat("Sending subtitles {0}", surl);
+          _logger.DebugFormat("Sending subtitles {0}", surl);
           headers.Add("CaptionInfo.sec", surl);
         }
       }
@@ -82,7 +83,7 @@ namespace NMaier.SimpleDlna.Server
       }
       headers.Add("transferMode.dlna.org", transferMode);
 
-      Logger.Debug(headers);
+      _logger.Debug(headers);
     }
 
     public Stream Body

@@ -37,9 +37,14 @@ namespace NMaier.SimpleDlna
 
     private int port = 0;
 
-    [Argument("cache", HelpVar = "file", HelpText = "Cache file to use for storing meta data (default: none)")]
-    [ShortArgument('c')]
-    public FileInfo CacheFile = null;
+    //[Argument("cache", HelpVar = "file", HelpText = "Cache file to use for storing meta data (default: none)")]
+    //[ShortArgument('c')]
+    //public FileInfo CacheFile = null;
+
+    [Argument("storage", HelpText = "Storage database; see --list-sort-orders")]
+    [ShortArgument('o')]
+    [FlagArgument(true)]
+    public string FileStore = "RaptorDB";
 
     [Argument("name", HelpVar = "name", HelpText = "Friendly name for this server (group)")]
     [ShortArgument('n')]

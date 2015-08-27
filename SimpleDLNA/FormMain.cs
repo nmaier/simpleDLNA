@@ -3,7 +3,7 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
 using log4net.Layout;
-using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Http;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Concurrent;
@@ -15,7 +15,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace NMaier.SimpleDlna.GUI
 {

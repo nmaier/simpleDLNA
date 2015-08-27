@@ -2,7 +2,6 @@
 using NMaier.SimpleDlna.FileMediaServer;
 using System.IO;
 using System;
-using SimpleDlna.Tests.Mocks;
 using NMaier.SimpleDlna.Utilities;
 using NMaier.SimpleDlna.Server;
 

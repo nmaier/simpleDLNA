@@ -7,7 +7,7 @@ namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class ByTitleView : BaseView
   {
-   private static readonly ILogging Logger = Logging.GetLogger<ByTitleView>();
+    private static readonly ILogging _logger = Logging.GetLogger<ByTitleView>();
     public override string Description
     {
       get
@@ -95,7 +95,7 @@ namespace NMaier.SimpleDlna.Server.Views
       }
       foreach (var i in titles.ChildFolders.ToList()) {
         if (i.ChildCount > 100) {
-          Logger.ErrorFormat("Partioning folder {0}", i.Title);
+          _logger.ErrorFormat("Partioning folder {0}", i.Title);
           PartitionChildren(i as VirtualFolder, new Prefixer());
         }
         root.AdoptFolder(i);

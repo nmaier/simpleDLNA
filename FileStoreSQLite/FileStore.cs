@@ -47,7 +47,7 @@ namespace NMaier.SimpleDlna.FileStore.SQLite
     private static readonly FileStoreVacuumer vacuumer =
       new FileStoreVacuumer();
 
-    protected static readonly ILogging Logger = Logging.GetLogger<FileStore>();
+    protected static readonly ILogging _logger = Logging.GetLogger<FileStore>();
 
     private readonly static object globalLock = new object();
 
@@ -118,7 +118,7 @@ namespace NMaier.SimpleDlna.FileStore.SQLite
       insertCover.DbType = DbType.Binary;
       insertCover.ParameterName = "@cover";
 
-      Logger.InfoFormat("FileStore at {0} is ready", StoreFile);
+      _logger.InfoFormat("FileStore at {0} is ready", StoreFile);
 
       vacuumer.Add(connection);
     }
@@ -142,7 +142,7 @@ namespace NMaier.SimpleDlna.FileStore.SQLite
           }
         }
         catch (Exception ex) {
-          Logger.NoticeFormat(
+          _logger.NoticeFormat(
             "Recreating database, schema update. ({0})",
             ex.Message
           );
@@ -208,7 +208,7 @@ namespace NMaier.SimpleDlna.FileStore.SQLite
           return (data as byte[]) != null;
         }
         catch (DbException ex) {
-          Logger.Error("Failed to lookup file cover existence from store", ex);
+          _logger.Error("Failed to lookup file cover existence from store", ex);
           return false;
         }
       }
@@ -230,7 +230,7 @@ namespace NMaier.SimpleDlna.FileStore.SQLite
           return selectCover.ExecuteScalar() as byte[];
         }
         catch (DbException ex) {
-          Logger.Error("Failed to lookup file cover from store", ex);
+          _logger.Error("Failed to lookup file cover from store", ex);
           return null;
         }
       }
@@ -279,7 +279,7 @@ namespace NMaier.SimpleDlna.FileStore.SQLite
           return select.ExecuteScalar() as byte[];
         }
         catch (DbException ex) {
-          Logger.Error("Failed to lookup file from store", ex);
+          _logger.Error("Failed to lookup file from store", ex);
           return null;
         }
       }
@@ -331,14 +331,14 @@ namespace NMaier.SimpleDlna.FileStore.SQLite
               insert.ExecuteNonQuery();
             }
             catch (DbException ex) {
-              Logger.Error("Failed to put file cover into store", ex);
+              _logger.Error("Failed to put file cover into store", ex);
               return;
             }
           }
         
       }
       catch (Exception ex) {
-        Logger.Error("Failed to serialize an object of type " + file.GetType(), ex);
+        _logger.Error("Failed to serialize an object of type " + file.GetType(), ex);
         throw;
       }
     }

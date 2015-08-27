@@ -1,4 +1,6 @@
-﻿namespace NMaier.SimpleDlna.Server
+﻿using NMaier.SimpleDlna.Server.Http;
+
+namespace NMaier.SimpleDlna.Server
 {
   internal sealed class IconHandler : IPrefixHandler
   {

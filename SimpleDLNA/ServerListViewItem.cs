@@ -3,6 +3,7 @@ using log4net.Core;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Http;
 using System;
 using System.IO;
 using System.Linq;

@@ -9,7 +9,7 @@ namespace NMaier.SimpleDlna.Server
 {
   public sealed class Identifiers// : Logging
   {
-   private static readonly ILogging Logger = Logging.GetLogger<Identifiers>();
+    private static readonly ILogging _logger = Logging.GetLogger<Identifiers>();
     public const string GeneralRoot = "0";
 
     public const string SamsungAudio = "A";
@@ -93,7 +93,7 @@ namespace NMaier.SimpleDlna.Server
         views.Add(ViewRepository.Lookup(name));
       }
       catch (Exception ex) {
-        Logger.Error("Failed to add view", ex);
+        _logger.Error("Failed to add view", ex);
         throw;
       }
     }
@@ -113,7 +113,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       paths = npaths;
-      Logger.DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
+      _logger.DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
     }
 
     public IMediaItem GetItemById(string id)

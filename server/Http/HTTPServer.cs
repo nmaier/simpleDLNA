@@ -9,7 +9,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Timers;
 
-namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server.Http
 {//Logging, 
   public sealed class HttpServer : IDisposable
   {

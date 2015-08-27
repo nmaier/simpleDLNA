@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server.Http
 {
   internal static class HttpPhrases
   {

@@ -28,7 +28,7 @@ namespace NMaier.SimpleDlna.FileStore.RaptorDB
     FileInfo _storeFile;
     public string StoreFile { get { return _storeFile.FullName; } }
 
-    private static readonly ILogging Logger = Logging.GetLogger<FileStore>();
+    private static readonly ILogging _logger = Logging.GetLogger<FileStore>();
 
     public void Dispose()
     {
@@ -55,7 +55,7 @@ namespace NMaier.SimpleDlna.FileStore.RaptorDB
       var storePath = _parameters.Keys.Contains("file") ? Convert.ToString(_parameters.GetValuesForKey("file").First()):DefaultFileName;
       if (!Path.IsPathRooted(storePath)) storePath = DataPath.Combine(storePath);
       _storeFile = new FileInfo(storePath);
-      Logger.NoticeFormat("Opening [{0}] Store...", _storeFile);
+      _logger.NoticeFormat("Opening [{0}] Store...", _storeFile);
       _db = RaptorDB<string>.Open(_storeFile.FullName, false);
     }
 
@@ -77,7 +77,7 @@ namespace NMaier.SimpleDlna.FileStore.RaptorDB
 
     public void MaybeStoreFile(IStoreItem file, byte[] data, byte[] coverData)
     {
-     Logger.NoticeFormat("MaybeStoreFile [{0}][{1}][{2}]", file.Item.Name, (data == null)?0:data.Length, (coverData == null)?0:coverData.Length);
+     _logger.NoticeFormat("MaybeStoreFile [{0}][{1}][{2}]", file.Item.Name, (data == null)?0:data.Length, (coverData == null)?0:coverData.Length);
       _db.Set(file.Item.FullName, data);
       _db.Set(CoverPrefix + file.Item.FullName, coverData);
     }

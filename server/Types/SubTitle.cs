@@ -11,7 +11,7 @@ namespace NMaier.SimpleDlna.Server
     [NonSerialized]
     private byte[] encodedText = null;
 
-   private static readonly ILogging logger = Logging.GetLogger<Subtitle>();
+   private static readonly ILogging _logger = Logging.GetLogger<Subtitle>();
 
    private static readonly string[] exts = new string[] {
       ".srt", ".SRT",
@@ -163,7 +163,7 @@ namespace NMaier.SimpleDlna.Server
           catch (NotSupportedException) {
           }
           catch (Exception ex) {
-            logger.Debug(string.Format(
+            _logger.Debug(string.Format(
               "Failed to get subtitle from {0}", sti.FullName), ex);
           }
         }
@@ -173,12 +173,12 @@ namespace NMaier.SimpleDlna.Server
         catch (NotSupportedException) {
         }
         catch (Exception ex) {
-          logger.Debug(string.Format(
+          _logger.Debug(string.Format(
             "Failed to get subtitle from {0}", file.FullName), ex);
         }
       }
       catch (Exception ex) {
-        logger.Error(string.Format(
+        _logger.Error(string.Format(
           "Failed to load subtitle for {0}", file.FullName), ex);
       }
     }

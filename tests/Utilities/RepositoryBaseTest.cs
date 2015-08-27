@@ -1,7 +1,4 @@
 ﻿using NUnit.Framework;
-using NMaier.SimpleDlna.FileMediaServer;
-using System.IO;
-using SimpleDlna.Tests.Mocks;
 using NMaier.SimpleDlna.Utilities;
 
 namespace SimpleDlna.Tests.Utilities

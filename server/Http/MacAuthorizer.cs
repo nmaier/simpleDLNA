@@ -1,13 +1,12 @@
 ﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Net;
 
-namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server.Http
 {//Logging, 
   public sealed class MacAuthorizer : IHttpAuthorizationMethod
   {
-   private static readonly ILogging Logger = Logging.GetLogger<MacAuthorizer>();
+    private static readonly ILogging _logger = Logging.GetLogger<MacAuthorizer>();
     private readonly Dictionary<string, object> macs =
       new Dictionary<string, object>();
 
@@ -29,18 +28,18 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
+    public bool Authorize(HttpRequestAuthParameters ap)//IHeaders headers, IPEndPoint endPoint, string mac)
     {
-      if (string.IsNullOrEmpty(mac)) {
+      if (string.IsNullOrEmpty(ap.Mac)) {
         return false;
       }
 
-      var rv = macs.ContainsKey(mac);
+      var rv = macs.ContainsKey(ap.Mac);
       if (!rv) {
-        Logger.DebugFormat("Rejecting {0}. Not in MAC whitelist", mac ?? "<UNKNOWN>");
+        _logger.DebugFormat("Rejecting {0}. Not in MAC whitelist", ap.Mac ?? "<UNKNOWN>");
       }
       else {
-        Logger.DebugFormat("Accepted {0} via MAC whitelist", mac);
+        _logger.DebugFormat("Accepted {0} via MAC whitelist", ap.Mac);
       }
       return rv;
     }

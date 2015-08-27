@@ -1,13 +1,12 @@
 ﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Net;
 
-namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server.Http
 {//Logging, 
   public sealed class UserAgentAuthorizer : IHttpAuthorizationMethod
   {
-   private static readonly ILogging Logger = Logging.GetLogger<UserAgentAuthorizer>();
+   private static readonly ILogging _logger = Logging.GetLogger<UserAgentAuthorizer>();
     private readonly Dictionary<string, object> userAgents =
       new Dictionary<string, object>();
 
@@ -28,24 +27,24 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
+    public bool Authorize(HttpRequestAuthParameters ap)//IHeaders headers, IPEndPoint endPoint, string mac)
     {
-      if (headers == null) {
-        throw new ArgumentNullException("headers");
-      }
-      string ua;
-      if (!headers.TryGetValue("User-Agent", out ua)) {
+      //if (headers == null) {
+      //  throw new ArgumentNullException("headers");
+      //}
+      //string ua;
+      //if (!headers.TryGetValue("User-Agent", out ua)) {
+      //  return false;
+      //}
+      if (string.IsNullOrEmpty(ap.UserAgent)) {
         return false;
       }
-      if (string.IsNullOrEmpty(ua)) {
-        return false;
-      }
-      var rv = userAgents.ContainsKey(ua);
+      var rv = userAgents.ContainsKey(ap.UserAgent);
       if (!rv) {
-        Logger.DebugFormat("Rejecting {0}. Not in User-Agent whitelist", ua);
+        _logger.DebugFormat("Rejecting {0}. Not in User-Agent whitelist", ap.UserAgent);
       }
       else {
-        Logger.DebugFormat("Accepted {0} via User-Agent whitelist", ua);
+        _logger.DebugFormat("Accepted {0} via User-Agent whitelist", ap.UserAgent);
       }
       return rv;
     }

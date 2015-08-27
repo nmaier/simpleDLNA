@@ -67,6 +67,7 @@
     <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Http\HttpAuthorizationEventArgs.cs" />
     <Compile Include="Http\HttpPhrases.cs" />
+    <Compile Include="Http\HttpRequestAuthParameters.cs" />
     <Compile Include="Interfaces\IBookmarkable.cs" />
     <Compile Include="Interfaces\IMediaAudioResource.cs" />
     <Compile Include="Interfaces\IMediaImageResource.cs" />

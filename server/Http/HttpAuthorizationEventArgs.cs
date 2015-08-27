@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server.Http
 {
   public sealed class HttpAuthorizationEventArgs : EventArgs
   {

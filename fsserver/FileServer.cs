@@ -1,4 +1,5 @@
 ﻿using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Http;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
@@ -41,8 +42,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private static readonly double ChangeDeleteTime =
       TimeSpan.FromSeconds(2).TotalMilliseconds;
 
-    private readonly List<WeakReference> pendingFiles =
-      new List<WeakReference>();
+    private readonly List<WeakReference> pendingFiles = new List<WeakReference>();
 
     private readonly Identifiers ids;
 
@@ -289,20 +289,21 @@ namespace NMaier.SimpleDlna.FileMediaServer
       RescanInternal();
     }
 
-    private void Thumbnail()
-    {
-      if (_store == null) {
-        lock (this) {
+    void ClearPending() {
+        lock (pendingFiles) {
           pendingFiles.Clear();
         }
-        return;
+    }
+
+    private void Thumbnail()
+    {
+      if (_store != null) {
+        lock (pendingFiles) {
+          DebugFormat("Passing {0} files to background cacher", pendingFiles.Count);
+          BackgroundCacher.AddFiles(_store, pendingFiles);
+        }
       }
-      lock (this) {
-        DebugFormat(
-          "Passing {0} files to background cacher", pendingFiles.Count);
-        BackgroundCacher.AddFiles(_store, pendingFiles);
-        pendingFiles.Clear();
-      }
+      ClearPending();
     }
 
     internal void DelayedRescan(WatcherChangeTypes changeType)
@@ -368,18 +369,21 @@ namespace NMaier.SimpleDlna.FileMediaServer
       if (_store != null) {
         item = _storeReader.GetFile(info, this, type);
         if (item != null) {
-          lock (this) {
-            pendingFiles.Add(new WeakReference(item));
-          }
+          AddPending(item);
           return item;
         }
       }
 
-      lock (this) {
-        var rv = BaseFile.GetFile(aParent, info, type, mediaType);
-        pendingFiles.Add(new WeakReference(rv));
-        return rv;
-      }
+      var rv = BaseFile.GetFile(aParent, info, type, mediaType);
+      AddPending(rv);
+      return rv;
+    }
+
+    void AddPending(BaseFile file) {
+        lock (pendingFiles) {
+          if (pendingFiles.Any(f => ((BaseFile)f.Target).Path == file.Path)) return;
+          pendingFiles.Add(new WeakReference(file));
+        }
     }
 
     internal void UpdateFileCache(BaseFile aFile)

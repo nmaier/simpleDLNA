@@ -23,11 +23,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       return new BlockingCollection<Item>(new ConcurrentQueue<Item>());
     }
 
-    private readonly static ILogging logger = Logging.GetLogger<BackgroundCacher>();
+    private readonly static ILogging _logger = Logging.GetLogger<BackgroundCacher>();
 
     private static void Run()
     {
-      logger.Debug("started");
+      _logger.Debug("started");
       var loadedSubTitles = 0ul;
       try {
         for (; ; ) {
@@ -38,7 +38,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           var item = queue.Take();
           var store = item.Store.Target as IFileStore;
           var file = item.File.Target as BaseFile;
-          logger.NoticeFormat("Processing [{0}]", file.Item.Name);
+          _logger.NoticeFormat("Processing [{0}]", file.Item.Name);
           if (store == null || file == null) {
             continue;
           }
@@ -60,7 +60,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
       }
       finally {
-        logger.DebugFormat("stopped subtitles: {0}", loadedSubTitles);
+        _logger.DebugFormat("stopped subtitles: {0}", loadedSubTitles);
       }
     }
 

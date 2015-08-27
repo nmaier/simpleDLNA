@@ -1,5 +1,5 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
+﻿using NMaier.SimpleDlna.Server.Http;
+using NMaier.SimpleDlna.Server.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -75,7 +75,7 @@ namespace NMaier.SimpleDlna.Server
     private void ChangedServer(object sender, EventArgs e)
     {
       soapCache.Clear();
-      Logger.InfoFormat("Rescanned mount {0}", Uuid);
+      _logger.InfoFormat("Rescanned mount {0}", Uuid);
       systemID++;
     }
 
@@ -138,16 +138,17 @@ namespace NMaier.SimpleDlna.Server
     {
       if (Authorizer != null &&
         !IPAddress.IsLoopback(request.RemoteEndpoint.Address) &&
-        !Authorizer.Authorize(
-          request.Headers,
-          request.RemoteEndpoint,
-          IP.GetMAC(request.RemoteEndpoint.Address)
-         )) {
+        !Authorizer.Authorize(new HttpRequestAuthParameters(request.Headers, request.RemoteEndpoint))
+         // request.Headers,
+         // request.RemoteEndpoint,
+         // IP.GetMAC(request.RemoteEndpoint.Address)
+         //)
+        ) {
         throw new HttpStatusException(HttpCode.Denied);
       }
 
       var path = request.Path.Substring(prefix.Length);
-      Logger.Debug(path);
+      _logger.Debug(path);
       if (path == "description.xml") {
         return new StringResponse(
           HttpCode.Ok,
@@ -181,19 +182,19 @@ namespace NMaier.SimpleDlna.Server
       }
       if (path.StartsWith("file/", StringComparison.Ordinal)) {
         var id = path.Split('/')[1];
-        Logger.InfoFormat("Serving file {0}", id);
+        _logger.InfoFormat("Serving file {0}", id);
         var item = GetItem(id) as IMediaResource;
         return new ItemResponse(prefix, request, item);
       }
       if (path.StartsWith("cover/", StringComparison.Ordinal)) {
         var id = path.Split('/')[1];
-        Logger.InfoFormat("Serving cover {0}", id);
+        _logger.InfoFormat("Serving cover {0}", id);
         var item = GetItem(id) as IMediaCover;
         return new ItemResponse(prefix, request, item.Cover, "Interactive");
       }
       if (path.StartsWith("subtitle/", StringComparison.Ordinal)) {
         var id = path.Split('/')[1];
-        Logger.InfoFormat("Serving subtitle {0}", id);
+        _logger.InfoFormat("Serving subtitle {0}", id);
         var item = GetItem(id) as IMetaVideoItem;
         return new ItemResponse(prefix, request, item.Subtitle, "Background");
       }
@@ -215,7 +216,7 @@ namespace NMaier.SimpleDlna.Server
       if (request.Method == "UNSUBSCRIBE") {
         return new StringResponse(HttpCode.Ok, string.Empty);
       }
-      Logger.WarnFormat("Did not understand {0} {1}", request.Method, path);
+      _logger.WarnFormat("Did not understand {0} {1}", request.Method, path);
       throw new HttpStatusException(HttpCode.NotFound);
     }
   }
