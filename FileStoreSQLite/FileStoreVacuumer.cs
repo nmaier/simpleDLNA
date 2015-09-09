@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 
-namespace NMaier.SimpleDlna.FileMediaServer
+namespace NMaier.SimpleDlna.FileStore.SQLite
 {
   internal sealed class FileStoreVacuumer : Logging, IDisposable
   {

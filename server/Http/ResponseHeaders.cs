@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server.Http
 {
   public sealed class ResponseHeaders : RawHeaders
   {

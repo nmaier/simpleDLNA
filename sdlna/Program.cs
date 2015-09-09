@@ -3,6 +3,7 @@ using NMaier.GetOptNet;
 using NMaier.SimpleDlna.FileMediaServer;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Http;
 using NMaier.SimpleDlna.Server.Views;
 using NMaier.SimpleDlna.Utilities;
 using System;
@@ -117,29 +118,29 @@ namespace NMaier.SimpleDlna
               var types = options.Types[0];
               foreach (var t in options.Types) {
                 types = types | t;
-                server.InfoFormat("Enabled type {0}", t);
+                server.Logger.InfoFormat("Enabled type {0}", t);
               }
 
               var friendlyName = "sdlna";
 
               if (options.Seperate) {
                 foreach (var d in options.Directories) {
-                  server.InfoFormat("Mounting FileServer for {0}", d.FullName);
+                  server.Logger.InfoFormat("Mounting FileServer for {0}", d.FullName);
                   var fs = SetupFileServer(
                     options, types, new DirectoryInfo[] { d });
                   friendlyName = fs.FriendlyName;
                   server.RegisterMediaServer(fs);
-                  server.NoticeFormat("{0} mounted", d.FullName);
+                  server.Logger.NoticeFormat("{0} mounted", d.FullName);
                 }
               }
               else {
-                server.InfoFormat(
+                server.Logger.InfoFormat(
                   "Mounting FileServer for {0} ({1})",
                   options.Directories[0], options.Directories.Length);
                 var fs = SetupFileServer(options, types, options.Directories);
                 friendlyName = fs.FriendlyName;
                 server.RegisterMediaServer(fs);
-                server.NoticeFormat(
+                server.Logger.NoticeFormat(
                   "{0} ({1}) mounted",
                   options.Directories[0], options.Directories.Length);
               }
@@ -167,11 +168,11 @@ namespace NMaier.SimpleDlna
 
     private static void Run(HttpServer server)
     {
-      server.Info("CTRL-C to terminate");
+      server.Logger.Info("CTRL-C to terminate");
       BlockEvent.WaitOne();
 
-      server.Info("Going down!");
-      server.Info("Closed!");
+      server.Logger.Info("Going down!");
+      server.Logger.Info("Closed!");
     }
 
     private static FileServer SetupFileServer(Options options,
@@ -193,8 +194,8 @@ namespace NMaier.SimpleDlna
         fs.FriendlyName = options.FriendlyName;
       }
       try {
-        if (options.CacheFile != null) {
-          fs.SetCacheFile(options.CacheFile);
+        if (options.FileStore != null) {
+          fs.SetCacheFile(FileStoreRepository.Lookup(options.FileStore));
         }
         fs.Load();
         if (!options.Rescanning) {
@@ -218,7 +219,7 @@ namespace NMaier.SimpleDlna
     private static void ShowVersion()
     {
       Console.WriteLine("Version: {0}", ProductInformation.ProductVersion);
-      Console.WriteLine("Http:    {0}", HttpServer.Signature);
+      Console.WriteLine("Http:    {0}", Server.Http.HttpServer.Signature);
     }
   }
 }

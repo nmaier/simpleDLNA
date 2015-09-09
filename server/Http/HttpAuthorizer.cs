@@ -1,16 +1,13 @@
 ﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Net;
 
-namespace NMaier.SimpleDlna.Server
-{
-  public sealed class HttpAuthorizer
-    : Logging, IHttpAuthorizationMethod, IDisposable
+namespace NMaier.SimpleDlna.Server.Http
+{//Logging, 
+  public sealed class HttpAuthorizer : IHttpAuthorizationMethod, IDisposable
   {
-    private readonly List<IHttpAuthorizationMethod> methods =
-      new List<IHttpAuthorizationMethod>();
-
+    private static readonly ILogging _logger = Logging.GetLogger<HttpAuthorizer>();
+    private readonly List<IHttpAuthorizationMethod> methods = new List<IHttpAuthorizationMethod>();
     private readonly HttpServer server = null;
 
     public HttpAuthorizer()
@@ -28,10 +25,10 @@ namespace NMaier.SimpleDlna.Server
 
     private void OnAuthorize(object sender, HttpAuthorizationEventArgs e)
     {
-      e.Cancel = !Authorize(
-        e.Headers,
-        e.RemoteEndpoint,
-        IP.GetMAC(e.RemoteEndpoint.Address)
+      e.Cancel = !Authorize(new HttpRequestAuthParameters(e.Headers,e.RemoteEndpoint)
+        //e.Headers,
+        //e.RemoteEndpoint,
+        //IP.GetMAC(e.RemoteEndpoint.Address)
         );
     }
 
@@ -43,21 +40,22 @@ namespace NMaier.SimpleDlna.Server
       methods.Add(method);
     }
 
-    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
+    public bool Authorize(HttpRequestAuthParameters ap)//IHeaders headers, IPEndPoint endPoint, string mac)
     {
+      _logger.NoticeFormat("Authorize:[{0}]", ap);
       if (methods.Count == 0) {
         return true;
       }
       try {
         foreach (var m in methods) {
-          if (m.Authorize(headers, endPoint, mac)) {
+          if (m.Authorize(ap)) {
             return true;
           }
         }
         return false;
       }
       catch (Exception ex) {
-        Error("Failed to authorize", ex);
+        _logger.Error("Failed to authorize", ex);
         return false;
       }
     }

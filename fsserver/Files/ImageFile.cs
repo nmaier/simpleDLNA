@@ -127,7 +127,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             height = tl.Properties.PhotoHeight;
           }
           catch (Exception ex) {
-            Debug("Failed to transpose Properties props", ex);
+            _logger.Debug("Failed to transpose Properties props", ex);
           }
 
           try {
@@ -146,7 +146,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             }
           }
           catch (Exception ex) {
-            Debug("Failed to transpose Tag props", ex);
+            _logger.Debug("Failed to transpose Tag props", ex);
           }
         }
 
@@ -156,17 +156,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
         Server.UpdateFileCache(this);
       }
       catch (TagLib.CorruptFileException ex) {
-        Debug(
+        _logger.Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (TagLib.UnsupportedFormatException ex) {
-        Debug(
+        _logger.Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
       catch (Exception ex) {
-        Warn(
+        _logger.Warn(
           "Unhandled exception reading meta data for file " + Item.FullName,
           ex);
       }

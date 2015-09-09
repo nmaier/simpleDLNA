@@ -53,10 +53,10 @@
     <CodeAnalysisRuleSet>..\sdlna.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>D:\bin\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisLogFile>bin\Release\sdnla.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
@@ -104,6 +104,10 @@
     <Compile Include="SafeNativeMethods.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FileStoreRaptorDB\FileStoreRaptorDB.csproj">
+      <Project>{6961f1c2-41e9-4e7f-8e88-7d4a259b3df8}</Project>
+      <Name>FileStoreRaptorDB</Name>
+    </ProjectReference>
     <ProjectReference Include="..\fsserver\fsserver.csproj">
       <Project>{50E06B21-E11A-42F0-81E2-0911E771E861}</Project>
       <Name>fsserver</Name>

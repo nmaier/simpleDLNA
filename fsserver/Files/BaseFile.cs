@@ -7,8 +7,8 @@ using System.IO;
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   using CoverCache = LeastRecentlyUsedDictionary<string, Cover>;
-
-  internal class BaseFile : Logging, IMediaResource, IMediaCover, IMetaInfo
+  [Serializable] //Logging, 
+  public class BaseFile : IStoreItem, IMediaResource, IMediaCover, IMetaInfo
   {
     private string comparableTitle;
 
@@ -16,6 +16,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private long? length = null;
 
+    [NonSerialized]
     private readonly FileServer server;
 
     private readonly string title;
@@ -26,6 +27,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private static readonly StringComparer comparer =
       new NaturalStringComparer(false);
+
+    protected static readonly ILogging _logger = Logging.GetLogger<BaseFile>();
 
     protected BaseFile(FileServer server, FileInfo file, DlnaMime type,
                        DlnaMediaTypes mediaType)
@@ -80,7 +83,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    internal FileInfo Item
+    public FileInfo Item
     {
       get;
       set;
@@ -168,7 +171,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
         }
         catch (Exception ex) {
-          Debug("Failed to access cover", ex);
+          _logger.Debug("Failed to access cover", ex);
         }
         return rv;
       }
@@ -209,7 +212,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    internal Cover MaybeGetCover()
+    public Cover MaybeGetCover()
     {
       return cover;
     }
@@ -228,17 +231,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return FileStreamCache.Get(Item);
       }
       catch (FileNotFoundException ex) {
-        Error("Failed to access: " + Item.FullName, ex);
+        _logger.Error("Failed to access: " + Item.FullName, ex);
         server.DelayedRescan(WatcherChangeTypes.Deleted);
         throw;
       }
       catch (UnauthorizedAccessException ex) {
-        Error("Failed to access: " + Item.FullName, ex);
+        _logger.Error("Failed to access: " + Item.FullName, ex);
         server.DelayedRescan(WatcherChangeTypes.Changed);
         throw;
       }
       catch (IOException ex) {
-        Error("Failed to access: " + Item.FullName, ex);
+        _logger.Error("Failed to access: " + Item.FullName, ex);
         server.DelayedRescan(WatcherChangeTypes.Changed);
         throw;
       }

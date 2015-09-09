@@ -1,9 +1,9 @@
 using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -23,10 +23,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       return new BlockingCollection<Item>(new ConcurrentQueue<Item>());
     }
 
+    private readonly static ILogging _logger = Logging.GetLogger<BackgroundCacher>();
+
     private static void Run()
     {
-      var logger = log4net.LogManager.GetLogger(typeof(BackgroundCacher));
-      logger.Debug("started");
+      _logger.Debug("started");
       var loadedSubTitles = 0ul;
       try {
         for (; ; ) {
@@ -35,8 +36,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
             continue;
           }
           var item = queue.Take();
-          var store = item.Store.Target as FileStore;
+          var store = item.Store.Target as IFileStore;
           var file = item.File.Target as BaseFile;
+          _logger.NoticeFormat("Processing [{0}]", file.Item.Name);
           if (store == null || file == null) {
             continue;
           }
@@ -58,11 +60,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
       }
       finally {
-        logger.DebugFormat("stopped subtitles: {0}", loadedSubTitles);
+        _logger.DebugFormat("stopped subtitles: {0}", loadedSubTitles);
       }
     }
 
-    public static void AddFiles(FileStore store,
+    public static void AddFiles(IFileStore store,
                                 IEnumerable<WeakReference> items)
     {
       var storeRef = new WeakReference(store);

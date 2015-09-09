@@ -1,4 +1,5 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
+﻿using NMaier.SimpleDlna.Server.Http;
+using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ namespace NMaier.SimpleDlna.Server
 {
   internal partial class MediaMount
   {
+   private static readonly ILogging _logger = Logging.GetLogger<MediaMount>();
     private const string NS_DC = "http://purl.org/dc/elements/1.1/";
 
     private const string NS_DIDL =
@@ -370,7 +372,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       catch (Exception ex) {
-        Debug("Not all params provided", ex);
+        _logger.Debug("Not all params provided", ex);
       }
 
       var root = GetItem(id) as IMediaFolder;
@@ -573,7 +575,7 @@ namespace NMaier.SimpleDlna.Server
           "<detail><UPnPError xmlns=\"urn:schemas-upnp-org:control-1-0\"><errorCode>401</errorCode><errorDescription>Invalid Action</errorDescription></UPnPError></detail>";
         fault.AppendChild(detail);
         rbody.AppendChild(fault);
-        WarnFormat(
+        _logger.WarnFormat(
           "Invalid call: Action: {0}, Params: {1}, Problem {2}",
           method.LocalName, sparams, ex.Message);
       }

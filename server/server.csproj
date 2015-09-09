@@ -26,7 +26,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -44,10 +44,6 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-client\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -71,6 +67,7 @@
     <Compile Include="Handlers\IndexHandler.cs" />
     <Compile Include="Http\HttpAuthorizationEventArgs.cs" />
     <Compile Include="Http\HttpPhrases.cs" />
+    <Compile Include="Http\HttpRequestAuthParameters.cs" />
     <Compile Include="Interfaces\IBookmarkable.cs" />
     <Compile Include="Interfaces\IMediaAudioResource.cs" />
     <Compile Include="Interfaces\IMediaImageResource.cs" />
@@ -141,6 +138,7 @@
     <Compile Include="Types\VirtualClonedFolder.cs" />
     <Compile Include="Types\VirtualFolder.cs" />
     <Compile Include="Views\BaseView.cs" />
+    <Compile Include="Views\ByDateView.cs" />
     <Compile Include="Views\ByTitleView.cs" />
     <Compile Include="Views\DimensionView.cs" />
     <Compile Include="Views\DoubleKeyedVirtualFolder.cs" />
@@ -165,7 +163,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="Resources\contentdirectory.xml" />
     <None Include="Resources\description.xml" />
     <None Include="sdlna.key.snk" />

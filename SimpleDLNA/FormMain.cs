@@ -3,7 +3,8 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
 using log4net.Layout;
-using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Http;
+using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,7 +15,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -28,14 +28,14 @@ namespace NMaier.SimpleDlna.GUI
       Properties.Settings.Default;
 
     private readonly FileInfo cacheFile =
-      new FileInfo(Path.Combine(cacheDir, "sdlna.cache"));
+      new FileInfo(DataPath.Combine("sdlna.cache"));
 
 #if DEBUG
     private readonly FileInfo logFile =
-      new FileInfo(Path.Combine(cacheDir, "sdlna.dbg.log"));
+      new FileInfo(DataPath.Combine("sdlna.dbg.log"));
 #else
     private readonly FileInfo logFile =
-      new FileInfo(Path.Combine(cacheDir, "sdlna.log"));
+      new FileInfo(DataPath.Combine("sdlna.log"));
 #endif
 
     private readonly object appenderLock = new object();
@@ -56,6 +56,11 @@ namespace NMaier.SimpleDlna.GUI
 
     public FormMain()
     {
+      var rv = Config.cache;
+      if (!string.IsNullOrWhiteSpace(rv) && Directory.Exists(rv)) {
+        DataPath.Path = rv;
+      }
+
       HandleCreated += (o, e) =>
       {
         logging = true;
@@ -99,41 +104,6 @@ namespace NMaier.SimpleDlna.GUI
 
     private delegate void logDelegate(string level, string logger, string msg,
                                       string ex);
-
-    private static string cacheDir
-    {
-      get
-      {
-        var rv = Config.cache;
-        if (!string.IsNullOrWhiteSpace(rv) && Directory.Exists(rv)) {
-          return rv;
-        }
-        try {
-          try {
-            rv = Environment.GetFolderPath(
-              Environment.SpecialFolder.LocalApplicationData);
-            if (string.IsNullOrEmpty(rv)) {
-              throw new IOException("Cannot get LocalAppData");
-            }
-          }
-          catch (Exception) {
-            rv = Environment.GetFolderPath(
-              Environment.SpecialFolder.ApplicationData);
-            if (string.IsNullOrEmpty(rv)) {
-              throw new IOException("Cannot get LocalAppData");
-            }
-          }
-          rv = Path.Combine(rv, "SimpleDLNA");
-          if (!Directory.Exists(rv)) {
-            Directory.CreateDirectory(rv);
-          }
-          return rv;
-        }
-        catch (Exception) {
-          return Path.GetTempPath();
-        }
-      }
-    }
 
     public override string Text
     {
@@ -381,11 +351,7 @@ namespace NMaier.SimpleDlna.GUI
     {
       List<ServerDescription> rv;
       try {
-        var serializer = new XmlSerializer(typeof(List<ServerDescription>));
-        using (var reader = new StreamReader(
-            Path.Combine(cacheDir, descriptorFile))) {
-          rv = serializer.Deserialize(reader) as List<ServerDescription>;
-        }
+        rv = XmlHelper.FromFile<List<ServerDescription>>(DataPath.Combine(descriptorFile));
       }
       catch (Exception) {
         rv = Config.Descriptors;
@@ -476,15 +442,13 @@ namespace NMaier.SimpleDlna.GUI
       try {
         var descs = (from ServerListViewItem item in listDescriptions.Items
                      select item.Description).ToArray();
-        var serializer = new XmlSerializer(descs.GetType());
-        var file = new FileInfo(
-          Path.Combine(cacheDir, descriptorFile + ".tmp"));
-        using (var writer = new StreamWriter(file.FullName)) {
-          serializer.Serialize(writer, descs);
-        }
-        var outfile = Path.Combine(cacheDir, descriptorFile);
-        File.Copy(file.FullName, outfile, true);
-        file.Delete();
+
+        var file = DataPath.Combine(descriptorFile + ".tmp");
+        XmlHelper.ToFile(descs, file);
+
+        var outfile = DataPath.Combine(descriptorFile);
+        File.Copy(file, outfile, true);
+        File.Delete(file);
       }
       catch (Exception ex) {
         log.Error("Failed to write descriptors", ex);

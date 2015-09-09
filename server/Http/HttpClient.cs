@@ -6,10 +6,12 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace NMaier.SimpleDlna.Server
-{
-  internal sealed class HttpClient : Logging, IRequest, IDisposable
+namespace NMaier.SimpleDlna.Server.Http
+{//Logging, 
+  internal sealed class HttpClient : IRequest, IDisposable
   {
+    private static readonly ILogging _logger = Logging.GetLogger<HttpClient>();
+
     private const uint BEGIN_TIMEOUT = 30;
 
     private const int BUFFER_SIZE = 1 << 16;
@@ -244,7 +246,7 @@ namespace NMaier.SimpleDlna.Server
         status = HttpCode.Partial;
       }
       catch (Exception ex) {
-        Warn(String.Format(
+        _logger.Warn(String.Format(
           "{0} - Failed to process range request!", this), ex);
       }
       return responseBody;
@@ -256,7 +258,7 @@ namespace NMaier.SimpleDlna.Server
         stream.BeginRead(buffer, 0, buffer.Length, ReadCallback, 0);
       }
       catch (IOException ex) {
-        Warn(String.Format("{0} - Failed to BeginRead", this), ex);
+        _logger.Warn(String.Format("{0} - Failed to BeginRead", this), ex);
         Close();
       }
     }
@@ -275,13 +277,13 @@ namespace NMaier.SimpleDlna.Server
         if (read < 0) {
           throw new HttpException("Client did not send anything");
         }
-        DebugFormat("{0} - Read {1} bytes", this, read);
+        _logger.DebugFormat("{0} - Read {1} bytes", this, read);
         readStream.Write(buffer, 0, read);
         lastActivity = DateTime.Now;
       }
       catch (Exception) {
         if (!IsATimeout) {
-          WarnFormat("{0} - Failed to read data", this);
+          _logger.WarnFormat("{0} - Failed to read data", this);
           Close();
         }
         return;
@@ -304,7 +306,7 @@ namespace NMaier.SimpleDlna.Server
                 }
                 var bytes = Encoding.ASCII.GetBytes(reader.ReadToEnd());
                 readStream.Write(bytes, 0, bytes.Length);
-                DebugFormat("Must read body bytes {0}", bodyBytes);
+                _logger.DebugFormat("Must read body bytes {0}", bodyBytes);
               }
               else {
                 readStream = new MemoryStream();
@@ -315,7 +317,7 @@ namespace NMaier.SimpleDlna.Server
               var parts = line.Split(new char[] { ' ' }, 3);
               method = parts[0].Trim().ToUpperInvariant();
               path = parts[1].Trim();
-              DebugFormat("{0} - {1} request for {2}", this, method, path);
+              _logger.DebugFormat("{0} - {1} request for {2}", this, method, path);
             }
             else {
               var parts = line.Split(new char[] { ':' }, 2);
@@ -324,20 +326,20 @@ namespace NMaier.SimpleDlna.Server
           }
         }
         if (bodyBytes != 0 && bodyBytes > readStream.Length) {
-          DebugFormat(
+          _logger.DebugFormat(
             "{0} - Bytes to go {1}", this, bodyBytes - readStream.Length);
           Read();
           return;
         }
         using (readStream) {
           body = Encoding.UTF8.GetString(readStream.ToArray());
-          Debug(body);
-          Debug(headers);
+          _logger.Debug(body);
+          _logger.Debug(headers);
         }
         SetupResponse();
       }
       catch (Exception ex) {
-        Warn(String.Format("{0} - Failed to process request", this), ex);
+        _logger.Warn(String.Format("{0} - Failed to process request", this), ex);
         response = Error500.HandleRequest(this);
         SendResponse();
       }
@@ -380,7 +382,7 @@ namespace NMaier.SimpleDlna.Server
           responseStream.AddStream(responseBody);
           responseBody = null;
         }
-        InfoFormat("{0} - {1} response for {2}", this, (uint)statusCode, path);
+        _logger.InfoFormat("{0} - {1} response for {2}", this, (uint)statusCode, path);
         state = HttpStates.WRITING;
         var sp = new StreamPump(responseStream, stream, BUFFER_SIZE);
         sp.Pump((pump, result) =>
@@ -388,7 +390,7 @@ namespace NMaier.SimpleDlna.Server
           pump.Input.Close();
           pump.Input.Dispose();
           if (result == StreamPumpResult.Delivered) {
-            DebugFormat("{0} - Done writing response", this);
+            _logger.DebugFormat("{0} - Done writing response", this);
 
             string conn;
             if (headers.TryGetValue("connection", out conn) &&
@@ -398,7 +400,7 @@ namespace NMaier.SimpleDlna.Server
             }
           }
           else {
-            DebugFormat("{0} - Client aborted connection", this);
+            _logger.DebugFormat("{0} - Client aborted connection", this);
           }
           Close();
         });
@@ -422,6 +424,7 @@ namespace NMaier.SimpleDlna.Server
           throw new HttpStatusException(HttpCode.Denied);
         }
         if (string.IsNullOrEmpty(path)) {
+          _logger.Error("Empty path");
           throw new HttpStatusException(HttpCode.NotFound);
         }
         var handler = owner.FindHandler(path);
@@ -435,9 +438,9 @@ namespace NMaier.SimpleDlna.Server
       }
       catch (HttpStatusException ex) {
 #if DEBUG
-        Warn(String.Format("{0} - Got a {2}: {1}", this, path, ex.Code), ex);
+        _logger.Warn(String.Format("{0} - Got a {2}: {1}", this, path, ex.Code), ex);
 #else
-        InfoFormat("{0} - Got a {2}: {1}", this, path, ex.Code);
+        _logger.InfoFormat("{0} - Got a {2}: {1}", this, path, ex.Code);
 #endif
         switch (ex.Code) {
           case HttpCode.NotFound:
@@ -459,7 +462,7 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       catch (Exception ex) {
-        Warn(String.Format("{0} - Failed to process response", this), ex);
+        _logger.Warn(String.Format("{0} - Failed to process response", this), ex);
         response = Error500.HandleRequest(this);
       }
       SendResponse();
@@ -469,7 +472,7 @@ namespace NMaier.SimpleDlna.Server
     {
       State = HttpStates.CLOSED;
 
-      DebugFormat(
+      _logger.DebugFormat(
         "{0} - Closing connection after {1} requests", this, requestCount);
       try {
         client.Close();

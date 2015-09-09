@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  public abstract class Repository<TInterface>
-    where TInterface : class, IRepositoryItem
+  public abstract class Repository<TInterface> : RepositoryBase where TInterface : class, IRepositoryItem
   {
     private static readonly Dictionary<string, TInterface> items =
       BuildRepository();
@@ -13,8 +12,8 @@ namespace NMaier.SimpleDlna.Utilities
     {
       var items = new Dictionary<string, TInterface>();
       var type = typeof(TInterface).Name;
-      var a = typeof(TInterface).Assembly;
-      foreach (Type t in a.GetTypes()) {
+//      var a = typeof(TInterface).Assembly;
+      foreach (Type t in GetInterfaceImplementations<TInterface>()) {
         if (t.GetInterface(type) == null) {
           continue;
         }

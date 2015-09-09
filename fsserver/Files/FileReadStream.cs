@@ -1,8 +1,6 @@
-using log4net;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -10,8 +8,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal class FileStreamCache
   {
-    private readonly static ILog logger =
-      LogManager.GetLogger(typeof(FileReadStream));
+    private readonly static ILogging _logger = Logging.GetLogger<FileReadStream>();
 
     private class CacheItem
     {
@@ -35,7 +32,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           if (streams.TryGetValue(key, out item)) {
             var diff = (DateTime.UtcNow - item.insertionPoint);
             if (diff.TotalMilliseconds > 2500) {
-              logger.DebugFormat("Removed file stream {0} from cache", key);
+              _logger.DebugFormat("Removed file stream {0} from cache", key);
               item.stream.Kill();
               streams.Remove(key);
             }
@@ -61,11 +58,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
       lock (streams) {
         if (streams.TryGetValue(key, out rv)) {
           streams.Remove(key);
-          logger.DebugFormat("Retrieved file stream {0} from cache", key);
+          _logger.DebugFormat("Retrieved file stream {0} from cache", key);
           return rv.stream;
         }
       }
-      logger.DebugFormat("Constructing file stream {0}", key);
+      _logger.DebugFormat("Constructing file stream {0}", key);
       return new FileReadStream(info);
     }
 
@@ -77,7 +74,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           CacheItem ignore;
           if (!streams.TryGetValue(key, out ignore) ||
             Object.Equals(ignore.stream, stream)) {
-            logger.DebugFormat("Recycling {0}", key);
+            _logger.DebugFormat("Recycling {0}", key);
             stream.Seek(0, SeekOrigin.Begin);
             var removed = streams.AddAndPop(key, new CacheItem(stream));
             if (removed != null) {
@@ -100,8 +97,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private readonly FileInfo info;
 
-    private readonly static ILog logger =
-      LogManager.GetLogger(typeof(FileReadStream));
+    private readonly static ILogging _logger = Logging.GetLogger<FileReadStream>();
 
     private bool killed = false;
 
@@ -112,12 +108,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
              FileOptions.Asynchronous | FileOptions.SequentialScan)
     {
       this.info = info;
-      logger.DebugFormat("Opened file {0}", this.info.FullName);
+      _logger.DebugFormat("Opened file {0}", this.info.FullName);
     }
 
     public void Kill()
     {
-      logger.DebugFormat("Killed file {0}", info.FullName);
+      _logger.DebugFormat("Killed file {0}", info.FullName);
       killed = true;
       Close();
       Dispose();
@@ -130,7 +126,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return;
       }
       base.Close();
-      logger.DebugFormat("Closed file {0}", info.FullName);
+      _logger.DebugFormat("Closed file {0}", info.FullName);
     }
 
     protected override void Dispose(bool disposing)

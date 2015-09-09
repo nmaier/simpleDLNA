@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Server.Http;
+using System;
 using System.Runtime.Serialization;
 
 namespace NMaier.SimpleDlna.Server

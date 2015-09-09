@@ -10,3 +10,4 @@ setup/Release
 setup/*.cmd
 pages/
 cov-int*
+/UpgradeLog.htm

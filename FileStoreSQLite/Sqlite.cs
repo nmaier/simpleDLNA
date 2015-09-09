@@ -1,10 +1,10 @@
-﻿using System;
+﻿using NMaier.SimpleDlna.Utilities;
+using System;
 using System.Data;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
-namespace NMaier.SimpleDlna.Utilities
+namespace NMaier.SimpleDlna.FileStore.SQLite
 {
   public static class Sqlite
   {
@@ -55,7 +55,7 @@ namespace NMaier.SimpleDlna.Utilities
         rv.SetChunkSize(GROW_SIZE);
       }
       catch (Exception ex) {
-        log4net.LogManager.GetLogger(typeof(Sqlite)).Error(
+        Logging.GetLogger(typeof(Sqlite)).Error(
           "Failed to sqlite control", ex);
       }
 

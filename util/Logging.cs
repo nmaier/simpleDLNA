@@ -4,17 +4,29 @@ using System;
 
 namespace NMaier.SimpleDlna.Utilities
 {
-  public class Logging : ILog
+  public class Logging : ILogging
   {
     private ILog instance;
+
+    public static ILogging GetLogger<T>() {
+      return GetLogger(typeof(T));
+    }
+
+    public static ILogging GetLogger(Type t) {
+      return new Logging(t);
+    }
+
+    public Logging() { instance = LogManager.GetLogger(GetType()); }
+
+    public Logging(Type t) { instance = LogManager.GetLogger(t); }
 
     private ILog logger
     {
       get
       {
-        if (instance == null) {
-          instance = LogManager.GetLogger(GetType());
-        }
+        //if (instance == null) {
+        //  instance = LogManager.GetLogger(GetType());
+        //}
         return instance;
       }
     }

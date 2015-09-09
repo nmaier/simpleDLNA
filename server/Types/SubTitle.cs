@@ -1,5 +1,4 @@
-﻿using log4net;
-using NMaier.SimpleDlna.Utilities;
+﻿using NMaier.SimpleDlna.Utilities;
 using System;
 using System.IO;
 using System.Text;
@@ -12,12 +11,9 @@ namespace NMaier.SimpleDlna.Server
     [NonSerialized]
     private byte[] encodedText = null;
 
-    [NonSerialized]
-    private static readonly ILog logger =
-      LogManager.GetLogger(typeof(Subtitle));
+   private static readonly ILogging _logger = Logging.GetLogger<Subtitle>();
 
-    [NonSerialized]
-    private static readonly string[] exts = new string[] {
+   private static readonly string[] exts = new string[] {
       ".srt", ".SRT",
       ".ass", ".ASS",
       ".ssa", ".SSA",
@@ -167,7 +163,7 @@ namespace NMaier.SimpleDlna.Server
           catch (NotSupportedException) {
           }
           catch (Exception ex) {
-            logger.Debug(string.Format(
+            _logger.Debug(string.Format(
               "Failed to get subtitle from {0}", sti.FullName), ex);
           }
         }
@@ -177,12 +173,12 @@ namespace NMaier.SimpleDlna.Server
         catch (NotSupportedException) {
         }
         catch (Exception ex) {
-          logger.Debug(string.Format(
+          _logger.Debug(string.Format(
             "Failed to get subtitle from {0}", file.FullName), ex);
         }
       }
       catch (Exception ex) {
-        logger.Error(string.Format(
+        _logger.Error(string.Format(
           "Failed to load subtitle for {0}", file.FullName), ex);
       }
     }

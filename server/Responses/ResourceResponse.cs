@@ -1,12 +1,14 @@
-﻿using NMaier.SimpleDlna.Utilities;
+﻿using NMaier.SimpleDlna.Server.Http;
+using NMaier.SimpleDlna.Utilities;
 using System;
 using System.IO;
 using System.Resources;
 
 namespace NMaier.SimpleDlna.Server
-{
-  internal sealed class ResourceResponse : Logging, IResponse
+{//Logging, 
+  internal sealed class ResourceResponse : IResponse
   {
+    private static readonly ILogging _logger = Logging.GetLogger<ResourceResponse>();
     private readonly IHeaders headers = new ResponseHeaders();
 
     private readonly byte[] resource;
@@ -29,7 +31,7 @@ namespace NMaier.SimpleDlna.Server
         headers["Content-Length"] = resource.Length.ToString();
       }
       catch (Exception ex) {
-        Error("Failed to prepare resource " + aResource, ex);
+        _logger.Error("Failed to prepare resource " + aResource, ex);
         throw;
       }
     }

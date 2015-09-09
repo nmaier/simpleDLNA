@@ -1,5 +1,4 @@
-﻿using log4net;
-using NMaier.SimpleDlna.Server;
+﻿using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Collections.Generic;
@@ -91,6 +90,8 @@ namespace NMaier.SimpleDlna.Thumbnails
       throw new ArgumentException("Not a supported resource");
     }
 
+    private readonly static ILogging _logger = Logging.GetLogger<ThumbnailMaker>();
+
     internal static Image ResizeImage(Image image, int width, int height,
                                       ThumbnailMakerBorder border)
     {
@@ -114,7 +115,7 @@ namespace NMaier.SimpleDlna.Thumbnails
           result.SetResolution(image.HorizontalResolution, image.VerticalResolution);
         }
         catch (Exception ex) {
-          LogManager.GetLogger(typeof(ThumbnailMaker)).Debug("Failed to set resolution", ex);
+          _logger.Debug("Failed to set resolution", ex);
         }
         using (var graphics = Graphics.FromImage(result)) {
           if (result.Width > image.Width && result.Height > image.Height) {
