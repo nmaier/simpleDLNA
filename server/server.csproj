@@ -146,6 +146,7 @@
     <Compile Include="Views\DoubleKeyedVirtualFolder.cs" />
     <Compile Include="Views\FilteringView.cs" />
     <Compile Include="Views\FilterView.cs" />
+    <Compile Include="Views\IFilteredView.cs" />
     <Compile Include="Views\NewView.cs" />
     <Compile Include="Views\FlattenView.cs" />
     <Compile Include="Views\IView.cs" />

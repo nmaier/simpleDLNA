@@ -11,41 +11,36 @@ namespace NMaier.SimpleDlna.FileMediaServer
   {
     private readonly DirectoryInfo dir;
 
-    private PlainFolder(FileServer server, DlnaMediaTypes types,
-                        VirtualFolder parent, DirectoryInfo dir,
-                        IEnumerable<string> exts)
+    internal PlainFolder(FileServer server, VirtualFolder parent, DirectoryInfo dir)
       : base(parent, dir.Name)
     {
       Server = server;
       this.dir = dir;
-      folders = (from d in dir.GetDirectories()
-                 let m = TryGetFolder(server, types, d)
-                 where m != null && m.ChildCount > 0
-                 select m as IMediaFolder).ToList();
-
-      var rawfiles = from f in dir.GetFiles("*.*")
-                     select f;
+      var rawfiles = (from f in dir.GetFiles("*.*")
+                      select f);
       var files = new List<BaseFile>();
       foreach (var f in rawfiles) {
         var ext = f.Extension;
         if (string.IsNullOrEmpty(ext) ||
-          !exts.Contains(ext.Substring(1), StringComparer.OrdinalIgnoreCase)) {
+          !server.Filter.Filtered(ext.Substring(1))) {
           continue;
         }
         try {
-          files.Add(server.GetFile(this, f));
+          var file = server.GetFile(this, f);
+          if (server.Allowed(file)) {
+            files.Add(file);
+          }
         }
         catch (Exception ex) {
           server.Warn(f, ex);
         }
       }
       resources.AddRange(files);
-    }
 
-    protected PlainFolder(FileServer server, DlnaMediaTypes types,
-                          VirtualFolder parent, DirectoryInfo dir)
-      : this(server, types, parent, dir, types.GetExtensions())
-    {
+      folders = (from d in dir.GetDirectories()
+                 let m = TryGetFolder(server, d)
+                 where m != null && m.ChildCount > 0
+                 select m as IMediaFolder).ToList();
     }
 
     public DateTime InfoDate
@@ -86,11 +81,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
     }
 
-    private PlainFolder TryGetFolder(FileServer server, DlnaMediaTypes types,
-                                     DirectoryInfo d)
+    private PlainFolder TryGetFolder(FileServer server, DirectoryInfo d)
     {
       try {
-        return new PlainFolder(server, types, this, d);
+        return new PlainFolder(server, this, d);
       }
       catch (Exception ex) {
         server.Warn("Failed to access folder", ex);

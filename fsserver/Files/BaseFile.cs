@@ -108,7 +108,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        if (lastModified == null) {
+        if (!lastModified.HasValue) {
           lastModified = Item.LastWriteTimeUtc;
         }
         return lastModified.Value;
@@ -119,7 +119,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       get
       {
-        if (length == null) {
+        if (!length.HasValue) {
           length = Item.Length;
         }
         return length;

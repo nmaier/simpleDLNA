@@ -209,9 +209,9 @@ namespace NMaier.SimpleDlna.Server
       folders.Remove(folder);
     }
 
-    public void RemoveResource(IMediaResource res)
+    public bool RemoveResource(IMediaResource res)
     {
-      resources.Remove(res);
+      return resources.Remove(res);
     }
 
     public void Sort(IComparer<IMediaItem> comparer, bool descending)

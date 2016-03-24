@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -37,7 +38,7 @@ namespace NMaier.SimpleDlna.Server.Views
         var groups = from i in folder.ChildItems.ToList()
                      let prefix = prefixer.GetWordPrefix(GetTitle(i), wordcount)
                      where !string.IsNullOrWhiteSpace(prefix)
-                     group i by prefix
+                     group i by prefix.ToLowerInvariant()
                        into g
                        let gcount = g.LongCount()
                        where gcount > 3
@@ -93,32 +94,43 @@ namespace NMaier.SimpleDlna.Server.Views
       }
       foreach (var i in titles.ChildFolders.ToList()) {
         if (i.ChildCount > 100) {
-          ErrorFormat("Partioning folder {0}", i.Title);
-          PartitionChildren(i as VirtualFolder, new Prefixer());
+          DebugFormat("Partioning folder {0}", i.Title);
+          using (var prefixer = new Prefixer()) {
+            PartitionChildren(i as VirtualFolder, prefixer);
+          }
         }
         root.AdoptFolder(i);
       }
       return root;
     }
 
-    private sealed class Prefixer
+    private sealed class Prefixer : IDisposable
     {
-      private static Regex wordsplit = new Regex(@"(\b[^\s]+\b)", RegexOptions.Compiled);
+      private readonly static Regex wordsplit = new Regex(@"(\b[^\s]+\b)", RegexOptions.Compiled);
+      private readonly static Regex numbers = new Regex(@"[\d+._()\[\]+-]+", RegexOptions.Compiled);
 
       private readonly Dictionary<string, string[]> cache = new Dictionary<string, string[]>();
 
       public string GetWordPrefix(string str, int wordcount)
       {
         string[] m;
-        if (!cache.TryGetValue(str, out m)) {
+        var key = str.ToUpperInvariant();
+        if (!cache.TryGetValue(key, out m)) {
           m = (from w in wordsplit.Matches(str).Cast<Match>()
-               select w.Value.Trim()).ToArray();
-          cache[str] = m;
+               let v = numbers.Replace(w.Value, "").Trim()
+               where !string.IsNullOrWhiteSpace(v)
+               select v).ToArray();
+          cache[key] = m;
         }
         if (m.Length < wordcount) {
           return null;
         }
         return string.Join(" ", m.Take(wordcount).ToArray());
+      }
+
+      public void Dispose()
+      {
+        cache.Clear();
       }
     }
   }

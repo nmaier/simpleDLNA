@@ -31,6 +31,7 @@ namespace NMaier.SimpleDlna.Server
       new Dictionary<string, string>();
 
     private readonly List<IView> views = new List<IView>();
+    private readonly List<IFilteredView> filters = new List<IFilteredView>();
 
     private readonly bool order;
 
@@ -61,12 +62,12 @@ namespace NMaier.SimpleDlna.Server
     private void RegisterFolderTree(IMediaFolder folder)
     {
       foreach (var f in folder.ChildFolders) {
-        RegisterPath(f);
         RegisterFolderTree(f);
       }
       foreach (var i in folder.ChildItems) {
         RegisterPath(i);
       }
+      RegisterPath(folder);
     }
 
     private void RegisterPath(IMediaItem item)
@@ -89,7 +90,12 @@ namespace NMaier.SimpleDlna.Server
     public void AddView(string name)
     {
       try {
-        views.Add(ViewRepository.Lookup(name));
+        var view = ViewRepository.Lookup(name);
+        views.Add(view);
+        var filter = view as IFilteredView;
+        if (filter != null) {
+          filters.Add(filter);
+        }
       }
       catch (Exception ex) {
         Error("Failed to add view", ex);
@@ -143,6 +149,15 @@ namespace NMaier.SimpleDlna.Server
       rv.Id = id;
       rv.Sort(comparer, order);
       return rv;
+    }
+
+    public bool Allowed(IMediaResource item) {
+      foreach (var f in filters) {
+        if (!f.Allowed(item)) {
+          return false;
+        }
+      }
+      return true;
     }
   }
 }

@@ -294,41 +294,44 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       try {
         using (var s = new MemoryStream()) {
-          var ctx = new StreamingContext(
-            StreamingContextStates.Persistence,
-            null
-            );
-          var formatter = new BinaryFormatter(null, ctx) {
-            TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
-            AssemblyFormat = FormatterAssemblyStyle.Simple
-          };
-          formatter.Serialize(s, file);
-
-          lock (connection) {
-            insertKey.Value = file.Item.FullName;
-            insertSize.Value = file.Item.Length;
-            insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
-            insertData.Value = s.ToArray();
-
-            insertCover.Value = null;
+          using (var c = new MemoryStream()) {
+            var ctx = new StreamingContext(
+              StreamingContextStates.Persistence,
+              null
+              );
+            var formatter = new BinaryFormatter(null, ctx) {
+              TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
+              AssemblyFormat = FormatterAssemblyStyle.Simple
+            };
+            formatter.Serialize(s, file);
+            Cover cover = null;
             try {
-              var cover = file.MaybeGetCover();
+              cover = file.MaybeGetCover();
               if (cover != null) {
-                using (var c = new MemoryStream()) {
-                  formatter.Serialize(c, cover);
-                  insertCover.Value = c.ToArray();
-                }
+                formatter.Serialize(c, cover);
               }
             }
             catch (NotSupportedException) {
               // Ignore and store null.
             }
-            try {
-              insert.ExecuteNonQuery();
-            }
-            catch (DbException ex) {
-              Error("Failed to put file cover into store", ex);
-              return;
+
+            lock (connection) {
+              insertKey.Value = file.Item.FullName;
+              insertSize.Value = file.Item.Length;
+              insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
+              insertData.Value = s.ToArray();
+
+              insertCover.Value = null;
+              if (cover != null) {
+                insertCover.Value = c.ToArray();
+              }
+              try {
+                insert.ExecuteNonQuery();
+              }
+              catch (DbException ex) {
+                Error("Failed to put file cover into store", ex);
+                return;
+              }
             }
           }
         }

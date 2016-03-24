@@ -34,7 +34,7 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    protected override bool DoFilter(IMediaResource res)
+    public override bool Allowed(IMediaResource res)
     {
       var i = res as IMetaResolution;
       if (i == null || !i.MetaWidth.HasValue || !i.MetaHeight.HasValue) {

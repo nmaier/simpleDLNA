@@ -63,9 +63,10 @@
     <Compile Include="..\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="ExtensionFilter.cs" />
     <Compile Include="Files\DeserializeInfo.cs" />
     <Compile Include="Files\FileReadStream.cs" />
-    <Compile Include="Files\FileStore.cs" />
+    <Compile Include="FileStore.cs" />
     <Compile Include="Files\AudioFile.cs" />
     <Compile Include="ByteVectorExtend.cs" />
     <Compile Include="Files\Cover.cs" />

@@ -72,6 +72,30 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
+    private void MergeFolders(VirtualFolder aFrom, VirtualFolder aTo)
+    {
+      var merges = from f in aFrom.ChildFolders
+                   join t in aTo.ChildFolders on f.Title equals t.Title
+                   where f != t
+                   select new {
+                     f = f as VirtualFolder,
+                     t = t as VirtualFolder
+                   };
+      foreach (var m in merges.ToList()) {
+        MergeFolders(m.f, m.t);
+        foreach (var c in m.f.ChildFolders.ToList()) {
+          m.t.AdoptFolder(c);
+        }
+        foreach (var c in m.f.ChildItems.ToList()) {
+          m.t.AddResource(c);
+          m.f.RemoveResource(c);
+        }
+        if (aFrom != aTo) {
+          (m.f.Parent as VirtualFolder).ReleaseFolder(m.f);
+        }
+      }
+    }
+
     public override IMediaFolder Transform(IMediaFolder Root)
     {
       var root = new VirtualClonedFolder(Root);
@@ -87,6 +111,7 @@ namespace NMaier.SimpleDlna.Server.Views
         var fsmi = f as VirtualFolder;
         root.AdoptFolder(fsmi);
       }
+      MergeFolders(root, root);
       if (!cascade || root.ChildFolders.LongCount() <= 50) {
         return root;
       }

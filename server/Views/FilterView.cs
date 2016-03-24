@@ -25,8 +25,11 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    protected override bool DoFilter(IMediaResource res)
+    public override bool Allowed(IMediaResource res)
     {
+      if (filter == null) {
+        return true;
+      }
       return filter.IsMatch(res.Title) || filter.IsMatch(res.Path);
     }
 

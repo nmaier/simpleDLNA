@@ -5,9 +5,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class PlainRootFolder : PlainFolder
   {
-    internal PlainRootFolder(FileServer server, DlnaMediaTypes types,
-                             DirectoryInfo di)
-      : base(server, types, null, di)
+    internal PlainRootFolder(FileServer server,  DirectoryInfo di)
+      : base(server, null, di)
     {
       Id = Identifiers.GeneralRoot;
     }

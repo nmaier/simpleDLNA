@@ -18,7 +18,7 @@ namespace NMaier.SimpleDlna.Server
 
     void Cleanup();
 
-    void RemoveResource(IMediaResource res);
+    bool RemoveResource(IMediaResource res);
 
     void Sort(IComparer<IMediaItem> comparer, bool descending);
   }

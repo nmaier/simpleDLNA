@@ -88,7 +88,7 @@ namespace NMaier.SimpleDlna.Utilities
           );
       }
       var cs = string.Format(
-        "Uri=file:{0};Pooling=true;Synchronous=Off;journal mode=WAL",
+        "Uri=file:{0};Pooling=true;Synchronous=Off;journal mode=WAL;DefaultTimeout=4",
         database.FullName
         );
 
