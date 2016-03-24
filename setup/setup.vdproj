@@ -479,7 +479,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.FileMediaServer, Version=1.0.5406.6325, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.FileMediaServer, Version=1.1.5748.19430, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_16DF506659DEFD7B608074EFC39D915D"
@@ -550,7 +550,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.Server, Version=1.0.5406.6324, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.Server, Version=1.1.5748.18128, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_8B027FF01F1C9D3A2EB9B544E468D6BF"
@@ -612,7 +612,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:NMaier.Windows.Forms, Version=1.0.5406.6324, Culture=neutral, PublicKeyToken=505218781ea3b66a, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:NMaier.Windows.Forms, Version=1.0.5738.10268, Culture=neutral, PublicKeyToken=505218781ea3b66a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_9767B4B00DAD697D731913A175E995A0"
@@ -663,7 +663,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.Utilities, Version=1.0.5406.6324, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.Utilities, Version=1.1.5738.10269, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_D4AC720A49A3302B93FE5716E205514D"
@@ -776,7 +776,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:SimpleDlna.Thumbnails, Version=1.0.5406.6324, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:SimpleDlna.Thumbnails, Version=1.1.5748.18130, Culture=neutral, PublicKeyToken=1f1720021aa13803, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_FF60C74C923980A10AE5C7BBA9493FB1"
