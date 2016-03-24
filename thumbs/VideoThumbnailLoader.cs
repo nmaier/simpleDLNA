@@ -33,11 +33,16 @@ namespace NMaier.SimpleDlna.Thumbnails
                                                         ref int width,
                                                         ref int height)
     {
+      var lastPosition = 0L;
       using (var thumb = new MemoryStream()) {
         using (var pump = new StreamPump(
           p.StandardOutput.BaseStream, thumb, 4096)) {
           pump.Pump(null);
-          if (!p.WaitForExit(20000)) {
+          while (!p.WaitForExit(20000)) {
+            if (lastPosition != thumb.Position) {
+              lastPosition = thumb.Position;
+              continue;
+            }
             p.Kill();
             throw new ArgumentException("ffmpeg timed out");
           }

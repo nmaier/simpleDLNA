@@ -250,11 +250,17 @@ namespace NMaier.SimpleDlna.Utilities
           sti.RedirectStandardOutput = true;
           p.Start();
 
+          var lastPosition = 0L;
           using (var reader = new StreamReader(new MemoryStream())) {
             using (var pump = new StreamPump(
-              p.StandardOutput.BaseStream, reader.BaseStream, 40960)) {
+              p.StandardOutput.BaseStream, reader.BaseStream, 100)) {
               pump.Pump(null);
-              if (!p.WaitForExit(10000)) {
+              while (!p.WaitForExit(20000)) {
+                if (lastPosition != reader.BaseStream.Position) {
+                  lastPosition = reader.BaseStream.Position;
+                  continue;
+                }
+                p.Kill();
                 throw new NotSupportedException("ffmpeg timed out");
               }
               if (!pump.Wait(2000)) {

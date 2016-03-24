@@ -163,6 +163,7 @@ namespace NMaier.SimpleDlna.Server
               continue;
             }
             text = FFmpeg.GetSubtitleSubrip(sti);
+            logger.DebugFormat("Loaded subtitle from {9}", sti.FullName);
           }
           catch (NotSupportedException) {
           }
@@ -173,8 +174,10 @@ namespace NMaier.SimpleDlna.Server
         }
         try {
           text = FFmpeg.GetSubtitleSubrip(file);
+          logger.DebugFormat("Loaded subtitle from {0}", file.FullName);
         }
-        catch (NotSupportedException) {
+        catch (NotSupportedException ex) {
+          logger.Debug(string.Format("Subtitle not supported {0}", file.FullName), ex);
         }
         catch (Exception ex) {
           logger.Debug(string.Format(
