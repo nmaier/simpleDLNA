@@ -68,11 +68,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
       DebugFormat("VACUUM {0}", connection.Database);
       var files = new List<string>();
 
-      using (var q = connection.CreateCommand()) {
-        q.CommandText = "SELECT key FROM store";
-        using (var r = q.ExecuteReader()) {
-          while (r.Read()) {
-            files.Add(r.GetString(0));
+      lock (connection) {
+        using (var q = connection.CreateCommand()) {
+          q.CommandText = "SELECT key FROM store";
+          using (var r = q.ExecuteReader()) {
+            while (r.Read()) {
+              files.Add(r.GetString(0));
+            }
           }
         }
       }

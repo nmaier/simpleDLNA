@@ -13,13 +13,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private static BlockingCollection<Item> CreateQueue()
     {
-      for (var i = 0; i < 4; ++i) {
-        new Thread(Run) {
-          IsBackground = true,
-          Priority = ThreadPriority.Lowest
-        }.Start();
-      }
+      new Thread(() =>
+      {
+        Thread.Sleep(20000);
+        for (var i = 0; i < 4; ++i) {
+          new Thread(Run) {
+            IsBackground = true,
+            Priority = ThreadPriority.Lowest
+          }.Start();
+        }
 
+      }) { IsBackground = true }.Start();
       return new BlockingCollection<Item>(new ConcurrentQueue<Item>());
     }
 

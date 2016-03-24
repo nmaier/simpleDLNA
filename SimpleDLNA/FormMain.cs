@@ -363,7 +363,7 @@ namespace NMaier.SimpleDlna.GUI
       Task.Factory.StartNew(() =>
       {
         var po = new ParallelOptions() {
-          MaxDegreeOfParallelism = Math.Min(3, Environment.ProcessorCount)
+          MaxDegreeOfParallelism = Math.Min(2, Environment.ProcessorCount)
         };
         Parallel.ForEach(descs, po, i =>
         {
