@@ -306,9 +306,6 @@ namespace NMaier.SimpleDlna.Server
                 readStream.Write(bytes, 0, bytes.Length);
                 DebugFormat("Must read body bytes {0}", bodyBytes);
               }
-              else {
-                readStream = new MemoryStream();
-              }
               break;
             }
             if (method == null) {

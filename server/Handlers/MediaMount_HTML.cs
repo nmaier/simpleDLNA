@@ -50,7 +50,7 @@ namespace NMaier.SimpleDlna.Server
         e.AppendChild(document.EL(
           "a",
           new AttributeCollection() {
-            { "href", String.Format("{0}index/{1}", prefix, i.Id) }
+            { "href", String.Format("{0}index/{1}#{2}", prefix, i.Id, i.Path) }
           },
           string.Format("{0} ({1})", i.Title, i.FullChildCount)
           ));

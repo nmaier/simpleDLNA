@@ -98,10 +98,10 @@ namespace NMaier.SimpleDlna.Server
         if (Parent != null) {
           var vp = Parent as VirtualFolder;
           if (vp != null) {
-            path = string.Format("{0}/:{1}", vp.Path, p);
+            path = string.Format("{0}/v:{1}", vp.Path, p);
           }
           else {
-            path = string.Format("{0}/:{1}", Parent.Id, p);
+            path = string.Format("{0}/v:{1}", Parent.Id, p);
           }
         }
         else {
