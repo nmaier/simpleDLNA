@@ -87,7 +87,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return new PlainFolder(server, this, d);
       }
       catch (Exception ex) {
-        server.Warn("Failed to access folder", ex);
+        if (!d.Name.Equals("System Volume Information")) {
+          server.Warn("Failed to access folder", ex);
+        }
         return null;
       }
     }

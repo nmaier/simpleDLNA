@@ -163,7 +163,7 @@ namespace NMaier.SimpleDlna.Server
               continue;
             }
             text = FFmpeg.GetSubtitleSubrip(sti);
-            logger.DebugFormat("Loaded subtitle from {9}", sti.FullName);
+            logger.DebugFormat("Loaded subtitle from {0}", sti.FullName);
           }
           catch (NotSupportedException) {
           }
