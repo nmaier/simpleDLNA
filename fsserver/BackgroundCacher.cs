@@ -16,7 +16,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       new Thread(() =>
       {
         Thread.Sleep(20000);
-        for (var i = 0; i < 4; ++i) {
+        for (var i = 0; i < (Environment.ProcessorCount + 2); ++i) {
           new Thread(Run) {
             IsBackground = true,
             Priority = ThreadPriority.Lowest
