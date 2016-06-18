@@ -14,7 +14,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStore : Logging, IDisposable
   {
-    private const uint SCHEMA = 0x20140818;
+    private const uint SCHEMA = 0x20160618;
 
     private readonly IDbConnection connection;
 
@@ -143,10 +143,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
         using (var pragma = connection.CreateCommand()) {
           pragma.CommandText = "PRAGMA journal_size_limt = 33554432";
           pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA wal_autocheckpoint = 100";
-          pragma.ExecuteNonQuery();
-          pragma.CommandText = "PRAGMA wal_checkpoint(TRUNCATE)";
-          pragma.ExecuteNonQuery();
         }
       }
     }
@@ -201,15 +197,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
       var info = file.Item;
       byte[] data;
       lock (connection) {
-        selectCoverKey.Value = info.FullName;
-        selectCoverSize.Value = info.Length;
-        selectCoverTime.Value = info.LastWriteTimeUtc.Ticks;
         try {
-          data = selectCover.ExecuteScalar() as byte[];
+          selectCoverKey.Value = info.FullName;
+          selectCoverSize.Value = info.Length;
+          selectCoverTime.Value = info.LastWriteTimeUtc.Ticks;
+          try {
+            data = selectCover.ExecuteScalar() as byte[];
+          }
+          catch (DbException ex) {
+            Error("Failed to lookup file cover from store", ex);
+            return null;
+          }
         }
-        catch (DbException ex) {
-          Error("Failed to lookup file cover from store", ex);
-          return null;
+        finally {
+          selectCover.Cancel();
         }
       }
       if (data == null) {
@@ -247,15 +248,20 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
       byte[] data;
       lock (connection) {
-        selectKey.Value = info.FullName;
-        selectSize.Value = info.Length;
-        selectTime.Value = info.LastWriteTimeUtc.Ticks;
         try {
-          data = select.ExecuteScalar() as byte[];
+          selectKey.Value = info.FullName;
+          selectSize.Value = info.Length;
+          selectTime.Value = info.LastWriteTimeUtc.Ticks;
+          try {
+            data = select.ExecuteScalar() as byte[];
+          }
+          catch (DbException ex) {
+            Error("Failed to lookup file from store", ex);
+            return null;
+          }
         }
-        catch (DbException ex) {
-          Error("Failed to lookup file from store", ex);
-          return null;
+        finally {
+          select.Cancel();
         }
       }
       if (data == null) {
@@ -316,21 +322,25 @@ namespace NMaier.SimpleDlna.FileMediaServer
             }
 
             lock (connection) {
-              insertKey.Value = file.Item.FullName;
-              insertSize.Value = file.Item.Length;
-              insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
-              insertData.Value = s.ToArray();
+              using (var trans = connection.BeginTransaction()) {
+                insertKey.Value = file.Item.FullName;
+                insertSize.Value = file.Item.Length;
+                insertTime.Value = file.Item.LastWriteTimeUtc.Ticks;
+                insertData.Value = s.ToArray();
 
-              insertCover.Value = null;
-              if (cover != null) {
-                insertCover.Value = c.ToArray();
-              }
-              try {
-                insert.ExecuteNonQuery();
-              }
-              catch (DbException ex) {
-                Error("Failed to put file cover into store", ex);
-                return;
+                insertCover.Value = null;
+                if (cover != null) {
+                  insertCover.Value = c.ToArray();
+                }
+                try {
+                  insert.Transaction = trans;
+                  insert.ExecuteNonQuery();
+                  trans.Commit();
+                }
+                catch (DbException ex) {
+                  Error("Failed to put file cover into store", ex);
+                  return;
+                }
               }
             }
           }
