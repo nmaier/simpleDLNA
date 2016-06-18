@@ -260,12 +260,12 @@ namespace NMaier.SimpleDlna.Server
 
       var res = result.CreateElement(string.Empty, "res", NS_DIDL);
       res.InnerText = String.Format(
-      "http://{0}:{1}{2}file/{3}/res",
-      request.LocalEndPoint.Address,
-      request.LocalEndPoint.Port,
-      prefix,
-      resource.Id
-      );
+        "http://{0}:{1}{2}file/{3}/res",
+        request.LocalEndPoint.Address,
+        request.LocalEndPoint.Port,
+        prefix,
+        resource.Id
+        );
 
       var prop = string.Empty;
       if (props.TryGetValue("SizeRaw", out prop)) {

@@ -8,9 +8,9 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public class HttpStream : Stream, IDisposable
   {
-    private const int BUFFER_SIZE = 1 << 16;
+    private const int BUFFER_SIZE = 1 << 10;
 
-    private const long SMALL_SEEK = BUFFER_SIZE << 15;
+    private const long SMALL_SEEK = 1 << 9;
 
     private const int TIMEOUT = 30000;
 
@@ -61,12 +61,11 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        if (response == null) {
-          OpenAt(0, HttpMethod.HEAD);
-        }
         if (Length <= 0) {
           return false;
         }
+
+        EnsureResponse();
         var ranges = response.Headers.Get("Accept-Ranges");
         if (!string.IsNullOrEmpty(ranges) &&
           ranges.ToUpperInvariant() == "none") {
@@ -92,13 +91,18 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
+    private void EnsureResponse()
+    {
+      if (response != null) {
+        return;
+      }
+      OpenAt(0, HttpMethod.HEAD);
+    }
     public string ContentType
     {
       get
       {
-        if (response == null) {
-          OpenAt(0, HttpMethod.HEAD);
-        }
+        EnsureResponse();
         return response.ContentType;
       }
     }
@@ -107,9 +111,7 @@ namespace NMaier.SimpleDlna.Utilities
     {
       get
       {
-        if (response == null) {
-          OpenAt(0, HttpMethod.HEAD);
-        }
+        EnsureResponse();
         return response.LastModified;
       }
     }
@@ -254,6 +256,7 @@ namespace NMaier.SimpleDlna.Utilities
 
     public override void Flush()
     {
+      Dispose(true);
     }
 
     public override int Read(byte[] buffer, int offset, int count)
