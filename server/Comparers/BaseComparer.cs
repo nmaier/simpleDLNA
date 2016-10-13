@@ -10,13 +10,9 @@ namespace NMaier.SimpleDlna.Server.Comparers
 
     public abstract int Compare(IMediaItem x, IMediaItem y);
 
-    public virtual void SetParameters(AttributeCollection parameters)
-    {
-    }
-
     public override string ToString()
     {
-      return string.Format("{0} - {1}", Name, Description);
+      return $"{Name} - {Description}";
     }
   }
 }

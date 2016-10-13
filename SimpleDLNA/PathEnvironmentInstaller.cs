@@ -1,11 +1,11 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Configuration.Install;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Win32;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -19,7 +19,7 @@ namespace NMaier.SimpleDlna.GUI
     private const string REG_PATH = "PATH";
 
     private readonly DirectoryInfo directory =
-      new FileInfo(Assembly.GetExecutingAssembly().Location).Directory;
+      new FileInfo(Assembly.GetExecutingAssembly().Location ?? string.Empty).Directory;
 
     public override void Install(IDictionary stateSaver)
     {
@@ -29,7 +29,7 @@ namespace NMaier.SimpleDlna.GUI
       }
 
       using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
-        var path = registry.GetValue(
+        var path = registry?.GetValue(
           REG_PATH, string.Empty,
           RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
         if (path == null) {
@@ -39,13 +39,13 @@ namespace NMaier.SimpleDlna.GUI
         var exists = from p in path.Split(';')
                      where c.Equals(p, directory.FullName)
                      select p;
-        if (exists.Count() > 0) {
+        if (exists.Any()) {
           return;
         }
         stateSaver[ENV_PATH] = path;
         var newpath = directory.FullName;
         if (!string.IsNullOrWhiteSpace(path)) {
-          newpath = string.Format("{0};{1}", path, newpath);
+          newpath = $"{path};{newpath}";
         }
         registry.SetValue(REG_PATH, newpath, RegistryValueKind.ExpandString);
       }
@@ -58,7 +58,7 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
       using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
-        registry.SetValue(
+        registry?.SetValue(
           REG_PATH, savedState[ENV_PATH], registry.GetValueKind(REG_PATH));
       }
     }
@@ -71,7 +71,7 @@ namespace NMaier.SimpleDlna.GUI
       }
 
       using (var registry = Registry.CurrentUser.OpenSubKey(REG_ENV, true)) {
-        var path = registry.GetValue(
+        var path = registry?.GetValue(
           REG_PATH, string.Empty,
           RegistryValueOptions.DoNotExpandEnvironmentNames) as string;
         if (string.IsNullOrEmpty(path)) {

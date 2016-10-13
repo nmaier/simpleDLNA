@@ -1,16 +1,16 @@
-﻿using log4net;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using log4net;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
-  using Drawing2D = System.Drawing.Drawing2D;
-
   public sealed class ThumbnailMaker : Logging
   {
     private static readonly LeastRecentlyUsedDictionary<string, CacheItem> cache =
@@ -21,39 +21,33 @@ namespace NMaier.SimpleDlna.Thumbnails
 
     private static Dictionary<DlnaMediaTypes, List<IThumbnailLoader>> BuildThumbnailers()
     {
-      var thumbers = new Dictionary<DlnaMediaTypes, List<IThumbnailLoader>>();
-      var types = Enum.GetValues(typeof(DlnaMediaTypes));
-      foreach (DlnaMediaTypes i in types) {
-        thumbers.Add(i, new List<IThumbnailLoader>());
-      }
+      var types = Enum.GetValues(typeof (DlnaMediaTypes));
+      var buildThumbnailers = types.Cast<DlnaMediaTypes>().ToDictionary(i => i, i => new List<IThumbnailLoader>());
       var a = Assembly.GetExecutingAssembly();
-      foreach (Type t in a.GetTypes()) {
+      foreach (var t in a.GetTypes()) {
         if (t.GetInterface("IThumbnailLoader") == null) {
           continue;
         }
-        var ctor = t.GetConstructor(new Type[] { });
-        if (ctor == null) {
-          continue;
-        }
-        var thumber = ctor.Invoke(new object[] { }) as IThumbnailLoader;
+        var ctor = t.GetConstructor(new Type[] {});
+        var thumber = ctor?.Invoke(new object[] {}) as IThumbnailLoader;
         if (thumber == null) {
           continue;
         }
         foreach (DlnaMediaTypes i in types) {
           if (thumber.Handling.HasFlag(i)) {
-            thumbers[i].Add(thumber);
+            buildThumbnailers[i].Add(thumber);
           }
         }
       }
-      return thumbers;
+      return buildThumbnailers;
     }
 
     private static bool GetThumbnailFromCache(ref string key, ref int width,
-                                              ref int height, out byte[] rv)
+      ref int height, out byte[] rv)
     {
-      key = string.Format("{0}x{1} {2}", width, height, key);
-      CacheItem ci;
+      key = $"{width}x{height} {key}";
       lock (cache) {
+        CacheItem ci;
         if (cache.TryGetValue(key, out ci)) {
           rv = ci.Data;
           width = ci.Width;
@@ -66,8 +60,8 @@ namespace NMaier.SimpleDlna.Thumbnails
     }
 
     private byte[] GetThumbnailInternal(string key, object item,
-                                        DlnaMediaTypes type, ref int width,
-                                        ref int height)
+      DlnaMediaTypes type, ref int width,
+      ref int height)
     {
       var thumbnailers = thumbers[type];
       var rw = width;
@@ -83,16 +77,14 @@ namespace NMaier.SimpleDlna.Thumbnails
           }
         }
         catch (Exception ex) {
-          Debug(String.Format(
-            "{0} failed to thumbnail a resource", thumber.GetType()), ex);
-          continue;
+          Debug($"{thumber.GetType()} failed to thumbnail a resource", ex);
         }
       }
       throw new ArgumentException("Not a supported resource");
     }
 
     internal static Image ResizeImage(Image image, int width, int height,
-                                      ThumbnailMakerBorder border)
+      ThumbnailMakerBorder border)
     {
       var nw = (float)image.Width;
       var nh = (float)image.Height;
@@ -114,26 +106,26 @@ namespace NMaier.SimpleDlna.Thumbnails
           result.SetResolution(image.HorizontalResolution, image.VerticalResolution);
         }
         catch (Exception ex) {
-          LogManager.GetLogger(typeof(ThumbnailMaker)).Debug("Failed to set resolution", ex);
+          LogManager.GetLogger(typeof (ThumbnailMaker)).Debug("Failed to set resolution", ex);
         }
         using (var graphics = Graphics.FromImage(result)) {
           if (result.Width > image.Width && result.Height > image.Height) {
             graphics.CompositingQuality =
-              Drawing2D.CompositingQuality.HighQuality;
+              CompositingQuality.HighQuality;
             graphics.InterpolationMode =
-              Drawing2D.InterpolationMode.High;
+              InterpolationMode.High;
           }
           else {
             graphics.CompositingQuality =
-              Drawing2D.CompositingQuality.HighSpeed;
-            graphics.InterpolationMode = Drawing2D.InterpolationMode.Bicubic;
+              CompositingQuality.HighSpeed;
+            graphics.InterpolationMode = InterpolationMode.Bicubic;
           }
           var rect = new Rectangle(
             (int)(result.Width - nw) / 2,
             (int)(result.Height - nh) / 2,
             (int)nw, (int)nh
             );
-          graphics.SmoothingMode = Drawing2D.SmoothingMode.HighSpeed;
+          graphics.SmoothingMode = SmoothingMode.HighSpeed;
           graphics.FillRectangle(
             Brushes.Black, new Rectangle(0, 0, result.Width, result.Height));
           graphics.DrawImage(image, rect);
@@ -149,7 +141,7 @@ namespace NMaier.SimpleDlna.Thumbnails
     public IThumbnail GetThumbnail(FileSystemInfo file, int width, int height)
     {
       if (file == null) {
-        throw new ArgumentNullException("file");
+        throw new ArgumentNullException(nameof(file));
       }
       var ext = file.Extension.ToUpperInvariant().Substring(1);
       var mediaType = DlnaMaps.Ext2Media[ext];
@@ -158,7 +150,6 @@ namespace NMaier.SimpleDlna.Thumbnails
       byte[] rv;
       if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {
         return new Thumbnail(width, height, rv);
-        ;
       }
 
       rv = GetThumbnailInternal(key, file, mediaType, ref width, ref height);
@@ -166,7 +157,7 @@ namespace NMaier.SimpleDlna.Thumbnails
     }
 
     public IThumbnail GetThumbnail(string key, DlnaMediaTypes type,
-                                   Stream stream, int width, int height)
+      Stream stream, int width, int height)
     {
       byte[] rv;
       if (GetThumbnailFromCache(ref key, ref width, ref height, out rv)) {

@@ -5,4 +5,3 @@ namespace NMaier.SimpleDlna.Server.Views
     bool Allowed(IMediaResource item);
   }
 }
-

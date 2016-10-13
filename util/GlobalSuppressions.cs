@@ -25,3 +25,6 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.Sqlite.#GetDatabaseConnectionSDS(System.String)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#IdentifyInternalFromProcess(System.IO.FileInfo)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "ffmpeg", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.FFmpeg.#IdentifyInternalFromProcess(System.IO.FileInfo)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Booley", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.Formatting.#Booley(System.String)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Scope = "member", Target = "NMaier.SimpleDlna.Utilities.Formatting.#GetSystemName()")]
+

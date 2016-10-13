@@ -1,110 +1,104 @@
-﻿using log4net;
-using log4net.Appender;
-using log4net.Config;
-using log4net.Core;
-using log4net.Layout;
-using NMaier.SimpleDlna.Server;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using log4net.Layout;
+using NMaier.SimpleDlna.GUI.Properties;
+using NMaier.SimpleDlna.Server;
+using Form = NMaier.Windows.Forms.Form;
+using SystemInformation = NMaier.SimpleDlna.Utilities.SystemInformation;
+using Timer = System.Timers.Timer;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  public partial class FormMain : NMaier.Windows.Forms.Form, IAppender, IDisposable
+  public partial class FormMain : Form, IAppender
   {
-    private const string descriptorFile = "descriptors.xml";
+    private const string DESCRIPTOR_FILE = "descriptors.xml";
 
-    private bool canClose = false;
+    private bool canClose;
 
-    private static readonly Properties.Settings Config =
-      Properties.Settings.Default;
+    private static readonly Settings config = Settings.Default;
 
     private readonly FileInfo cacheFile =
-      new FileInfo(Path.Combine(cacheDir, "sdlna.cache"));
+      new FileInfo(Path.Combine(CacheDir, "sdlna.cache"));
 
 #if DEBUG
     private readonly FileInfo logFile =
       new FileInfo(Path.Combine(cacheDir, "sdlna.dbg.log"));
 #else
     private readonly FileInfo logFile =
-      new FileInfo(Path.Combine(cacheDir, "sdlna.log"));
+      new FileInfo(Path.Combine(CacheDir, "sdlna.log"));
 #endif
 
     private readonly object appenderLock = new object();
 
-    private readonly System.Timers.Timer appenderTimer =
-      new System.Timers.Timer(2000);
+    private readonly Timer appenderTimer =
+      new Timer(2000);
 
     private readonly ConcurrentQueue<LogEntry> pendingLogEntries =
       new ConcurrentQueue<LogEntry>();
 
-    private static readonly ILog log = LogManager.GetLogger(typeof(FormMain));
+    private static readonly ILog log = LogManager.GetLogger(typeof (FormMain));
 
-    private bool minimized = Config.startminimized;
+    private bool minimized = config.startminimized;
 
     private HttpServer httpServer;
 
-    private bool logging = false;
+    private bool logging;
 
     public FormMain()
     {
-      HandleCreated += (o, e) =>
-      {
-        logging = true;
-      };
-      HandleDestroyed += (o, e) =>
-      {
-        logging = false;
-      };
+      HandleCreated += (o, e) => { logging = true; };
+      HandleDestroyed += (o, e) => { logging = false; };
 
       InitializeComponent();
 
-      listImages.Images.Add("idle", Properties.Resources.idle);
-      listImages.Images.Add("active", Properties.Resources.active);
-      listImages.Images.Add("inactive", Properties.Resources.inactive);
-      listImages.Images.Add("refreshing", Properties.Resources.refreshing);
-      listImages.Images.Add("loading", Properties.Resources.loading);
-      listImages.Images.Add("info", Properties.Resources.info);
-      listImages.Images.Add("warn", Properties.Resources.warn);
-      listImages.Images.Add("error", Properties.Resources.error);
-      listImages.Images.Add("server", Properties.Resources.server.ToBitmap());
+      listImages.Images.Add("idle", Resources.idle);
+      listImages.Images.Add("active", Resources.active);
+      listImages.Images.Add("inactive", Resources.inactive);
+      listImages.Images.Add("refreshing", Resources.refreshing);
+      listImages.Images.Add("loading", Resources.loading);
+      listImages.Images.Add("info", Resources.info);
+      listImages.Images.Add("warn", Resources.warn);
+      listImages.Images.Add("error", Resources.error);
+      listImages.Images.Add("server", Resources.server.ToBitmap());
 
-      appenderTimer.Elapsed += (s, e) =>
-      {
-        BeginInvoke((Action)(() =>
-        {
-          DoAppendInternal(s, e);
-        }));
-      };
+      appenderTimer.Elapsed += (s, e) => { BeginInvoke((Action)(() => { DoAppendInternal(s, e); })); };
 
       SetupLogging();
 
       StartPipeNotification();
 
       notifyIcon.Icon = Icon;
-      if (!string.IsNullOrWhiteSpace(Config.cache)) {
-        cacheFile = new FileInfo(Config.cache);
+      if (!string.IsNullOrWhiteSpace(config.cache)) {
+        cacheFile = new FileInfo(config.cache);
       }
       CreateHandle();
       SetupServer();
     }
 
-    private delegate void logDelegate(string level, string logger, string msg,
-                                      string ex);
-
-    private static string cacheDir
+    protected sealed override void CreateHandle()
     {
-      get
-      {
-        var rv = Config.cache;
+      base.CreateHandle();
+    }
+
+    private static string CacheDir
+    {
+      get {
+        var rv = config.cache;
         if (!string.IsNullOrWhiteSpace(rv) && Directory.Exists(rv)) {
           return rv;
         }
@@ -137,12 +131,8 @@ namespace NMaier.SimpleDlna.GUI
 
     public override string Text
     {
-      get
-      {
-        return base.Text;
-      }
-      set
-      {
+      get { return base.Text; }
+      set {
         base.Text = value;
         notifyIcon.Text = value;
       }
@@ -168,10 +158,7 @@ namespace NMaier.SimpleDlna.GUI
           Task.Factory.StartNew(() =>
           {
             item.UpdateInfo(desc);
-            BeginInvoke((Action)(() =>
-            {
-              SaveConfig();
-            }));
+            BeginInvoke((Action)SaveConfig);
           });
         }
       }
@@ -198,7 +185,7 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
       var dr = MessageBox.Show(
-        string.Format("Would you like to remove {0}?", item.Description.Name),
+        $"Would you like to remove {item.Description.Name}?",
         "Remove Server",
         MessageBoxButtons.YesNo,
         MessageBoxIcon.Question);
@@ -243,9 +230,9 @@ namespace NMaier.SimpleDlna.GUI
           ctxStartStop.Text = buttonStartStop.Text =
             item.Description.Active ? "Stop" : "Start";
           ctxStartStop.Image = buttonStartStop.Image =
-            item.Description.Active ?
-            Properties.Resources.inactive :
-            Properties.Resources.active;
+            item.Description.Active
+              ? Resources.inactive
+              : Resources.active;
         }));
       });
     }
@@ -274,7 +261,7 @@ namespace NMaier.SimpleDlna.GUI
       }
       catch (Exception ex) {
         log.Error(
-          string.Format("Failed to remove cache file {0}", cacheFile.FullName),
+          $"Failed to remove cache file {cacheFile.FullName}",
           ex);
       }
       foreach (var item in running) {
@@ -334,20 +321,20 @@ namespace NMaier.SimpleDlna.GUI
     }
 
     private void ListDescriptions_SelectedIndexChanged(object sender,
-                                                       EventArgs e)
+      EventArgs e)
     {
       var enable = listDescriptions.SelectedItems.Count != 0;
       ctxStartStop.Enabled = ctxRemove.Enabled = ctxEdit.Enabled =
         buttonStartStop.Enabled = buttonRemove.Enabled = buttonEdit.Enabled =
-        enable;
+          enable;
       if (enable) {
-        var item = (listDescriptions.SelectedItems[0] as ServerListViewItem);
+        var item = (ServerListViewItem)listDescriptions.SelectedItems[0];
         ctxStartStop.Text = buttonStartStop.Text =
           item.Description.Active ? "Stop" : "Start";
         ctxStartStop.Image = buttonStartStop.Image =
-          item.Description.Active ?
-          Properties.Resources.inactive :
-          Properties.Resources.active;
+          item.Description.Active
+            ? Resources.inactive
+            : Resources.active;
         ctxRescan.Enabled = buttonRescan.Enabled = item.Description.Active;
       }
       else {
@@ -358,20 +345,23 @@ namespace NMaier.SimpleDlna.GUI
     private void LoadConfig()
     {
       var descs = LoadDescriptors();
-      listDescriptions.Items.AddRange(descs.ToArray());
+      if (descs == null) {
+        throw new ArgumentException("Failed to load config");
+      }
+      var items = new List<ListViewItem>();
+      items.AddRange(descs.ToArray());
+      listDescriptions.Items.AddRange(items.ToArray());
 
       Task.Factory.StartNew(() =>
       {
-        var po = new ParallelOptions() {
+        var po = new ParallelOptions
+        {
           MaxDegreeOfParallelism = Math.Min(2, Environment.ProcessorCount)
         };
-        Parallel.ForEach(descs, po, i =>
-        {
-          i.Load();
-        });
+        Parallel.ForEach(descs, po, i => { i.Load(); });
         BeginInvoke((Action)(() =>
         {
-          Config.Descriptors.Clear();
+          config.Descriptors.Clear();
           SaveConfig();
         }));
       });
@@ -381,14 +371,14 @@ namespace NMaier.SimpleDlna.GUI
     {
       List<ServerDescription> rv;
       try {
-        var serializer = new XmlSerializer(typeof(List<ServerDescription>));
+        var serializer = new XmlSerializer(typeof (List<ServerDescription>));
         using (var reader = new StreamReader(
-            Path.Combine(cacheDir, descriptorFile))) {
+          Path.Combine(CacheDir, DESCRIPTOR_FILE))) {
           rv = serializer.Deserialize(reader) as List<ServerDescription>;
         }
       }
       catch (Exception) {
-        rv = Config.Descriptors;
+        rv = config.Descriptors;
       }
       return (from d in rv
               let i = new ServerListViewItem(httpServer, cacheFile, d)
@@ -396,14 +386,11 @@ namespace NMaier.SimpleDlna.GUI
     }
 
     private void notifyContext_Opening(object sender,
-                                       System.ComponentModel.CancelEventArgs e)
+      CancelEventArgs e)
     {
-      var items = new List<ToolStripItem>();
-      foreach (ToolStripItem i in notifyContext.Items) {
-        if (i.Tag != null) {
-          items.Add(i);
-        }
-      }
+      var items = (from ToolStripItem i in notifyContext.Items
+                   where i.Tag != null
+                   select i).ToList();
       foreach (var i in items) {
         notifyContext.Items.Remove(i);
       }
@@ -419,9 +406,10 @@ namespace NMaier.SimpleDlna.GUI
         }
         var innerItem = item;
         var menuItem =
-          new ToolStripMenuItem(String.Format("Rescan {0}", item.Text)) {
+          new ToolStripMenuItem($"Rescan {item.Text}")
+          {
             Tag = innerItem,
-            Image = Properties.Resources.refreshing
+            Image = Resources.refreshing
           };
         menuItem.Click += (s, a) =>
         {
@@ -453,10 +441,9 @@ namespace NMaier.SimpleDlna.GUI
     }
 
     private void openInBrowserToolStripMenuItem_Click(object sender,
-                                                      EventArgs e)
+      EventArgs e)
     {
-      Process.Start(string.Format(
-        "http://localhost:{0}/", httpServer.RealPort));
+      Process.Start($"http://localhost:{httpServer.RealPort}/");
     }
 
     private void rescanAllContextMenuItem_Click(object sender, EventArgs e)
@@ -478,41 +465,43 @@ namespace NMaier.SimpleDlna.GUI
                      select item.Description).ToArray();
         var serializer = new XmlSerializer(descs.GetType());
         var file = new FileInfo(
-          Path.Combine(cacheDir, descriptorFile + ".tmp"));
+          Path.Combine(CacheDir, DESCRIPTOR_FILE + ".tmp"));
         using (var writer = new StreamWriter(file.FullName)) {
           serializer.Serialize(writer, descs);
         }
-        var outfile = Path.Combine(cacheDir, descriptorFile);
+        var outfile = Path.Combine(CacheDir, DESCRIPTOR_FILE);
         File.Copy(file.FullName, outfile, true);
         file.Delete();
       }
       catch (Exception ex) {
         log.Error("Failed to write descriptors", ex);
       }
-      Config.Save();
+      config.Save();
     }
 
     private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
     {
       using (var settings = new FormSettings()) {
         settings.ShowDialog();
-        Config.Save();
+        config.Save();
         SetupLogging();
       }
     }
 
     private void SetupLogging()
     {
-      if (!Config.filelogging) {
+      if (!config.filelogging) {
         BasicConfigurator.Configure(this);
         return;
       }
 
-      var layout = new PatternLayout() {
+      var layout = new PatternLayout
+      {
         ConversionPattern = "%date %6level [%3thread] %-30.30logger{1} - %message%newline%exception"
       };
       layout.ActivateOptions();
-      var fileAppender = new RollingFileAppender() {
+      var fileAppender = new RollingFileAppender
+      {
         File = logFile.FullName,
         Layout = layout,
         MaximumFileSize = "10MB",
@@ -528,9 +517,9 @@ namespace NMaier.SimpleDlna.GUI
 
     private void SetupServer()
     {
-      httpServer = new HttpServer((int)Config.port);
+      httpServer = new HttpServer((int)config.port);
       LoadConfig();
-      Text = string.Format("{0} - Port {1}", Text, httpServer.RealPort);
+      Text = $"{Text} - Port {httpServer.RealPort}";
     }
 
     private void StartPipeNotification()
@@ -538,16 +527,16 @@ namespace NMaier.SimpleDlna.GUI
 #if DEBUG
       log.Info("Debug mode / Skipping one-instance-only stuff");
 #else
-      if (Utilities.SystemInformation.IsRunningOnMono()) {
+      if (SystemInformation.IsRunningOnMono()) {
         // XXX Mono sometimes stack overflows for whatever reason.
         return;
       }
       new Thread(() =>
       {
-        for (; ; ) {
+        for (;;) {
           try {
             using (var pipe = new NamedPipeServerStream(
-                "simpledlnagui", PipeDirection.InOut)) {
+              "simpledlnagui", PipeDirection.InOut)) {
               pipe.WaitForConnection();
               pipe.ReadByte();
               BeginInvoke((Action)(() =>
@@ -558,9 +547,11 @@ namespace NMaier.SimpleDlna.GUI
             }
           }
           catch (Exception) {
+            // ignored
           }
         }
-      }) { IsBackground = true }.Start();
+        // ReSharper disable once FunctionNeverReturns
+      }) {IsBackground = true}.Start();
 #endif
     }
 
@@ -598,7 +589,8 @@ namespace NMaier.SimpleDlna.GUI
           key = "warn";
         }
       }
-      pendingLogEntries.Enqueue(new LogEntry() {
+      pendingLogEntries.Enqueue(new LogEntry
+      {
         Class = cls,
         Exception = loggingEvent.GetExceptionString(),
         Key = key,
@@ -611,7 +603,7 @@ namespace NMaier.SimpleDlna.GUI
     }
 
     public void DoAppendInternal(object sender,
-                                 System.Timers.ElapsedEventArgs e)
+      ElapsedEventArgs e)
     {
       lock (appenderLock) {
         appenderTimer.Enabled = false;
@@ -619,22 +611,24 @@ namespace NMaier.SimpleDlna.GUI
       if (!logging) {
         return;
       }
-      LogEntry entry;
       ListViewItem last = null;
       logger.BeginUpdate();
       try {
+        LogEntry entry;
         while (pendingLogEntries.TryDequeue(out entry)) {
           if (logger.Items.Count >= 300) {
             logger.Items.RemoveAt(0);
           }
           last = logger.Items.Add(
-            new ListViewItem(new string[] {
+            new ListViewItem(new[]
+            {
               entry.Time, entry.Class, entry.Message
             }));
           last.ImageKey = entry.Key;
           if (!string.IsNullOrWhiteSpace(entry.Exception)) {
             last = logger.Items.Add(
-              new ListViewItem(new string[] {
+              new ListViewItem(new[]
+              {
                 string.Empty, entry.Class, entry.Exception
               }));
             last.ImageKey = entry.Key;

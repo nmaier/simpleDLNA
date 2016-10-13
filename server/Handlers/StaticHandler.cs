@@ -2,8 +2,6 @@
 {
   internal sealed class StaticHandler : IPrefixHandler
   {
-    private readonly string prefix;
-
     private readonly IResponse response;
 
     public StaticHandler(IResponse aResponse)
@@ -13,17 +11,11 @@
 
     public StaticHandler(string aPrefix, IResponse aResponse)
     {
-      prefix = aPrefix;
+      Prefix = aPrefix;
       response = aResponse;
     }
 
-    public string Prefix
-    {
-      get
-      {
-        return prefix;
-      }
-    }
+    public string Prefix { get; }
 
     public IResponse HandleRequest(IRequest req)
     {

@@ -1,121 +1,61 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
-using System;
+﻿using System;
 using System.IO;
+using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.Server
 {
   internal class MediaResourceDecorator<T> : IMediaResource, IMetaInfo
     where T : IMediaResource, IMetaInfo
   {
-    protected T resource;
+    protected T Resource;
 
     public MediaResourceDecorator(T resource)
     {
-      this.resource = resource;
+      Resource = resource;
     }
 
-    public virtual IMediaCoverResource Cover
-    {
-      get
-      {
-        return resource.Cover;
-      }
-    }
+    public virtual IMediaCoverResource Cover => Resource.Cover;
 
     public string Id
     {
-      get
-      {
-        return resource.Id;
-      }
-      set
-      {
-        resource.Id = value;
-      }
+      get { return Resource.Id; }
+      set { Resource.Id = value; }
     }
 
-    public DateTime InfoDate
-    {
-      get
-      {
-        return resource.InfoDate;
-      }
-    }
+    public virtual DlnaMediaTypes MediaType => Resource.MediaType;
 
-    public long? InfoSize
-    {
-      get
-      {
-        return resource.InfoSize;
-      }
-    }
+    public string Path => Resource.Path;
 
-    public virtual DlnaMediaTypes MediaType
-    {
-      get
-      {
-        return resource.MediaType;
-      }
-    }
+    public virtual string PN => Resource.PN;
 
-    public string Path
-    {
-      get
-      {
-        return resource.Path;
-      }
-    }
+    public virtual IHeaders Properties => Resource.Properties;
 
-    public virtual string PN
-    {
-      get
-      {
-        return resource.PN;
-      }
-    }
+    public virtual string Title => Resource.Title;
 
-    public virtual IHeaders Properties
-    {
-      get
-      {
-        return resource.Properties;
-      }
-    }
-
-    public virtual string Title
-    {
-      get
-      {
-        return resource.Title;
-      }
-    }
-
-    public DlnaMime Type
-    {
-      get
-      {
-        return resource.Type;
-      }
-    }
+    public DlnaMime Type => Resource.Type;
 
     public virtual int CompareTo(IMediaItem other)
     {
-      return resource.CompareTo(other);
+      return Resource.CompareTo(other);
     }
 
     public virtual Stream CreateContentStream()
     {
-      return resource.CreateContentStream();
+      return Resource.CreateContentStream();
     }
 
     public bool Equals(IMediaItem other)
     {
-      return resource.Equals(other);
+      return Resource.Equals(other);
     }
 
     public string ToComparableTitle()
     {
-      return resource.ToComparableTitle();
+      return Resource.ToComparableTitle();
     }
+
+    public DateTime InfoDate => Resource.InfoDate;
+
+    public long? InfoSize => Resource.InfoSize;
   }
 }

@@ -10,60 +10,18 @@ namespace NMaier.SimpleDlna.Server
     {
     }
 
-    public virtual string MetaAlbum
-    {
-      get
-      {
-        return resource.MetaAlbum;
-      }
-    }
+    public virtual string MetaAlbum => Resource.MetaAlbum;
 
-    public virtual string MetaArtist
-    {
-      get
-      {
-        return resource.MetaArtist;
-      }
-    }
+    public virtual string MetaArtist => Resource.MetaArtist;
 
-    public virtual string MetaDescription
-    {
-      get
-      {
-        return resource.MetaDescription;
-      }
-    }
+    public virtual string MetaDescription => Resource.MetaDescription;
 
-    public virtual TimeSpan? MetaDuration
-    {
-      get
-      {
-        return resource.MetaDuration;
-      }
-    }
+    public virtual TimeSpan? MetaDuration => Resource.MetaDuration;
 
-    public virtual string MetaGenre
-    {
-      get
-      {
-        return resource.MetaGenre;
-      }
-    }
+    public virtual string MetaGenre => Resource.MetaGenre;
 
-    public virtual string MetaPerformer
-    {
-      get
-      {
-        return resource.MetaPerformer;
-      }
-    }
+    public virtual string MetaPerformer => Resource.MetaPerformer;
 
-    public virtual int? MetaTrack
-    {
-      get
-      {
-        return resource.MetaTrack;
-      }
-    }
+    public virtual int? MetaTrack => Resource.MetaTrack;
   }
 }

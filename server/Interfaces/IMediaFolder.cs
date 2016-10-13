@@ -20,6 +20,6 @@ namespace NMaier.SimpleDlna.Server
 
     bool RemoveResource(IMediaResource res);
 
-    void Sort(IComparer<IMediaItem> comparer, bool descending);
+    void Sort(IComparer<IMediaItem> sortComparer, bool descending);
   }
 }

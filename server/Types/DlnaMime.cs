@@ -16,7 +16,7 @@
     VideoAVC,
     VideoAVI,
     VideoFLV,
-    VideoMATROSKA,
+    VideoMKV,
     VideoMPEG,
     VideoOGV,
     VideoWMV

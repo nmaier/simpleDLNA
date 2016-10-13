@@ -4,5 +4,5 @@
   {
     Aborted,
     Delivered
-  };
+  }
 }

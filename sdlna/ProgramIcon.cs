@@ -1,21 +1,15 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna
 {
   internal class ProgramIcon : Logging, IDisposable
   {
-    private IntPtr window = IntPtr.Zero;
-
-    private readonly IntPtr iconLg = IntPtr.Zero;
-
-    private readonly IntPtr iconSm = IntPtr.Zero;
-
     private readonly IntPtr oldLg = IntPtr.Zero;
-
     private readonly IntPtr oldSm = IntPtr.Zero;
+    private IntPtr window = IntPtr.Zero;
 
     public ProgramIcon()
     {
@@ -26,12 +20,12 @@ namespace NMaier.SimpleDlna
         }
         var inst = Marshal.GetHINSTANCE(
           Assembly.GetEntryAssembly().GetModules()[0]);
-        iconLg = SafeNativeMethods.LoadImage(inst, "#32512", 1, 0, 0, 0x40);
+        var iconLg = SafeNativeMethods.LoadImage(inst, "#32512", 1, 0, 0, 0x40);
         if (iconLg == IntPtr.Zero) {
           throw new Exception("Failed to load large icon");
         }
         var desired = SafeNativeMethods.GetSystemMetrics(49);
-        iconSm = SafeNativeMethods.LoadImage(
+        var iconSm = SafeNativeMethods.LoadImage(
           inst, "#32512", 1, desired, desired, 0);
         if (iconLg == IntPtr.Zero) {
           throw new Exception("Failed to load small icon");
@@ -44,11 +38,6 @@ namespace NMaier.SimpleDlna
       catch (Exception ex) {
         Debug("Couldnd't set icon", ex);
       }
-    }
-
-    ~ProgramIcon()
-    {
-      Dispose();
     }
 
     public void Dispose()
@@ -71,6 +60,11 @@ namespace NMaier.SimpleDlna
       catch (Exception ex) {
         Debug("Couldn't restore icon", ex);
       }
+    }
+
+    ~ProgramIcon()
+    {
+      Dispose();
     }
   }
 }

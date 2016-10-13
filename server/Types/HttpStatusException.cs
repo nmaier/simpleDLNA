@@ -39,10 +39,6 @@ namespace NMaier.SimpleDlna.Server
       Code = HttpCode.None;
     }
 
-    public HttpCode Code
-    {
-      get;
-      private set;
-    }
+    public HttpCode Code { get; private set; }
   }
 }

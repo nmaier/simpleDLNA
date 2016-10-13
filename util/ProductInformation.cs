@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -6,10 +7,9 @@ namespace NMaier.SimpleDlna.Utilities
   {
     public static string Company
     {
-      get
-      {
+      get {
         var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(
-          typeof(AssemblyCompanyAttribute), false);
+          typeof (AssemblyCompanyAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
@@ -19,10 +19,9 @@ namespace NMaier.SimpleDlna.Utilities
 
     public static string Copyright
     {
-      get
-      {
+      get {
         var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(
-          typeof(AssemblyCopyrightAttribute), false);
+          typeof (AssemblyCopyrightAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
@@ -32,10 +31,9 @@ namespace NMaier.SimpleDlna.Utilities
 
     public static string ProductVersion
     {
-      get
-      {
+      get {
         var attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(
-          typeof(AssemblyInformationalVersionAttribute), false);
+          typeof (AssemblyInformationalVersionAttribute), false);
         if (attributes.Length == 0) {
           return string.Empty;
         }
@@ -47,17 +45,16 @@ namespace NMaier.SimpleDlna.Utilities
 
     public static string Title
     {
-      get
-      {
+      get {
         var attributes = Assembly.GetEntryAssembly().GetCustomAttributes(
-          typeof(AssemblyTitleAttribute), false);
+          typeof (AssemblyTitleAttribute), false);
         if (attributes.Length > 0) {
           var titleAttribute = (AssemblyTitleAttribute)attributes[0];
           if (!string.IsNullOrWhiteSpace(titleAttribute.Title)) {
             return titleAttribute.Title;
           }
         }
-        return System.IO.Path.GetFileNameWithoutExtension(
+        return Path.GetFileNameWithoutExtension(
           Assembly.GetExecutingAssembly().CodeBase);
       }
     }

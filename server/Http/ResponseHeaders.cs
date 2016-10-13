@@ -5,7 +5,7 @@ namespace NMaier.SimpleDlna.Server
   public sealed class ResponseHeaders : RawHeaders
   {
     public ResponseHeaders()
-      : this(noCache: true)
+      : this(true)
     {
     }
 

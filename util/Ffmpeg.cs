@@ -1,5 +1,4 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -7,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -14,14 +14,8 @@ namespace NMaier.SimpleDlna.Utilities
 
   public static class FFmpeg
   {
-    private static DirectoryInfo GetFFMpegFolder(
-      Environment.SpecialFolder folder)
+    private static readonly DirectoryInfo[] specialLocations =
     {
-      return new DirectoryInfo(
-        Path.Combine(Environment.GetFolderPath(folder), "ffmpeg"));
-    }
-
-    private static readonly DirectoryInfo[] specialLocations = new DirectoryInfo[] {
       GetFFMpegFolder(Environment.SpecialFolder.CommonProgramFiles),
       GetFFMpegFolder(Environment.SpecialFolder.CommonProgramFilesX86),
       GetFFMpegFolder(Environment.SpecialFolder.ProgramFiles),
@@ -31,7 +25,7 @@ namespace NMaier.SimpleDlna.Utilities
         Environment.SpecialFolder.UserProfile))
     };
 
-    private readonly static InfoCache infoCache = new InfoCache(500);
+    private static readonly InfoCache infoCache = new InfoCache(500);
 
     private static readonly Regex regAssStrip =
       new Regex(@"^,+", RegexOptions.Compiled);
@@ -46,6 +40,13 @@ namespace NMaier.SimpleDlna.Utilities
     public static readonly string FFmpegExecutable =
       FindExecutable("ffmpeg");
 
+    private static DirectoryInfo GetFFMpegFolder(
+      Environment.SpecialFolder folder)
+    {
+      return new DirectoryInfo(
+        Path.Combine(Environment.GetFolderPath(folder), "ffmpeg"));
+    }
+
     private static string FindExecutable(string executable)
     {
       var os = Environment.OSVersion.Platform.ToString().ToUpperInvariant();
@@ -54,39 +55,48 @@ namespace NMaier.SimpleDlna.Utilities
         executable += ".exe";
       }
       var places = new List<DirectoryInfo>();
-      places.Add(new FileInfo(
-        Assembly.GetExecutingAssembly().Location).Directory);
+      var assemblyLoc = Assembly.GetExecutingAssembly().Location;
+      if (assemblyLoc != null) {
+        places.Add(new FileInfo(assemblyLoc).Directory);
+      }
       try {
-        places.Add(new DirectoryInfo(
-          Environment.GetEnvironmentVariable("FFMPEG_HOME")));
+        var ffhome = Environment.GetEnvironmentVariable("FFMPEG_HOME");
+        if (!string.IsNullOrWhiteSpace(ffhome)) {
+          places.Add(new DirectoryInfo(ffhome));
+        }
       }
       catch (Exception) {
+        // ignored
       }
       foreach (var l in specialLocations) {
         try {
           places.Add(l);
         }
         catch (Exception) {
-          continue;
+          // ignored
         }
       }
-      foreach (var p in Environment.GetEnvironmentVariable("PATH").
-        Split(isWin ? ';' : ':')) {
-        try {
-          places.Add(new DirectoryInfo(p.Trim()));
-        }
-        catch (Exception) {
-          continue;
+      var envpath = Environment.GetEnvironmentVariable("PATH");
+      if (!string.IsNullOrWhiteSpace(envpath)) {
+        foreach (var p in envpath.
+          Split(isWin ? ';' : ':')) {
+          try {
+            places.Add(new DirectoryInfo(p.Trim()));
+          }
+          catch (Exception) {
+            // ignored
+          }
         }
       }
 
       foreach (var i in places) {
-        LogManager.GetLogger(typeof(FFmpeg)).DebugFormat(
+        LogManager.GetLogger(typeof (FFmpeg)).DebugFormat(
           "Searching {0}", i.FullName);
         if (!i.Exists) {
           continue;
         }
-        var folders = new[] {
+        var folders = new[]
+        {
           i,
           new DirectoryInfo(Path.Combine(i.FullName, "bin"))
         };
@@ -95,20 +105,20 @@ namespace NMaier.SimpleDlna.Utilities
             var r = di.GetFiles(executable, SearchOption.TopDirectoryOnly);
             if (r.Length != 0) {
               var rv = r[0];
-              LogManager.GetLogger(typeof(FFmpeg)).InfoFormat(
+              LogManager.GetLogger(typeof (FFmpeg)).InfoFormat(
                 "Found {0} at {1}",
                 executable,
                 rv.FullName
-              );
+                );
               return rv.FullName;
             }
           }
           catch (Exception) {
-            continue;
+            // ignored
           }
         }
       }
-      LogManager.GetLogger(typeof(FFmpeg)).WarnFormat(
+      LogManager.GetLogger(typeof (FFmpeg)).WarnFormat(
         "Did not find {0}", executable);
       return null;
     }
@@ -116,11 +126,11 @@ namespace NMaier.SimpleDlna.Utilities
     private static IDictionary<string, string> IdentifyFileInternal(
       FileInfo file)
     {
-      if (FFmpeg.FFmpegExecutable == null) {
+      if (FFmpegExecutable == null) {
         throw new NotSupportedException();
       }
       if (file == null) {
-        throw new ArgumentNullException("file");
+        throw new ArgumentNullException(nameof(file));
       }
       IDictionary<string, string> rv;
       if (infoCache.TryGetValue(file, out rv)) {
@@ -137,22 +147,20 @@ namespace NMaier.SimpleDlna.Utilities
     private static IDictionary<string, string> IdentifyInternalFromProcess(
       FileInfo file)
     {
-      IDictionary<string, string> rv;
-
       using (var p = new Process()) {
         var sti = p.StartInfo;
 #if !DEBUG
         sti.CreateNoWindow = true;
 #endif
         sti.UseShellExecute = false;
-        sti.FileName = FFmpeg.FFmpegExecutable;
-        sti.Arguments = String.Format("-i \"{0}\"", file.FullName);
+        sti.FileName = FFmpegExecutable;
+        sti.Arguments = $"-i \"{file.FullName}\"";
         sti.LoadUserProfile = false;
         sti.RedirectStandardError = true;
         p.Start();
-        rv = new Dictionary<string, string>();
+        IDictionary<string, string> rv = new Dictionary<string, string>();
 
-        using (var reader = new StreamReader(new MemoryStream())) {
+        using (var reader = new StreamReader(StreamManager.GetStream())) {
           using (var pump = new StreamPump(
             p.StandardError.BaseStream, reader.BaseStream, 4096)) {
             pump.Pump(null);
@@ -166,11 +174,12 @@ namespace NMaier.SimpleDlna.Utilities
 
             var output = reader.ReadToEnd();
             var match = regDuration.Match(output);
-            if (match != null && match.Success) {
-              int h, m, s, ms;
+            if (match.Success) {
+              int h, m, s;
               if (int.TryParse(match.Groups[1].Value, out h) &&
-                int.TryParse(match.Groups[2].Value, out m) &&
-                int.TryParse(match.Groups[3].Value, out s)) {
+                  int.TryParse(match.Groups[2].Value, out m) &&
+                  int.TryParse(match.Groups[3].Value, out s)) {
+                int ms;
                 if (match.Groups.Count < 5 ||
                     !int.TryParse(match.Groups[4].Value, out ms)) {
                   ms = 0;
@@ -182,10 +191,10 @@ namespace NMaier.SimpleDlna.Utilities
               }
             }
             match = regDimensions.Match(output);
-            if (match != null && match.Success) {
+            if (match.Success) {
               int w, h;
               if (int.TryParse(match.Groups[1].Value, out w) &&
-                int.TryParse(match.Groups[2].Value, out h)) {
+                  int.TryParse(match.Groups[2].Value, out h)) {
                 rv.Add("VIDEO_WIDTH", w.ToString());
                 rv.Add("VIDEO_HEIGHT", h.ToString());
               }
@@ -204,10 +213,10 @@ namespace NMaier.SimpleDlna.Utilities
       string sw, sh;
       int w, h;
       if (IdentifyFile(file).TryGetValue("VIDEO_WIDTH", out sw)
-        && IdentifyFile(file).TryGetValue("VIDEO_HEIGHT", out sh)
-        && int.TryParse(sw, out w)
-        && int.TryParse(sh, out h)
-        && w > 0 && h > 0) {
+          && IdentifyFile(file).TryGetValue("VIDEO_HEIGHT", out sh)
+          && int.TryParse(sw, out w)
+          && int.TryParse(sh, out h)
+          && w > 0 && h > 0) {
         return new Size(w, h);
       }
       throw new NotSupportedException();
@@ -216,9 +225,9 @@ namespace NMaier.SimpleDlna.Utilities
     public static double GetFileDuration(FileInfo file)
     {
       string sl;
-      if (FFmpeg.IdentifyFile(file).TryGetValue("LENGTH", out sl)) {
+      if (IdentifyFile(file).TryGetValue("LENGTH", out sl)) {
         double dur;
-        bool valid = Double.TryParse(
+        var valid = double.TryParse(
           sl, NumberStyles.AllowDecimalPoint,
           CultureInfo.GetCultureInfo("en-US", "en"), out dur);
         if (valid && dur > 0) {
@@ -230,11 +239,11 @@ namespace NMaier.SimpleDlna.Utilities
 
     public static string GetSubtitleSubrip(FileInfo file)
     {
-      if (FFmpeg.FFmpegExecutable == null) {
+      if (FFmpegExecutable == null) {
         throw new NotSupportedException();
       }
       if (file == null) {
-        throw new ArgumentNullException("file");
+        throw new ArgumentNullException(nameof(file));
       }
       try {
         using (var p = new Process()) {
@@ -243,15 +252,14 @@ namespace NMaier.SimpleDlna.Utilities
           sti.CreateNoWindow = true;
 #endif
           sti.UseShellExecute = false;
-          sti.FileName = FFmpeg.FFmpegExecutable;
-          sti.Arguments = String.Format(
-            "-i \"{0}\" -map s:0 -f srt pipe:", file.FullName);
+          sti.FileName = FFmpegExecutable;
+          sti.Arguments = $"-i \"{file.FullName}\" -map s:0 -f srt pipe:";
           sti.LoadUserProfile = false;
           sti.RedirectStandardOutput = true;
           p.Start();
 
           var lastPosition = 0L;
-          using (var reader = new StreamReader(new MemoryStream())) {
+          using (var reader = new StreamReader(StreamManager.GetStream())) {
             using (var pump = new StreamPump(
               p.StandardOutput.BaseStream, reader.BaseStream, 100)) {
               pump.Pump(null);
@@ -289,7 +297,7 @@ namespace NMaier.SimpleDlna.Utilities
 
     public static IDictionary<string, string> IdentifyFile(FileInfo file)
     {
-      if (FFmpeg.FFmpegExecutable != null) {
+      if (FFmpegExecutable != null) {
         return IdentifyFileInternal(file);
       }
       throw new NotSupportedException();

@@ -1,26 +1,25 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
   public static class IP
   {
-    private readonly static AddressToMacResolver macResolver =
+    private static readonly AddressToMacResolver macResolver =
       new AddressToMacResolver();
 
-    private readonly static ILog logger = LogManager.GetLogger(typeof(IP));
+    private static readonly ILog logger = LogManager.GetLogger(typeof (IP));
 
-    private static bool warned = false;
+    private static bool warned;
 
     public static IEnumerable<IPAddress> AllIPAddresses
     {
-      get
-      {
+      get {
         try {
           return GetIPsDefault().ToArray();
         }
@@ -36,15 +35,9 @@ namespace NMaier.SimpleDlna.Utilities
       }
     }
 
-    public static IEnumerable<IPAddress> ExternalIPAddresses
-    {
-      get
-      {
-        return from i in AllIPAddresses
-               where !IPAddress.IsLoopback(i)
-               select i;
-      }
-    }
+    public static IEnumerable<IPAddress> ExternalIPAddresses => from i in AllIPAddresses
+                                                                where !IPAddress.IsLoopback(i)
+                                                                select i;
 
     private static IEnumerable<IPAddress> GetIPsDefault()
     {
@@ -54,7 +47,7 @@ namespace NMaier.SimpleDlna.Utilities
         var gateways = from ga in props.GatewayAddresses
                        where !ga.Address.Equals(IPAddress.Any)
                        select true;
-        if (gateways.Count() == 0) {
+        if (!gateways.Any()) {
           logger.DebugFormat("Skipping {0}. No gateways", props);
           continue;
         }

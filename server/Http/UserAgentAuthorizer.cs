@@ -1,7 +1,7 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -10,14 +10,10 @@ namespace NMaier.SimpleDlna.Server
     private readonly Dictionary<string, object> userAgents =
       new Dictionary<string, object>();
 
-    private UserAgentAuthorizer()
-    {
-    }
-
     public UserAgentAuthorizer(IEnumerable<string> userAgents)
     {
       if (userAgents == null) {
-        throw new ArgumentNullException("userAgents");
+        throw new ArgumentNullException(nameof(userAgents));
       }
       foreach (var u in userAgents) {
         if (string.IsNullOrEmpty(u)) {
@@ -30,7 +26,7 @@ namespace NMaier.SimpleDlna.Server
     public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
     {
       if (headers == null) {
-        throw new ArgumentNullException("headers");
+        throw new ArgumentNullException(nameof(headers));
       }
       string ua;
       if (!headers.TryGetValue("User-Agent", out ua)) {
@@ -40,12 +36,7 @@ namespace NMaier.SimpleDlna.Server
         return false;
       }
       var rv = userAgents.ContainsKey(ua);
-      if (!rv) {
-        DebugFormat("Rejecting {0}. Not in User-Agent whitelist", ua);
-      }
-      else {
-        DebugFormat("Accepted {0} via User-Agent whitelist", ua);
-      }
+      DebugFormat(!rv ? "Rejecting {0}. Not in User-Agent whitelist" : "Accepted {0} via User-Agent whitelist", ua);
       return rv;
     }
   }

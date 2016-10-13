@@ -1,9 +1,10 @@
 using System;
 using System.IO;
+using File = TagLib.File;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
-  internal sealed class TagLibFileAbstraction : TagLib.File.IFileAbstraction
+  internal sealed class TagLibFileAbstraction : File.IFileAbstraction
   {
     private readonly FileInfo info;
 
@@ -12,32 +13,17 @@ namespace NMaier.SimpleDlna.FileMediaServer
       this.info = info;
     }
 
-    public string Name
-    {
-      get
-      {
-        return info.FullName;
-      }
-    }
+    public string Name => info.FullName;
 
-    public Stream ReadStream
-    {
-      get
-      {
-        return info.Open(
-          FileMode.Open,
-          FileAccess.Read,
-          FileShare.ReadWrite
-          );
-      }
-    }
+    public Stream ReadStream => info.Open(
+      FileMode.Open,
+      FileAccess.Read,
+      FileShare.ReadWrite
+      );
 
     public Stream WriteStream
     {
-      get
-      {
-        throw new NotImplementedException();
-      }
+      get { throw new NotImplementedException(); }
     }
 
     public void CloseStream(Stream stream)

@@ -7,7 +7,7 @@
     private readonly DlnaMediaTypes types;
 
     private VirtualClonedFolder(IMediaFolder parent, string name, string id,
-                                DlnaMediaTypes types)
+      DlnaMediaTypes types)
       : base(parent, name, id)
     {
       this.types = types;
@@ -28,7 +28,7 @@
     }
 
     public VirtualClonedFolder(IMediaFolder parent, string name,
-                               DlnaMediaTypes types)
+      DlnaMediaTypes types)
       : this(parent, name, name, types)
     {
     }

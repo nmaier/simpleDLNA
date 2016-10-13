@@ -1,8 +1,8 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
 {
@@ -17,7 +17,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     public readonly bool Sticky;
 
     public Datagram(IPEndPoint endPoint, IPAddress localAddress,
-                    string message, bool sticky)
+      string message, bool sticky)
     {
       EndPoint = endPoint;
       LocalAddress = localAddress;
@@ -26,11 +26,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       SendCount = 0;
     }
 
-    public uint SendCount
-    {
-      get;
-      private set;
-    }
+    public uint SendCount { get; private set; }
 
     public void Send()
     {
@@ -53,6 +49,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
               client.Close();
             }
             catch (Exception) {
+              // ignored
             }
           }
         }, null);

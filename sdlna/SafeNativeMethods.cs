@@ -15,11 +15,11 @@ namespace NMaier.SimpleDlna
 
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr LoadImage(IntPtr inst, string name,
-                                          uint type, int cxDesired,
-                                          int cyDesired, uint fuLoad);
+      uint type, int cxDesired,
+      int cyDesired, uint fuLoad);
 
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern IntPtr SendMessage(IntPtr hWnd, Int32 Msg,
-                                            IntPtr wParam, IntPtr lParam);
+    public static extern IntPtr SendMessage(IntPtr hWnd, int msg,
+      IntPtr wParam, IntPtr lParam);
   }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -11,38 +12,34 @@ namespace NMaier.SimpleDlna.Utilities
 
     private static Dictionary<string, TInterface> BuildRepository()
     {
-      var items = new Dictionary<string, TInterface>();
-      var type = typeof(TInterface).Name;
-      var a = typeof(TInterface).Assembly;
-      foreach (Type t in a.GetTypes()) {
+      var found = new Dictionary<string, TInterface>(StringComparer.CurrentCultureIgnoreCase);
+      var type = typeof (TInterface).Name;
+      var a = typeof (TInterface).Assembly;
+      foreach (var t in a.GetTypes()) {
         if (t.GetInterface(type) == null) {
           continue;
         }
-        var ctor = t.GetConstructor(new Type[] { });
+        var ctor = t.GetConstructor(new Type[] {});
         if (ctor == null) {
           continue;
         }
         try {
-          var item = ctor.Invoke(new object[] { }) as TInterface;
+          var item = ctor.Invoke(new object[] {}) as TInterface;
           if (item == null) {
             continue;
           }
-          items.Add(item.Name.ToUpperInvariant(), item);
+          found.Add(item.Name, item);
         }
         catch (Exception) {
-          continue;
+          // ignored
         }
       }
-      return items;
+      return found;
     }
 
     public static IDictionary<string, IRepositoryItem> ListItems()
     {
-      var rv = new Dictionary<string, IRepositoryItem>();
-      foreach (var v in items.Values) {
-        rv.Add(v.Name, v);
-      }
-      return rv;
+      return items.Values.ToDictionary<TInterface, string, IRepositoryItem>(v => v.Name, v => v);
     }
 
     public static TInterface Lookup(string name)
@@ -50,44 +47,36 @@ namespace NMaier.SimpleDlna.Utilities
       if (string.IsNullOrWhiteSpace(name)) {
         throw new ArgumentException(
           "Invalid repository name",
-          "name");
+          nameof(name));
       }
-      var n_p = name.Split(new char[] { ':' }, 2);
-      name = n_p[0].ToUpperInvariant().Trim();
-      var result = (TInterface)null;
+      var argsplit = name.Split(new[] {':'}, 2);
+      name = argsplit[0].ToUpperInvariant().Trim();
+      TInterface result;
       if (!items.TryGetValue(name, out result)) {
         throw new RepositoryLookupException(name);
       }
-      if (n_p.Length == 1) {
+      if (argsplit.Length == 1 || !(result is IConfigurable)) {
         return result;
       }
-
-      var ctor = result.GetType().GetConstructor(new Type[] { });
+      var parameters = new ConfigParameters(argsplit[1]);
+      if (parameters.Count == 0) {
+        return result;
+      }
+      var ctor = result.GetType().GetConstructor(new Type[] {});
       if (ctor == null) {
         throw new RepositoryLookupException(name);
       }
-      var parameters = new AttributeCollection();
-      foreach (var p in n_p[1].Split(',')) {
-        var k_v = p.Split(new char[] { '=' }, 2);
-        if (k_v.Length == 2) {
-          parameters.Add(k_v[0], k_v[1]);
-        }
-        else {
-          parameters.Add(k_v[0], null);
-        }
-      }
       try {
-        var item = ctor.Invoke(new object[] { }) as TInterface;
+        var item = ctor.Invoke(new object[] {}) as TInterface;
         if (item == null) {
           throw new RepositoryLookupException(name);
         }
-        item.SetParameters(parameters);
+        var configItem = item as IConfigurable;
+        configItem?.SetParameters(parameters);
         return item;
       }
       catch (Exception ex) {
-        throw new RepositoryLookupException(string.Format(
-          "Cannot construct repository item: {0}",
-          ex.Message), ex);
+        throw new RepositoryLookupException($"Cannot construct repository item: {ex.Message}", ex);
       }
     }
   }

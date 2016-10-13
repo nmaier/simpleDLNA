@@ -1,9 +1,9 @@
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Metadata;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Metadata;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -16,13 +16,13 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       Server = server;
       this.dir = dir;
-      var rawfiles = (from f in dir.GetFiles("*.*")
-                      select f);
+      var rawfiles = from f in dir.GetFiles("*.*")
+                     select f;
       var files = new List<BaseFile>();
       foreach (var f in rawfiles) {
         var ext = f.Extension;
         if (string.IsNullOrEmpty(ext) ||
-          !server.Filter.Filtered(ext.Substring(1))) {
+            !server.Filter.Filtered(ext.Substring(1))) {
           continue;
         }
         try {
@@ -35,51 +35,23 @@ namespace NMaier.SimpleDlna.FileMediaServer
           server.Warn(f, ex);
         }
       }
-      resources.AddRange(files);
+      Resources.AddRange(files);
 
-      folders = (from d in dir.GetDirectories()
+      Folders = (from d in dir.GetDirectories()
                  let m = TryGetFolder(server, d)
                  where m != null && m.ChildCount > 0
                  select m as IMediaFolder).ToList();
     }
 
-    public DateTime InfoDate
-    {
-      get
-      {
-        return dir.LastWriteTimeUtc;
-      }
-    }
+    public override string Path => dir.FullName;
 
-    public long? InfoSize
-    {
-      get
-      {
-        return null;
-      }
-    }
+    public FileServer Server { get; protected set; }
 
-    public override string Path
-    {
-      get
-      {
-        return dir.FullName;
-      }
-    }
+    public override string Title => dir.Name;
 
-    public FileServer Server
-    {
-      get;
-      protected set;
-    }
+    public DateTime InfoDate => dir.LastWriteTimeUtc;
 
-    public override string Title
-    {
-      get
-      {
-        return dir.Name;
-      }
-    }
+    public long? InfoSize => null;
 
     private PlainFolder TryGetFolder(FileServer server, DirectoryInfo d)
     {

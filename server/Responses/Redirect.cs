@@ -2,7 +2,7 @@
 
 namespace NMaier.SimpleDlna.Server
 {
-  internal sealed class Redirect : StringResponse, IResponse
+  internal sealed class Redirect : StringResponse
   {
     internal Redirect(string uri)
       : this(HttpCode.TemporaryRedirect, uri)
@@ -31,7 +31,7 @@ namespace NMaier.SimpleDlna.Server
     }
 
     internal Redirect(HttpCode code, IRequest request, string path)
-      : this(code, string.Format("http://{0}{1}", request.LocalEndPoint, path))
+      : this(code, $"http://{request.LocalEndPoint}{path}")
     {
     }
   }

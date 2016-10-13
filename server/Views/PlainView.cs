@@ -5,21 +5,9 @@ namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class PlainView : BaseView
   {
-    public override string Description
-    {
-      get
-      {
-        return "Mushes all files together into the root folder";
-      }
-    }
+    public override string Description => "Mushes all files together into the root folder";
 
-    public override string Name
-    {
-      get
-      {
-        return "plain";
-      }
-    }
+    public override string Name => "plain";
 
     private static void EatAll(IMediaFolder root, IMediaFolder folder)
     {
@@ -31,13 +19,13 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    public override IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder oldRoot)
     {
-      if (Root == null) {
-        throw new ArgumentNullException("Root");
+      if (oldRoot == null) {
+        throw new ArgumentNullException(nameof(oldRoot));
       }
-      var rv = new VirtualFolder(null, Root.Title, Root.Id);
-      EatAll(rv, Root);
+      var rv = new VirtualFolder(null, oldRoot.Title, oldRoot.Id);
+      EatAll(rv, oldRoot);
       return rv;
     }
   }

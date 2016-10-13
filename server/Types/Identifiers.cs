@@ -1,39 +1,40 @@
-﻿using NMaier.SimpleDlna.Server.Comparers;
-using NMaier.SimpleDlna.Server.Views;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Views;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class Identifiers : Logging
   {
-    public const string GeneralRoot = "0";
+    public const string GENERAL_ROOT = "0";
 
-    public const string SamsungAudio = "A";
+    public const string SAMSUNG_AUDIO = "A";
 
-    public const string SamsungImages = "I";
+    public const string SAMSUNG_IMAGES = "I";
 
-    public const string SamsungVideo = "V";
-
-    private readonly IItemComparer comparer;
+    public const string SAMSUNG_VIDEO = "V";
 
     private static readonly Random idGen = new Random();
+
+    private readonly IItemComparer comparer;
+    private readonly List<IFilteredView> filters = new List<IFilteredView>();
+
+    // ReSharper disable once CollectionNeverQueried.Local
+    private readonly Dictionary<string, IMediaItem> hardRefs =
+      new Dictionary<string, IMediaItem>();
 
     private readonly Dictionary<string, WeakReference> ids =
       new Dictionary<string, WeakReference>();
 
-    private readonly Dictionary<string, IMediaItem> hardRefs =
-      new Dictionary<string, IMediaItem>();
+    private readonly bool order;
+
+    private readonly List<IView> views = new List<IView>();
 
     private Dictionary<string, string> paths =
       new Dictionary<string, string>();
-
-    private readonly List<IView> views = new List<IView>();
-    private readonly List<IFilteredView> filters = new List<IFilteredView>();
-
-    private readonly bool order;
 
     public Identifiers(IItemComparer comparer, bool order)
     {
@@ -41,23 +42,11 @@ namespace NMaier.SimpleDlna.Server
       this.order = order;
     }
 
-    public bool HasViews
-    {
-      get
-      {
-        return views.Count != 0;
-      }
-    }
+    public bool HasViews => views.Count != 0;
 
-    public IEnumerable<WeakReference> Resources
-    {
-      get
-      {
-        return (from i in ids.Values
-                where (i.Target is IMediaResource)
-                select i).ToList();
-      }
-    }
+    public IEnumerable<WeakReference> Resources => (from i in ids.Values
+                                                    where i.Target is IMediaResource
+                                                    select i).ToList();
 
     private void RegisterFolderTree(IMediaFolder folder)
     {
@@ -118,7 +107,8 @@ namespace NMaier.SimpleDlna.Server
         }
       }
       paths = npaths;
-      DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count, pc - paths.Count);
+      DebugFormat("Cleanup complete: ids (evicted) {0} ({1}), paths {2} ({3})", ids.Count, ic - ids.Count, paths.Count,
+                  pc - paths.Count);
     }
 
     public IMediaItem GetItemById(string id)
@@ -151,13 +141,9 @@ namespace NMaier.SimpleDlna.Server
       return rv;
     }
 
-    public bool Allowed(IMediaResource item) {
-      foreach (var f in filters) {
-        if (!f.Allowed(item)) {
-          return false;
-        }
-      }
-      return true;
+    public bool Allowed(IMediaResource item)
+    {
+      return filters.All(f => f.Allowed(item));
     }
   }
 }

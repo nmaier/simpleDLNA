@@ -7,10 +7,6 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly string body;
 
-    private readonly IHeaders headers = new ResponseHeaders();
-
-    private readonly HttpCode status;
-
     public StringResponse(HttpCode aStatus, string aBody)
       : this(aStatus, "text/html; charset=utf-8", aBody)
     {
@@ -18,35 +14,17 @@ namespace NMaier.SimpleDlna.Server
 
     public StringResponse(HttpCode aStatus, string aMime, string aBody)
     {
-      status = aStatus;
+      Status = aStatus;
       body = aBody;
 
-      headers["Content-Type"] = aMime;
-      headers["Content-Length"] = Encoding.UTF8.GetByteCount(body).ToString();
+      Headers["Content-Type"] = aMime;
+      Headers["Content-Length"] = Encoding.UTF8.GetByteCount(body).ToString();
     }
 
-    public Stream Body
-    {
-      get
-      {
-        return new MemoryStream(Encoding.UTF8.GetBytes(body));
-      }
-    }
+    public Stream Body => new MemoryStream(Encoding.UTF8.GetBytes(body));
 
-    public IHeaders Headers
-    {
-      get
-      {
-        return headers;
-      }
-    }
+    public IHeaders Headers { get; } = new ResponseHeaders();
 
-    public HttpCode Status
-    {
-      get
-      {
-        return status;
-      }
-    }
+    public HttpCode Status { get; }
   }
 }

@@ -1,7 +1,7 @@
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal class DoubleKeyedVirtualFolder
-        : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
+    : KeyedVirtualFolder<SimpleKeyedVirtualFolder>
   {
     public DoubleKeyedVirtualFolder()
     {
@@ -13,4 +13,3 @@ namespace NMaier.SimpleDlna.Server.Views
     }
   }
 }
-

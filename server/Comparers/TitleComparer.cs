@@ -1,34 +1,21 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Comparers
 {
   internal class TitleComparer : BaseComparer
   {
-    private readonly static StringComparer comparer =
+    private static readonly StringComparer comparer =
       new NaturalStringComparer(false);
 
-    public override string Description
-    {
-      get
-      {
-        return "Sort alphabetically";
-      }
-    }
+    public override string Description => "Sort alphabetically";
 
-    public override string Name
-    {
-      get
-      {
-        return "title";
-      }
-    }
+    public override string Name => "title";
 
     public override int Compare(IMediaItem x, IMediaItem y)
     {
       if (x == null && y == null) {
         return 0;
-        throw new ArgumentNullException("x");
       }
       if (x == null) {
         return 1;

@@ -1,32 +1,30 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.IO;
 using System.Resources;
+using NMaier.SimpleDlna.Server.Properties;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   internal sealed class ResourceResponse : Logging, IResponse
   {
-    private readonly IHeaders headers = new ResponseHeaders();
-
     private readonly byte[] resource;
 
-    private readonly HttpCode status;
-
     public ResourceResponse(HttpCode aStatus, string type, string aResource)
-      : this(aStatus, type, Properties.Resources.ResourceManager, aResource)
+      : this(aStatus, type, Resources.ResourceManager, aResource)
     {
     }
 
     public ResourceResponse(HttpCode aStatus, string type,
-                            ResourceManager aResourceManager, string aResource)
+      ResourceManager aResourceManager, string aResource)
     {
-      status = aStatus;
+      Status = aStatus;
       try {
-        resource = aResourceManager.GetObject(aResource) as byte[];
+        resource = (byte[])aResourceManager.GetObject(aResource);
 
-        headers["Content-Type"] = type;
-        headers["Content-Length"] = resource.Length.ToString();
+        Headers["Content-Type"] = type;
+        var len = resource?.Length.ToString() ?? "0";
+        Headers["Content-Length"] = len;
       }
       catch (Exception ex) {
         Error("Failed to prepare resource " + aResource, ex);
@@ -34,28 +32,10 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public Stream Body
-    {
-      get
-      {
-        return new MemoryStream(resource);
-      }
-    }
+    public Stream Body => new MemoryStream(resource);
 
-    public IHeaders Headers
-    {
-      get
-      {
-        return headers;
-      }
-    }
+    public IHeaders Headers { get; } = new ResponseHeaders();
 
-    public HttpCode Status
-    {
-      get
-      {
-        return status;
-      }
-    }
+    public HttpCode Status { get; }
   }
 }

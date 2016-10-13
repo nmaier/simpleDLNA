@@ -6,10 +6,6 @@ namespace NMaier.SimpleDlna.Server
   {
     private readonly FileInfo body;
 
-    private readonly IHeaders headers = new ResponseHeaders();
-
-    private readonly HttpCode status;
-
     public FileResponse(HttpCode aStatus, FileInfo aBody)
       : this(aStatus, "text/html; charset=utf-8", aBody)
     {
@@ -17,35 +13,17 @@ namespace NMaier.SimpleDlna.Server
 
     public FileResponse(HttpCode aStatus, string aMime, FileInfo aBody)
     {
-      status = aStatus;
+      Status = aStatus;
       body = aBody;
 
-      headers["Content-Type"] = aMime;
-      headers["Content-Length"] = body.Length.ToString();
+      Headers["Content-Type"] = aMime;
+      Headers["Content-Length"] = body.Length.ToString();
     }
 
-    public Stream Body
-    {
-      get
-      {
-        return body.OpenRead();
-      }
-    }
+    public Stream Body => body.OpenRead();
 
-    public IHeaders Headers
-    {
-      get
-      {
-        return headers;
-      }
-    }
+    public IHeaders Headers { get; } = new ResponseHeaders();
 
-    public HttpCode Status
-    {
-      get
-      {
-        return status;
-      }
-    }
+    public HttpCode Status { get; }
   }
 }

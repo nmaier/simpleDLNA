@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,14 +10,14 @@ namespace NMaier.SimpleDlna.Server
 {
   public class Headers : IHeaders
   {
-    private readonly bool asIs = false;
+    private static readonly Regex validator = new Regex(
+      @"^[a-z\d][a-z\d_.-]+$",
+      RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private readonly bool asIs;
 
     private readonly Dictionary<string, string> dict =
       new Dictionary<string, string>();
-
-    private readonly static Regex validator = new Regex(
-      @"^[a-z\d][a-z\d_.-]+$",
-      RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     protected Headers(bool asIs)
     {
@@ -24,22 +25,15 @@ namespace NMaier.SimpleDlna.Server
     }
 
     public Headers()
-      : this(asIs: false)
+      : this(false)
     {
     }
 
-    public int Count
-    {
-      get
-      {
-        return dict.Count;
-      }
-    }
+    public int Count => dict.Count;
 
     public string HeaderBlock
     {
-      get
-      {
+      get {
         var hb = new StringBuilder();
         foreach (var h in this) {
           hb.AppendFormat("{0}: {1}\r\n", h.Key, h.Value);
@@ -48,63 +42,21 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public Stream HeaderStream
-    {
-      get
-      {
-        return new MemoryStream(Encoding.ASCII.GetBytes(HeaderBlock));
-      }
-    }
+    public Stream HeaderStream => new MemoryStream(Encoding.ASCII.GetBytes(HeaderBlock));
 
-    public bool IsReadOnly
-    {
-      get
-      {
-        return false;
-      }
-    }
+    public bool IsReadOnly => false;
 
-    public ICollection<string> Keys
-    {
-      get
-      {
-        return dict.Keys;
-      }
-    }
+    public ICollection<string> Keys => dict.Keys;
 
-    public ICollection<string> Values
-    {
-      get
-      {
-        return dict.Values;
-      }
-    }
+    public ICollection<string> Values => dict.Values;
 
     public string this[string key]
     {
-      get
-      {
-        return dict[Normalize(key)];
-      }
-      set
-      {
-        dict[Normalize(key)] = value;
-      }
+      get { return dict[Normalize(key)]; }
+      set { dict[Normalize(key)] = value; }
     }
 
-    private string Normalize(string header)
-    {
-      if (!asIs) {
-        header = header.ToUpperInvariant();
-      }
-      header = header.Trim();
-      if (!validator.IsMatch(header)) {
-        throw new ArgumentException("Invalid header: " + header);
-      }
-      return header;
-    }
-
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    IEnumerator IEnumerable.GetEnumerator()
     {
       return dict.GetEnumerator();
     }
@@ -156,20 +108,26 @@ namespace NMaier.SimpleDlna.Server
       return Remove(item.Key);
     }
 
-    public override string ToString()
-    {
-      return string.Format(
-        "({0})",
-        string.Join(
-          ", ",
-          (from x in dict select string.Format("{0}={1}", x.Key, x.Value))
-          )
-        );
-    }
-
     public bool TryGetValue(string key, out string value)
     {
       return dict.TryGetValue(Normalize(key), out value);
+    }
+
+    private string Normalize(string header)
+    {
+      if (!asIs) {
+        header = header.ToUpperInvariant();
+      }
+      header = header.Trim();
+      if (!validator.IsMatch(header)) {
+        throw new ArgumentException("Invalid header: " + header);
+      }
+      return header;
+    }
+
+    public override string ToString()
+    {
+      return $"({string.Join(", ", from x in dict select $"{x.Key}={x.Value}")})";
     }
   }
 }

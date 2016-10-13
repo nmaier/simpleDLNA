@@ -1,16 +1,18 @@
-﻿using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Comparers;
-using NMaier.SimpleDlna.Server.Views;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Windows.Forms;
+using NMaier.SimpleDlna.GUI.Properties;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Views;
+using NMaier.SimpleDlna.Utilities;
+using Form = NMaier.Windows.Forms.Form;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  internal partial class FormServer : NMaier.Windows.Forms.Form
+  internal sealed partial class FormServer : Form
   {
     public FormServer()
     {
@@ -44,7 +46,8 @@ namespace NMaier.SimpleDlna.GUI
       checkOrderDescending.Checked = description.OrderDescending;
 
       foreach (var v in description.Views) {
-        var i = new ListViewItem(new string[] {
+        var i = new ListViewItem(new[]
+        {
           v, ViewRepository.Lookup(v).Description
         });
         listViews.Items.Add(i);
@@ -78,8 +81,7 @@ namespace NMaier.SimpleDlna.GUI
 
     public ServerDescription Description
     {
-      get
-      {
+      get {
         DlnaMediaTypes types = 0;
         if (checkVideo.Checked) {
           types |= DlnaMediaTypes.Video;
@@ -103,7 +105,8 @@ namespace NMaier.SimpleDlna.GUI
         var uas = (from ListViewItem i in listRestrictions.Items
                    where (int)i.Tag == 2
                    select i.Text).ToArray();
-        var rv = new ServerDescription() {
+        var rv = new ServerDescription
+        {
           Name = textName.Text,
           Order = ((IItemComparer)comboOrder.SelectedItem).Name,
           OrderDescending = checkOrderDescending.Checked,
@@ -148,7 +151,7 @@ namespace NMaier.SimpleDlna.GUI
         var found = from ListViewItem i in listDirectories.Items
                     where StringComparer.InvariantCulture.Equals(path, i.Text)
                     select i;
-        if (found.Count() == 0) {
+        if (!found.Any()) {
           listDirectories.Items.Add(path);
         }
       }
@@ -160,18 +163,18 @@ namespace NMaier.SimpleDlna.GUI
       var valid = false;
       var re = textRestriction.Text;
       switch (comboNewRestriction.SelectedIndex) {
-        case 0:
-          valid = IP.IsAcceptedMAC(re);
-          break;
-        case 1:
-          IPAddress o;
-          valid = IPAddress.TryParse(re, out o);
-          break;
-        case 2:
-          valid = !string.IsNullOrWhiteSpace(re);
-          break;
-        default:
-          break;
+      case 0:
+        valid = IP.IsAcceptedMAC(re);
+        break;
+      case 1:
+        IPAddress o;
+        valid = IPAddress.TryParse(re, out o);
+        break;
+      case 2:
+        valid = !string.IsNullOrWhiteSpace(re);
+        break;
+      default:
+        break;
       }
       if (!valid) {
         errorProvider.SetError(
@@ -191,14 +194,14 @@ namespace NMaier.SimpleDlna.GUI
         return;
       }
       listViews.Items.Add(
-        new ListViewItem(new string[] { i.Name, i.Description }));
+        new ListViewItem(new[] {i.Name, i.Description}));
       SizeColumns(listViews);
     }
 
     private void buttonRemoveDirectory_Click(object sender, EventArgs e)
     {
       foreach (var i in listDirectories.SelectedItems) {
-        listDirectories.Items.Remove(i as ListViewItem);
+        listDirectories.Items.Remove((ListViewItem)i);
       }
       SizeDirectoryColumn();
     }
@@ -206,7 +209,7 @@ namespace NMaier.SimpleDlna.GUI
     private void buttonRemoveRestriction_Click(object sender, EventArgs e)
     {
       foreach (var i in listRestrictions.SelectedItems) {
-        var item = i as ListViewItem;
+        var item = (ListViewItem)i;
         var index = (int)item.Tag;
         textRestriction.Text = item.Text;
         comboNewRestriction.SelectedIndex = index;
@@ -218,7 +221,7 @@ namespace NMaier.SimpleDlna.GUI
     private void buttonRemoveView_Click(object sender, EventArgs e)
     {
       foreach (var i in listViews.SelectedItems) {
-        listViews.Items.Remove(i as ListViewItem);
+        listViews.Items.Remove((ListViewItem)i);
       }
       SizeColumns(listViews);
     }
@@ -242,7 +245,7 @@ namespace NMaier.SimpleDlna.GUI
     private void Init()
     {
       InitializeComponent();
-      Icon = Properties.Resources.server;
+      Icon = Resources.server;
       AddOrderItems();
       AddViewItems();
       comboNewRestriction.SelectedIndex = 0;

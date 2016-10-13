@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Data;
+using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
-using System.Runtime.InteropServices;
+using log4net;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -10,7 +11,7 @@ namespace NMaier.SimpleDlna.Utilities
   {
     private const int GROW_SIZE = 1 << 24;
 
-    private static Action<IDbConnection> clearPool = null;
+    private static Action<IDbConnection> clearPool;
 
     private static IDbConnection GetDatabaseConnectionMono(string cs)
     {
@@ -25,8 +26,11 @@ namespace NMaier.SimpleDlna.Utilities
       }
       var dbconn = monoSqlite.GetType(
         "Mono.Data.Sqlite.SqliteConnection");
-      var ctor = dbconn.GetConstructor(new[] { typeof(string) });
-      var rv = ctor.Invoke(new[] { cs }) as IDbConnection;
+      var ctor = dbconn.GetConstructor(new[] {typeof (string)});
+      if (ctor == null) {
+        throw new ArgumentException("No mono SQLite found");
+      }
+      var rv = ctor.Invoke(new object[] {cs}) as IDbConnection;
       if (rv == null) {
         throw new ArgumentException("no connection");
       }
@@ -35,9 +39,7 @@ namespace NMaier.SimpleDlna.Utilities
         var cp = dbconn.GetMethod("ClearPool");
         clearPool = conn =>
         {
-          if (cp != null) {
-            cp.Invoke(null, new object[] { conn });
-          }
+          cp?.Invoke(null, new object[] {conn});
         };
       }
       return rv;
@@ -45,7 +47,7 @@ namespace NMaier.SimpleDlna.Utilities
 
     private static IDbConnection GetDatabaseConnectionSDS(string cs)
     {
-      var rv = new System.Data.SQLite.SQLiteConnection(cs);
+      var rv = new SQLiteConnection(cs);
       if (rv == null) {
         throw new ArgumentException("no connection");
       }
@@ -55,15 +57,15 @@ namespace NMaier.SimpleDlna.Utilities
         rv.SetChunkSize(GROW_SIZE);
       }
       catch (Exception ex) {
-        log4net.LogManager.GetLogger(typeof(Sqlite)).Error(
+        LogManager.GetLogger(typeof (Sqlite)).Error(
           "Failed to sqlite control", ex);
       }
 
       if (clearPool == null) {
         clearPool = conn =>
         {
-          System.Data.SQLite.SQLiteConnection.ClearPool(
-            conn as System.Data.SQLite.SQLiteConnection);
+          SQLiteConnection.ClearPool(
+            conn as SQLiteConnection);
         };
       }
       return rv;
@@ -71,29 +73,23 @@ namespace NMaier.SimpleDlna.Utilities
 
     public static void ClearPool(IDbConnection conn)
     {
-      if (clearPool != null) {
-        clearPool(conn);
-      }
+      clearPool?.Invoke(conn);
     }
 
     public static IDbConnection GetDatabaseConnection(FileInfo database)
     {
       if (database == null) {
-        throw new ArgumentNullException("database");
+        throw new ArgumentNullException(nameof(database));
       }
       if (database.Exists && database.IsReadOnly) {
         throw new ArgumentException(
           "Database file is read only",
-          "database"
+          nameof(database)
           );
       }
-      var cs = string.Format(
-        "Uri=file:{0};Pooling=true;Synchronous=Off;journal mode=TRUNCATE;DefaultTimeout=5",
-        database.FullName
-        );
+      var cs = $"Uri=file:{database.FullName};Pooling=true;Synchronous=Off;journal mode=TRUNCATE;DefaultTimeout=5";
 
-      if (Utilities.SystemInformation.IsRunningOnMono())
-      {
+      if (SystemInformation.IsRunningOnMono()) {
         return GetDatabaseConnectionMono(cs);
       }
       return GetDatabaseConnectionSDS(cs);

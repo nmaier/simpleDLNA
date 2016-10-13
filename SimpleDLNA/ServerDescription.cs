@@ -1,5 +1,5 @@
-using NMaier.SimpleDlna.Server;
 using System;
+using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.GUI
 {
@@ -34,7 +34,7 @@ namespace NMaier.SimpleDlna.GUI
     public void AdoptInfo(ServerDescription other)
     {
       if (other == null) {
-        throw new ArgumentNullException("other");
+        throw new ArgumentNullException(nameof(other));
       }
       Directories = other.Directories;
       Name = other.Name;

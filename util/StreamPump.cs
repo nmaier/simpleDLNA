@@ -18,18 +18,18 @@ namespace NMaier.SimpleDlna.Utilities
       Output = outputStream;
     }
 
-    public Stream Input { get; private set; }
+    public Stream Input { get; }
 
-    public Stream Output { get; private set; }
+    public Stream Output { get; }
+
+    public void Dispose()
+    {
+      sem.Dispose();
+    }
 
     private void Finish(StreamPumpResult result, StreamPumpCallback callback)
     {
-      if (callback != null) {
-        callback.BeginInvoke(this, result, ir =>
-        {
-          callback.EndInvoke(ir);
-        }, null);
-      }
+      callback?.BeginInvoke(this, result, callback.EndInvoke, null);
       try {
         sem.Release();
       }
@@ -37,13 +37,8 @@ namespace NMaier.SimpleDlna.Utilities
         // ignore
       }
       catch (Exception ex) {
-        LogManager.GetLogger(typeof(StreamPump)).Error(ex.Message, ex);
+        LogManager.GetLogger(typeof (StreamPump)).Error(ex.Message, ex);
       }
-    }
-
-    public void Dispose()
-    {
-      sem.Dispose();
     }
 
     public void Pump(StreamPumpCallback callback)

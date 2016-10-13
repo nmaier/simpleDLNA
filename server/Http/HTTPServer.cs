@@ -1,7 +1,4 @@
-﻿using log4net;
-using NMaier.SimpleDlna.Server.Ssdp;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,33 +6,36 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Timers;
+using log4net;
+using NMaier.SimpleDlna.Server.Ssdp;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   public sealed class HttpServer : Logging, IDisposable
   {
+    public static readonly string Signature = GenerateServerSignature();
+
     private readonly ConcurrentDictionary<HttpClient, DateTime> clients =
       new ConcurrentDictionary<HttpClient, DateTime>();
-
-    private readonly ConcurrentDictionary<string, IPrefixHandler> prefixes =
-      new ConcurrentDictionary<string, IPrefixHandler>();
 
     private readonly ConcurrentDictionary<Guid, List<Guid>> devicesForServers =
       new ConcurrentDictionary<Guid, List<Guid>>();
 
+    private readonly TcpListener listener;
+
+    private readonly ConcurrentDictionary<string, IPrefixHandler> prefixes =
+      new ConcurrentDictionary<string, IPrefixHandler>();
+
     private readonly ConcurrentDictionary<Guid, MediaMount> servers =
       new ConcurrentDictionary<Guid, MediaMount>();
 
-    public static readonly string Signature = GenerateServerSignature();
+    private readonly SsdpHandler ssdpServer;
 
     private readonly Timer timeouter = new Timer(10 * 1000);
 
-    private readonly TcpListener listener = null;
-
-    private readonly SsdpHandler ssdpServer;
-
     public HttpServer()
-      : this(port: 0)
+      : this(0)
     {
     }
 
@@ -58,7 +58,7 @@ namespace NMaier.SimpleDlna.Server
       listener.Server.UseOnlyOverlappedIO = true;
       listener.Start();
 
-      RealPort = (listener.LocalEndpoint as IPEndPoint).Port;
+      RealPort = ((IPEndPoint)listener.LocalEndpoint).Port;
 
       NoticeFormat(
         "Running HTTP Server: {0} on port {1}", Signature, RealPort);
@@ -70,12 +70,9 @@ namespace NMaier.SimpleDlna.Server
       Accept();
     }
 
-    public event EventHandler<HttpAuthorizationEventArgs> OnAuthorizeClient;
-
     public Dictionary<string, string> MediaMounts
     {
-      get
-      {
+      get {
         var rv = new Dictionary<string, string>();
         foreach (var m in servers) {
           rv[m.Value.Prefix] = m.Value.FriendlyName;
@@ -84,7 +81,25 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public int RealPort { get; private set; }
+    public int RealPort { get; }
+
+    public void Dispose()
+    {
+      Debug("Disposing HTTP");
+      timeouter.Enabled = false;
+      foreach (var s in servers.Values.ToList()) {
+        UnregisterMediaServer(s);
+      }
+      ssdpServer.Dispose();
+      timeouter.Dispose();
+      listener.Stop();
+      foreach (var c in clients.ToList()) {
+        c.Key.Dispose();
+      }
+      clients.Clear();
+    }
+
+    public event EventHandler<HttpAuthorizationEventArgs> OnAuthorizeClient;
 
     private void Accept()
     {
@@ -107,10 +122,7 @@ namespace NMaier.SimpleDlna.Server
         var tcpclient = listener.EndAcceptTcpClient(result);
         var client = new HttpClient(this, tcpclient);
         try {
-          clients.AddOrUpdate(client, DateTime.Now, (k, v) =>
-          {
-            return DateTime.Now;
-          });
+          clients.AddOrUpdate(client, DateTime.Now, (k, v) => DateTime.Now);
           DebugFormat("Accepted client {0}", client);
           client.Start();
         }
@@ -134,29 +146,24 @@ namespace NMaier.SimpleDlna.Server
       var os = Environment.OSVersion;
       var pstring = os.Platform.ToString();
       switch (os.Platform) {
-        case PlatformID.Win32NT:
-        case PlatformID.Win32S:
-        case PlatformID.Win32Windows:
-          pstring = "WIN";
-          break;
-        default:
-          try {
-            pstring = Formatting.GetSystemName();
-          }
-          catch (Exception ex) {
-            LogManager.GetLogger(typeof(HttpServer)).Debug("Failed to get uname", ex);
-          }
-          break;
+      case PlatformID.Win32NT:
+      case PlatformID.Win32S:
+      case PlatformID.Win32Windows:
+        pstring = "WIN";
+        break;
+      default:
+        try {
+          pstring = Formatting.GetSystemName();
+        }
+        catch (Exception ex) {
+          LogManager.GetLogger(typeof (HttpServer)).Debug("Failed to get uname", ex);
+        }
+        break;
       }
-      return String.Format(
-      "{0}{1}/{2}.{3} UPnP/1.0 DLNADOC/1.5 sdlna/{4}.{5}",
-      pstring,
-      IntPtr.Size * 8,
-      os.Version.Major,
-      os.Version.Minor,
-      Assembly.GetExecutingAssembly().GetName().Version.Major,
-      Assembly.GetExecutingAssembly().GetName().Version.Minor
-      );
+      var version = Assembly.GetExecutingAssembly().GetName().Version;
+      var bitness = IntPtr.Size * 8;
+      return
+        $"{pstring}{bitness}/{os.Version.Major}.{os.Version.Minor} UPnP/1.0 DLNADOC/1.5 sdlna/{version.Major}.{version.Minor}";
     }
 
     private void TimeouterCallback(object sender, ElapsedEventArgs e)
@@ -186,25 +193,22 @@ namespace NMaier.SimpleDlna.Server
     internal IPrefixHandler FindHandler(string prefix)
     {
       if (string.IsNullOrEmpty(prefix)) {
-        throw new ArgumentNullException("prefix");
+        throw new ArgumentNullException(nameof(prefix));
       }
 
       if (prefix == "/") {
         return new IndexHandler(this);
       }
 
-      foreach (var s in prefixes.Keys) {
-        if (prefix.StartsWith(s, StringComparison.Ordinal)) {
-          return prefixes[s];
-        }
-      }
-      return null;
+      return (from s in prefixes.Keys
+              where prefix.StartsWith(s, StringComparison.Ordinal)
+              select prefixes[s]).FirstOrDefault();
     }
 
     internal void RegisterHandler(IPrefixHandler handler)
     {
       if (handler == null) {
-        throw new ArgumentNullException("handler");
+        throw new ArgumentNullException(nameof(handler));
       }
       var prefix = handler.Prefix;
       if (!prefix.StartsWith("/", StringComparison.Ordinal)) {
@@ -236,33 +240,17 @@ namespace NMaier.SimpleDlna.Server
       }
     }
 
-    public void Dispose()
-    {
-      Debug("Disposing HTTP");
-      timeouter.Enabled = false;
-      foreach (var s in servers.Values.ToList()) {
-        UnregisterMediaServer(s);
-      }
-      ssdpServer.Dispose();
-      timeouter.Dispose();
-      listener.Stop();
-      foreach (var c in clients.ToList()) {
-        c.Key.Dispose();
-      }
-      clients.Clear();
-    }
-
     public void RegisterMediaServer(IMediaServer server)
     {
       if (server == null) {
-        throw new ArgumentNullException("server");
+        throw new ArgumentNullException(nameof(server));
       }
-      var guid = server.Uuid;
+      var guid = server.UUID;
       if (servers.ContainsKey(guid)) {
         throw new ArgumentException("Attempting to register more than once");
       }
 
-      var end = listener.LocalEndpoint as IPEndPoint;
+      var end = (IPEndPoint)listener.LocalEndpoint;
       var mount = new MediaMount(server);
       servers[guid] = mount;
       RegisterHandler(mount);
@@ -275,13 +263,10 @@ namespace NMaier.SimpleDlna.Server
           list.Add(deviceGuid);
         }
         mount.AddDeviceGuid(deviceGuid, address);
-        var uri = new Uri(string.Format(
-          "http://{0}:{1}{2}",
-          address,
-          end.Port,
-          mount.DescriptorURI
-          ));
-        ssdpServer.RegisterNotification(deviceGuid, uri, address);
+        var uri = new Uri($"http://{address}:{end.Port}{mount.DescriptorURI}");
+        lock (list) {
+          ssdpServer.RegisterNotification(deviceGuid, uri, address);
+        }
         NoticeFormat("New mount at: {0}", uri);
       }
     }
@@ -289,28 +274,28 @@ namespace NMaier.SimpleDlna.Server
     public void UnregisterMediaServer(IMediaServer server)
     {
       if (server == null) {
-        throw new ArgumentNullException("server");
+        throw new ArgumentNullException(nameof(server));
       }
       MediaMount mount;
-      if (!servers.TryGetValue(server.Uuid, out mount)) {
+      if (!servers.TryGetValue(server.UUID, out mount)) {
         return;
       }
 
       List<Guid> list;
-      if (devicesForServers.TryGetValue(server.Uuid, out list)) {
+      if (devicesForServers.TryGetValue(server.UUID, out list)) {
         lock (list) {
           foreach (var deviceGuid in list) {
             ssdpServer.UnregisterNotification(deviceGuid);
           }
         }
-        devicesForServers.TryRemove(server.Uuid, out list);
+        devicesForServers.TryRemove(server.UUID, out list);
       }
 
       UnregisterHandler(mount);
 
       MediaMount ignored;
-      if (servers.TryRemove(server.Uuid, out ignored)) {
-        InfoFormat("Unregistered Media Server {0}", server.Uuid);
+      if (servers.TryRemove(server.UUID, out ignored)) {
+        InfoFormat("Unregistered Media Server {0}", server.UUID);
       }
     }
   }

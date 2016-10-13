@@ -5,7 +5,5 @@
     string Description { get; }
 
     string Name { get; }
-
-    void SetParameters(AttributeCollection parameters);
   }
 }

@@ -17,7 +17,7 @@ namespace NMaier.SimpleDlna.Utilities
         return 1;
       }
       if (type != other.type) {
-        if (type == typeof(StringSortPart)) {
+        if (type == typeof (StringSortPart)) {
           return 1;
         }
         return -1;

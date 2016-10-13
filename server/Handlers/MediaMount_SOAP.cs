@@ -1,9 +1,10 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Server.Properties;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -25,47 +26,44 @@ namespace NMaier.SimpleDlna.Server
     private const string NS_UPNP = "urn:schemas-upnp-org:metadata-1-0/upnp/";
 
     private static readonly string featureList =
-      Encoding.UTF8.GetString(Properties.Resources.ResourceManager.GetObject("x_featurelist") as byte[]);
+      Encoding.UTF8.GetString((byte[])Resources.ResourceManager.GetObject("x_featurelist") ?? new byte[0]);
 
-    private readonly static IDictionary<string, AttributeCollection> soapCache =
+    private static readonly IDictionary<string, AttributeCollection> soapCache =
       new LeastRecentlyUsedDictionary<string, AttributeCollection>(200);
 
-    private readonly static XmlNamespaceManager namespaceMgr =
+    private static readonly XmlNamespaceManager namespaceMgr =
       CreateNamespaceManager();
 
     private static void AddBookmarkInfo(IMediaResource resource,
-                                        XmlElement item)
+      XmlElement item)
     {
       var bookmarkable = resource as IBookmarkable;
-      if (bookmarkable == null) {
-        return;
-      }
-      var bookmark = bookmarkable.Bookmark;
-      if (bookmark.HasValue) {
-        var dcmInfo = item.OwnerDocument.CreateElement(
+      var bookmark = bookmarkable?.Bookmark;
+      if (bookmark != null) {
+        var dcmInfo = item.OwnerDocument?.CreateElement(
           "sec", "dcmInfo", NS_SEC);
-        dcmInfo.InnerText = string.Format("BM={0}", bookmark.Value);
-        item.AppendChild(dcmInfo);
+        if (dcmInfo != null) {
+          dcmInfo.InnerText = $"BM={bookmark.Value}";
+          item.AppendChild(dcmInfo);
+        }
       }
     }
 
-    private void AddCover(IRequest request, IMediaResource resource,
-                          XmlElement item)
+    private void AddCover(IRequest request, IMediaItem resource,
+      XmlNode item)
     {
       var result = item.OwnerDocument;
+      if (result == null) {
+        return;
+      }
       var cover = resource as IMediaCover;
       if (cover == null) {
         return;
       }
       try {
         var c = cover.Cover;
-        var curl = String.Format(
-        "http://{0}:{1}{2}cover/{3}/i.jpg",
-        request.LocalEndPoint.Address,
-        request.LocalEndPoint.Port,
-        prefix,
-        resource.Id
-        );
+        var curl =
+          $"http://{request.LocalEndPoint.Address}:{request.LocalEndPoint.Port}{Prefix}cover/{resource.Id}/i.jpg";
         var icon = result.CreateElement("upnp", "albumArtURI", NS_UPNP);
         var profile = result.CreateAttribute("dlna", "profileID", NS_DLNA);
         profile.InnerText = "JPEG_TN";
@@ -85,108 +83,115 @@ namespace NMaier.SimpleDlna.Server
         res.SetAttribute("protocolInfo", string.Format(
           "http-get:*:{1}:DLNA.ORG_PN={0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
           c.PN, DlnaMaps.Mime[c.Type], DlnaMaps.DefaultStreaming
-          ));
+                                           ));
         var width = c.MetaWidth;
         var height = c.MetaHeight;
         if (width.HasValue && height.HasValue) {
-          res.SetAttribute("resolution", string.Format("{0}x{1}", width.Value, height.Value));
+          res.SetAttribute("resolution", $"{width.Value}x{height.Value}");
         }
         else {
           res.SetAttribute("resolution", "200x200");
         }
-        res.SetAttribute("protocolInfo", string.Format(
-          "http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_CI=1;DLNA.ORG_FLAGS={0}",
-          DlnaMaps.DefaultInteractive
-          ));
+        res.SetAttribute("protocolInfo",
+                         $"http-get:*:image/jpeg:DLNA.ORG_PN=JPEG_TN;DLNA.ORG_OP=01;DLNA.ORG_CI=1;DLNA.ORG_FLAGS={DlnaMaps.DefaultInteractive}");
         item.AppendChild(res);
       }
       catch (Exception) {
-        return;
+        // ignored
       }
     }
 
     private static void AddGeneralProperties(IHeaders props, XmlElement item)
     {
-      var prop = string.Empty;
+      string prop;
+      var ownerDocument = item.OwnerDocument;
+      if (ownerDocument == null) {
+        throw new ArgumentNullException(nameof(item));
+      }
       if (props.TryGetValue("DateO", out prop)) {
-        var e = item.OwnerDocument.CreateElement("dc", "date", NS_DC);
+        var e = ownerDocument.CreateElement("dc", "date", NS_DC);
         e.InnerText = prop;
         item.AppendChild(e);
       }
       if (props.TryGetValue("Genre", out prop)) {
-        var e = item.OwnerDocument.CreateElement("upnp", "genre", NS_UPNP);
+        var e = ownerDocument.CreateElement("upnp", "genre", NS_UPNP);
         e.InnerText = prop;
         item.AppendChild(e);
       }
       if (props.TryGetValue("Description", out prop)) {
-        var e = item.OwnerDocument.CreateElement("dc", "description", NS_DC);
+        var e = ownerDocument.CreateElement("dc", "description", NS_DC);
         e.InnerText = prop;
         item.AppendChild(e);
       }
       if (props.TryGetValue("Artist", out prop)) {
-        var e = item.OwnerDocument.CreateElement("upnp", "artist", NS_UPNP);
+        var e = ownerDocument.CreateElement("upnp", "artist", NS_UPNP);
         e.SetAttribute("role", "AlbumArtist");
         e.InnerText = prop;
         item.AppendChild(e);
       }
       if (props.TryGetValue("Performer", out prop)) {
-        var e = item.OwnerDocument.CreateElement("upnp", "artist", NS_UPNP);
+        var e = ownerDocument.CreateElement("upnp", "artist", NS_UPNP);
         e.SetAttribute("role", "Performer");
         e.InnerText = prop;
         item.AppendChild(e);
-        e = item.OwnerDocument.CreateElement("dc", "creator", NS_DC);
+        e = ownerDocument.CreateElement("dc", "creator", NS_DC);
         e.InnerText = prop;
         item.AppendChild(e);
       }
       if (props.TryGetValue("Album", out prop)) {
-        var e = item.OwnerDocument.CreateElement("upnp", "album", NS_UPNP);
+        var e = ownerDocument.CreateElement("upnp", "album", NS_UPNP);
         e.InnerText = prop;
         item.AppendChild(e);
       }
       if (props.TryGetValue("Track", out prop)) {
-        var e = item.OwnerDocument.CreateElement(
+        var e = ownerDocument.CreateElement(
           "upnp", "originalTrackNumber", NS_UPNP);
         e.InnerText = prop;
         item.AppendChild(e);
       }
       if (props.TryGetValue("Creator", out prop)) {
-        var e = item.OwnerDocument.CreateElement("dc", "creator", NS_DC);
+        var e = ownerDocument.CreateElement("dc", "creator", NS_DC);
         e.InnerText = prop;
         item.AppendChild(e);
       }
 
       if (props.TryGetValue("Director", out prop)) {
-        var e = item.OwnerDocument.CreateElement("upnp", "director", NS_UPNP);
+        var e = ownerDocument.CreateElement("upnp", "director", NS_UPNP);
         e.InnerText = prop;
         item.AppendChild(e);
       }
     }
 
     private static void AddVideoProperties(IRequest request,
-                                           IMediaResource resource,
-                                           XmlElement item)
+      IMediaResource resource,
+      XmlNode item)
     {
+      if (request == null) {
+        throw new ArgumentNullException(nameof(request));
+      }
       var mvi = resource as IMetaVideoItem;
       if (mvi == null) {
         return;
       }
       try {
+        var ownerDocument = item.OwnerDocument;
         var actors = mvi.MetaActors;
-        if (actors != null) {
+        if (actors != null && ownerDocument != null) {
           foreach (var actor in actors) {
-            var e = item.OwnerDocument.CreateElement("upnp", "actor", NS_UPNP);
+            var e = ownerDocument.CreateElement("upnp", "actor", NS_UPNP);
             e.InnerText = actor;
             item.AppendChild(e);
           }
         }
       }
       catch (Exception) {
+        // ignored
       }
 #if ANNOUNCE_SUBTITLE_IN_SOAP
-      // This is a kind of costly operation, as getting subtitles in general
-      // for the first time is costly. Most Samsung TVs seem to query the
-      // subtitle when actually playing a file anyway (see ItemResponse), and 
-      // that should be enough.
+  // This is a kind of costly operation, as getting subtitles in general
+  // for the first time is costly. Most Samsung TVs seem to query the
+  // subtitle when actually playing a file anyway (see ItemResponse), and 
+  // that should be enough.
       if (mvi.SubTitle.HasSubtitle) {
         var surl = String.Format(
           "http://{0}:{1}{2}subtitle/{3}/st.srt",
@@ -214,17 +219,12 @@ namespace NMaier.SimpleDlna.Server
       container.SetAttribute("childCount", f.ChildCount.ToString());
       container.SetAttribute("id", f.Id);
       var parent = f.Parent;
-      if (parent == null) {
-        container.SetAttribute("parentID", Identifiers.GeneralRoot);
-      }
-      else {
-        container.SetAttribute("parentID", parent.Id);
-      }
+      container.SetAttribute("parentID", parent == null ? Identifiers.GENERAL_ROOT : parent.Id);
 
       var title = result.CreateElement("dc", "title", NS_DC);
       title.InnerText = f.Title;
       container.AppendChild(title);
-      if (meta != null && meta.InfoDate != null) {
+      if (meta != null) {
         var date = result.CreateElement("dc", "date", NS_DC);
         date.InnerText = meta.InfoDate.ToString("o");
         container.AppendChild(date);
@@ -233,18 +233,18 @@ namespace NMaier.SimpleDlna.Server
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
       objectClass.InnerText = "object.container";
       container.AppendChild(objectClass);
-      result.DocumentElement.AppendChild(container);
+      result.DocumentElement?.AppendChild(container);
     }
 
     private void Browse_AddItem(IRequest request, XmlDocument result,
-                                IMediaResource resource)
+      IMediaResource resource)
     {
       var props = resource.Properties;
 
       var item = result.CreateElement(string.Empty, "item", NS_DIDL);
       item.SetAttribute("restricted", "1");
       item.SetAttribute("id", resource.Id);
-      item.SetAttribute("parentID", Identifiers.GeneralRoot);
+      item.SetAttribute("parentID", Identifiers.GENERAL_ROOT);
 
       item.AppendChild(CreateObjectClass(result, resource));
 
@@ -259,15 +259,10 @@ namespace NMaier.SimpleDlna.Server
       item.AppendChild(title);
 
       var res = result.CreateElement(string.Empty, "res", NS_DIDL);
-      res.InnerText = String.Format(
-        "http://{0}:{1}{2}file/{3}/res",
-        request.LocalEndPoint.Address,
-        request.LocalEndPoint.Port,
-        prefix,
-        resource.Id
-        );
+      res.InnerText =
+        $"http://{request.LocalEndPoint.Address}:{request.LocalEndPoint.Port}{Prefix}file/{resource.Id}/res";
 
-      var prop = string.Empty;
+      string prop;
       if (props.TryGetValue("SizeRaw", out prop)) {
         res.SetAttribute("size", prop);
       }
@@ -278,19 +273,19 @@ namespace NMaier.SimpleDlna.Server
         res.SetAttribute("duration", prop);
       }
 
-      res.SetAttribute("protocolInfo", String.Format(
+      res.SetAttribute("protocolInfo", string.Format(
         "http-get:*:{1}:DLNA.ORG_PN={0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={2}",
         resource.PN, DlnaMaps.Mime[resource.Type], DlnaMaps.DefaultStreaming
-        ));
+                                         ));
       item.AppendChild(res);
 
       AddCover(request, resource, item);
-      result.DocumentElement.AppendChild(item);
+      result.DocumentElement?.AppendChild(item);
     }
 
     private int BrowseFolder_AddItems(IRequest request, XmlDocument result,
-                                      IMediaFolder root, int start,
-                                      int requested)
+      IMediaFolder root, int start,
+      int requested)
     {
       var provided = 0;
       foreach (var i in root.ChildFolders) {
@@ -326,21 +321,21 @@ namespace NMaier.SimpleDlna.Server
     }
 
     private static XmlElement CreateObjectClass(XmlDocument result,
-                                                IMediaResource resource)
+      IMediaResource resource)
     {
       var objectClass = result.CreateElement("upnp", "class", NS_UPNP);
       switch (resource.MediaType) {
-        case DlnaMediaTypes.Video:
-          objectClass.InnerText = "object.item.videoItem.movie";
-          break;
-        case DlnaMediaTypes.Image:
-          objectClass.InnerText = "object.item.imageItem.photo";
-          break;
-        case DlnaMediaTypes.Audio:
-          objectClass.InnerText = "object.item.audioItem.musicTrack";
-          break;
-        default:
-          throw new NotSupportedException();
+      case DlnaMediaTypes.Video:
+        objectClass.InnerText = "object.item.videoItem.movie";
+        break;
+      case DlnaMediaTypes.Image:
+        objectClass.InnerText = "object.item.imageItem.photo";
+        break;
+      case DlnaMediaTypes.Audio:
+        objectClass.InnerText = "object.item.audioItem.musicTrack";
+        break;
+      default:
+        throw new NotSupportedException();
       }
       return objectClass;
     }
@@ -374,6 +369,9 @@ namespace NMaier.SimpleDlna.Server
       }
 
       var root = GetItem(id) as IMediaFolder;
+      if (root == null) {
+        throw new ArgumentException("Invalid id");
+      }
       var result = new XmlDocument();
 
       var didl = result.CreateElement(string.Empty, "DIDL-Lite", NS_DIDL);
@@ -392,75 +390,78 @@ namespace NMaier.SimpleDlna.Server
           request, result, root, start, requested);
       }
       var resXML = result.OuterXml;
-      rv = new AttributeCollection() {
-            { "Result", resXML },
-            { "NumberReturned", provided.ToString() },
-            { "TotalMatches", root.ChildCount.ToString() },
-            { "UpdateID", systemID.ToString() }
-            };
+      rv = new AttributeCollection
+      {
+        {"Result", resXML},
+        {"NumberReturned", provided.ToString()},
+        {"TotalMatches", root.ChildCount.ToString()},
+        {"UpdateID", systemID.ToString()}
+      };
       soapCache[key] = rv;
       return rv;
     }
 
     private static IHeaders HandleGetCurrentConnectionIDs()
     {
-      return new RawHeaders() { { "ConnectionIDs", "0" } };
+      return new RawHeaders {{"ConnectionIDs", "0"}};
     }
 
     private static IHeaders HandleGetCurrentConnectionInfo()
     {
-      return new RawHeaders() {
-        { "RcsID", "-1" },
-        { "AVTransportID", "-1" },
-        { "ProtocolInfo", string.Empty },
-        { "PeerConnectionmanager", string.Empty },
-        { "PeerConnectionID", "0" },
-        { "Direction", "Output" },
-        { "Status", "OK" }
+      return new RawHeaders
+      {
+        {"RcsID", "-1"},
+        {"AVTransportID", "-1"},
+        {"ProtocolInfo", string.Empty},
+        {"PeerConnectionmanager", string.Empty},
+        {"PeerConnectionID", "0"},
+        {"Direction", "Output"},
+        {"Status", "OK"}
       };
     }
 
     private static IHeaders HandleGetProtocolInfo()
     {
-      return new RawHeaders() {
-        { "Source", DlnaMaps.ProtocolInfo },
-        { "Sink", string.Empty }
+      return new RawHeaders
+      {
+        {"Source", DlnaMaps.ProtocolInfo},
+        {"Sink", string.Empty}
       };
     }
 
     private static IHeaders HandleGetSearchCapabilities()
     {
-      return new RawHeaders() { { "SearchCaps", string.Empty } };
+      return new RawHeaders {{"SearchCaps", string.Empty}};
     }
 
     private static IHeaders HandleGetSortCapabilities()
     {
-      return new RawHeaders() { { "SortCaps", string.Empty } };
+      return new RawHeaders {{"SortCaps", string.Empty}};
     }
 
     private IHeaders HandleGetSystemUpdateID()
     {
-      return new RawHeaders() { { "Id", systemID.ToString() } };
+      return new RawHeaders {{"Id", systemID.ToString()}};
     }
 
     private static IHeaders HandleIsAuthorized()
     {
-      return new RawHeaders() { { "Result", "1" } };
+      return new RawHeaders {{"Result", "1"}};
     }
 
     private static IHeaders HandleIsValidated()
     {
-      return new RawHeaders() { { "Result", "1" } };
+      return new RawHeaders {{"Result", "1"}};
     }
 
     private static IHeaders HandleRegisterDevice()
     {
-      return new RawHeaders() { { "RegistrationRespMsg", string.Empty } };
+      return new RawHeaders {{"RegistrationRespMsg", string.Empty}};
     }
 
     private static IHeaders HandleXGetFeatureList()
     {
-      return new RawHeaders() { { "FeatureList", featureList } };
+      return new RawHeaders {{"FeatureList", featureList}};
     }
 
     private IHeaders HandleXSetBookmark(IHeaders sparams)
@@ -487,6 +488,9 @@ namespace NMaier.SimpleDlna.Server
       soap.LoadXml(request.Body);
       var sparams = new RawHeaders();
       var body = soap.SelectSingleNode("//soap:Body", namespaceMgr);
+      if (body == null) {
+        throw new HttpStatusException(HttpCode.InternalError);
+      }
       var method = body.FirstChild;
       foreach (var p in method.ChildNodes) {
         var e = p as XmlElement;
@@ -504,53 +508,52 @@ namespace NMaier.SimpleDlna.Server
         "http://schemas.xmlsoap.org/soap/encoding/");
 
       var rbody = env.CreateElement("SOAP-ENV:Body", NS_SOAPENV);
-      env.DocumentElement.AppendChild(rbody);
+      env.DocumentElement?.AppendChild(rbody);
 
       var code = HttpCode.Ok;
       try {
         IEnumerable<KeyValuePair<string, string>> result;
         switch (method.LocalName) {
-          case "GetSearchCapabilities":
-            result = HandleGetSearchCapabilities();
-            break;
-          case "GetSortCapabilities":
-            result = HandleGetSortCapabilities();
-            break;
-          case "GetSystemUpdateID":
-            result = HandleGetSystemUpdateID();
-            break;
-          case "Browse":
-            result = HandleBrowse(request, sparams);
-            break;
-          case "X_GetFeatureList":
-            result = HandleXGetFeatureList();
-            break;
-          case "X_SetBookmark":
-            result = HandleXSetBookmark(sparams);
-            break;
-          case "GetCurrentConnectionIDs":
-            result = HandleGetCurrentConnectionIDs();
-            break;
-          case "GetCurrentConnectionInfo":
-            result = HandleGetCurrentConnectionInfo();
-            break;
-          case "GetProtocolInfo":
-            result = HandleGetProtocolInfo();
-            break;
-          case "IsAuthorized":
-            result = HandleIsAuthorized();
-            break;
-          case "IsValidated":
-            result = HandleIsValidated();
-            break;
-          case "RegisterDevice":
-            result = HandleRegisterDevice();
-            break;
-          default:
-            throw new HttpStatusException(HttpCode.NotFound);
+        case "GetSearchCapabilities":
+          result = HandleGetSearchCapabilities();
+          break;
+        case "GetSortCapabilities":
+          result = HandleGetSortCapabilities();
+          break;
+        case "GetSystemUpdateID":
+          result = HandleGetSystemUpdateID();
+          break;
+        case "Browse":
+          result = HandleBrowse(request, sparams);
+          break;
+        case "X_GetFeatureList":
+          result = HandleXGetFeatureList();
+          break;
+        case "X_SetBookmark":
+          result = HandleXSetBookmark(sparams);
+          break;
+        case "GetCurrentConnectionIDs":
+          result = HandleGetCurrentConnectionIDs();
+          break;
+        case "GetCurrentConnectionInfo":
+          result = HandleGetCurrentConnectionInfo();
+          break;
+        case "GetProtocolInfo":
+          result = HandleGetProtocolInfo();
+          break;
+        case "IsAuthorized":
+          result = HandleIsAuthorized();
+          break;
+        case "IsValidated":
+          result = HandleIsValidated();
+          break;
+        case "RegisterDevice":
+          result = HandleRegisterDevice();
+          break;
+        default:
+          throw new HttpStatusException(HttpCode.NotFound);
         }
-        var response = env.CreateElement(String.Format(
-          "u:{0}Response", method.LocalName), method.NamespaceURI);
+        var response = env.CreateElement($"u:{method.LocalName}Response", method.NamespaceURI);
         rbody.AppendChild(response);
 
         foreach (var i in result) {

@@ -6,52 +6,55 @@ namespace NMaier.SimpleDlna.Utilities
 {
   public static class Formatting
   {
-    private readonly static Regex sanitizer = new Regex(
+    private static readonly Regex sanitizer = new Regex(
       @"\b(?:the|an?|ein(?:e[rs]?)?|der|die|das)\b",
       RegexOptions.IgnoreCase | RegexOptions.Compiled
       );
 
-    private readonly static Regex trim = new Regex(
+    private static readonly Regex trim = new Regex(
       @"\s+|^[._+)}\]-]+|[._+({\[-]+$",
       RegexOptions.Compiled
       );
 
-    private readonly static Regex trimmore =
+    private static readonly Regex trimmore =
       new Regex(@"^[^\d\w]+|[^\d\w]+$", RegexOptions.Compiled);
 
-    private readonly static Regex respace =
+    private static readonly Regex respace =
       new Regex(@"[.+]+", RegexOptions.Compiled);
 
-    public static bool Booley(string str)
+    public static bool Booley(string maybeBoolean)
     {
-      str = str.Trim();
+      if (maybeBoolean == null) {
+        throw new ArgumentNullException(nameof(maybeBoolean));
+      }
+      maybeBoolean = maybeBoolean.Trim();
       var sc = StringComparer.CurrentCultureIgnoreCase;
-      return sc.Equals("yes", str) || sc.Equals("1", str) || sc.Equals("true", str);
+      return sc.Equals("yes", maybeBoolean) || sc.Equals("1", maybeBoolean) || sc.Equals("true", maybeBoolean);
     }
 
     public static string FormatFileSize(this long size)
     {
       if (size < 900) {
-        return string.Format("{0} B", size);
+        return $"{size} B";
       }
       var ds = size / 1024.0;
       if (ds < 900) {
-        return string.Format("{0:F2} KB", ds);
+        return $"{ds:F2} KB";
       }
       ds /= 1024.0;
       if (ds < 900) {
-        return string.Format("{0:F2} MB", ds);
+        return $"{ds:F2} MB";
       }
       ds /= 1024.0;
       if (ds < 900) {
-        return string.Format("{0:F3} GB", ds);
+        return $"{ds:F3} GB";
       }
       ds /= 1024.0;
       if (ds < 900) {
-        return string.Format("{0:F3} TB", ds);
+        return $"{ds:F3} TB";
       }
       ds /= 1024.0;
-      return string.Format("{0:F4} PB", ds);
+      return $"{ds:F4} PB";
     }
 
     public static string GetSystemName()
@@ -69,7 +72,7 @@ namespace NMaier.SimpleDlna.Utilities
     public static string StemCompareBase(this string name)
     {
       if (name == null) {
-        throw new ArgumentNullException("name");
+        throw new ArgumentNullException(nameof(name));
       }
 
       var san = trimmore.Replace(
@@ -84,7 +87,7 @@ namespace NMaier.SimpleDlna.Utilities
     public static string StemNameBase(this string name)
     {
       if (name == null) {
-        throw new ArgumentNullException("name");
+        throw new ArgumentNullException(nameof(name));
       }
 
       if (!name.Contains(" ")) {
@@ -95,12 +98,11 @@ namespace NMaier.SimpleDlna.Utilities
         name = respace.Replace(name, " ");
       }
       var ws = name;
-      var wsprev = name;
+      string wsprev;
       do {
         wsprev = ws;
         ws = trim.Replace(wsprev.Trim(), " ").Trim();
-      }
-      while (wsprev != ws);
+      } while (wsprev != ws);
       if (string.IsNullOrWhiteSpace(ws)) {
         return name;
       }

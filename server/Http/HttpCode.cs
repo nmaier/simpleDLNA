@@ -1,6 +1,6 @@
 ﻿namespace NMaier.SimpleDlna.Server
 {
-  public enum HttpCode : int
+  public enum HttpCode
   {
     None = 0,
     Ok = 200,

@@ -1,5 +1,3 @@
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Utilities;
 using System;
 using System.Data;
 using System.Data.Common;
@@ -9,12 +7,19 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
   internal sealed class FileStore : Logging, IDisposable
   {
     private const uint SCHEMA = 0x20160618;
+
+    private static readonly FileStoreVacuumer vacuumer =
+      new FileStoreVacuumer();
+
+    private static readonly object globalLock = new object();
 
     private readonly IDbConnection connection;
 
@@ -45,11 +50,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly IDbDataParameter selectSize;
 
     private readonly IDbDataParameter selectTime;
-
-    private static readonly FileStoreVacuumer vacuumer =
-      new FileStoreVacuumer();
-
-    private readonly static object globalLock = new object();
 
     public readonly FileInfo StoreFile;
 
@@ -105,8 +105,19 @@ namespace NMaier.SimpleDlna.FileMediaServer
       vacuumer.Add(connection);
     }
 
+    public void Dispose()
+    {
+      insert?.Dispose();
+      @select?.Dispose();
+      if (connection != null) {
+        vacuumer.Remove(connection);
+        Sqlite.ClearPool(connection);
+        connection.Dispose();
+      }
+    }
+
     private void OpenConnection(FileInfo storeFile,
-                                out IDbConnection newConnection)
+      out IDbConnection newConnection)
     {
       lock (globalLock) {
         newConnection = Sqlite.GetDatabaseConnection(storeFile);
@@ -115,7 +126,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
             ver.CommandText = "PRAGMA user_version";
             var currentVersion = (uint)(long)ver.ExecuteScalar();
             if (!currentVersion.Equals(SCHEMA)) {
-              throw new ArgumentOutOfRangeException("SCHEMA");
+              throw new IndexOutOfRangeException("SCHEMA");
             }
           }
         }
@@ -123,7 +134,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           NoticeFormat(
             "Recreating database, schema update. ({0})",
             ex.Message
-          );
+            );
           Sqlite.ClearPool(newConnection);
           newConnection.Close();
           newConnection.Dispose();
@@ -151,8 +162,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     {
       using (var transaction = connection.BeginTransaction()) {
         using (var pragma = connection.CreateCommand()) {
-          pragma.CommandText = string.Format(
-            "PRAGMA user_version = {0}", SCHEMA);
+          pragma.CommandText = $"PRAGMA user_version = {SCHEMA}";
           pragma.ExecuteNonQuery();
           pragma.CommandText = "PRAGMA page_size = 8192";
           pragma.ExecuteNonQuery();
@@ -179,7 +189,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         selectCoverTime.Value = info.LastWriteTimeUtc.Ticks;
         try {
           var data = selectCover.ExecuteScalar();
-          return (data as byte[]) != null;
+          return data is byte[];
         }
         catch (DbException ex) {
           Error("Failed to lookup file cover existence from store", ex);
@@ -222,7 +232,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
             StreamingContextStates.Persistence,
             new DeserializeInfo(null, info, DlnaMime.ImageJPEG)
             );
-          var formatter = new BinaryFormatter(null, ctx) {
+          var formatter = new BinaryFormatter(null, ctx)
+          {
             TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
             AssemblyFormat = FormatterAssemblyStyle.Simple
           };
@@ -241,7 +252,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     }
 
     internal BaseFile MaybeGetFile(FileServer server, FileInfo info,
-                                   DlnaMime type)
+      DlnaMime type)
     {
       if (connection == null) {
         return null;
@@ -272,11 +283,15 @@ namespace NMaier.SimpleDlna.FileMediaServer
           var ctx = new StreamingContext(
             StreamingContextStates.Persistence,
             new DeserializeInfo(server, info, type));
-          var formatter = new BinaryFormatter(null, ctx) {
+          var formatter = new BinaryFormatter(null, ctx)
+          {
             TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
             AssemblyFormat = FormatterAssemblyStyle.Simple
           };
           var rv = formatter.Deserialize(s) as BaseFile;
+          if (rv == null) {
+            throw new SerializationException("Deserialized as null");
+          }
           rv.Item = info;
           return rv;
         }
@@ -299,13 +314,14 @@ namespace NMaier.SimpleDlna.FileMediaServer
         return;
       }
       try {
-        using (var s = new MemoryStream()) {
-          using (var c = new MemoryStream()) {
+        using (var s = StreamManager.GetStream()) {
+          using (var c = StreamManager.GetStream()) {
             var ctx = new StreamingContext(
               StreamingContextStates.Persistence,
               null
               );
-            var formatter = new BinaryFormatter(null, ctx) {
+            var formatter = new BinaryFormatter(null, ctx)
+            {
               TypeFormat = FormatterTypeStyle.TypesWhenNeeded,
               AssemblyFormat = FormatterAssemblyStyle.Simple
             };
@@ -339,7 +355,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
                 }
                 catch (DbException ex) {
                   Error("Failed to put file cover into store", ex);
-                  return;
                 }
               }
             }
@@ -349,21 +364,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       catch (Exception ex) {
         Error("Failed to serialize an object of type " + file.GetType(), ex);
         throw;
-      }
-    }
-
-    public void Dispose()
-    {
-      if (insert != null) {
-        insert.Dispose();
-      }
-      if (select != null) {
-        select.Dispose();
-      }
-      if (connection != null) {
-        vacuumer.Remove(connection);
-        Sqlite.ClearPool(connection);
-        connection.Dispose();
       }
     }
   }

@@ -13,12 +13,12 @@ namespace NMaier.SimpleDlna.Server
 
     public readonly string USN;
 
-    public readonly Guid Uuid;
+    public readonly Guid UUID;
 
     public UpnpDevice(Guid uuid, string type, Uri descriptor,
-                      IPAddress address)
+      IPAddress address)
     {
-      Uuid = uuid;
+      UUID = uuid;
       Type = type;
       Descriptor = descriptor;
       Address = address;
@@ -27,7 +27,7 @@ namespace NMaier.SimpleDlna.Server
         USN = Type;
       }
       else {
-        USN = String.Format("uuid:{0}::{1}", Uuid, Type);
+        USN = $"uuid:{UUID}::{Type}";
       }
     }
   }

@@ -7,37 +7,24 @@ namespace NMaier.SimpleDlna.Utilities
 {
   using Attribute = KeyValuePair<string, string>;
 
-  public sealed class AttributeCollection : IEnumerable<Attribute>
+  public class AttributeCollection : IEnumerable<Attribute>
   {
     private readonly IList<Attribute> list = new List<Attribute>();
 
-    public int Count
-    {
-      get
-      {
-        return list.Count;
-      }
-    }
+    public int Count => list.Count;
 
-    public ICollection<string> Keys
-    {
-      get
-      {
-        return (from i in list
-                select i.Key).ToList();
-      }
-    }
+    public ICollection<string> Keys => (from i in list
+                                        select i.Key).ToList();
 
-    public ICollection<string> Values
-    {
-      get
-      {
-        return (from i in list
-                select i.Value).ToList();
-      }
-    }
+    public ICollection<string> Values => (from i in list
+                                          select i.Value).ToList();
 
     IEnumerator IEnumerable.GetEnumerator()
+    {
+      return list.GetEnumerator();
+    }
+
+    public IEnumerator<Attribute> GetEnumerator()
     {
       return list.GetEnumerator();
     }
@@ -62,15 +49,25 @@ namespace NMaier.SimpleDlna.Utilities
       return list.Contains(item);
     }
 
-    public IEnumerator<Attribute> GetEnumerator()
+    public bool Has(string key)
     {
-      return list.GetEnumerator();
+      return Has(key, StringComparer.CurrentCultureIgnoreCase);
+    }
+
+    public bool Has(string key, StringComparer comparer)
+    {
+      return list.Any(e => comparer.Equals(key, e.Key));
     }
 
     public IEnumerable<string> GetValuesForKey(string key)
     {
+      return GetValuesForKey(key, StringComparer.CurrentCultureIgnoreCase);
+    }
+
+    public IEnumerable<string> GetValuesForKey(string key, StringComparer comparer)
+    {
       return from i in list
-             where StringComparer.CurrentCultureIgnoreCase.Equals(i.Key, key)
+             where comparer.Equals(i.Key, key)
              select i.Value;
     }
   }

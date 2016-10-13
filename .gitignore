@@ -5,6 +5,8 @@ packages/
 */obj
 *.suo
 *.user
+*.DotSettings
+*.dat
 setup/Debug
 setup/Release
 setup/*.cmd

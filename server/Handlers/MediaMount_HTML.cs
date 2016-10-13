@@ -1,13 +1,13 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
   internal partial class MediaMount
   {
-    private readonly List<string> htmlItemProperties = new List<string>() {
+    private readonly List<string> htmlItemProperties = new List<string>
+    {
       "Type",
       "Duration",
       "Resolution",
@@ -17,7 +17,8 @@ namespace NMaier.SimpleDlna.Server
       "Album",
       "Genre",
       "Date",
-      "Size" };
+      "Size"
+    };
 
     private IResponse ProcessHtmlRequest(IMediaItem aItem)
     {
@@ -27,47 +28,53 @@ namespace NMaier.SimpleDlna.Server
       }
 
       var article = HtmlTools.CreateHtmlArticle(
-        string.Format("Folder: {0}", item.Title));
+        $"Folder: {item.Title}");
       var document = article.OwnerDocument;
+      if (document == null) {
+        throw new HttpStatusException(HttpCode.InternalError);
+      }
 
       XmlNode e;
       var folders = document.EL(
         "ul",
-        new AttributeCollection() { { "class", "folders" } }
+        new AttributeCollection {{"class", "folders"}}
         );
       if (item.Parent != null) {
         folders.AppendChild(e = document.EL("li"));
         e.AppendChild(document.EL(
           "a",
-          new AttributeCollection() {
-            { "href", String.Format("{0}index/{1}", prefix, item.Parent.Id) },
-            { "class", "parent" } },
+          new AttributeCollection
+          {
+            {"href", $"{Prefix}index/{item.Parent.Id}"},
+            {"class", "parent"}
+          },
           "Parent"
-          ));
+                        ));
       }
       foreach (var i in item.ChildFolders) {
         folders.AppendChild(e = document.EL("li"));
         e.AppendChild(document.EL(
           "a",
-          new AttributeCollection() {
-            { "href", String.Format("{0}index/{1}#{2}", prefix, i.Id, i.Path) }
+          new AttributeCollection
+          {
+            {"href", $"{Prefix}index/{i.Id}#{i.Path}"}
           },
-          string.Format("{0} ({1})", i.Title, i.FullChildCount)
-          ));
+          $"{i.Title} ({i.FullChildCount})"));
       }
       article.AppendChild(folders);
 
-      var items = (XmlNode)null;
+      XmlNode items;
       article.AppendChild(items = document.EL(
-        "ul", new AttributeCollection() { { "class", "items" } }));
+        "ul", new AttributeCollection {{"class", "items"}}));
       foreach (var i in item.ChildItems) {
         items.AppendChild(e = document.EL("li"));
         var link = document.EL(
           "a",
-          new AttributeCollection() {
-            { "href", string.Format(
-              "{0}file/{1}/{2}.{3}", prefix, i.Id, i.Title,
-              DlnaMaps.Dlna2Ext[i.Type][0]) }
+          new AttributeCollection
+          {
+            {
+              "href", $"{Prefix}file/{i.Id}/{i.Title}.{DlnaMaps.Dlna2Ext[i.Type][0]}"
+            }
           }
           );
         var details = document.EL("section");
@@ -75,18 +82,19 @@ namespace NMaier.SimpleDlna.Server
         e.AppendChild(link);
 
         details.AppendChild(document.EL(
-          "h3", new AttributeCollection { { "title", i.Title } }, i.Title));
+          "h3", new AttributeCollection {{"title", i.Title}}, i.Title));
 
         var props = i.Properties;
         if (props.ContainsKey("HasCover")) {
           details.AppendChild(document.EL(
             "img",
-            new AttributeCollection {
-              { "title", "Cover image" },
-              { "alt", "Cover image" },
-              { "src", String.Format(
-                "{0}cover/{1}/{2}.{3}", prefix, i.Id, i.Title,
-                DlnaMaps.Dlna2Ext[i.Type][0]) }
+            new AttributeCollection
+            {
+              {"title", "Cover image"},
+              {"alt", "Cover image"},
+              {
+                "src", $"{Prefix}cover/{i.Id}/{i.Title}.{DlnaMaps.Dlna2Ext[i.Type][0]}"
+              }
             }));
         }
 
@@ -95,8 +103,8 @@ namespace NMaier.SimpleDlna.Server
           string v;
           if (props.TryGetValue(p, out v)) {
             table.AppendChild(e = document.EL("tr"));
-            e.AppendChild(document.EL("th", text: p));
-            e.AppendChild(document.EL("td", text: v));
+            e.AppendChild(document.EL("th", p));
+            e.AppendChild(document.EL("td", v));
           }
         }
         if (table.ChildNodes.Count != 0) {
@@ -106,7 +114,7 @@ namespace NMaier.SimpleDlna.Server
         string description;
         if (props.TryGetValue("Description", out description)) {
           link.AppendChild(document.EL(
-            "p", new AttributeCollection() { { "class", "desc" } },
+            "p", new AttributeCollection {{"class", "desc"}},
             description));
         }
       }

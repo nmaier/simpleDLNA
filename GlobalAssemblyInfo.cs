@@ -8,13 +8,14 @@ using System.Runtime.InteropServices;
 #else
 [assembly: AssemblyConfiguration("Release")]
 #endif
+
 [assembly: AssemblyCompany("Nils Maier")]
 [assembly: AssemblyProduct("SimpleDLNA")]
-[assembly: AssemblyCopyright("Copyright © 2012-2015 Nils Maier")]
+[assembly: AssemblyCopyright("Copyright © 2012-2016 Nils Maier")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("1.1.*")]
-[assembly: AssemblyInformationalVersion("1.1")]
-[assembly: NeutralResourcesLanguageAttribute("en-US")]
+[assembly: AssemblyVersion("1.2.*")]
+[assembly: AssemblyInformationalVersion("1.2")]
+[assembly: NeutralResourcesLanguage("en-US")]
 [assembly: CLSCompliant(true)]

@@ -1,7 +1,7 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -10,14 +10,10 @@ namespace NMaier.SimpleDlna.Server
     private readonly Dictionary<string, object> macs =
       new Dictionary<string, object>();
 
-    private MacAuthorizer()
-    {
-    }
-
     public MacAuthorizer(IEnumerable<string> macs)
     {
       if (macs == null) {
-        throw new ArgumentNullException("macs");
+        throw new ArgumentNullException(nameof(macs));
       }
       foreach (var m in macs) {
         var mac = m.ToUpperInvariant().Trim();
@@ -35,12 +31,7 @@ namespace NMaier.SimpleDlna.Server
       }
 
       var rv = macs.ContainsKey(mac);
-      if (!rv) {
-        DebugFormat("Rejecting {0}. Not in MAC whitelist", mac ?? "<UNKNOWN>");
-      }
-      else {
-        DebugFormat("Accepted {0} via MAC whitelist", mac);
-      }
+      DebugFormat(!rv ? "Rejecting {0}. Not in MAC whitelist" : "Accepted {0} via MAC whitelist", mac);
       return rv;
     }
   }

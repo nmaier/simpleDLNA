@@ -3,7 +3,7 @@
 namespace NMaier.SimpleDlna.Server
 {
   [Flags]
-  public enum DlnaMediaTypes : int
+  public enum DlnaMediaTypes
   {
     Audio = 1 << 2,
     Image = 1 << 1,

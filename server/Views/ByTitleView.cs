@@ -7,21 +7,9 @@ namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class ByTitleView : BaseView
   {
-    public override string Description
-    {
-      get
-      {
-        return "Reorganizes files into folders by title";
-      }
-    }
+    public override string Description => "Reorganizes files into folders by title";
 
-    public override string Name
-    {
-      get
-      {
-        return "bytitle";
-      }
-    }
+    public override string Name => "bytitle";
 
     private static string GetTitle(IMediaResource res)
     {
@@ -34,16 +22,17 @@ namespace NMaier.SimpleDlna.Server.Views
 
     private void PartitionChildren(VirtualFolder folder, Prefixer prefixer, int startfrom = 1)
     {
-      for (var wordcount = startfrom; ; ) {
+      for (var wordcount = startfrom;;) {
+        var curwc = wordcount;
         var groups = from i in folder.ChildItems.ToList()
-                     let prefix = prefixer.GetWordPrefix(GetTitle(i), wordcount)
+                     let prefix = prefixer.GetWordPrefix(GetTitle(i), curwc)
                      where !string.IsNullOrWhiteSpace(prefix)
                      group i by prefix.ToLowerInvariant()
-                       into g
-                       let gcount = g.LongCount()
-                       where gcount > 3
-                       orderby g.LongCount() descending
-                       select g;
+                     into g
+                     let gcount = g.LongCount()
+                     where gcount > 3
+                     orderby g.LongCount() descending
+                     select g;
         var longest = groups.FirstOrDefault();
         if (longest == null) {
           if (wordcount++ > 5) {
@@ -84,9 +73,9 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    public override IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder oldRoot)
     {
-      var root = new VirtualClonedFolder(Root);
+      var root = new VirtualClonedFolder(oldRoot);
       var titles = new SimpleKeyedVirtualFolder(root, "titles");
       SortFolder(root, titles);
       foreach (var i in root.ChildFolders.ToList()) {
@@ -106,10 +95,15 @@ namespace NMaier.SimpleDlna.Server.Views
 
     private sealed class Prefixer : IDisposable
     {
-      private readonly static Regex wordsplit = new Regex(@"(\b[^\s]+\b)", RegexOptions.Compiled);
-      private readonly static Regex numbers = new Regex(@"[\d+._()\[\]+-]+", RegexOptions.Compiled);
+      private static readonly Regex wordsplit = new Regex(@"(\b[^\s]+\b)", RegexOptions.Compiled);
+      private static readonly Regex numbers = new Regex(@"[\d+._()\[\]+-]+", RegexOptions.Compiled);
 
       private readonly Dictionary<string, string[]> cache = new Dictionary<string, string[]>();
+
+      public void Dispose()
+      {
+        cache.Clear();
+      }
 
       public string GetWordPrefix(string str, int wordcount)
       {
@@ -126,11 +120,6 @@ namespace NMaier.SimpleDlna.Server.Views
           return null;
         }
         return string.Join(" ", m.Take(wordcount).ToArray());
-      }
-
-      public void Dispose()
-      {
-        cache.Clear();
       }
     }
   }

@@ -8,7 +8,7 @@ namespace NMaier.SimpleDlna.Utilities
   public sealed class NaturalStringComparer : StringComparer
   {
     private static readonly StringComparer comparer =
-      StringComparer.CurrentCultureIgnoreCase;
+      CurrentCultureIgnoreCase;
 
     private static readonly bool platformSupport = HasPlatformSupport();
 
@@ -26,6 +26,8 @@ namespace NMaier.SimpleDlna.Utilities
       this.stemBase = stemBase;
     }
 
+    public static IComparer<string> Comparer { get; } = new NaturalStringComparer();
+
     private static bool HasPlatformSupport()
     {
       try {
@@ -39,8 +41,10 @@ namespace NMaier.SimpleDlna.Utilities
     private BaseSortPart[] Split(string str)
     {
       BaseSortPart[] rv;
-      if (partsCache.TryGetValue(str, out rv)) {
-        return rv;
+      lock (partsCache) {
+        if (partsCache.TryGetValue(str, out rv)) {
+          return rv;
+        }
       }
 
       var parts = new List<BaseSortPart>();
@@ -92,7 +96,7 @@ namespace NMaier.SimpleDlna.Utilities
       if (platformSupport) {
         return SafeNativeMethods.StrCmpLogicalW(x, y);
       }
-      if (x == y || StringComparer.InvariantCulture.Compare(x, y) == 0) {
+      if (x == y || InvariantCulture.Compare(x, y) == 0) {
         return 0;
       }
       var p1 = Split(x);

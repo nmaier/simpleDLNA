@@ -1,7 +1,8 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -11,7 +12,7 @@ namespace NMaier.SimpleDlna.Server
     private readonly List<IHttpAuthorizationMethod> methods =
       new List<IHttpAuthorizationMethod>();
 
-    private readonly HttpServer server = null;
+    private readonly HttpServer server;
 
     public HttpAuthorizer()
     {
@@ -20,10 +21,31 @@ namespace NMaier.SimpleDlna.Server
     public HttpAuthorizer(HttpServer server)
     {
       if (server == null) {
-        throw new ArgumentNullException("server");
+        throw new ArgumentNullException(nameof(server));
       }
       this.server = server;
       server.OnAuthorizeClient += OnAuthorize;
+    }
+
+    public void Dispose()
+    {
+      if (server != null) {
+        server.OnAuthorizeClient -= OnAuthorize;
+      }
+    }
+
+    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
+    {
+      if (methods.Count == 0) {
+        return true;
+      }
+      try {
+        return methods.Any(m => m.Authorize(headers, endPoint, mac));
+      }
+      catch (Exception ex) {
+        Error("Failed to authorize", ex);
+        return false;
+      }
     }
 
     private void OnAuthorize(object sender, HttpAuthorizationEventArgs e)
@@ -38,35 +60,9 @@ namespace NMaier.SimpleDlna.Server
     public void AddMethod(IHttpAuthorizationMethod method)
     {
       if (method == null) {
-        throw new ArgumentNullException("method");
+        throw new ArgumentNullException(nameof(method));
       }
       methods.Add(method);
-    }
-
-    public bool Authorize(IHeaders headers, IPEndPoint endPoint, string mac)
-    {
-      if (methods.Count == 0) {
-        return true;
-      }
-      try {
-        foreach (var m in methods) {
-          if (m.Authorize(headers, endPoint, mac)) {
-            return true;
-          }
-        }
-        return false;
-      }
-      catch (Exception ex) {
-        Error("Failed to authorize", ex);
-        return false;
-      }
-    }
-
-    public void Dispose()
-    {
-      if (server != null) {
-        server.OnAuthorizeClient -= OnAuthorize;
-      }
     }
   }
 }

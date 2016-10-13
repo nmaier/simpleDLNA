@@ -8,7 +8,7 @@ namespace NMaier.SimpleDlna.Server
 
     string FriendlyName { get; }
 
-    Guid Uuid { get; }
+    Guid UUID { get; }
 
     IMediaItem GetItem(string id);
   }

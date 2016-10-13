@@ -1,30 +1,18 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal sealed class MusicView : BaseView
   {
-    public override string Description
-    {
-      get
-      {
-        return "Reorganizes files into a proper music collection";
-      }
-    }
+    public override string Description => "Reorganizes files into a proper music collection";
 
-    public override string Name
-    {
-      get
-      {
-        return "music";
-      }
-    }
+    public override string Name => "music";
 
     private static void LinkTriple(TripleKeyedVirtualFolder folder,
-                                   IMediaAudioResource r, string key1,
-                                   string key2)
+      IMediaAudioResource r, string key1,
+      string key2)
     {
       if (string.IsNullOrWhiteSpace(key1)) {
         return;
@@ -34,22 +22,22 @@ namespace NMaier.SimpleDlna.Server.Views
       }
       var targetFolder = folder
         .GetFolder(key1.StemCompareBase().First().ToString()
-        .ToUpper(CultureInfo.CurrentUICulture))
+                     .ToUpper(CultureInfo.CurrentUICulture))
         .GetFolder(key1.StemNameBase());
       targetFolder
         .GetFolder(key2.StemNameBase())
         .AddResource(r);
       var allRes = new AlbumInTitleAudioResource(r);
       targetFolder
-      .GetFolder("All Albums")
-      .AddResource(allRes);
+        .GetFolder("All Albums")
+        .AddResource(allRes);
     }
 
     private static void SortFolder(VirtualFolder folder,
-                                   TripleKeyedVirtualFolder artists,
-                                   TripleKeyedVirtualFolder performers,
-                                   DoubleKeyedVirtualFolder albums,
-                                   SimpleKeyedVirtualFolder genres)
+      TripleKeyedVirtualFolder artists,
+      TripleKeyedVirtualFolder performers,
+      DoubleKeyedVirtualFolder albums,
+      SimpleKeyedVirtualFolder genres)
     {
       foreach (var f in folder.ChildFolders.ToList()) {
         SortFolder(f as VirtualFolder, artists, performers, albums, genres);
@@ -59,12 +47,9 @@ namespace NMaier.SimpleDlna.Server.Views
         if (ai == null) {
           continue;
         }
-        var album = ai.MetaAlbum;
-        if (album == null) {
-          album = "Unspecified album";
-        }
+        var album = ai.MetaAlbum ?? "Unspecified album";
         albums.GetFolder(album.StemCompareBase().First().ToString().
-          ToUpper(CultureInfo.CurrentUICulture)).
+                           ToUpper(CultureInfo.CurrentUICulture)).
           GetFolder(album.StemNameBase()).AddResource(i);
         LinkTriple(artists, ai, ai.MetaArtist, album);
         LinkTriple(performers, ai, ai.MetaPerformer, album);
@@ -75,9 +60,9 @@ namespace NMaier.SimpleDlna.Server.Views
       }
     }
 
-    public override IMediaFolder Transform(IMediaFolder Root)
+    public override IMediaFolder Transform(IMediaFolder oldRoot)
     {
-      var root = new VirtualClonedFolder(Root);
+      var root = new VirtualClonedFolder(oldRoot);
       var artists = new TripleKeyedVirtualFolder(root, "Artists");
       var performers = new TripleKeyedVirtualFolder(root, "Performers");
       var albums = new DoubleKeyedVirtualFolder(root, "Albums");
@@ -104,11 +89,10 @@ namespace NMaier.SimpleDlna.Server.Views
 
       public override string Title
       {
-        get
-        {
+        get {
           var album = MetaAlbum;
           if (!string.IsNullOrWhiteSpace(album)) {
-            return string.Format("{0} — {1}", album, base.Title);
+            return $"{album} — {base.Title}";
           }
           return base.Title;
         }
@@ -116,12 +100,8 @@ namespace NMaier.SimpleDlna.Server.Views
     }
 
     private class TripleKeyedVirtualFolder
-    : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
+      : KeyedVirtualFolder<DoubleKeyedVirtualFolder>
     {
-      public TripleKeyedVirtualFolder()
-      {
-      }
-
       public TripleKeyedVirtualFolder(IMediaFolder aParent, string aName)
         : base(aParent, aName)
       {

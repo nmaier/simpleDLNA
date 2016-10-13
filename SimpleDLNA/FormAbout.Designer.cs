@@ -1,6 +1,6 @@
 ﻿namespace NMaier.SimpleDlna.GUI
 {
-  partial class FormAbout
+  sealed partial class FormAbout
   {
     /// <summary>
     /// Required designer variable.

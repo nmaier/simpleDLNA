@@ -4,21 +4,9 @@ namespace NMaier.SimpleDlna.Server.Comparers
 {
   internal class DateComparer : TitleComparer
   {
-    public override string Description
-    {
-      get
-      {
-        return "Sort by file date";
-      }
-    }
+    public override string Description => "Sort by file date";
 
-    public override string Name
-    {
-      get
-      {
-        return "date";
-      }
-    }
+    public override string Name => "date";
 
     public override int Compare(IMediaItem x, IMediaItem y)
     {

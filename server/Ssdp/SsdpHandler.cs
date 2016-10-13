@@ -1,5 +1,4 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +6,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-
-using Threading = System.Threading;
-using Timers = System.Timers;
+using System.Threading;
+using System.Timers;
+using NMaier.SimpleDlna.Utilities;
+using Timer = System.Timers.Timer;
 
 namespace NMaier.SimpleDlna.Server.Ssdp
 {
@@ -21,10 +21,21 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     private const int SSDP_PORT = 1900;
 
+    private static readonly Random random = new Random();
+
+    private static readonly IPEndPoint ssdpEndp =
+      new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
+
+    internal static readonly IPEndPoint BroadEndp =
+      new IPEndPoint(IPAddress.Parse("255.255.255.255"), SSDP_PORT);
+
+    private static readonly IPAddress ssdpIP =
+      IPAddress.Parse(SSDP_ADDR);
+
     private readonly UdpClient client = new UdpClient();
 
-    private readonly Threading.AutoResetEvent datagramPosted =
-      new Threading.AutoResetEvent(false);
+    private readonly AutoResetEvent datagramPosted =
+      new AutoResetEvent(false);
 
     private readonly Dictionary<Guid, List<UpnpDevice>> devices =
       new Dictionary<Guid, List<UpnpDevice>>();
@@ -32,22 +43,11 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     private readonly ConcurrentQueue<Datagram> messageQueue =
       new ConcurrentQueue<Datagram>();
 
-    private readonly Timers.Timer notificationTimer =
-      new Timers.Timer(60000);
+    private readonly Timer notificationTimer =
+      new Timer(60000);
 
-    private readonly Timers.Timer queueTimer =
-      new Timers.Timer(1000);
-
-    private static readonly Random random = new Random();
-
-    private static readonly IPEndPoint SSDP_ENDP =
-      new IPEndPoint(IPAddress.Parse(SSDP_ADDR), SSDP_PORT);
-
-    internal static readonly IPEndPoint BROAD_ENDP =
-      new IPEndPoint(IPAddress.Parse("255.255.255.255"), SSDP_PORT);
-
-    private static readonly IPAddress SSDP_IP =
-      IPAddress.Parse(SSDP_ADDR);
+    private readonly Timer queueTimer =
+      new Timer(1000);
 
     private bool running = true;
 
@@ -66,30 +66,43 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         );
       client.ExclusiveAddressUse = false;
       client.Client.Bind(new IPEndPoint(IPAddress.Any, SSDP_PORT));
-      client.JoinMulticastGroup(SSDP_IP, 10);
+      client.JoinMulticastGroup(ssdpIP, 10);
       Notice("SSDP service started");
       Receive();
     }
 
     private UpnpDevice[] Devices
     {
-      get
-      {
+      get {
         UpnpDevice[] devs;
         lock (devices) {
-          devs = devices.Values.SelectMany(i =>
-          {
-            return i;
-          }).ToArray();
+          devs = devices.Values.SelectMany(i => i).ToArray();
         }
         return devs;
       }
     }
 
-    private void ProcessQueue(object sender, Timers.ElapsedEventArgs e)
+    public void Dispose()
+    {
+      Debug("Disposing SSDP");
+      running = false;
+      while (messageQueue.Count != 0) {
+        datagramPosted.WaitOne();
+      }
+
+      client.DropMulticastGroup(ssdpIP);
+
+      notificationTimer.Enabled = false;
+      queueTimer.Enabled = false;
+      notificationTimer.Dispose();
+      queueTimer.Dispose();
+      datagramPosted.Dispose();
+    }
+
+    private void ProcessQueue(object sender, ElapsedEventArgs e)
     {
       while (messageQueue.Count != 0) {
-        var msg = (Datagram)null;
+        Datagram msg;
         if (!messageQueue.TryPeek(out msg)) {
           continue;
         }
@@ -100,9 +113,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
           }
           break;
         }
-        else {
-          messageQueue.TryDequeue(out msg);
-        }
+        messageQueue.TryDequeue(out msg);
       }
       datagramPosted.Set();
       queueTimer.Enabled = messageQueue.Count != 0;
@@ -142,15 +153,16 @@ namespace NMaier.SimpleDlna.Server.Ssdp
           if (string.IsNullOrEmpty(proto)) {
             throw new IOException("Invalid protocol line");
           }
-          var method = proto.Split(new char[] { ' ' }, 2)[0];
+          var method = proto.Split(new[] {' '}, 2)[0];
           var headers = new Headers();
-          for (var line = reader.ReadLine(); line != null;
+          for (var line = reader.ReadLine();
+            line != null;
             line = reader.ReadLine()) {
             line = line.Trim();
             if (string.IsNullOrEmpty(line)) {
               break;
             }
-            var parts = line.Split(new char[] { ':' }, 2);
+            var parts = line.Split(new[] {':'}, 2);
             headers[parts[0]] = parts[1].Trim();
           }
 #if DUMP_ALL_SSDP
@@ -172,7 +184,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     }
 
     private void SendDatagram(IPEndPoint endpoint, IPAddress address,
-                              string message, bool sticky)
+      string message, bool sticky)
     {
       if (!running) {
         return;
@@ -187,19 +199,21 @@ namespace NMaier.SimpleDlna.Server.Ssdp
 
     private void SendSearchResponse(IPEndPoint endpoint, UpnpDevice dev)
     {
-      var headers = new RawHeaders();
-      headers.Add("CACHE-CONTROL", "max-age = 600");
-      headers.Add("DATE", DateTime.Now.ToString("R"));
-      headers.Add("EXT", string.Empty);
-      headers.Add("LOCATION", dev.Descriptor.ToString());
-      headers.Add("SERVER", HttpServer.Signature);
-      headers.Add("ST", dev.Type);
-      headers.Add("USN", dev.USN);
+      var headers = new RawHeaders
+      {
+        {"CACHE-CONTROL", "max-age = 600"},
+        {"DATE", DateTime.Now.ToString("R")},
+        {"EXT", string.Empty},
+        {"LOCATION", dev.Descriptor.ToString()},
+        {"SERVER", HttpServer.Signature},
+        {"ST", dev.Type},
+        {"USN", dev.USN}
+      };
 
       SendDatagram(
         endpoint,
         dev.Address,
-        String.Format("HTTP/1.1 200 OK\r\n{0}\r\n", headers.HeaderBlock),
+        $"HTTP/1.1 200 OK\r\n{headers.HeaderBlock}\r\n",
         false
         );
       InfoFormat(
@@ -207,7 +221,7 @@ namespace NMaier.SimpleDlna.Server.Ssdp
         dev.Address);
     }
 
-    private void Tick(object sender, Timers.ElapsedEventArgs e)
+    private void Tick(object sender, ElapsedEventArgs e)
     {
       Debug("Sending SSDP notifications!");
       notificationTimer.Interval = random.Next(60000, 120000);
@@ -225,54 +239,52 @@ namespace NMaier.SimpleDlna.Server.Ssdp
     internal void NotifyDevice(UpnpDevice dev, string type, bool sticky)
     {
       Debug("NotifyDevice");
-      var headers = new RawHeaders();
-      headers.Add("HOST", "239.255.255.250:1900");
-      headers.Add("CACHE-CONTROL", "max-age = 600");
-      headers.Add("LOCATION", dev.Descriptor.ToString());
-      headers.Add("SERVER", HttpServer.Signature);
-      headers.Add("NTS", "ssdp:" + type);
-      headers.Add("NT", dev.Type);
-      headers.Add("USN", dev.USN);
+      var headers = new RawHeaders
+      {
+        {"HOST", "239.255.255.250:1900"},
+        {"CACHE-CONTROL", "max-age = 600"},
+        {"LOCATION", dev.Descriptor.ToString()},
+        {"SERVER", HttpServer.Signature},
+        {"NTS", "ssdp:" + type},
+        {"NT", dev.Type},
+        {"USN", dev.USN}
+      };
 
       SendDatagram(
-        SSDP_ENDP,
+        ssdpEndp,
         dev.Address,
-        String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock),
+        $"NOTIFY * HTTP/1.1\r\n{headers.HeaderBlock}\r\n",
         sticky
         );
       // Some buggy network equipment will swallow multicast packets, so lets
       // cheat, increase the odds, by sending to broadcast.
       SendDatagram(
-        BROAD_ENDP,
+        BroadEndp,
         dev.Address,
-        String.Format("NOTIFY * HTTP/1.1\r\n{0}\r\n", headers.HeaderBlock),
+        $"NOTIFY * HTTP/1.1\r\n{headers.HeaderBlock}\r\n",
         sticky
         );
       DebugFormat("{0} said {1}", dev.USN, type);
     }
 
-    internal void RegisterNotification(Guid UUID, Uri Descriptor,
-                                       IPAddress address)
+    internal void RegisterNotification(Guid uuid, Uri descriptor,
+      IPAddress address)
     {
       List<UpnpDevice> list;
       lock (devices) {
-        if (!devices.TryGetValue(UUID, out list)) {
-          devices.Add(UUID, list = new List<UpnpDevice>());
+        if (!devices.TryGetValue(uuid, out list)) {
+          devices.Add(uuid, list = new List<UpnpDevice>());
         }
       }
-      foreach (var t in new string[] {
-        "upnp:rootdevice",
-        "urn:schemas-upnp-org:device:MediaServer:1",
-        "urn:schemas-upnp-org:service:ContentDirectory:1",
-        "urn:schemas-upnp-org:service:ConnectionManager:1",
-        "urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1",
-        "uuid:" + UUID
-      }) {
-        list.Add(new UpnpDevice(UUID, t, Descriptor, address));
-      }
+      list.AddRange(new[]
+      {
+        "upnp:rootdevice", "urn:schemas-upnp-org:device:MediaServer:1",
+        "urn:schemas-upnp-org:service:ContentDirectory:1", "urn:schemas-upnp-org:service:ConnectionManager:1",
+        "urn:schemas-upnp-org:service:X_MS_MediaReceiverRegistrar:1", "uuid:" + uuid
+      }.Select(t => new UpnpDevice(uuid, t, descriptor, address)));
 
       NotifyAll();
-      DebugFormat("Registered mount {0}, {1}", UUID, address);
+      DebugFormat("Registered mount {0}, {1}", uuid, address);
     }
 
     internal void RespondToSearch(IPEndPoint endpoint, string req)
@@ -290,36 +302,19 @@ namespace NMaier.SimpleDlna.Server.Ssdp
       }
     }
 
-    internal void UnregisterNotification(Guid UUID)
+    internal void UnregisterNotification(Guid uuid)
     {
       List<UpnpDevice> dl;
       lock (devices) {
-        if (!devices.TryGetValue(UUID, out dl)) {
+        if (!devices.TryGetValue(uuid, out dl)) {
           return;
         }
-        devices.Remove(UUID);
+        devices.Remove(uuid);
       }
       foreach (var d in dl) {
         NotifyDevice(d, "byebye", true);
       }
-      DebugFormat("Unregistered mount {0}", UUID);
-    }
-
-    public void Dispose()
-    {
-      Debug("Disposing SSDP");
-      running = false;
-      while (messageQueue.Count != 0) {
-        datagramPosted.WaitOne();
-      }
-
-      client.DropMulticastGroup(SSDP_IP);
-
-      notificationTimer.Enabled = false;
-      queueTimer.Enabled = false;
-      notificationTimer.Dispose();
-      queueTimer.Dispose();
-      datagramPosted.Dispose();
+      DebugFormat("Unregistered mount {0}", uuid);
     }
   }
 }

@@ -10,8 +10,6 @@ namespace NMaier.SimpleDlna.Utilities
   public sealed class LeastRecentlyUsedDictionary<TKey, TValue>
     : IDictionary<TKey, TValue>
   {
-    private readonly uint capacity;
-
     private readonly ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>> items =
       new ConcurrentDictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>();
 
@@ -23,7 +21,7 @@ namespace NMaier.SimpleDlna.Utilities
     [CLSCompliant(false)]
     public LeastRecentlyUsedDictionary(uint capacity)
     {
-      this.capacity = capacity;
+      Capacity = capacity;
       toDrop = Math.Min(10, (uint)(capacity * 0.07));
     }
 
@@ -33,56 +31,22 @@ namespace NMaier.SimpleDlna.Utilities
     }
 
     [CLSCompliant(false)]
-    public uint Capacity
-    {
-      get
-      {
-        return capacity;
-      }
-    }
+    public uint Capacity { get; }
 
-    public int Count
-    {
-      get
-      {
-        return items.Count;
-      }
-    }
+    public int Count => items.Count;
 
-    public bool IsReadOnly
-    {
-      get
-      {
-        return false;
-      }
-    }
+    public bool IsReadOnly => false;
 
-    public ICollection<TKey> Keys
-    {
-      get
-      {
-        return items.Keys;
-      }
-    }
+    public ICollection<TKey> Keys => items.Keys;
 
-    public ICollection<TValue> Values
-    {
-      get
-      {
-        return (from i in items.Values
-                select i.Value.Value).ToList();
-      }
-    }
+    public ICollection<TValue> Values => (from i in items.Values
+                                          select i.Value.Value).ToList();
 
     public TValue this[TKey key]
     {
-      get
-      {
-        return items[key].Value.Value;
-      }
+      get { return items[key].Value.Value; }
       [MethodImpl(MethodImplOptions.Synchronized)]
-      set
-      {
+      set {
         Remove(key);
         Add(key, value);
       }
@@ -93,45 +57,10 @@ namespace NMaier.SimpleDlna.Utilities
       return items.GetEnumerator();
     }
 
-    private TValue MaybeDropSome()
-    {
-      if (Count <= capacity) {
-        return default(TValue);
-      }
-      lock (order) {
-        LinkedListNode<KeyValuePair<TKey, TValue>> item;
-        TValue rv = default(TValue);
-        for (var i = 0; i < toDrop; ++i) {
-          if (items.TryRemove(order.Last.Value.Key, out item)) {
-            rv = item.Value.Value;
-          }
-          order.RemoveLast();
-        }
-        return rv;
-      }
-    }
-
-    [MethodImpl(MethodImplOptions.Synchronized)]
-    public TValue AddAndPop(KeyValuePair<TKey, TValue> item)
-    {
-      LinkedListNode<KeyValuePair<TKey, TValue>> node;
-      lock (order) {
-        node = order.AddFirst(item);
-      }
-      items.TryAdd(item.Key, node);
-      return MaybeDropSome();
-    }
-
     [MethodImpl(MethodImplOptions.Synchronized)]
     public void Add(KeyValuePair<TKey, TValue> item)
     {
       AddAndPop(item);
-    }
-
-    [MethodImpl(MethodImplOptions.Synchronized)]
-    public TValue AddAndPop(TKey key, TValue value)
-    {
-      return AddAndPop(new KeyValuePair<TKey, TValue>(key, value));
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
@@ -167,9 +96,7 @@ namespace NMaier.SimpleDlna.Utilities
 
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
     {
-      foreach (var i in items) {
-        yield return i.Value.Value;
-      }
+      return items.Select(i => i.Value.Value).GetEnumerator();
     }
 
     [MethodImpl(MethodImplOptions.Synchronized)]
@@ -207,6 +134,41 @@ namespace NMaier.SimpleDlna.Utilities
       }
       value = default(TValue);
       return false;
+    }
+
+    private TValue MaybeDropSome()
+    {
+      if (Count <= Capacity) {
+        return default(TValue);
+      }
+      lock (order) {
+        var rv = default(TValue);
+        for (var i = 0; i < toDrop; ++i) {
+          LinkedListNode<KeyValuePair<TKey, TValue>> item;
+          if (items.TryRemove(order.Last.Value.Key, out item)) {
+            rv = item.Value.Value;
+          }
+          order.RemoveLast();
+        }
+        return rv;
+      }
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public TValue AddAndPop(KeyValuePair<TKey, TValue> item)
+    {
+      LinkedListNode<KeyValuePair<TKey, TValue>> node;
+      lock (order) {
+        node = order.AddFirst(item);
+      }
+      items.TryAdd(item.Key, node);
+      return MaybeDropSome();
+    }
+
+    [MethodImpl(MethodImplOptions.Synchronized)]
+    public TValue AddAndPop(TKey key, TValue value)
+    {
+      return AddAndPop(new KeyValuePair<TKey, TValue>(key, value));
     }
   }
 }

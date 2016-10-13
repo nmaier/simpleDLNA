@@ -1,36 +1,37 @@
-﻿using log4net;
-using NMaier.GetOptNet;
-using NMaier.SimpleDlna.FileMediaServer;
-using NMaier.SimpleDlna.Server;
-using NMaier.SimpleDlna.Server.Comparers;
-using NMaier.SimpleDlna.Server.Views;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using log4net;
+using NMaier.GetOptNet;
+using NMaier.SimpleDlna.FileMediaServer;
+using NMaier.SimpleDlna.Properties;
+using NMaier.SimpleDlna.Server;
+using NMaier.SimpleDlna.Server.Comparers;
+using NMaier.SimpleDlna.Server.Views;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna
 {
   public static class Program
   {
-    private readonly static ManualResetEvent BlockEvent =
+    private static readonly ManualResetEvent blockEvent =
       new ManualResetEvent(false);
 
-    private static uint CancelHitCount = 0;
+    private static uint cancelHitCount;
 
     private static void CancelKeyPressed(object sender,
-                                         ConsoleCancelEventArgs e)
+      ConsoleCancelEventArgs e)
     {
-      if (CancelHitCount++ == 3) {
-        LogManager.GetLogger(typeof(Program)).Fatal(
+      if (cancelHitCount++ == 3) {
+        LogManager.GetLogger(typeof (Program)).Fatal(
           "Emergency exit commencing");
         return;
       }
       e.Cancel = true;
-      BlockEvent.Set();
-      LogManager.GetLogger(typeof(Program)).Info("Shutdown requested");
+      blockEvent.Set();
+      LogManager.GetLogger(typeof (Program)).Info("Shutdown requested");
       Console.Title = "SimpleDLNA - shutting down ...";
     }
 
@@ -97,7 +98,7 @@ namespace NMaier.SimpleDlna
 
         options.SetupLogging();
 
-        using (var icon = new ProgramIcon()) {
+        using (new ProgramIcon()) {
           var server = new HttpServer(options.Port);
           try {
             using (var authorizer = new HttpAuthorizer(server)) {
@@ -126,7 +127,7 @@ namespace NMaier.SimpleDlna
                 foreach (var d in options.Directories) {
                   server.InfoFormat("Mounting FileServer for {0}", d.FullName);
                   var fs = SetupFileServer(
-                    options, types, new DirectoryInfo[] { d });
+                    options, types, new[] {d});
                   friendlyName = fs.FriendlyName;
                   server.RegisterMediaServer(fs);
                   server.NoticeFormat("{0} mounted", d.FullName);
@@ -144,7 +145,7 @@ namespace NMaier.SimpleDlna
                   options.Directories[0], options.Directories.Length);
               }
 
-              Console.Title = String.Format("{0} - running ...", friendlyName);
+              Console.Title = $"{friendlyName} - running ...";
 
               Run(server);
             }
@@ -160,7 +161,7 @@ namespace NMaier.SimpleDlna
       }
 #if !DEBUG
       catch (Exception ex) {
-        LogManager.GetLogger(typeof(Program)).Fatal("Failed to run", ex);
+        LogManager.GetLogger(typeof (Program)).Fatal("Failed to run", ex);
       }
 #endif
     }
@@ -168,15 +169,15 @@ namespace NMaier.SimpleDlna
     private static void Run(HttpServer server)
     {
       server.Info("CTRL-C to terminate");
-      BlockEvent.WaitOne();
+      blockEvent.WaitOne();
 
       server.Info("Going down!");
       server.Info("Closed!");
     }
 
     private static FileServer SetupFileServer(Options options,
-                                              DlnaMediaTypes types,
-                                              DirectoryInfo[] d)
+      DlnaMediaTypes types,
+      DirectoryInfo[] d)
     {
       var ids = new Identifiers(
         ComparerRepository.Lookup(options.Order), options.DescendingOrder);
@@ -189,10 +190,10 @@ namespace NMaier.SimpleDlna
         }
       }
       var fs = new FileServer(types, ids, d);
-      if (!string.IsNullOrEmpty(options.FriendlyName)) {
-        fs.FriendlyName = options.FriendlyName;
-      }
       try {
+        if (!string.IsNullOrEmpty(options.FriendlyName)) {
+          fs.FriendlyName = options.FriendlyName;
+        }
         if (options.CacheFile != null) {
           fs.SetCacheFile(options.CacheFile);
         }
@@ -212,7 +213,7 @@ namespace NMaier.SimpleDlna
     {
       Console.WriteLine(ProductInformation.Copyright);
       Console.WriteLine();
-      Console.Write(Encoding.UTF8.GetString(Properties.Resources.LICENSE));
+      Console.Write(Encoding.UTF8.GetString(Resources.LICENSE));
     }
 
     private static void ShowVersion()

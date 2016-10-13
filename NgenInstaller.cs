@@ -20,10 +20,7 @@ namespace NMaier.SimpleDlna
           RuntimeEnvironment.GetRuntimeDirectory(),
           "ngen.exe"
           );
-        proc.StartInfo.Arguments = string.Format(
-          "install /nologo \"{0}\"",
-          Assembly.GetExecutingAssembly().Location
-          );
+        proc.StartInfo.Arguments = $"install /nologo \"{Assembly.GetExecutingAssembly().Location}\"";
         proc.StartInfo.UseShellExecute = false;
         proc.StartInfo.CreateNoWindow = true;
         proc.Start();

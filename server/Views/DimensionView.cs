@@ -1,10 +1,10 @@
+using System;
 using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
-using System;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal class DimensionView : FilteringView
+  internal class DimensionView : FilteringView, IConfigurable
   {
     private uint? max;
 
@@ -18,26 +18,14 @@ namespace NMaier.SimpleDlna.Server.Views
 
     private uint? minWidth;
 
-    public override string Description
-    {
-      get
-      {
-        return "Show only items of a certain dimension";
-      }
-    }
+    public override string Description => "Show only items of a certain dimension";
 
-    public override string Name
-    {
-      get
-      {
-        return "dimension";
-      }
-    }
+    public override string Name => "dimension";
 
     public override bool Allowed(IMediaResource res)
     {
       var i = res as IMetaResolution;
-      if (i == null || !i.MetaWidth.HasValue || !i.MetaHeight.HasValue) {
+      if (i?.MetaWidth == null || !i.MetaHeight.HasValue) {
         return false;
       }
       var w = i.MetaWidth.Value;
@@ -63,41 +51,26 @@ namespace NMaier.SimpleDlna.Server.Views
       return true;
     }
 
-    public override void SetParameters(AttributeCollection parameters)
+    public void SetParameters(ConfigParameters parameters)
     {
       if (parameters == null) {
-        throw new ArgumentNullException("parameters");
+        throw new ArgumentNullException(nameof(parameters));
       }
-      base.SetParameters(parameters);
-
-      min = SetParametersFor(parameters, "min");
-      max = SetParametersFor(parameters, "max");
-      minWidth = SetParametersFor(parameters, "minwidth");
-      maxWidth = SetParametersFor(parameters, "maxwidth");
-      minHeight = SetParametersFor(parameters, "minheight");
-      maxHeight = SetParametersFor(parameters, "maxheight");
+      min = parameters.MaybeGet<uint>("min");
+      max = parameters.MaybeGet<uint>("max");
+      minWidth = parameters.MaybeGet<uint>("minwidth");
+      maxWidth = parameters.MaybeGet<uint>("maxwidth");
+      minHeight = parameters.MaybeGet<uint>("minheight");
+      maxHeight = parameters.MaybeGet<uint>("maxheight");
     }
 
-    public static uint? SetParametersFor(AttributeCollection parameters,
-                                         string key)
-    {
-      var val = (uint?)null;
-      foreach (var v in parameters.GetValuesForKey(key)) {
-        uint uv;
-        if (uint.TryParse(v, out uv)) {
-          val = uv;
-        }
-      }
-      return val;
-    }
-
-    public override IMediaFolder Transform(IMediaFolder root)
+    public override IMediaFolder Transform(IMediaFolder oldRoot)
     {
       if (!min.HasValue && !max.HasValue && !minWidth.HasValue &&
           !maxWidth.HasValue && !minHeight.HasValue && !maxHeight.HasValue) {
-        return root;
+        return oldRoot;
       }
-      return base.Transform(root);
+      return base.Transform(oldRoot);
     }
   }
 }

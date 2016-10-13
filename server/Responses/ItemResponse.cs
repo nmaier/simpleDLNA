@@ -1,7 +1,7 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
-using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.IO;
+using NMaier.SimpleDlna.Server.Metadata;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.Server
 {
@@ -11,13 +11,11 @@ namespace NMaier.SimpleDlna.Server
 
     private readonly IMediaResource item;
 
-    private readonly HttpCode status = HttpCode.Ok;
-
     public ItemResponse(string prefix, IRequest request, IMediaResource item,
-                        string transferMode = "Streaming")
+      string transferMode = "Streaming")
     {
       this.item = item;
-      headers = new ResponseHeaders(noCache: !(item is IMediaCoverResource));
+      headers = new ResponseHeaders(!(item is IMediaCoverResource));
       var meta = item as IMetaInfo;
       if (meta != null) {
         headers.Add("Content-Length", meta.InfoSize.ToString());
@@ -27,26 +25,12 @@ namespace NMaier.SimpleDlna.Server
       headers.Add("Content-Type", DlnaMaps.Mime[item.Type]);
       if (request.Headers.ContainsKey("getcontentFeatures.dlna.org")) {
         try {
-          if (item.MediaType == DlnaMediaTypes.Image) {
-            headers.Add(
-              "contentFeatures.dlna.org",
-              String.Format(
-                "DLNA.ORG_PN={0};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
-                item.PN,
-                DlnaMaps.DefaultInteractive
-                )
-              );
-          }
-          else {
-            headers.Add(
-              "contentFeatures.dlna.org",
-              String.Format(
-                "DLNA.ORG_PN={0};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={1}",
-                item.PN,
-                DlnaMaps.DefaultStreaming
-                )
-              );
-          }
+          headers.Add(
+            "contentFeatures.dlna.org",
+            item.MediaType == DlnaMediaTypes.Image
+              ? $"DLNA.ORG_PN={item.PN};DLNA.ORG_OP=00;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={DlnaMaps.DefaultInteractive}"
+              : $"DLNA.ORG_PN={item.PN};DLNA.ORG_OP=01;DLNA.ORG_CI=0;DLNA.ORG_FLAGS={DlnaMaps.DefaultStreaming}"
+            );
         }
         catch (NotSupportedException) {
         }
@@ -56,26 +40,18 @@ namespace NMaier.SimpleDlna.Server
       if (request.Headers.ContainsKey("getCaptionInfo.sec")) {
         var mvi = item as IMetaVideoItem;
         if (mvi != null && mvi.Subtitle.HasSubtitle) {
-          var surl = String.Format(
-          "http://{0}:{1}{2}subtitle/{3}/st.srt",
-          request.LocalEndPoint.Address,
-          request.LocalEndPoint.Port,
-          prefix,
-          item.Id
-          );
+          var surl =
+            $"http://{request.LocalEndPoint.Address}:{request.LocalEndPoint.Port}{prefix}subtitle/{item.Id}/st.srt";
           DebugFormat("Sending subtitles {0}", surl);
           headers.Add("CaptionInfo.sec", surl);
         }
       }
       if (request.Headers.ContainsKey("getMediaInfo.sec")) {
         var md = item as IMetaDuration;
-        if (md != null && md.MetaDuration.HasValue) {
+        if (md?.MetaDuration != null) {
           headers.Add(
             "MediaInfo.sec",
-            string.Format(
-              "SEC_Duration={0};",
-              md.MetaDuration.Value.TotalMilliseconds
-              )
+            $"SEC_Duration={md.MetaDuration.Value.TotalMilliseconds};"
             );
         }
       }
@@ -84,28 +60,10 @@ namespace NMaier.SimpleDlna.Server
       Debug(headers);
     }
 
-    public Stream Body
-    {
-      get
-      {
-        return item.CreateContentStream();
-      }
-    }
+    public Stream Body => item.CreateContentStream();
 
-    public IHeaders Headers
-    {
-      get
-      {
-        return headers;
-      }
-    }
+    public IHeaders Headers => headers;
 
-    public HttpCode Status
-    {
-      get
-      {
-        return status;
-      }
-    }
+    public HttpCode Status { get; } = HttpCode.Ok;
   }
 }

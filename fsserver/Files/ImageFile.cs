@@ -1,7 +1,9 @@
-﻿using NMaier.SimpleDlna.Server;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
+using NMaier.SimpleDlna.Server;
+using TagLib;
+using File = TagLib.File;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -13,21 +15,21 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private string description;
 
-    private bool initialized = false;
+    private bool initialized;
 
     private string title;
 
     private int? width,
-
-    height;
+      height;
 
     private ImageFile(SerializationInfo info, StreamingContext context)
-      : this((context.Context as DeserializeInfo).Server,
-             (context.Context as DeserializeInfo).Info,
-             (context.Context as DeserializeInfo).Type)
+      : this(((DeserializeInfo)context.Context).Server,
+             ((DeserializeInfo)context.Context).Info,
+             ((DeserializeInfo)context.Context).Type)
     {
     }
 
+    // ReSharper disable once UnusedMember.Local
     private ImageFile(SerializationInfo info, DeserializeInfo di)
       : this(di.Server, di.Info, di.Type)
     {
@@ -47,8 +49,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public string MetaCreator
     {
-      get
-      {
+      get {
         MaybeInit();
         return creator;
       }
@@ -56,8 +57,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public string MetaDescription
     {
-      get
-      {
+      get {
         MaybeInit();
         return description;
       }
@@ -65,8 +65,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public int? MetaHeight
     {
-      get
-      {
+      get {
         MaybeInit();
         return height;
       }
@@ -74,8 +73,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public int? MetaWidth
     {
-      get
-      {
+      get {
         MaybeInit();
         return width;
       }
@@ -83,8 +81,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public override IHeaders Properties
     {
-      get
-      {
+      get {
         MaybeInit();
         var rv = base.Properties;
         if (description != null) {
@@ -95,9 +92,9 @@ namespace NMaier.SimpleDlna.FileMediaServer
         }
         if (width != null && height != null) {
           rv.Add(
-          "Resolution",
-          string.Format("{0}x{1}", width.Value, height.Value)
-          );
+            "Resolution",
+            $"{width.Value}x{height.Value}"
+            );
         }
         return rv;
       }
@@ -105,13 +102,25 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public override string Title
     {
-      get
-      {
+      get {
         if (!string.IsNullOrWhiteSpace(title)) {
-          return string.Format("{0} — {1}", base.Title, title);
+          return $"{base.Title} — {title}";
         }
         return base.Title;
       }
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
+    {
+      if (info == null) {
+        throw new ArgumentNullException(nameof(info));
+      }
+      MaybeInit();
+      info.AddValue("cr", creator);
+      info.AddValue("d", description);
+      info.AddValue("t", title);
+      info.AddValue("w", width);
+      info.AddValue("h", height);
     }
 
     private void MaybeInit()
@@ -121,7 +130,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
 
       try {
-        using (var tl = TagLib.File.Create(new TagLibFileAbstraction(Item))) {
+        using (var tl = File.Create(new TagLibFileAbstraction(Item))) {
           try {
             width = tl.Properties.PhotoWidth;
             height = tl.Properties.PhotoHeight;
@@ -131,7 +140,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
 
           try {
-            var t = (tl as TagLib.Image.File).ImageTag;
+            var t = ((TagLib.Image.File)tl).ImageTag;
             title = t.Title;
             if (string.IsNullOrWhiteSpace(title)) {
               title = null;
@@ -155,12 +164,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
         Server.UpdateFileCache(this);
       }
-      catch (TagLib.CorruptFileException ex) {
+      catch (CorruptFileException ex) {
         Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
-      catch (TagLib.UnsupportedFormatException ex) {
+      catch (UnsupportedFormatException ex) {
         Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
@@ -170,19 +179,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
           "Unhandled exception reading meta data for file " + Item.FullName,
           ex);
       }
-    }
-
-    public void GetObjectData(SerializationInfo info, StreamingContext ctx)
-    {
-      if (info == null) {
-        throw new ArgumentNullException("info");
-      }
-      MaybeInit();
-      info.AddValue("cr", creator);
-      info.AddValue("d", description);
-      info.AddValue("t", title);
-      info.AddValue("w", width);
-      info.AddValue("h", height);
     }
   }
 }

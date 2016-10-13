@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 
 namespace NMaier.SimpleDlna.Utilities
 {
@@ -38,20 +38,20 @@ namespace NMaier.SimpleDlna.Utilities
         var raw = new byte[6];
         var length = 6u;
 #pragma warning disable 612,618
-        var addr = (UInt32)ip.Address;
+        var addr = (uint)ip.Address;
 #pragma warning restore 612,618
         string mac = null;
 
         try {
           if (SafeNativeMethods.SendARP(addr, 0, raw, ref length) == 0) {
-            mac = string.Format("{0:X}:{1:X}:{2:X}:{3:X}:{4:X}:{5:X}",
-              raw[0], raw[1], raw[2], raw[3], raw[4], raw[5]);
+            mac = $"{raw[0]:X}:{raw[1]:X}:{raw[2]:X}:{raw[3]:X}:{raw[4]:X}:{raw[5]:X}";
           }
         }
         catch (DllNotFoundException) {
           // ignore
         }
-        cache.TryAdd(ip, new MACInfo() {
+        cache.TryAdd(ip, new MACInfo
+        {
           MAC = mac,
           Fresh = DateTime.Now.AddMinutes(mac != null ? 10 : 1)
         });
@@ -59,7 +59,7 @@ namespace NMaier.SimpleDlna.Utilities
         return mac;
       }
       catch (Exception ex) {
-        Warn(string.Format("Failed to resolve {0} to MAC", ip), ex);
+        Warn($"Failed to resolve {ip} to MAC", ex);
         return null;
       }
     }

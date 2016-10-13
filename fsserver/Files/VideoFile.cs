@@ -1,8 +1,10 @@
-﻿using NMaier.SimpleDlna.Server;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
+using NMaier.SimpleDlna.Server;
+using TagLib;
+using File = TagLib.File;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -10,6 +12,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
   internal sealed class VideoFile
     : BaseFile, IMediaVideoResource, ISerializable, IBookmarkable
   {
+    private static readonly TimeSpan emptyDuration = new TimeSpan(0);
     private string[] actors;
 
     private long? bookmark;
@@ -20,13 +23,11 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     private TimeSpan? duration;
 
-    private static readonly TimeSpan EmptyDuration = new TimeSpan(0);
-
     private string genre;
 
     private int? height;
 
-    private bool initialized = false;
+    private bool initialized;
 
     private Subtitle subTitle;
 
@@ -42,7 +43,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private VideoFile(SerializationInfo info, DeserializeInfo di)
       : this(di.Server, di.Info, di.Type)
     {
-      actors = info.GetValue("a", typeof(string[])) as string[];
+      actors = info.GetValue("a", typeof (string[])) as string[];
       description = info.GetString("de");
       director = info.GetString("di");
       genre = info.GetString("g");
@@ -52,6 +53,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         height = info.GetInt32("h");
       }
       catch (Exception) {
+        // ignored
       }
       var ts = info.GetInt64("du");
       if (ts > 0) {
@@ -64,7 +66,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
         bookmark = 0;
       }
       try {
-        subTitle = info.GetValue("st", typeof(Subtitle)) as Subtitle;
+        subTitle = info.GetValue("st", typeof (Subtitle)) as Subtitle;
       }
       catch (Exception) {
         subTitle = null;
@@ -79,12 +81,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public long? Bookmark
     {
-      get
-      {
-        return bookmark;
-      }
-      set
-      {
+      get { return bookmark; }
+      set {
         bookmark = value;
         Server.UpdateFileCache(this);
       }
@@ -92,8 +90,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public IEnumerable<string> MetaActors
     {
-      get
-      {
+      get {
         MaybeInit();
         return actors;
       }
@@ -101,8 +98,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public string MetaDescription
     {
-      get
-      {
+      get {
         MaybeInit();
         return description;
       }
@@ -110,8 +106,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public string MetaDirector
     {
-      get
-      {
+      get {
         MaybeInit();
         return director;
       }
@@ -119,8 +114,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public TimeSpan? MetaDuration
     {
-      get
-      {
+      get {
         MaybeInit();
         return duration;
       }
@@ -128,8 +122,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public string MetaGenre
     {
-      get
-      {
+      get {
         MaybeInit();
         if (string.IsNullOrWhiteSpace(genre)) {
           throw new NotSupportedException();
@@ -140,8 +133,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public int? MetaHeight
     {
-      get
-      {
+      get {
         MaybeInit();
         return height;
       }
@@ -149,8 +141,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public int? MetaWidth
     {
-      get
-      {
+      get {
         MaybeInit();
         return width;
       }
@@ -158,8 +149,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public override IHeaders Properties
     {
-      get
-      {
+      get {
         MaybeInit();
         var rv = base.Properties;
         if (description != null) {
@@ -180,8 +170,8 @@ namespace NMaier.SimpleDlna.FileMediaServer
         if (width != null && height != null) {
           rv.Add(
             "Resolution",
-            string.Format("{0}x{1}", width.Value, height.Value)
-          );
+            $"{width.Value}x{height.Value}"
+            );
         }
         return rv;
       }
@@ -189,8 +179,7 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public Subtitle Subtitle
     {
-      get
-      {
+      get {
         try {
           if (subTitle == null) {
             subTitle = new Subtitle(Item);
@@ -207,13 +196,30 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
     public override string Title
     {
-      get
-      {
+      get {
         if (!string.IsNullOrWhiteSpace(title)) {
-          return string.Format("{0} — {1}", base.Title, title);
+          return $"{base.Title} — {title}";
         }
         return base.Title;
       }
+    }
+
+    public void GetObjectData(SerializationInfo info, StreamingContext context)
+    {
+      if (info == null) {
+        throw new ArgumentNullException(nameof(info));
+      }
+      MaybeInit();
+      info.AddValue("a", actors, typeof (string[]));
+      info.AddValue("de", description);
+      info.AddValue("di", director);
+      info.AddValue("g", genre);
+      info.AddValue("t", title);
+      info.AddValue("w", width);
+      info.AddValue("h", height);
+      info.AddValue("b", bookmark);
+      info.AddValue("du", duration.GetValueOrDefault(emptyDuration).Ticks);
+      info.AddValue("st", subTitle);
     }
 
     private void MaybeInit()
@@ -223,10 +229,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
       }
 
       try {
-        using (var tl = TagLib.File.Create(new TagLibFileAbstraction(Item))) {
+        using (var tl = File.Create(new TagLibFileAbstraction(Item))) {
           try {
             duration = tl.Properties.Duration;
-            if (duration.HasValue && duration.Value.TotalSeconds < 0.1) {
+            if (duration.Value.TotalSeconds < 0.1) {
               duration = null;
             }
             width = tl.Properties.VideoWidth;
@@ -265,12 +271,12 @@ namespace NMaier.SimpleDlna.FileMediaServer
 
         Server.UpdateFileCache(this);
       }
-      catch (TagLib.CorruptFileException ex) {
+      catch (CorruptFileException ex) {
         Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
       }
-      catch (TagLib.UnsupportedFormatException ex) {
+      catch (UnsupportedFormatException ex) {
         Debug(
           "Failed to read meta data via taglib for file " + Item.FullName, ex);
         initialized = true;
@@ -280,24 +286,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
           "Unhandled exception reading meta data for file " + Item.FullName,
           ex);
       }
-    }
-
-    public void GetObjectData(SerializationInfo info, StreamingContext context)
-    {
-      if (info == null) {
-        throw new ArgumentNullException("info");
-      }
-      MaybeInit();
-      info.AddValue("a", actors, typeof(string[]));
-      info.AddValue("de", description);
-      info.AddValue("di", director);
-      info.AddValue("g", genre);
-      info.AddValue("t", title);
-      info.AddValue("w", width);
-      info.AddValue("h", height);
-      info.AddValue("b", bookmark);
-      info.AddValue("du", duration.GetValueOrDefault(EmptyDuration).Ticks);
-      info.AddValue("st", subTitle);
     }
   }
 }

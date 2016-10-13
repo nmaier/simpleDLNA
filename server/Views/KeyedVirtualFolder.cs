@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
   internal class KeyedVirtualFolder<T> : VirtualFolder
-      where T : VirtualFolder, new()
+    where T : VirtualFolder, new()
   {
-    private readonly Dictionary<string, T> keys = new Dictionary<string, T>();
+    private readonly Dictionary<string, T> keys = new Dictionary<string, T>(StringComparer.CurrentCultureIgnoreCase);
 
     protected KeyedVirtualFolder()
       : this(null, null)
@@ -20,13 +21,14 @@ namespace NMaier.SimpleDlna.Server.Views
     public T GetFolder(string key)
     {
       T rv;
-      var compareKey = key.ToUpperInvariant();
-      if (!keys.TryGetValue(compareKey, out rv)) {
-        rv = new T();
-        rv.Name = key;
-        rv.Parent = this;
-        folders.Add(rv);
-        keys.Add(compareKey, rv);
+      if (!keys.TryGetValue(key, out rv)) {
+        rv = new T
+        {
+          Name = key,
+          Parent = this
+        };
+        Folders.Add(rv);
+        keys.Add(key, rv);
       }
       return rv;
     }

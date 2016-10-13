@@ -1,24 +1,22 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
+﻿using System.Text;
+using NMaier.SimpleDlna.GUI.Properties;
+using NMaier.SimpleDlna.Utilities;
+using NMaier.Windows.Forms;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  partial class FormAbout : NMaier.Windows.Forms.Form
+  internal sealed partial class FormAbout : Form
   {
     public FormAbout()
     {
       InitializeComponent();
-      Text = String.Format("About {0}", ProductInformation.Title);
+      Text = $"About {ProductInformation.Title}";
       Product.Text = ProductInformation.Title;
       Product.Font = BoldFont;
-      Version.Text = String.Format(
-        "Version {0}", ProductInformation.ProductVersion);
+      Version.Text = $"Version {ProductInformation.ProductVersion}";
       Copyright.Text = ProductInformation.Copyright;
       Copyright.Font = ItalicFont;
-      License.Text = Encoding.UTF8.GetString(Properties.Resources.LICENSE);
+      License.Text = Encoding.UTF8.GetString(Resources.LICENSE);
     }
   }
 }

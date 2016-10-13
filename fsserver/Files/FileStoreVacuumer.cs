@@ -1,11 +1,11 @@
-﻿using NMaier.SimpleDlna.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using NMaier.SimpleDlna.Utilities;
 
 namespace NMaier.SimpleDlna.FileMediaServer
 {
@@ -18,14 +18,19 @@ namespace NMaier.SimpleDlna.FileMediaServer
     private readonly Dictionary<string, WeakReference> connections =
       new Dictionary<string, WeakReference>();
 
-    private readonly Timer timer = new Timer();
-
     private readonly Random rnd = new Random();
+
+    private readonly Timer timer = new Timer();
 
     public FileStoreVacuumer()
     {
       timer.Elapsed += Run;
       Schedule();
+    }
+
+    public void Dispose()
+    {
+      timer?.Dispose();
     }
 
     private void Run(object sender, ElapsedEventArgs e)
@@ -78,10 +83,10 @@ namespace NMaier.SimpleDlna.FileMediaServer
           }
         }
       }
-      var gone = (from f in files
-                  let m = new FileInfo(f)
-                  where !m.Exists
-                  select f);
+      var gone = from f in files
+                 let m = new FileInfo(f)
+                 where !m.Exists
+                 select f;
       lock (connection) {
         using (var trans = connection.BeginTransaction()) {
           using (var q = connection.CreateCommand()) {
@@ -119,13 +124,6 @@ namespace NMaier.SimpleDlna.FileMediaServer
       lock (connections) {
         connections[connection.ConnectionString] =
           new WeakReference(connection);
-      }
-    }
-
-    public void Dispose()
-    {
-      if (timer != null) {
-        timer.Dispose();
       }
     }
 

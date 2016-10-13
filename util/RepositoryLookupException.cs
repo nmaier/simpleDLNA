@@ -7,7 +7,7 @@ namespace NMaier.SimpleDlna.Utilities
   public sealed class RepositoryLookupException : ArgumentException
   {
     private RepositoryLookupException(SerializationInfo info,
-                                      StreamingContext context)
+      StreamingContext context)
       : base(info, context)
     {
     }
@@ -17,7 +17,7 @@ namespace NMaier.SimpleDlna.Utilities
     }
 
     public RepositoryLookupException(string key)
-      : base(String.Format("Failed to lookup {0}", key))
+      : base($"Failed to lookup {key}")
     {
       Key = key;
     }
@@ -27,16 +27,6 @@ namespace NMaier.SimpleDlna.Utilities
     {
     }
 
-    public string Key
-    {
-      get;
-      private set;
-    }
-
-    public override void GetObjectData(SerializationInfo info,
-                                       StreamingContext context)
-    {
-      base.GetObjectData(info, context);
-    }
+    public string Key { get; private set; }
   }
 }

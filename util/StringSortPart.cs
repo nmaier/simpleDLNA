@@ -3,7 +3,7 @@
 namespace NMaier.SimpleDlna.Utilities
 {
   internal sealed class StringSortPart
-  : BaseSortPart, IComparable<StringSortPart>
+    : BaseSortPart, IComparable<StringSortPart>
   {
     private readonly StringComparer comparer;
 
@@ -18,7 +18,7 @@ namespace NMaier.SimpleDlna.Utilities
     public int CompareTo(StringSortPart other)
     {
       if (other == null) {
-        throw new ArgumentNullException("other");
+        throw new ArgumentNullException(nameof(other));
       }
       return comparer.Compare(str, other.str);
     }

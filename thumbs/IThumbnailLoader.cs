@@ -1,5 +1,5 @@
-using NMaier.SimpleDlna.Server;
 using System.IO;
+using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {

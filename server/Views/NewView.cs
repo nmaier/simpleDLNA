@@ -1,28 +1,16 @@
-﻿using NMaier.SimpleDlna.Server.Metadata;
+﻿using System;
+using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
-using System;
 
 namespace NMaier.SimpleDlna.Server.Views
 {
-  internal class NewView : FilteringView
+  internal class NewView : FilteringView, IConfigurable
   {
     private DateTime minDate = DateTime.Now.AddDays(-7.0);
 
-    public override string Description
-    {
-      get
-      {
-        return "Show only new files";
-      }
-    }
+    public override string Description => "Show only new files";
 
-    public override string Name
-    {
-      get
-      {
-        return "new";
-      }
-    }
+    public override string Name => "new";
 
     public override bool Allowed(IMediaResource res)
     {
@@ -30,15 +18,14 @@ namespace NMaier.SimpleDlna.Server.Views
       if (i == null) {
         return false;
       }
-      return i.InfoDate != null && i.InfoDate >= minDate;
+      return i.InfoDate >= minDate;
     }
 
-    public override void SetParameters(AttributeCollection parameters)
+    public void SetParameters(ConfigParameters parameters)
     {
       if (parameters == null) {
-        throw new ArgumentNullException("parameters");
+        throw new ArgumentNullException(nameof(parameters));
       }
-      base.SetParameters(parameters);
 
       foreach (var v in parameters.GetValuesForKey("date")) {
         DateTime min;

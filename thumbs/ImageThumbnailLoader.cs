@@ -1,25 +1,19 @@
-﻿using NMaier.SimpleDlna.Server;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using NMaier.SimpleDlna.Server;
 
 namespace NMaier.SimpleDlna.Thumbnails
 {
   internal sealed class ImageThumbnailLoader : IThumbnailLoader
   {
-    public DlnaMediaTypes Handling
-    {
-      get
-      {
-        return DlnaMediaTypes.Image;
-      }
-    }
+    public DlnaMediaTypes Handling => DlnaMediaTypes.Image;
 
     public MemoryStream GetThumbnail(object item, ref int width,
-                                     ref int height)
+      ref int height)
     {
-      Image img = null;
+      Image img;
       var stream = item as Stream;
       if (stream != null) {
         img = Image.FromStream(stream);

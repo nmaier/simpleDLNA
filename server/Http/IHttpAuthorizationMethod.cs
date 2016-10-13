@@ -5,7 +5,7 @@ namespace NMaier.SimpleDlna.Server
   public interface IHttpAuthorizationMethod
   {
     /// <summary>
-    /// Checks if a request is authorized.
+    ///   Checks if a request is authorized.
     /// </summary>
     /// <param name="headers">Client supplied HttpHeaders.</param>
     /// <param name="endPoint">Client EndPoint</param>

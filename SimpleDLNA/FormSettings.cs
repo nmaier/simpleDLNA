@@ -1,22 +1,25 @@
 ﻿using System;
 using System.Windows.Forms;
+using NMaier.SimpleDlna.GUI.Properties;
+using Form = NMaier.Windows.Forms.Form;
+using SystemInformation = NMaier.SimpleDlna.Utilities.SystemInformation;
 
 namespace NMaier.SimpleDlna.GUI
 {
-  public partial class FormSettings : NMaier.Windows.Forms.Form
+  public partial class FormSettings : Form
   {
-    private const string AppKeyName = "SimpleDLNA";
+    private const string APP_KEY_NAME = "SimpleDLNA";
 
-    private StartupUtilities startUpUtilities;
+    private readonly StartupUtilities startUpUtilities;
 
     public FormSettings()
     {
       InitializeComponent();
-      Icon = Properties.Resources.preferencesIcon;
+      Icon = Resources.preferencesIcon;
 
-      if (!Utilities.SystemInformation.IsRunningOnMono()) {
+      if (!SystemInformation.IsRunningOnMono()) {
         startUpUtilities = new StartupUtilities(StartupUtilities.StartupUserScope.CurrentUser);
-        checkAutoStart.Checked = startUpUtilities.CheckIfRunAtWinBoot(AppKeyName);
+        checkAutoStart.Checked = startUpUtilities.CheckIfRunAtWinBoot(APP_KEY_NAME);
       }
       else {
         checkAutoStart.Visible = false;
@@ -33,10 +36,10 @@ namespace NMaier.SimpleDlna.GUI
     private void checkAutoStart_CheckedChanged(object sender, EventArgs e)
     {
       if (checkAutoStart.Checked) {
-        startUpUtilities.InstallAutoRun(AppKeyName);
+        startUpUtilities.InstallAutoRun(APP_KEY_NAME);
       }
       else {
-        startUpUtilities.UninstallAutoRun(AppKeyName);
+        startUpUtilities.UninstallAutoRun(APP_KEY_NAME);
       }
     }
   }
