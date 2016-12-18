@@ -384,7 +384,7 @@ namespace NMaier.SimpleDlna.Server
       }
       catch (HttpStatusException ex) {
 #if DEBUG
-        Warn(String.Format("{0} - Got a {2}: {1}", this, path, ex.Code), ex);
+        Warn(String.Format("{0} - Got a {2}: {1}", this, Path, ex.Code), ex);
 #else
         InfoFormat("{0} - Got a {2}: {1}", this, Path, ex.Code);
 #endif
