@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
@@ -19,7 +17,6 @@ using log4net.Layout;
 using NMaier.SimpleDlna.GUI.Properties;
 using NMaier.SimpleDlna.Server;
 using Form = NMaier.Windows.Forms.Form;
-using SystemInformation = NMaier.SimpleDlna.Utilities.SystemInformation;
 using Timer = System.Timers.Timer;
 
 namespace NMaier.SimpleDlna.GUI
@@ -37,7 +34,7 @@ namespace NMaier.SimpleDlna.GUI
 
 #if DEBUG
     private readonly FileInfo logFile =
-      new FileInfo(Path.Combine(cacheDir, "sdlna.dbg.log"));
+      new FileInfo(Path.Combine(CacheDir, "sdlna.dbg.log"));
 #else
     private readonly FileInfo logFile =
       new FileInfo(Path.Combine(CacheDir, "sdlna.log"));

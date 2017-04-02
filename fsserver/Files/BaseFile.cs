@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
-using System.Net;
 using NMaier.SimpleDlna.Server;
 using NMaier.SimpleDlna.Server.Metadata;
 using NMaier.SimpleDlna.Utilities;
