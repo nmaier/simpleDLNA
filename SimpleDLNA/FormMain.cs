@@ -34,7 +34,7 @@ namespace NMaier.SimpleDlna.GUI
 
 #if DEBUG
     private readonly FileInfo logFile =
-      new FileInfo(Path.Combine(cacheDir, "sdlna.dbg.log"));
+      new FileInfo(Path.Combine(CacheDir, "sdlna.dbg.log"));
 #else
     private readonly FileInfo logFile =
       new FileInfo(Path.Combine(CacheDir, "sdlna.log"));
