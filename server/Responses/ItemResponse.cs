@@ -18,7 +18,7 @@ namespace NMaier.SimpleDlna.Server
       headers = new ResponseHeaders(!(item is IMediaCoverResource));
       var meta = item as IMetaInfo;
       if (meta != null) {
-        headers.Add("Content-Length", meta.InfoSize.ToString());
+        if ((meta.InfoSize ?? 0) > 0) headers.Add("Content-Length", meta.InfoSize.ToString());
         headers.Add("Last-Modified", meta.InfoDate.ToString("R"));
       }
       headers.Add("Accept-Ranges", "bytes");
