@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -61,7 +61,7 @@ namespace NMaier.SimpleDlna.Server
     private static readonly string[] extPNG =
     {"png"};
 
-    private static readonly string[] extRAWAUDIO =
+    private static readonly string[] extWAV =
     {"wav"};
 
     private static readonly string[] extVORBIS =
@@ -91,7 +91,7 @@ namespace NMaier.SimpleDlna.Server
       {DlnaMime.AudioFLAC, "audio/flac"},
       {DlnaMime.AudioMP2, "audio/mpeg"},
       {DlnaMime.AudioMP3, "audio/mpeg"},
-      {DlnaMime.AudioRAW, "audio/L16;rate=44100;channels=2"},
+      {DlnaMime.AudioWAV, "audio/wav"},
       {DlnaMime.AudioVORBIS, "audio/ogg"},
       {DlnaMime.ImageGIF, "image/gif"},
       {DlnaMime.ImageJPEG, "image/jpeg"},
@@ -134,9 +134,9 @@ namespace NMaier.SimpleDlna.Server
         }
       },
       {
-        DlnaMime.AudioRAW, new List<string>
+        DlnaMime.AudioWAV, new List<string>
         {
-          "LPCM"
+          "WAV"
         }
       },
       {
@@ -304,7 +304,7 @@ namespace NMaier.SimpleDlna.Server
         new
         {t = DlnaMime.AudioMP3, e = extMP3},
         new
-        {t = DlnaMime.AudioRAW, e = extRAWAUDIO},
+        {t = DlnaMime.AudioWAV, e = extWAV},
         new
         {t = DlnaMime.AudioVORBIS, e = extVORBIS},
         new
@@ -346,7 +346,7 @@ namespace NMaier.SimpleDlna.Server
         new[] {extJPEG, extPNG, extGIF},
         DlnaMediaTypes.Image);
       InitMedia(
-        new[] {extAAC, extFLAC, extMP2, extMP3, extRAWAUDIO, extVORBIS},
+        new[] {extAAC, extFLAC, extMP2, extMP3, extWAV, extVORBIS},
         DlnaMediaTypes.Audio);
     }
 

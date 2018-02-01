@@ -1,4 +1,4 @@
-﻿namespace NMaier.SimpleDlna.Server
+namespace NMaier.SimpleDlna.Server
 {
   public enum DlnaMime
   {
@@ -6,7 +6,7 @@
     AudioFLAC,
     AudioMP2,
     AudioMP3,
-    AudioRAW,
+    AudioWAV,
     AudioVORBIS,
     ImageGIF,
     ImageJPEG,
